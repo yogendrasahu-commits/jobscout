@@ -232,25 +232,25 @@ export const Navbar = ({
   return (
     <header className="bg-slate-900/95 backdrop-blur-xl border-b border-slate-800/90 sticky top-0 z-[800] select-none shadow-xl w-full max-w-full">
       <div className="w-full max-w-[1700px] mx-auto px-2 sm:px-4 lg:px-6">
-        <div className="flex md:grid md:grid-cols-[1fr_auto_1fr] items-center justify-between h-[60px] md:h-[68px] gap-1.5 sm:gap-4">
+        <div className="flex md:grid md:grid-cols-[1fr_auto_1fr] items-center justify-between h-[56px] sm:h-[60px] md:h-[68px] gap-1 sm:gap-4">
           
           {/* ========================================================== */}
           {/* 1. BRAND LOGO & LOCATION PILL & SEARCH BAR */}
           {/* ========================================================== */}
-          <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-2.5 xl:gap-3 justify-start min-w-0">
+          <div className="flex items-center gap-1 sm:gap-2 lg:gap-2.5 xl:gap-3 justify-start flex-shrink-0">
             {/* Logo with Hover Name Tooltip */}
             <div 
-              className="flex items-center gap-1.5 sm:gap-2 cursor-pointer group relative flex-shrink-0" 
+              className="flex items-center gap-1 sm:gap-2 cursor-pointer group relative flex-shrink-0" 
               onClick={() => setCurrentTab('feed')}
               title="JobScout - Jobs + discovery"
             >
               <div className="relative group-hover:scale-105 transition-transform flex-shrink-0 shadow-lg shadow-indigo-950/40">
-                <JobScoutLogo size={36} className="w-8 h-8 sm:w-10 sm:h-10" />
+                <JobScoutLogo size={32} className="w-7 h-7 sm:w-9 sm:h-9" />
               </div>
 
               <div className="leading-none">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-black text-base sm:text-lg tracking-tight text-white group-hover:text-indigo-300 transition-colors">
+                <div className="flex items-center gap-1 sm:gap-1.5">
+                  <span className="font-black text-sm sm:text-base lg:text-lg tracking-tight text-white group-hover:text-indigo-300 transition-colors">
                     JobScout
                   </span>
                   <span className="hidden 2xl:inline-block text-[9px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/25 tracking-normal">
@@ -615,20 +615,20 @@ export const Navbar = ({
           {/* ========================================================== */}
           {/* 3. RIGHT CONTROLS: MOBILE SEARCH, POST JOB, BELL, PROFILE, HAMBURGER */}
           {/* ========================================================== */}
-          <div className="flex items-center gap-1.5 sm:gap-2 justify-end flex-shrink-0">
+          <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 justify-end flex-shrink-0">
             
             {/* Mobile Search Toggle Button (Phone Only) */}
             <div className="md:hidden relative" ref={mobileSearchRef}>
               <button
                 onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
-                className={`p-2 rounded-xl border transition-colors ${
+                className={`p-1.5 sm:p-2 rounded-xl border transition-colors ${
                   mobileSearchOpen 
                     ? 'bg-indigo-600 text-white border-indigo-500' 
                     : 'bg-slate-800/80 hover:bg-slate-700/80 border-slate-700 text-slate-300'
                 }`}
                 title="Search Jobs & People"
               >
-                <Search className="w-4 h-4" />
+                <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
 
               {/* Mobile Search Dropdown Input */}
@@ -706,11 +706,11 @@ export const Navbar = ({
               <button
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
                 title="Notifications"
-                className="relative p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-slate-300 transition-colors"
+                className="relative p-1.5 sm:p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-slate-300 transition-colors"
               >
-                <Bell className="w-4 h-4" />
+                <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 {unreadNotifsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-[9px] font-black text-white flex items-center justify-center animate-pulse">
+                  <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-rose-500 text-[8px] font-black text-white flex items-center justify-center animate-pulse">
                     {unreadNotifsCount}
                   </span>
                 )}
@@ -782,31 +782,31 @@ export const Navbar = ({
               <div className="relative group flex-shrink-0" ref={profileRef}>
                 <button
                   onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                  className="flex items-center gap-1.5 sm:gap-2 px-1.5 py-1 sm:px-2.5 sm:py-1 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 transition-all text-left flex-shrink-0 cursor-pointer shadow-sm hover:border-slate-600"
+                  className="flex items-center gap-1 sm:gap-2 px-1.5 py-1 sm:px-2.5 sm:py-1 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 transition-all text-left flex-shrink-0 cursor-pointer shadow-sm hover:border-slate-600"
                   title="Profile & Settings"
                 >
                   <div className="relative flex-shrink-0">
                     <img
                       src={user.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.name}`}
                       alt={user.name}
-                      className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-slate-600 object-cover bg-slate-900"
+                      className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-slate-600 object-cover bg-slate-900"
                     />
-                    <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-slate-900 ${
+                    <span className={`absolute bottom-0 right-0 w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full border-2 border-slate-900 ${
                       isSeeker ? 'bg-emerald-400' : 'bg-indigo-400'
                     }`} />
                   </div>
 
                   <div className="flex flex-col text-left min-w-0">
-                    <div className="text-xs font-bold text-white truncate max-w-[50px] xs:max-w-[75px] sm:max-w-[95px] md:max-w-[110px] lg:max-w-[130px] xl:max-w-[150px] leading-tight">
+                    <div className="text-[11px] sm:text-xs font-bold text-white truncate max-w-[42px] xs:max-w-[65px] sm:max-w-[95px] md:max-w-[110px] lg:max-w-[130px] xl:max-w-[150px] leading-tight">
                       {user.name}
                     </div>
-                    <div className="hidden xs:flex text-[10px] text-slate-400 items-center gap-1 leading-tight mt-0.5">
+                    <div className="hidden sm:flex text-[10px] text-slate-400 items-center gap-1 leading-tight mt-0.5">
                       <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isEmployer ? 'bg-indigo-400' : 'bg-emerald-400'}`} />
                       <span className="truncate">{isEmployer ? 'Recruiter' : 'Seeker'}</span>
                     </div>
                   </div>
 
-                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 flex-shrink-0 ml-0.5" />
+                  <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-400 flex-shrink-0 ml-0.5" />
                 </button>
 
                 {/* Hover Tooltip */}
@@ -921,7 +921,7 @@ export const Navbar = ({
               <button
                 type="button"
                 onClick={() => setMobileDrawerOpen(!mobileDrawerOpen)}
-                className={`p-2 rounded-xl border transition-all active:scale-95 flex items-center justify-center ${
+                className={`p-1.5 sm:p-2 rounded-xl border transition-all active:scale-95 flex items-center justify-center ${
                   mobileDrawerOpen 
                     ? 'bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-600/30' 
                     : 'bg-slate-800/90 text-slate-200 hover:text-white hover:bg-slate-700/90 border-slate-700 shadow-sm'
@@ -929,7 +929,7 @@ export const Navbar = ({
                 title="Navigation Menu & Options"
                 aria-label="Toggle navigation menu"
               >
-                {mobileDrawerOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5" />}
+                {mobileDrawerOpen ? <X className="w-4 h-4 sm:w-5 sm:h-5 text-white" /> : <Menu className="w-4 h-4 sm:w-5 sm:h-5" />}
               </button>
 
               {/* Hover Tooltip */}
