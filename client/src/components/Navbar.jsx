@@ -230,7 +230,7 @@ export const Navbar = ({
   };
 
   return (
-    <header className="bg-slate-900/95 backdrop-blur-xl border-b border-slate-800/90 sticky top-0 z-[800] select-none shadow-xl w-full max-w-full overflow-x-hidden">
+    <header className="bg-slate-900/95 backdrop-blur-xl border-b border-slate-800/90 sticky top-0 z-[800] select-none shadow-xl w-full max-w-full">
       <div className="w-full max-w-[1700px] mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex items-center justify-between h-16 gap-1 sm:gap-2 lg:gap-3">
           
