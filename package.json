@@ -1,0 +1,13 @@
+{
+  "name": "jobmap-platform",
+  "version": "1.0.0",
+  "description": "Fullstack Uber-style Job Map Platform with Video/Voice Call and Chat",
+  "scripts": {
+    "server": "cd server && npm start",
+    "client": "cd client && npm run dev",
+    "install-all": "cd server && npm install && cd ../client && npm install"
+  },
+  "keywords": ["react", "express", "webrtc", "socketio", "leaflet", "jobs", "map"],
+  "author": "Antigravity",
+  "license": "MIT"
+}

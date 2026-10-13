@@ -1,0 +1,269 @@
+import React, { useState, useEffect } from 'react';
+import { X, Briefcase, DollarSign, MapPin, Tag, Sparkles, Check } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+
+export const PostJobModal = ({ isOpen, onClose, onJobCreated, defaultCoords }) => {
+  const { user, token } = useAuth();
+
+  const [title, setTitle] = useState('');
+  const [company, setCompany] = useState(user?.companyName || user?.name || '');
+  const [category, setCategory] = useState('Technology');
+  const [jobType, setJobType] = useState('Full-time');
+  const [salary, setSalary] = useState('');
+  const [description, setDescription] = useState('');
+  const [skills, setSkills] = useState('');
+  const [address, setAddress] = useState(user?.address || 'Mumbai, Maharashtra');
+  const [lat, setLat] = useState(defaultCoords?.lat || user?.lat || 19.0760);
+  const [lng, setLng] = useState(defaultCoords?.lng || user?.lng || 72.8777);
+  const [urgent, setUrgent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Sync coordinates and employer defaults whenever modal opens or coordinates change
+  useEffect(() => {
+    if (isOpen) {
+      setError('');
+      setCompany(user?.companyName || user?.name || '');
+      setAddress(user?.address || 'Mumbai, Maharashtra');
+      setLat(defaultCoords?.lat || user?.lat || 19.0760);
+      setLng(defaultCoords?.lng || user?.lng || 72.8777);
+    }
+  }, [isOpen, defaultCoords, user]);
+
+  if (!isOpen) return null;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const trimmedTitle = title.trim();
+    const trimmedSalary = salary.trim();
+    const trimmedAddress = address.trim();
+
+    if (trimmedTitle.length < 3) {
+      setError('Job Title must be at least 3 characters long');
+      return;
+    }
+    if (trimmedSalary.length < 2) {
+      setError('Please enter a valid Salary / Compensation (e.g. ₹12,00,000/yr or ₹800/day)');
+      return;
+    }
+    if (trimmedAddress.length < 3) {
+      setError('Please enter a valid Location / Area name');
+      return;
+    }
+    const nLat = Number(lat);
+    const nLng = Number(lng);
+    if (!Number.isFinite(nLat) || !Number.isFinite(nLng) || nLat < 6 || nLat > 38 || nLng < 68 || nLng > 98) {
+      setError('Coordinates must be within India (Lat 6–38, Lng 68–98)');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/jobs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          title: trimmedTitle,
+          company: (company && company.trim()) || user?.companyName || user?.name,
+          category,
+          jobType,
+          salary: trimmedSalary,
+          description: description.trim(),
+          skills: skills.split(',').map(s => s.trim()).filter(Boolean),
+          address: trimmedAddress,
+          lat: nLat,
+          lng: nLng,
+          urgent
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to post job');
+
+      setTitle('');
+      setSalary('');
+      setDescription('');
+      setSkills('');
+      setUrgent(false);
+      if (onJobCreated) onJobCreated(data.job);
+      onClose();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 overflow-y-auto">
+      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              <Briefcase className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-lg text-white">Post a New Job on Map</h3>
+              <p className="text-xs text-slate-400">Live coordinates will make this visible to nearby seekers</p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {error && (
+          <div className="mt-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs">
+            {error}
+          </div>
+        )}
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">Job Title *</label>
+            <input
+              type="text"
+              required
+              placeholder="e.g. Senior Frontend Engineer, Delivery Partner, UI Designer"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">Category</label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+              >
+                <option value="Technology">Technology</option>
+                <option value="Design">Design</option>
+                <option value="Support">Support & IT</option>
+                <option value="Logistics">Logistics / Delivery</option>
+                <option value="Sales">Sales & Marketing</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">Employment Type</label>
+              <select
+                value={jobType}
+                onChange={(e) => setJobType(e.target.value)}
+                className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+              >
+                <option value="Full-time">Full-time</option>
+                <option value="Part-time">Part-time</option>
+                <option value="Contract / Gig">Contract / Gig</option>
+                <option value="Hourly">Hourly</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">Salary / Compensation *</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. ₹15,00,000 / yr or ₹2,500/day"
+                  value={salary}
+                  onChange={(e) => setSalary(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">Location / Area</label>
+              <input
+                type="text"
+                placeholder="e.g. Bandra Kurla Complex"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+          </div>
+
+          <div className="p-3 bg-slate-950/70 border border-slate-800 rounded-xl flex items-center justify-between text-xs text-slate-400">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-emerald-400" />
+              <span>Map Pin GPS: <strong className="text-slate-200">{Number(lat).toFixed(4)}, {Number(lng).toFixed(4)}</strong></span>
+            </div>
+            <span className="text-[10px] text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+              Live Radar Active
+            </span>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">Required Skills (comma separated)</label>
+            <input
+              type="text"
+              placeholder="e.g. React, Node.js, WebSockets, Tailwind"
+              value={skills}
+              onChange={(e) => setSkills(e.target.value)}
+              className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">Job Description</label>
+            <textarea
+              rows={3}
+              placeholder="Detail the role, perks, immediate joining requirement..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 resize-none"
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="urgent"
+              checked={urgent}
+              onChange={(e) => setUrgent(e.target.checked)}
+              className="w-4 h-4 rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0"
+            />
+            <label htmlFor="urgent" className="text-xs text-slate-300 cursor-pointer">
+              Mark as <span className="text-amber-400 font-semibold">Immediate Spot Hiring / Urgent</span>
+            </label>
+          </div>
+
+          <div className="pt-2 flex items-center justify-end gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-xs font-bold shadow-lg shadow-indigo-500/25 transition-all"
+            >
+              {loading ? 'Publishing...' : 'Publish to Live Map'}
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  );
+};

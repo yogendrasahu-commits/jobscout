@@ -1,0 +1,1478 @@
+{
+  "users": [
+    {
+      "id": "usr_emp_1",
+      "name": "TechPulse Solutions",
+      "email": "recruiter@techpulse.io",
+      "password": "$2a$10$JgjyTNZI8F.OZz7euaIrze0jAzn0zek8LOwGR94FAZh6Ue1s6yDIS",
+      "role": "emp",
+      "companyName": "TechPulse Solutions Pvt Ltd",
+      "industry": "Technology & Cloud",
+      "companySize": "50-200 Employees",
+      "hiringType": "Full-time & Contract",
+      "phone": "+91 98765 43210",
+      "avatar": "https://images.unsplash.com/photo-1549923746-c502d488b3ea?w=150",
+      "lat": 66.88409728668611,
+      "lng": 47.4609375,
+      "address": "Pinned [66.884, 47.461]",
+      "isOnline": false,
+      "createdAt": "2026-10-12T07:30:06.434Z"
+    },
+    {
+      "id": "usr_emp_2",
+      "name": "Nexus Cloud Innovations",
+      "email": "hr@nexuscloud.com",
+      "password": "$2a$10$JgjyTNZI8F.OZz7euaIrze0jAzn0zek8LOwGR94FAZh6Ue1s6yDIS",
+      "role": "emp",
+      "companyName": "Nexus Cloud Innovations",
+      "industry": "Cloud Infrastructure",
+      "companySize": "200+ Employees",
+      "hiringType": "Full-time",
+      "phone": "+91 98111 22334",
+      "avatar": "https://images.unsplash.com/photo-1572021335469-31706a17aaef?w=150",
+      "lat": 19.1136,
+      "lng": 72.8697,
+      "address": "MIDC Industrial Area, Andheri East, Mumbai",
+      "isOnline": false,
+      "createdAt": "2026-10-12T07:30:06.434Z"
+    },
+    {
+      "id": "usr_emp_3",
+      "name": "Apex Express Logistics",
+      "email": "hiring@apexlogistics.in",
+      "password": "$2a$10$JgjyTNZI8F.OZz7euaIrze0jAzn0zek8LOwGR94FAZh6Ue1s6yDIS",
+      "role": "emp",
+      "companyName": "Apex Express Logistics India",
+      "industry": "Logistics & Supply Chain",
+      "companySize": "500+ Employees",
+      "hiringType": "Immediate Spot Hiring",
+      "phone": "+91 98223 34455",
+      "avatar": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=150",
+      "lat": 19.091,
+      "lng": 72.886,
+      "address": "Sakinaka Junction, Kurla, Mumbai",
+      "isOnline": true,
+      "createdAt": "2026-10-12T07:30:06.434Z"
+    },
+    {
+      "id": "usr_emp_4",
+      "name": "PixelCraft Design Lab",
+      "email": "hello@pixelcraft.studio",
+      "password": "$2a$10$JgjyTNZI8F.OZz7euaIrze0jAzn0zek8LOwGR94FAZh6Ue1s6yDIS",
+      "role": "emp",
+      "companyName": "PixelCraft Studio Ltd",
+      "industry": "Design & Media",
+      "companySize": "11-50 Employees",
+      "hiringType": "Full-time / Gig",
+      "phone": "+91 98334 55667",
+      "avatar": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=150",
+      "lat": 19.0596,
+      "lng": 72.8295,
+      "address": "Hill Road, Bandra West, Mumbai",
+      "isOnline": true,
+      "createdAt": "2026-10-12T07:30:06.434Z"
+    },
+    {
+      "id": "usr_emp_5",
+      "name": "QuickServe Retail Supermarts",
+      "email": "careers@quickserve.com",
+      "password": "$2a$10$JgjyTNZI8F.OZz7euaIrze0jAzn0zek8LOwGR94FAZh6Ue1s6yDIS",
+      "role": "emp",
+      "companyName": "QuickServe Retail Network",
+      "industry": "Retail & Commerce",
+      "companySize": "200+ Employees",
+      "hiringType": "Hourly & Spot Hiring",
+      "phone": "+91 98445 66778",
+      "avatar": "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?w=150",
+      "lat": 19.0178,
+      "lng": 72.8478,
+      "address": "Dadar West Station Area, Mumbai",
+      "isOnline": true,
+      "createdAt": "2026-10-12T07:30:06.434Z"
+    },
+    {
+      "id": "usr_emp_6",
+      "name": "PrimeCare Diagnostic Centers",
+      "email": "hr@primecarehealth.in",
+      "password": "$2a$10$JgjyTNZI8F.OZz7euaIrze0jAzn0zek8LOwGR94FAZh6Ue1s6yDIS",
+      "role": "emp",
+      "companyName": "PrimeCare Health Systems",
+      "industry": "Healthcare & Pharma",
+      "companySize": "50-200 Employees",
+      "hiringType": "Full-time Permanent",
+      "phone": "+91 98556 77889",
+      "avatar": "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=150",
+      "lat": 19.12,
+      "lng": 72.905,
+      "address": "Hiranandani Business Park, Powai, Mumbai",
+      "isOnline": true,
+      "createdAt": "2026-10-12T07:30:06.434Z"
+    },
+    {
+      "id": "usr_seek_1",
+      "name": "Rahul Sharma",
+      "email": "rahul.sharma@example.com",
+      "password": "$2a$10$JgjyTNZI8F.OZz7euaIrze0jAzn0zek8LOwGR94FAZh6Ue1s6yDIS",
+      "role": "seeker",
+      "companyName": "",
+      "title": "Full Stack React & WebRTC Developer",
+      "skills": [
+        "React",
+        "Node.js",
+        "WebRTC",
+        "Tailwind",
+        "MongoDB"
+      ],
+      "phone": "+91 91234 56789",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "lat": 23.7582439,
+      "lng": 75.9986713,
+      "address": "Narwal, Agar Tahsil,  Agar Malwa",
+      "isOnline": false,
+      "experience": "3+ Years",
+      "expectedSalary": "₹14,00,000 / yr",
+      "availability": "Immediate (Ready Today)",
+      "vehicle": true,
+      "bio": "Passionate frontend and WebRTC engineer experienced in real-time chat, video calling, and interactive mapping applications.",
+      "createdAt": "2026-10-12T07:30:06.434Z"
+    },
+    {
+      "id": "usr_seek_2",
+      "name": "Priya Patel",
+      "email": "priya.patel@example.com",
+      "password": "$2a$10$JgjyTNZI8F.OZz7euaIrze0jAzn0zek8LOwGR94FAZh6Ue1s6yDIS",
+      "role": "seeker",
+      "companyName": "",
+      "title": "Senior UI/UX & Interaction Designer",
+      "skills": [
+        "Figma",
+        "React",
+        "CSS",
+        "Design Systems",
+        "User Research"
+      ],
+      "phone": "+91 98765 11223",
+      "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
+      "lat": 19.0596,
+      "lng": 72.8295,
+      "address": "Bandra West, Mumbai",
+      "isOnline": false,
+      "experience": "4+ Years",
+      "expectedSalary": "₹16,00,000 / yr",
+      "availability": "15 Days Notice",
+      "vehicle": false,
+      "bio": "Crafting delight through high-converting web and mobile app interfaces. 4 years of startup UX lead experience.",
+      "createdAt": "2026-10-12T07:30:06.434Z"
+    },
+    {
+      "id": "usr_seek_3",
+      "name": "Amit Verma",
+      "email": "amit.verma@example.com",
+      "password": "$2a$10$JgjyTNZI8F.OZz7euaIrze0jAzn0zek8LOwGR94FAZh6Ue1s6yDIS",
+      "role": "seeker",
+      "companyName": "",
+      "title": "Field Operations & Express Rider",
+      "skills": [
+        "Route Planning",
+        "Delivery Operations",
+        "Customer Service",
+        "Bike Rider"
+      ],
+      "phone": "+91 97766 55443",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+      "lat": 28.607536862182638,
+      "lng": 77.36927668613022,
+      "address": "My GPS Location",
+      "isOnline": true,
+      "experience": "2 Years",
+      "expectedSalary": "₹30,000 / mo",
+      "availability": "Immediate (Ready Today)",
+      "vehicle": true,
+      "bio": "Owns registered two-wheeler with clean driving record. Extensive knowledge of central and western Mumbai routes.",
+      "createdAt": "2026-10-12T07:30:06.434Z"
+    },
+    {
+      "id": "usr_seek_4",
+      "name": "Neha Kulkarni",
+      "email": "neha.kulkarni@example.com",
+      "password": "$2a$10$JgjyTNZI8F.OZz7euaIrze0jAzn0zek8LOwGR94FAZh6Ue1s6yDIS",
+      "role": "seeker",
+      "companyName": "",
+      "title": "Backend Python & Cloud Engineer",
+      "skills": [
+        "Python",
+        "FastAPI",
+        "Docker",
+        "AWS",
+        "PostgreSQL"
+      ],
+      "phone": "+91 98112 33445",
+      "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150",
+      "lat": 19.002,
+      "lng": 72.831,
+      "address": "Lower Parel Commercial Hub, Mumbai",
+      "isOnline": true,
+      "experience": "3.5 Years",
+      "expectedSalary": "₹18,00,000 / yr",
+      "availability": "Immediate (Ready Today)",
+      "vehicle": false,
+      "bio": "Backend systems specialist experienced in distributed task workers, high-throughput RESTful APIs, and Redis caching.",
+      "createdAt": "2026-10-12T07:30:06.434Z"
+    },
+    {
+      "id": "usr_seek_5",
+      "name": "Vikas Shinde",
+      "email": "vikas.shinde@example.com",
+      "password": "$2a$10$JgjyTNZI8F.OZz7euaIrze0jAzn0zek8LOwGR94FAZh6Ue1s6yDIS",
+      "role": "seeker",
+      "companyName": "",
+      "title": "Hardware & IT Support Engineer",
+      "skills": [
+        "Networking",
+        "Hardware Diagnostics",
+        "LAN Setup",
+        "CCTV & Security"
+      ],
+      "phone": "+91 98223 44556",
+      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
+      "lat": 19.08,
+      "lng": 72.841,
+      "address": "Santacruz East, Mumbai",
+      "isOnline": true,
+      "experience": "3 Years",
+      "expectedSalary": "₹35,000 / mo",
+      "availability": "Immediate (Ready Today)",
+      "vehicle": true,
+      "bio": "Certified desktop & network diagnostics engineer ready for on-premise spot maintenance contracts.",
+      "createdAt": "2026-10-12T07:30:06.434Z"
+    },
+    {
+      "id": "usr_seek_6",
+      "name": "Ananya Sen",
+      "email": "ananya.sen@example.com",
+      "password": "$2a$10$JgjyTNZI8F.OZz7euaIrze0jAzn0zek8LOwGR94FAZh6Ue1s6yDIS",
+      "role": "seeker",
+      "companyName": "",
+      "title": "Product Growth & Marketing Lead",
+      "skills": [
+        "Performance Marketing",
+        "SEO",
+        "Analytics",
+        "Growth Hacking"
+      ],
+      "phone": "+91 98334 66778",
+      "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150",
+      "lat": 19.015,
+      "lng": 72.818,
+      "address": "Worli Sea Face Area, Mumbai",
+      "isOnline": true,
+      "experience": "5+ Years",
+      "expectedSalary": "₹22,00,000 / yr",
+      "availability": "Within 7 Days",
+      "vehicle": false,
+      "bio": "Ex-unicorn growth marketer specializing in D2C organic retention and paid acquisition funnels.",
+      "createdAt": "2026-10-12T07:30:06.434Z"
+    },
+    {
+      "id": "usr_seek_7",
+      "name": "Deepak Rawat",
+      "email": "deepak.rawat@example.com",
+      "password": "$2a$10$JgjyTNZI8F.OZz7euaIrze0jAzn0zek8LOwGR94FAZh6Ue1s6yDIS",
+      "role": "seeker",
+      "companyName": "",
+      "title": "Warehouse & Inventory Manager",
+      "skills": [
+        "Inventory Audit",
+        "Supply Chain ERP",
+        "Staff Supervision",
+        "Safety Compliance"
+      ],
+      "phone": "+91 98445 77889",
+      "avatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150",
+      "lat": 19.102,
+      "lng": 72.912,
+      "address": "Ghatkopar West Industrial Estate, Mumbai",
+      "isOnline": true,
+      "experience": "4 Years",
+      "expectedSalary": "₹45,000 / mo",
+      "availability": "Immediate (Ready Today)",
+      "vehicle": true,
+      "bio": "Experienced in organizing 50,000+ sq ft fulfillment centers with 99.8% pick-pack accuracy.",
+      "createdAt": "2026-10-12T07:30:06.434Z"
+    },
+    {
+      "id": "usr_seek_8",
+      "name": "Pooja Joshi",
+      "email": "pooja.joshi@example.com",
+      "password": "$2a$10$JgjyTNZI8F.OZz7euaIrze0jAzn0zek8LOwGR94FAZh6Ue1s6yDIS",
+      "role": "seeker",
+      "companyName": "",
+      "title": "Customer Success & Inbound Lead",
+      "skills": [
+        "Customer Support",
+        "CRM (Zendesk)",
+        "Fluent English & Hindi",
+        "Call Handling"
+      ],
+      "phone": "+91 98556 88990",
+      "avatar": "https://images.unsplash.com/photo-1534751516642-a171edd2521d?w=150",
+      "lat": 19.14,
+      "lng": 72.93,
+      "address": "Vikhroli West, Mumbai",
+      "isOnline": true,
+      "experience": "2.5 Years",
+      "expectedSalary": "₹32,000 / mo",
+      "availability": "Immediate (Ready Today)",
+      "vehicle": false,
+      "bio": "Polite communicator dedicated to high customer satisfaction scores and rapid problem turnaround.",
+      "createdAt": "2026-10-12T07:30:06.435Z"
+    },
+    {
+      "id": "usr_1791793720063_4hon",
+      "createdAt": "2026-10-12T08:28:40.063Z",
+      "isOnline": true,
+      "name": "Alpha Corp Employer",
+      "phone": "+91 9999900001",
+      "email": "9999900001@user.jobradar.io",
+      "password": "$2a$10$uajaxIJR4AnAUNsh8npCo.cKZxBsfWugkK/iGMXAMR5ekQMfAsUMq",
+      "role": "emp",
+      "companyName": "Alpha Tech Corp",
+      "industry": "General",
+      "companySize": "1-10 Employees",
+      "website": "",
+      "hiringType": "Full-time",
+      "title": "",
+      "skills": [],
+      "experience": "",
+      "expectedSalary": "",
+      "availability": "",
+      "vehicle": false,
+      "bio": "",
+      "lat": 19.068,
+      "lng": 72.87,
+      "address": "BKC, Mumbai",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Alpha%20Corp%20Employer"
+    },
+    {
+      "id": "usr_1791793720543_7oq3",
+      "createdAt": "2026-10-12T08:28:40.543Z",
+      "isOnline": true,
+      "name": "Ravi Kumar Seeker",
+      "phone": "+91 9999900002",
+      "email": "9999900002@user.jobradar.io",
+      "password": "$2a$10$l/uwTEol4iaZYKYJj0TZ9uuqLC49AJZiwPrzjF89g9miF5B2vAiae",
+      "role": "seeker",
+      "companyName": "",
+      "industry": "",
+      "companySize": "",
+      "website": "",
+      "hiringType": "",
+      "title": "Senior Frontend Developer",
+      "skills": [],
+      "experience": "Fresher",
+      "expectedSalary": "Negotiable",
+      "availability": "Immediate",
+      "vehicle": false,
+      "bio": "",
+      "lat": 19.07,
+      "lng": 72.88,
+      "address": "Kurla West, Mumbai",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Ravi%20Kumar%20Seeker"
+    },
+    {
+      "id": "usr_1791798322258_zz4c",
+      "createdAt": "2026-10-12T09:45:22.259Z",
+      "isOnline": true,
+      "name": "kkdkd",
+      "phone": "+91 9499494994",
+      "email": "9499494994@user.jobradar.io",
+      "password": "$2a$10$0THx9/orRVAbM/n.apuC8.rjboyBXnFPf./Oc/1GwHBddTmK90nCe",
+      "role": "seeker",
+      "companyName": "",
+      "industry": "",
+      "companySize": "",
+      "website": "",
+      "hiringType": "",
+      "title": "ejjr",
+      "skills": [
+        "abc"
+      ],
+      "experience": "1 - 3 Years",
+      "expectedSalary": "Negotiable",
+      "availability": "Immediate (Ready Today)",
+      "vehicle": false,
+      "bio": "",
+      "lat": 19.076,
+      "lng": 72.8777,
+      "address": "Mumbai, Maharashtra",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=kkdkd"
+    },
+    {
+      "id": "usr_1791798396396_vwux",
+      "createdAt": "2026-10-12T09:46:36.396Z",
+      "isOnline": false,
+      "name": "jfrjfjf",
+      "phone": "+91 5885858588",
+      "email": "5885858588@user.jobradar.io",
+      "password": "$2a$10$csIOv5B6hZeJ/oIpjX11ueIP2P/ZlNp2uOPKOrOr14panUSM3F0xy",
+      "role": "emp",
+      "companyName": "fjjfrjrf",
+      "industry": "Technology & IT",
+      "companySize": "1-10 Employees",
+      "website": "",
+      "hiringType": "Full-time",
+      "title": "",
+      "skills": [],
+      "experience": "",
+      "expectedSalary": "",
+      "availability": "",
+      "vehicle": false,
+      "bio": "",
+      "lat": 19.076,
+      "lng": 72.8777,
+      "address": "Mumbai, Maharashtra",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=jfrjfjf"
+    },
+    {
+      "id": "usr_1791812405098_ryeb",
+      "createdAt": "2026-10-12T13:40:05.098Z",
+      "isOnline": true,
+      "name": "Apex Tech Labs",
+      "phone": "+91 9112233445",
+      "email": "9112233445@user.jobradar.io",
+      "password": "$2a$10$mpOmieNh/zZvrMHvbJPicuJ0i.aRWKwiC7xTU.6u2H6ZDErMT466i",
+      "role": "emp",
+      "companyName": "Apex Tech Labs Pvt Ltd",
+      "industry": "General",
+      "companySize": "1-10 Employees",
+      "website": "",
+      "hiringType": "Full-time",
+      "title": "",
+      "skills": [],
+      "experience": "",
+      "expectedSalary": "",
+      "availability": "",
+      "vehicle": false,
+      "bio": "",
+      "lat": 19.076,
+      "lng": 72.8777,
+      "address": "Mumbai, India",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Apex%20Tech%20Labs"
+    },
+    {
+      "id": "usr_1791812405413_6q3c",
+      "createdAt": "2026-10-12T13:40:05.413Z",
+      "isOnline": true,
+      "name": "Vikram Singh",
+      "phone": "+91 9988776655",
+      "email": "9988776655@user.jobradar.io",
+      "password": "$2a$10$PiRl.sdp6v7WvBuRx/a1duDO./tAqJpJyRRujBfY/P7CnFpNZX9LO",
+      "role": "seeker",
+      "companyName": "",
+      "industry": "",
+      "companySize": "",
+      "website": "",
+      "hiringType": "",
+      "title": "Full Stack Engineer",
+      "skills": [
+        "React",
+        "Node.js",
+        "PostgreSQL"
+      ],
+      "experience": "Fresher",
+      "expectedSalary": "Negotiable",
+      "availability": "Immediate",
+      "vehicle": false,
+      "bio": "",
+      "lat": 19.076,
+      "lng": 72.8777,
+      "address": "Mumbai, India",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Vikram%20Singh"
+    },
+    {
+      "id": "usr_1791888587089_sl1s",
+      "createdAt": "2026-10-13T10:49:47.089Z",
+      "isOnline": false,
+      "name": "6gt67667",
+      "phone": "+91 9876567898",
+      "email": "9876567898@user.jobradar.io",
+      "password": "$2a$10$mjTgMeRtOuugReHAx3MGKOo.xXJ7hfX5IIkxp8do.re.XhPdCWgS2",
+      "role": "emp",
+      "companyName": "ggggghhg",
+      "industry": "Technology & IT",
+      "companySize": "1-10 Employees",
+      "website": "",
+      "hiringType": "Full-time",
+      "title": "",
+      "skills": [],
+      "experience": "",
+      "expectedSalary": "",
+      "availability": "",
+      "vehicle": false,
+      "bio": "",
+      "lat": 28.6258,
+      "lng": 77.3638,
+      "address": "Sector 62 IT Corridor, Noida",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=6gt67667"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "job_1791812118840_cgbv",
+      "createdAt": "2026-10-12T13:35:18.840Z",
+      "status": "open",
+      "employerId": "usr_emp_1",
+      "employerName": "TechPulse Solutions",
+      "company": "TechPulse Solutions Pvt Ltd",
+      "title": "hhhdhhfhf",
+      "description": "",
+      "category": "Design",
+      "jobType": "Full-time",
+      "salary": "dhhdhdh",
+      "lat": 66.88409728668611,
+      "lng": 47.4609375,
+      "address": "Pinned [66.884, 47.461]",
+      "skills": [],
+      "urgent": true
+    },
+    {
+      "id": "job_1791791087859_kd3z",
+      "createdAt": "2026-10-12T07:44:47.859Z",
+      "status": "open",
+      "employerId": "usr_emp_1",
+      "employerName": "TechPulse Solutions",
+      "company": "TechPulse Solutions Pvt Ltd",
+      "title": "hii",
+      "description": "",
+      "category": "Technology",
+      "jobType": "Full-time",
+      "salary": "100",
+      "lat": 28.61540596763786,
+      "lng": 77.36900861983884,
+      "address": "noida",
+      "skills": [
+        "dhdhhd"
+      ],
+      "urgent": true
+    },
+    {
+      "id": "job_1",
+      "employerId": "usr_emp_1",
+      "employerName": "TechPulse Solutions",
+      "company": "TechPulse Solutions Pvt Ltd",
+      "title": "Senior React & WebRTC Engineer",
+      "category": "Technology",
+      "jobType": "Full-time",
+      "salary": "₹18,00,000 - ₹24,00,000 / yr",
+      "lat": 19.076,
+      "lng": 72.8777,
+      "address": "BKC, Mumbai (Hybrid / Onsite)",
+      "description": "Looking for an experienced React developer passionate about real-time audio/video streaming, WebSockets, and modern web apps.",
+      "skills": [
+        "React",
+        "WebRTC",
+        "Socket.io",
+        "Tailwind CSS"
+      ],
+      "urgent": true,
+      "status": "open",
+      "createdAt": "2026-10-12T02:30:06.435Z"
+    },
+    {
+      "id": "job_2",
+      "employerId": "usr_emp_1",
+      "employerName": "TechPulse Solutions",
+      "company": "TechPulse Solutions Pvt Ltd",
+      "title": "On-Demand Field IT Diagnostics Engineer",
+      "category": "Support",
+      "jobType": "Contract / Gig",
+      "salary": "₹2,500 / day",
+      "lat": 19.068,
+      "lng": 72.835,
+      "address": "Santacruz East, Mumbai",
+      "description": "Urgent spot requirement for hardware & network diagnostics on client premises. Spot hiring via live map.",
+      "skills": [
+        "Networking",
+        "Hardware Troubleshooting",
+        "OS Setup"
+      ],
+      "urgent": true,
+      "status": "open",
+      "createdAt": "2026-10-12T05:30:06.435Z"
+    },
+    {
+      "id": "job_3",
+      "employerId": "usr_emp_2",
+      "employerName": "Nexus Cloud Innovations",
+      "company": "Nexus Cloud Innovations",
+      "title": "Backend Node.js & Microservices Architect",
+      "category": "Technology",
+      "jobType": "Full-time",
+      "salary": "₹22,00,000 - ₹30,00,000 / yr",
+      "lat": 19.1136,
+      "lng": 72.8697,
+      "address": "MIDC, Andheri East, Mumbai",
+      "description": "Join our cloud infrastructure team to scale distributed microservices, APIs, and real-time event brokers.",
+      "skills": [
+        "Node.js",
+        "Express",
+        "Redis",
+        "Docker",
+        "PostgreSQL"
+      ],
+      "urgent": false,
+      "status": "open",
+      "createdAt": "2026-10-11T07:30:06.435Z"
+    },
+    {
+      "id": "job_4",
+      "employerId": "usr_emp_2",
+      "employerName": "Nexus Cloud Innovations",
+      "company": "Nexus Cloud Innovations",
+      "title": "DevOps & Kubernetes Infrastructure Engineer",
+      "category": "Technology",
+      "jobType": "Full-time",
+      "salary": "₹20,00,000 - ₹28,00,000 / yr",
+      "lat": 19.125,
+      "lng": 72.855,
+      "address": "Chakala, Andheri East, Mumbai",
+      "description": "Manage production AWS/GCP clusters, CI/CD pipelines, and zero-downtime microservices rollouts.",
+      "skills": [
+        "Kubernetes",
+        "Terraform",
+        "AWS",
+        "Docker"
+      ],
+      "urgent": false,
+      "status": "open",
+      "createdAt": "2026-10-11T13:30:06.435Z"
+    },
+    {
+      "id": "job_5",
+      "employerId": "usr_emp_3",
+      "employerName": "Apex Express Logistics",
+      "company": "Apex Express Logistics India",
+      "title": "Express Delivery Rider & Fleet Specialist",
+      "category": "Logistics",
+      "jobType": "Hourly / Gig",
+      "salary": "₹32,000 - ₹38,000 / mo + Fuel Bonus",
+      "lat": 19.091,
+      "lng": 72.886,
+      "address": "Sakinaka Junction, Kurla, Mumbai",
+      "description": "Immediate 20 openings for express package delivery. Instant onboarding with valid bike license.",
+      "skills": [
+        "Delivery",
+        "Two Wheeler",
+        "Route Navigation",
+        "Customer Handling"
+      ],
+      "urgent": true,
+      "status": "open",
+      "createdAt": "2026-10-12T06:30:06.435Z"
+    },
+    {
+      "id": "job_6",
+      "employerId": "usr_emp_3",
+      "employerName": "Apex Express Logistics",
+      "company": "Apex Express Logistics India",
+      "title": "Fulfillment Hub Inventory Supervisor",
+      "category": "Logistics",
+      "jobType": "Full-time",
+      "salary": "₹42,000 / mo",
+      "lat": 19.1,
+      "lng": 72.895,
+      "address": "Marol Naka Hub, Mumbai",
+      "description": "Supervise daily dispatches, manage warehouse shifts, and ensure on-time delivery metrics.",
+      "skills": [
+        "Warehouse Management",
+        "Inventory ERP",
+        "Team Leadership"
+      ],
+      "urgent": false,
+      "status": "open",
+      "createdAt": "2026-10-11T21:30:06.435Z"
+    },
+    {
+      "id": "job_7",
+      "employerId": "usr_emp_4",
+      "employerName": "PixelCraft Design Lab",
+      "company": "PixelCraft Studio Ltd",
+      "title": "Lead Product UI/UX Designer",
+      "category": "Design",
+      "jobType": "Full-time",
+      "salary": "₹15,00,000 - ₹20,00,000 / yr",
+      "lat": 19.0596,
+      "lng": 72.8295,
+      "address": "Hill Road, Bandra West, Mumbai",
+      "description": "Design world-class web and mobile interfaces. Shape brand identities and interactive design systems.",
+      "skills": [
+        "Figma",
+        "Prototyping",
+        "User Research",
+        "Design Systems"
+      ],
+      "urgent": false,
+      "status": "open",
+      "createdAt": "2026-10-11T17:30:06.435Z"
+    },
+    {
+      "id": "job_8",
+      "employerId": "usr_emp_5",
+      "employerName": "QuickServe Retail Supermarts",
+      "company": "QuickServe Retail Network",
+      "title": "Store Operations & Billing Lead",
+      "category": "Support",
+      "jobType": "Full-time",
+      "salary": "₹28,000 / mo",
+      "lat": 19.0178,
+      "lng": 72.8478,
+      "address": "Dadar West Station Area, Mumbai",
+      "description": "Manage store billing counters, supervise floor inventory, and provide helpful customer checkout experience.",
+      "skills": [
+        "POS Billing",
+        "Inventory Stocking",
+        "Customer Support"
+      ],
+      "urgent": true,
+      "status": "open",
+      "createdAt": "2026-10-12T03:30:06.435Z"
+    },
+    {
+      "id": "job_9",
+      "employerId": "usr_emp_6",
+      "employerName": "PrimeCare Diagnostic Centers",
+      "company": "PrimeCare Health Systems",
+      "title": "Customer Care & Medical Telecaller",
+      "category": "Support",
+      "jobType": "Full-time",
+      "salary": "₹35,000 / mo",
+      "lat": 19.12,
+      "lng": 72.905,
+      "address": "Powai Business Hub, Mumbai",
+      "description": "Assist patients with diagnostic report booking, home collection scheduling, and inbound inquiries.",
+      "skills": [
+        "Telecalling",
+        "Fluent English/Hindi",
+        "Patient Care"
+      ],
+      "urgent": false,
+      "status": "open",
+      "createdAt": "2026-10-11T23:30:06.435Z"
+    }
+  ],
+  "applications": [
+    {
+      "id": "app_1791885640720_y5n6",
+      "status": "pending",
+      "createdAt": "2026-10-13T10:00:40.720Z",
+      "jobId": "job_9",
+      "jobTitle": "Customer Care & Medical Telecaller",
+      "employerId": "usr_emp_6",
+      "employerName": "PrimeCare Diagnostic Centers",
+      "seekerId": "usr_seek_1",
+      "seekerName": "Rahul Sharma",
+      "seekerEmail": "rahul.sharma@example.com",
+      "seekerPhone": "+91 91234 56789",
+      "seekerAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "coverNote": "I am interested in this role and available for immediate discussion."
+    },
+    {
+      "id": "app_1791791104210_8456",
+      "status": "rejected",
+      "createdAt": "2026-10-12T07:45:04.210Z",
+      "jobId": "job_1791791087859_kd3z",
+      "jobTitle": "hii",
+      "employerId": "usr_emp_1",
+      "employerName": "TechPulse Solutions",
+      "seekerId": "usr_seek_1",
+      "seekerName": "Rahul Sharma",
+      "seekerEmail": "rahul.sharma@example.com",
+      "seekerPhone": "+91 91234 56789",
+      "seekerAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "coverNote": "I am interested in this role and available for immediate discussion."
+    },
+    {
+      "id": "app_1",
+      "jobId": "job_1",
+      "jobTitle": "Senior React & WebRTC Engineer",
+      "employerId": "usr_emp_1",
+      "seekerId": "usr_seek_1",
+      "seekerName": "Rahul Sharma",
+      "seekerEmail": "rahul.sharma@example.com",
+      "seekerPhone": "+91 91234 56789",
+      "seekerAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "coverNote": "I have 3+ years building real-time collaboration apps with React, Leaflet, and WebRTC. Located in Kurla West nearby!",
+      "status": "rejected",
+      "createdAt": "2026-10-12T04:30:06.435Z"
+    },
+    {
+      "id": "app_2",
+      "jobId": "job_7",
+      "jobTitle": "Lead Product UI/UX Designer",
+      "employerId": "usr_emp_4",
+      "seekerId": "usr_seek_2",
+      "seekerName": "Priya Patel",
+      "seekerEmail": "priya.patel@example.com",
+      "seekerPhone": "+91 98765 11223",
+      "seekerAvatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
+      "coverNote": "Excited about design systems at PixelCraft. 4 years of Figma and product UX experience.",
+      "status": "pending",
+      "createdAt": "2026-10-12T01:30:06.435Z"
+    }
+  ],
+  "messages": [
+    {
+      "id": "msg_1",
+      "senderId": "usr_emp_1",
+      "receiverId": "usr_seek_1",
+      "senderName": "TechPulse Solutions",
+      "message": "Hello Rahul! We saw your profile on the map nearby and reviewed your application for the React & WebRTC position.",
+      "timestamp": "2026-10-12T05:30:06.435Z",
+      "read": true
+    },
+    {
+      "id": "msg_2",
+      "senderId": "usr_seek_1",
+      "receiverId": "usr_emp_1",
+      "senderName": "Rahul Sharma",
+      "message": "Thank you! Yes, I am available right now for an interview or quick video call.",
+      "timestamp": "2026-10-12T06:30:06.435Z",
+      "read": true
+    },
+    {
+      "id": "msg_1791790893504_yh99",
+      "timestamp": "2026-10-12T07:41:33.504Z",
+      "read": true,
+      "senderId": "usr_emp_1",
+      "receiverId": "usr_seek_2",
+      "senderName": "TechPulse Solutions",
+      "message": "hi"
+    },
+    {
+      "id": "msg_1791792751854_mu1z",
+      "timestamp": "2026-10-12T08:12:31.854Z",
+      "read": true,
+      "senderId": "usr_emp_2",
+      "receiverId": "usr_seek_1",
+      "senderName": "Nexus Cloud Innovations",
+      "message": "hiii"
+    },
+    {
+      "id": "msg_1791798500655_mmo0",
+      "timestamp": "2026-10-12T09:48:20.655Z",
+      "read": true,
+      "senderId": "usr_1791798396396_vwux",
+      "receiverId": "usr_1791798322258_zz4c",
+      "senderName": "jfrjfjf",
+      "message": "hii"
+    },
+    {
+      "id": "msg_1791812048764_j0lt",
+      "timestamp": "2026-10-12T13:34:08.764Z",
+      "read": true,
+      "senderId": "usr_emp_1",
+      "receiverId": "usr_seek_1",
+      "senderName": "TechPulse Solutions",
+      "message": "helloooo"
+    },
+    {
+      "id": "msg_1791812059785_5zw2",
+      "timestamp": "2026-10-12T13:34:19.785Z",
+      "read": false,
+      "senderId": "usr_seek_1",
+      "receiverId": "usr_emp_1",
+      "senderName": "Rahul Sharma",
+      "message": "helllllfghjklpkjhgcx"
+    }
+  ],
+  "posts": [
+    {
+      "id": "post_1791811900158_1nze",
+      "createdAt": "2026-10-12T13:31:40.158Z",
+      "likes": 1,
+      "likedBy": [
+        "usr_emp_1"
+      ],
+      "comments": [],
+      "authorId": "usr_emp_1",
+      "authorName": "TechPulse Solutions",
+      "authorRole": "emp",
+      "authorTitle": "TechPulse Solutions Pvt Ltd",
+      "authorAvatar": "https://images.unsplash.com/photo-1549923746-c502d488b3ea?w=150",
+      "content": "helloooo",
+      "image": "https://wallpaperaccess.com/full/31201.jpg",
+      "tags": [
+        "#Hiring"
+      ]
+    },
+    {
+      "id": "post_1791811849528_efyc",
+      "createdAt": "2026-10-12T13:30:49.528Z",
+      "likes": 0,
+      "likedBy": [],
+      "comments": [],
+      "authorId": "usr_emp_1",
+      "authorName": "TechPulse Solutions",
+      "authorRole": "emp",
+      "authorTitle": "TechPulse Solutions Pvt Ltd",
+      "authorAvatar": "https://images.unsplash.com/photo-1549923746-c502d488b3ea?w=150",
+      "content": "hii",
+      "image": "https://www.bing.com/images/search?view=detailV2&ccid=tskwjQRc&id=FA1868BF7D0DC8C8D4DEFDC206D502DF6FBE4DC3&thid=OIP.tskwjQRcYYQE12dsScdXpgHaEC&mediaurl=https%3a%2f%2fwww.travelaroundtheworldblog.com%2fwp-content%2fuploads%2f2025%2f10%2fWorlds-of-Adventure-Tickets-in-Dubai-1024x559.jpg&exph=559&expw=1024&q=img&FORM=IRPRST&ck=6CA04B54EE85CF05F7F3A4A483587A09&selectedIndex=2&itb=0",
+      "tags": [
+        "#Hiring"
+      ]
+    },
+    {
+      "id": "post_1791798427926_yolf",
+      "createdAt": "2026-10-12T09:47:07.926Z",
+      "likes": 0,
+      "likedBy": [],
+      "comments": [],
+      "authorId": "usr_1791798322258_zz4c",
+      "authorName": "kkdkd",
+      "authorRole": "seeker",
+      "authorTitle": "ejjr",
+      "authorAvatar": "https://api.dicebear.com/7.x/bottts/svg?seed=kkdkd",
+      "content": "hi",
+      "image": null,
+      "tags": [
+        "#OpenToWork"
+      ]
+    },
+    {
+      "id": "post_1791793035490_d3bv",
+      "createdAt": "2026-10-12T08:17:15.490Z",
+      "likes": 0,
+      "likedBy": [],
+      "comments": [],
+      "authorId": "usr_seek_1",
+      "authorName": "Rahul Sharma",
+      "authorRole": "seeker",
+      "authorTitle": "Full Stack React & WebRTC Developer",
+      "authorAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "content": "#OpenToWork",
+      "image": null,
+      "tags": [
+        "#OpenToWork"
+      ]
+    },
+    {
+      "id": "post_1791792991991_9qer",
+      "createdAt": "2026-10-12T08:16:31.991Z",
+      "likes": 1,
+      "likedBy": [
+        "usr_seek_2"
+      ],
+      "comments": [
+        {
+          "id": "c_1791793001558_hvij",
+          "createdAt": "2026-10-12T08:16:41.558Z",
+          "authorName": "Rahul Sharma",
+          "authorAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+          "text": "hii"
+        }
+      ],
+      "authorId": "usr_seek_1",
+      "authorName": "Rahul Sharma",
+      "authorRole": "seeker",
+      "authorTitle": "Full Stack React & WebRTC Developer",
+      "authorAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "content": "hii",
+      "image": null,
+      "tags": [
+        "#OpenToWork"
+      ]
+    },
+    {
+      "id": "post_1",
+      "authorId": "usr_emp_1",
+      "authorName": "TechPulse Solutions",
+      "authorRole": "emp",
+      "authorTitle": "Technology & Cloud Solutions • Mumbai BKC",
+      "authorAvatar": "https://images.unsplash.com/photo-1549923746-c502d488b3ea?w=150",
+      "content": "🚀 We are expanding our Mumbai Engineering Hub! Hiring Senior React & WebRTC Engineers at BKC.\n\nKey Focus:\n• Low-latency audio/video P2P streaming\n• Scalable WebSockets & Uber-style interactive radar maps\n• Clean modern UI and state management\n\nApply directly via Easy Apply or message us for an instant video interview! #Hiring #React #WebRTC #TechJobs #JobRadar",
+      "image": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800",
+      "likes": 42,
+      "likedBy": [
+        "usr_seek_1",
+        "usr_seek_2"
+      ],
+      "comments": [
+        {
+          "id": "c_1",
+          "authorName": "Rahul Sharma",
+          "authorAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+          "text": "Just submitted my application via Easy Apply! Excited about real-time audio/video tech.",
+          "createdAt": "2026-10-12T04:50:46.855Z"
+        }
+      ],
+      "tags": [
+        "#Hiring",
+        "#React",
+        "#WebRTC",
+        "#TechJobs"
+      ],
+      "createdAt": "2026-10-12T02:50:46.855Z"
+    },
+    {
+      "id": "post_2",
+      "authorId": "usr_seek_1",
+      "authorName": "Rahul Sharma",
+      "authorRole": "seeker",
+      "authorTitle": "Senior React & WebRTC Engineer • Ex-Startup • #OpenToWork",
+      "authorAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "content": "🟢 #OpenToWork\n\nI am thrilled to announce that I am officially open to new full-time and high-impact engineering opportunities in Mumbai or Remote!\n\nOver the last 3.5 years, I have architected high-performance React & Node.js web applications, integrated real-time WebSockets, and built live location-based radars.\n\nFeel free to explore my verified skills, check my live radar pin on the map, or reach out directly for a quick video chat! 🤝\n\n#OpenToWork #SoftwareEngineer #FullStack #ReactJS #NodeJS",
+      "image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800",
+      "likes": 89,
+      "likedBy": [
+        "usr_emp_1",
+        "usr_emp_2",
+        "usr_seek_3"
+      ],
+      "comments": [
+        {
+          "id": "c_2",
+          "authorName": "TechPulse Solutions",
+          "authorAvatar": "https://images.unsplash.com/photo-1549923746-c502d488b3ea?w=150",
+          "text": "Great experience Rahul! Let us connect for an intro call.",
+          "createdAt": "2026-10-12T03:50:46.855Z"
+        }
+      ],
+      "tags": [
+        "#OpenToWork",
+        "#SoftwareEngineer",
+        "#ReactJS"
+      ],
+      "createdAt": "2026-10-11T23:50:46.855Z"
+    },
+    {
+      "id": "post_3",
+      "authorId": "usr_emp_4",
+      "authorName": "PixelCraft Design Lab",
+      "authorRole": "emp",
+      "authorTitle": "Product Design & Media Studio • Bandra West",
+      "authorAvatar": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=150",
+      "content": "🎨 \"Design is not just what it looks like and feels like. Design is how it works.\"\n\nWe are looking for a Senior UI/UX & Design Systems Lead to shape our next-gen mobile & desktop design systems at our Bandra West studio. Immediate spot hiring for creative minds!\n\n#Hiring #UIUX #ProductDesign #DesignJobs #Figma",
+      "image": "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=800",
+      "likes": 38,
+      "likedBy": [
+        "usr_seek_2"
+      ],
+      "comments": [],
+      "tags": [
+        "#Hiring",
+        "#UIUX",
+        "#DesignJobs"
+      ],
+      "createdAt": "2026-10-11T19:50:46.855Z"
+    },
+    {
+      "id": "post_4",
+      "authorId": "usr_seek_2",
+      "authorName": "Priya Patel",
+      "authorRole": "seeker",
+      "authorTitle": "Lead Product UI/UX Designer • Design Systems • #OpenToWork",
+      "authorAvatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
+      "content": "Thrilled to share my latest Design System case study on accessible mobile navigation and micro-interactions for gig-economy platforms! Clean typography, high contrast ratios, and intuitive gesture controls make all the difference.\n\nOpen for innovative product design roles! Check my profile for portfolio links. 🚀✨\n\n#DesignSystems #UIUX #Figma #OpenToWork #ProductDesign",
+      "image": "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800",
+      "likes": 64,
+      "likedBy": [
+        "usr_emp_4",
+        "usr_seek_1"
+      ],
+      "comments": [],
+      "tags": [
+        "#DesignSystems",
+        "#UIUX",
+        "#OpenToWork"
+      ],
+      "createdAt": "2026-10-11T15:50:46.855Z"
+    },
+    {
+      "id": "post_5",
+      "authorId": "usr_emp_2",
+      "authorName": "Nexus Cloud Innovations",
+      "authorRole": "emp",
+      "authorTitle": "Cloud Infrastructure & DevOps • Andheri East",
+      "authorAvatar": "https://images.unsplash.com/photo-1572021335469-31706a17aaef?w=150",
+      "content": "Milestone Alert: Our distributed cluster just crossed 15,000,000 requests handled today with 99.99% uptime! 🛡️⚡\n\nTo keep pace with our 3x year-on-year growth, we are expanding our Andheri East engineering base. Looking for Python, Kubernetes, and AWS specialists.\n\n#NexusCloud #CloudComputing #AWS #Hiring #DevOps",
+      "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800",
+      "likes": 112,
+      "likedBy": [
+        "usr_seek_4",
+        "usr_seek_5"
+      ],
+      "comments": [],
+      "tags": [
+        "#NexusCloud",
+        "#AWS",
+        "#Hiring"
+      ],
+      "createdAt": "2026-10-11T07:50:46.855Z"
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn_1",
+      "user1": "usr_emp_1",
+      "user2": "usr_seek_1",
+      "connectedAt": "2026-10-10T10:00:00.000Z"
+    },
+    {
+      "id": "conn_2",
+      "user1": "usr_emp_1",
+      "user2": "usr_seek_2",
+      "connectedAt": "2026-10-10T11:00:00.000Z"
+    },
+    {
+      "id": "conn_3",
+      "user1": "usr_seek_1",
+      "user2": "usr_seek_2",
+      "connectedAt": "2026-10-11T12:00:00.000Z"
+    }
+  ],
+  "anonDiscussions": [
+    {
+      "id": "anon_1791868285245_qwg6",
+      "title": "drftyuiytfghuijouhygv",
+      "content": "hjhgvvhjhghjh",
+      "channel": "r/InterviewLeaks",
+      "authorAlias": "Cyber Tiger #555",
+      "authorAvatarSeed": "owl",
+      "authorBadge": "Verified Job Seeker",
+      "score": 1,
+      "upvotes": 1,
+      "downvotes": 0,
+      "upvotedBy": [
+        "usr_seek_1"
+      ],
+      "downvotedBy": [],
+      "commentsCount": 0,
+      "comments": [],
+      "views": 1,
+      "createdAt": "2026-10-13T05:11:25.245Z"
+    },
+    {
+      "id": "anon_1791812998446_sbes",
+      "title": "hhhhhh",
+      "content": "okkkkk",
+      "channel": "r/SalaryTalk",
+      "authorAlias": "Stealth Panda #227",
+      "authorAvatarSeed": "falcon",
+      "authorBadge": "Verified Job Seeker",
+      "score": 1,
+      "upvotes": 1,
+      "downvotes": 0,
+      "upvotedBy": [
+        "usr_seek_1"
+      ],
+      "downvotedBy": [],
+      "commentsCount": 0,
+      "comments": [],
+      "views": 1,
+      "createdAt": "2026-10-12T13:49:58.446Z"
+    },
+    {
+      "id": "anon_1791812983688_vgak",
+      "title": "Is 25 LPA possible for 4 YOE React engineer in Mumbai without IIT/NIT tag?",
+      "content": "I have 4 YOE building responsive React & Node apps with WebSockets. Looking for honest feedback on whether 25L is realistic or if I should target remote US roles.",
+      "channel": "r/SalaryTalk",
+      "authorAlias": "Curious Tiger #304",
+      "authorAvatarSeed": "tiger",
+      "authorBadge": "Verified Seeker",
+      "score": 2,
+      "upvotes": 2,
+      "downvotes": 0,
+      "upvotedBy": [
+        "anon_creator",
+        "tester_1"
+      ],
+      "downvotedBy": [],
+      "commentsCount": 1,
+      "comments": [
+        {
+          "id": "ac_1791812983758_94td",
+          "authorAlias": "Wise Owl #42",
+          "authorAvatarSeed": "owl",
+          "authorBadge": "Senior Tech Lead",
+          "content": "Absolutely 100% yes. If you know performance optimization and system design, Series B/C startups in BKC pay 24-28 LPA easily.",
+          "upvotes": 1,
+          "upvotedBy": [],
+          "reactions": {
+            "🔥": 2
+          },
+          "createdAt": "2026-10-12T13:49:43.758Z"
+        }
+      ],
+      "views": 1,
+      "createdAt": "2026-10-12T13:49:43.688Z"
+    },
+    {
+      "id": "anon_1",
+      "title": "Real 2026 In-Hand Breakdown for BKC & Andheri Tech: ₹18 LPA vs ₹25 LPA CTC reality",
+      "content": "Everyone quotes huge CTCs on LinkedIn, but here is my honest in-hand breakdown as a 3.5 YOE Fullstack Engineer at a BKC Series B company:\n\n• Stated CTC: ₹22,00,000\n• Fixed Base: ₹17,50,000\n• Monthly in-hand post-tax & PF: ₹1,18,000 / month\n• Variable component: ₹2,50,000 (dependent on company OKRs, got 75% last year)\n• ESOPs paper value: ₹2,00,000 (vesting over 4 yrs)\n\nAsk me anything about negotiations with Mumbai HRs or cost of living near Kurla/Santacruz.",
+      "channel": "r/SalaryTalk",
+      "authorAlias": "Curious Fox #412",
+      "authorAvatarSeed": "fox",
+      "authorBadge": "Verified Tech Engineer",
+      "score": 68,
+      "upvotes": 72,
+      "downvotes": 4,
+      "upvotedBy": [
+        "usr_seek_1",
+        "usr_seek_2",
+        "usr_seek_3"
+      ],
+      "downvotedBy": [],
+      "commentsCount": 3,
+      "comments": [
+        {
+          "id": "ac_101",
+          "authorAlias": "Shadow Ninja #88",
+          "authorAvatarSeed": "ninja",
+          "authorBadge": "Senior Dev",
+          "content": "Spot on! Also don't forget the professional tax and medical insurance deductions. Many juniors expect ₹1.5L in hand for ₹20L CTC and get surprised when they see ₹1.08L.",
+          "upvotes": 18,
+          "upvotedBy": [],
+          "reactions": {
+            "🔥": 5,
+            "💯": 8
+          },
+          "createdAt": "2026-10-12T09:44:07.826Z"
+        },
+        {
+          "id": "ac_102",
+          "authorAlias": "Clever Owl #19",
+          "authorAvatarSeed": "owl",
+          "authorBadge": "Recruiter",
+          "content": "HR here (anonymously): always ask the recruiter explicitly for the \"Fixed Base\" salary in writing before scheduling the final VP interview round. Saves everyone time.",
+          "upvotes": 24,
+          "upvotedBy": [],
+          "reactions": {
+            "💡": 12,
+            "👏": 6
+          },
+          "createdAt": "2026-10-12T10:44:07.826Z"
+        },
+        {
+          "id": "ac_103",
+          "authorAlias": "Swift Falcon #77",
+          "authorAvatarSeed": "falcon",
+          "authorBadge": "Candidate",
+          "content": "Thanks for this transparency. In my last offer they bundled ₹3L gratuity and retention bonus into CTC which was completely misleading.",
+          "upvotes": 9,
+          "upvotedBy": [],
+          "reactions": {
+            "💀": 4
+          },
+          "createdAt": "2026-10-12T12:44:07.826Z"
+        }
+      ],
+      "views": 312,
+      "createdAt": "2026-10-12T07:44:07.826Z"
+    },
+    {
+      "id": "anon_2",
+      "title": "Recently interviewed at Swiggy/Instamart & Logistics Startups in Mumbai — Exact System Design & React questions asked",
+      "content": "Sharing my interview notes to help fellow devs anonymously:\n\nRound 1: Machine Coding (React 18)\n- Build a live vehicle tracking component with WebSocket updates\n- Smooth coordinate interpolation without re-rendering entire map tiles\n- Debounced search with auto-suggest\n\nRound 2: System Design\n- Design high-scale rider dispatch mechanism (Uber/Zomato style)\n- Handling rider GPS pings every 3s across 50k concurrent couriers\n- Geo-hashing vs QuadTree indexing in Redis\n\nRound 3: Behavioral\n- Conflict resolution with PMs when product deadlines slip.",
+      "channel": "r/InterviewLeaks",
+      "authorAlias": "Stealth Coder #93",
+      "authorAvatarSeed": "coder",
+      "authorBadge": "Verified Frontend Dev",
+      "score": 94,
+      "upvotes": 96,
+      "downvotes": 2,
+      "upvotedBy": [
+        "usr_seek_1",
+        "usr_seek_4"
+      ],
+      "downvotedBy": [],
+      "commentsCount": 2,
+      "comments": [
+        {
+          "id": "ac_201",
+          "authorAlias": "Brave Panda #55",
+          "authorAvatarSeed": "panda",
+          "authorBadge": "Fullstack Dev",
+          "content": "Did they ask about offline queuing or service workers when delivery rider loses 4G connection?",
+          "upvotes": 11,
+          "upvotedBy": [],
+          "reactions": {
+            "🔥": 3
+          },
+          "createdAt": "2026-10-12T05:44:07.826Z"
+        },
+        {
+          "id": "ac_202",
+          "authorAlias": "Stealth Coder #93",
+          "authorAvatarSeed": "coder",
+          "authorBadge": "Verified Frontend Dev",
+          "content": "Yes! They asked to implement IndexedDB local queue for tracking pings and sync back via background sync API when online.",
+          "upvotes": 16,
+          "upvotedBy": [],
+          "reactions": {
+            "💡": 9
+          },
+          "createdAt": "2026-10-12T06:44:07.826Z"
+        }
+      ],
+      "views": 489,
+      "createdAt": "2026-10-12T03:44:07.826Z"
+    },
+    {
+      "id": "anon_3",
+      "title": "Unfiltered HR confession: The real reason why you don't hear back for 2-3 weeks after 'clearing' final rounds",
+      "content": "Posting anonymously as an HR Lead at a 300+ tech firm in Mumbai:\n\n1. Budget freezes happen mid-quarter without telling hiring managers.\n2. You might be \"Option B\". If \"Option A\" accepts the offer letter, we send you the rejection. If they back out, we suddenly call you saying \"Congratulations!\".\n3. Internal approvals (VP / CFO sign-off) take 10+ business days in corporate bureaucracy.\n\nTip: If you have a competing offer, tell us immediately. It magically speeds up our turnaround from 14 days to 48 hours.",
+      "channel": "r/WorkCulture",
+      "authorAlias": "Mystic Recruiter #12",
+      "authorAvatarSeed": "recruiter",
+      "authorBadge": "Verified Talent Partner",
+      "score": 142,
+      "upvotes": 148,
+      "downvotes": 6,
+      "upvotedBy": [
+        "usr_emp_1",
+        "usr_seek_2",
+        "usr_seek_5"
+      ],
+      "downvotedBy": [],
+      "commentsCount": 2,
+      "comments": [
+        {
+          "id": "ac_301",
+          "authorAlias": "Cyber Wolf #67",
+          "authorAvatarSeed": "wolf",
+          "authorBadge": "Job Seeker",
+          "content": "I knew it! The \"Option B\" holding pattern is so brutal on candidates' mental health. At least communicate an update!",
+          "upvotes": 35,
+          "upvotedBy": [],
+          "reactions": {
+            "💯": 15,
+            "💀": 8
+          },
+          "createdAt": "2026-10-12T01:44:07.826Z"
+        },
+        {
+          "id": "ac_302",
+          "authorAlias": "Quiet Bear #33",
+          "authorAvatarSeed": "bear",
+          "authorBadge": "Engineering Manager",
+          "content": "Engineering manager here: 100% true. As interviewers we often recommend hire on Day 1, but HR compensation benchmarking committees take forever.",
+          "upvotes": 21,
+          "upvotedBy": [],
+          "reactions": {
+            "👏": 7
+          },
+          "createdAt": "2026-10-12T02:44:07.826Z"
+        }
+      ],
+      "views": 620,
+      "createdAt": "2026-10-11T22:44:07.826Z"
+    },
+    {
+      "id": "anon_4",
+      "title": "Startup in Bandra West vs IT MNC in Powai: 3 years comparison on mental health, pay and commute",
+      "content": "Having worked at both:\n\nMNC gave job security and fixed 9-to-6, but tech stack was 8 years old and appraisal was capped at 7%.\n\nBandra startup gave me ₹20L (almost 2x hike) and modern WebSockets/Next.js stack, but you own production issues on weekends and wear 5 different hats.\n\nChoose your trade-offs wisely depending on your life stage.",
+      "channel": "r/CompanyReview",
+      "authorAlias": "Zen Tiger #48",
+      "authorAvatarSeed": "tiger",
+      "authorBadge": "Senior Engineer",
+      "score": 53,
+      "upvotes": 55,
+      "downvotes": 2,
+      "upvotedBy": [
+        "usr_seek_3"
+      ],
+      "downvotedBy": [],
+      "commentsCount": 1,
+      "comments": [
+        {
+          "id": "ac_401",
+          "authorAlias": "Neon Dolphin #14",
+          "authorAvatarSeed": "dolphin",
+          "authorBadge": "DevOps Lead",
+          "content": "Don't underestimate Western line vs Central line commute in Mumbai either. Reaching Bandra from Andheri is 20 mins; Powai traffic can take 1.5 hours.",
+          "upvotes": 14,
+          "upvotedBy": [],
+          "reactions": {
+            "💯": 6
+          },
+          "createdAt": "2026-10-11T19:44:07.826Z"
+        }
+      ],
+      "views": 280,
+      "createdAt": "2026-10-11T17:44:07.826Z"
+    },
+    {
+      "id": "anon_5",
+      "title": "Why WebSockets + WebRTC beats HTTP Polling for instant location dispatch (Production lessons)",
+      "content": "We reduced our server AWS bill by 65% by switching from 3-second REST polling to WebSocket signaling with binary payloads.\n\nIf you are building maps or radar apps, look into socket room partitioning based on geohashes instead of broadcasting to everyone.\n\nHappy to share code snippets on room subdivision.",
+      "channel": "r/TechSecrets",
+      "authorAlias": "Ghost Architect #07",
+      "authorAvatarSeed": "ghost",
+      "authorBadge": "Staff Cloud Architect",
+      "score": 81,
+      "upvotes": 82,
+      "downvotes": 1,
+      "upvotedBy": [
+        "usr_emp_2"
+      ],
+      "downvotedBy": [],
+      "commentsCount": 1,
+      "comments": [
+        {
+          "id": "ac_501",
+          "authorAlias": "Pixel Rabbit #99",
+          "authorAvatarSeed": "rabbit",
+          "authorBadge": "Junior Dev",
+          "content": "Please share the geohash clustering logic! Dealing with high socket CPU right now.",
+          "upvotes": 8,
+          "upvotedBy": [],
+          "reactions": {
+            "🔥": 4
+          },
+          "createdAt": "2026-10-11T15:44:07.826Z"
+        }
+      ],
+      "views": 340,
+      "createdAt": "2026-10-11T13:44:07.826Z"
+    },
+    {
+      "id": "anon_6",
+      "title": "How I cracked a 80% hike in 45 days after feeling stuck for 2 years (Prep playbook)",
+      "content": "No DSA grinding for 6 months. Here is what actually worked:\n\n1. 2 solid full-stack portfolio projects that run live with WebSockets and clean mobile responsiveness.\n2. Mastered browser internals, event loop, and render optimization.\n3. Applied directly via live maps and speed connect hubs instead of generic cold applying.\n\nStay consistent and don't settle for underpaid roles.",
+      "channel": "r/ChaiCharcha",
+      "authorAlias": "Chai Lover #21",
+      "authorAvatarSeed": "chai",
+      "authorBadge": "Verified Job Seeker",
+      "score": 115,
+      "upvotes": 118,
+      "downvotes": 3,
+      "upvotedBy": [
+        "usr_seek_1",
+        "usr_seek_2",
+        "usr_seek_6"
+      ],
+      "downvotedBy": [],
+      "commentsCount": 1,
+      "comments": [
+        {
+          "id": "ac_601",
+          "authorAlias": "Cosmic Lion #71",
+          "authorAvatarSeed": "lion",
+          "authorBadge": "Fresher",
+          "content": "Needed to read this today! Felt demotivated after 3 rejections last week. Back to building projects.",
+          "upvotes": 19,
+          "upvotedBy": [],
+          "reactions": {
+            "🔥": 10,
+            "👏": 12
+          },
+          "createdAt": "2026-10-11T09:44:07.826Z"
+        }
+      ],
+      "views": 540,
+      "createdAt": "2026-10-11T07:44:07.826Z"
+    }
+  ]
+}

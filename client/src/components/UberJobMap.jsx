@@ -1,0 +1,1608 @@
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { 
+  MapContainer, 
+  TileLayer, 
+  Marker, 
+  Popup, 
+  Circle, 
+  useMap, 
+  useMapEvents 
+} from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { 
+  Briefcase, 
+  User, 
+  Navigation, 
+  Layers, 
+  Search, 
+  DollarSign, 
+  Phone, 
+  Video, 
+  MessageSquare,
+  Crosshair,
+  Filter,
+  CheckCircle,
+  Radio,
+  MapPin,
+  Sparkles,
+  Sliders,
+  ChevronUp,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Move,
+  Eye,
+  EyeOff,
+  Car,
+  X,
+  Loader2,
+  Building,
+  Compass,
+  Moon,
+  Sun,
+  Plus,
+  Minus
+} from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useSocket } from '../context/SocketContext';
+
+// Fix Leaflet's default marker icons in case standard markers are used
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png'
+});
+
+// Haversine Distance Calculation (Distance between two coordinates in kilometers)
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  if (lat1 == null || lon1 == null || lat2 == null || lon2 == null) return 9999;
+  const R = 6371; // Earth's mean radius in km
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) *
+      Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const dist = R * c;
+  return Math.round(dist * 10) / 10; // Round to 1 decimal place (e.g. 4.2 km)
+}
+
+// Instant Pre-indexed Popular Locations & Tech/Business Hubs in India
+const POPULAR_LOCATIONS = [
+  // Mumbai Hubs (Seed Job Area)
+  { name: 'Bandra Kurla Complex (BKC)', city: 'Mumbai', state: 'Maharashtra', lat: 19.0760, lng: 72.8777, label: 'BKC' },
+  { name: 'Andheri East (MIDC & SEEPZ)', city: 'Mumbai', state: 'Maharashtra', lat: 19.1136, lng: 72.8697, label: 'Andheri E' },
+  { name: 'Andheri West (Lokhandwala)', city: 'Mumbai', state: 'Maharashtra', lat: 19.1363, lng: 72.8277, label: 'Andheri W' },
+  { name: 'Bandra West (Hill Rd & Linking)', city: 'Mumbai', state: 'Maharashtra', lat: 19.0596, lng: 72.8295, label: 'Bandra' },
+  { name: 'Lower Parel (Kamala Mills & Phoenix)', city: 'Mumbai', state: 'Maharashtra', lat: 19.0020, lng: 72.8310, label: 'Parel' },
+  { name: 'Dadar West & Central Station', city: 'Mumbai', state: 'Maharashtra', lat: 19.0178, lng: 72.8478, label: 'Dadar' },
+  { name: 'Powai (Hiranandani Tech Hub)', city: 'Mumbai', state: 'Maharashtra', lat: 19.1176, lng: 72.9060, label: 'Powai' },
+  { name: 'Kurla & Sakinaka Junction', city: 'Mumbai', state: 'Maharashtra', lat: 19.0910, lng: 72.8860, label: 'Sakinaka' },
+  { name: 'Santacruz East & Airport Hub', city: 'Mumbai', state: 'Maharashtra', lat: 19.0800, lng: 72.8410, label: 'Santacruz' },
+  { name: 'Worli & Sea Face Commercials', city: 'Mumbai', state: 'Maharashtra', lat: 19.0150, lng: 72.8180, label: 'Worli' },
+  { name: 'Ghatkopar & Vikhroli Tech Park', city: 'Mumbai', state: 'Maharashtra', lat: 19.1020, lng: 72.9120, label: 'Ghatkopar' },
+  { name: 'Navi Mumbai (Vashi & Mahape IT)', city: 'Navi Mumbai', state: 'Maharashtra', lat: 19.0330, lng: 73.0297, label: 'Navi Mum' },
+  { name: 'Thane West (Wagle Estate & Ghodbunder)', city: 'Thane', state: 'Maharashtra', lat: 19.2183, lng: 72.9781, label: 'Thane' },
+  { name: 'Colaba & Nariman Point', city: 'South Mumbai', state: 'Maharashtra', lat: 18.9220, lng: 72.8346, label: 'Colaba' },
+  { name: 'Goregaon East (NESCO IT Hub)', city: 'Mumbai', state: 'Maharashtra', lat: 19.1550, lng: 72.8550, label: 'Goregaon' },
+  { name: 'Malad West (Mindspace Park)', city: 'Mumbai', state: 'Maharashtra', lat: 19.1860, lng: 72.8350, label: 'Malad' },
+  { name: 'Borivali West & Station', city: 'Mumbai', state: 'Maharashtra', lat: 19.2307, lng: 72.8567, label: 'Borivali' },
+
+  // Delhi NCR
+  { name: 'Connaught Place (CP)', city: 'New Delhi', state: 'Delhi', lat: 28.6304, lng: 77.2177, label: 'Delhi CP' },
+  { name: 'Cyber City, DLF Phase 2', city: 'Gurugram', state: 'Haryana', lat: 28.4900, lng: 77.0880, label: 'Gurugram' },
+  { name: 'Sector 62 IT Corridor', city: 'Noida', state: 'Uttar Pradesh', lat: 28.6258, lng: 77.3638, label: 'Noida 62' },
+  { name: 'South Extension & AIIMS', city: 'New Delhi', state: 'Delhi', lat: 28.5700, lng: 77.2200, label: 'South Ext' },
+
+  // Bengaluru
+  { name: 'Koramangala Tech Corridor', city: 'Bengaluru', state: 'Karnataka', lat: 12.9352, lng: 77.6245, label: 'Koramangala' },
+  { name: 'Indiranagar 100ft Road', city: 'Bengaluru', state: 'Karnataka', lat: 12.9784, lng: 77.6408, label: 'Indiranagar' },
+  { name: 'HSR Layout Startup Hub', city: 'Bengaluru', state: 'Karnataka', lat: 12.9121, lng: 77.6446, label: 'HSR' },
+  { name: 'Whitefield & ITPL', city: 'Bengaluru', state: 'Karnataka', lat: 12.9698, lng: 77.7500, label: 'Whitefield' },
+
+  // Pune & Hyderabad
+  { name: 'Hinjawadi IT Park Phase 1', city: 'Pune', state: 'Maharashtra', lat: 18.5913, lng: 73.7389, label: 'Hinjawadi' },
+  { name: 'Viman Nagar & Kharadi IT', city: 'Pune', state: 'Maharashtra', lat: 18.5679, lng: 73.9143, label: 'Viman Ngr' },
+  { name: 'Hitec City & Madhapur', city: 'Hyderabad', state: 'Telangana', lat: 17.4474, lng: 78.3762, label: 'Hitec City' },
+  { name: 'Gachibowli Financial Dist', city: 'Hyderabad', state: 'Telangana', lat: 17.4401, lng: 78.3489, label: 'Gachibowli' }
+];
+
+// Forces Leaflet to invalidate size and re-render tiles on mount and resize
+function MapResizer() {
+  const map = useMap();
+  useEffect(() => {
+    map.invalidateSize();
+    const t1 = setTimeout(() => map.invalidateSize(), 100);
+    const t2 = setTimeout(() => map.invalidateSize(), 400);
+    const handleResize = () => map.invalidateSize();
+    window.addEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [map]);
+  return null;
+}
+
+// Smoothly pan & fly the map when center coordinates change, zooming to maximum on search
+function MapRecenter({ coords, flyTrigger }) {
+  const map = useMap();
+  const prevCoordsRef = useRef(coords);
+  useEffect(() => {
+    if (coords && coords[0] && coords[1]) {
+      const prev = prevCoordsRef.current;
+      const changed = !prev || prev[0] !== coords[0] || prev[1] !== coords[1];
+      if (changed || flyTrigger > 0) {
+        prevCoordsRef.current = coords;
+        // Fly to maximum zoom (18) on searched locations
+        const targetZoom = flyTrigger > 0 ? 18 : Math.max(map.getZoom(), 16);
+        map.flyTo(coords, targetZoom, { animate: true, duration: 1.2 });
+      }
+    }
+  }, [coords, flyTrigger, map]);
+  return null;
+}
+
+// Map Controller to provide map instance for external zoom buttons
+function MapController({ onMapReady }) {
+  const map = useMap();
+  useEffect(() => {
+    if (onMapReady) onMapReady(map);
+  }, [map, onMapReady]);
+  return null;
+}
+
+// Map Events Listener for Click and Move / Pan events (like Google Maps)
+function MapEventsHandler({ onMapClick, onMapMoveEnd }) {
+  const map = useMapEvents({
+    click(e) {
+      if (onMapClick) {
+        onMapClick(e.latlng);
+      }
+    },
+    moveend() {
+      if (onMapMoveEnd) {
+        onMapMoveEnd(map.getCenter());
+      }
+    }
+  });
+  return null;
+}
+
+// Validate coordinates are within geographic boundaries of India (Lat: ~6-38, Lng: ~68-98)
+const isWithinIndia = (lat, lng) => {
+  const nLat = Number(lat);
+  const nLng = Number(lng);
+  return !isNaN(nLat) && !isNaN(nLng) && nLat >= 6 && nLat <= 38 && nLng >= 68 && nLng <= 98;
+};
+
+// Auto-fits map bounds to include all jobs, seekers, and the current center
+function MapBoundsFitter({ boundsTrigger, jobs, seekers, centerCoords }) {
+  const map = useMap();
+  const initialFitDone = useRef(false);
+
+  useEffect(() => {
+    // Run on manual trigger OR once on initial load when data is available
+    if (!boundsTrigger && initialFitDone.current) return;
+
+    const points = [];
+    if (centerCoords && centerCoords[0] && centerCoords[1]) {
+      points.push(centerCoords);
+    }
+    jobs?.forEach((j) => {
+      if (j.lat && j.lng && isWithinIndia(j.lat, j.lng)) {
+        points.push([Number(j.lat), Number(j.lng)]);
+      }
+    });
+    seekers?.forEach((s) => {
+      if (s.lat && s.lng && isWithinIndia(s.lat, s.lng)) {
+        points.push([Number(s.lat), Number(s.lng)]);
+      }
+    });
+
+    if (points.length > 1 || (points.length === 1 && boundsTrigger > 0)) {
+      try {
+        const bounds = L.latLngBounds(points);
+        map.fitBounds(bounds, { padding: [60, 60], maxZoom: 14 });
+        initialFitDone.current = true;
+      } catch (err) {
+        console.warn('Map fitBounds error:', err);
+      }
+    }
+  }, [boundsTrigger, map, jobs, seekers, centerCoords]);
+
+  return null;
+}
+
+// Custom Leaflet DivIcon for Job Markers with Distance Badge
+const createJobIcon = (job) => {
+  const isInside = job.isInsideRadar;
+  return L.divIcon({
+    className: 'custom-job-icon',
+    html: `
+      <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform 0.2s;">
+        <div style="
+          background: ${isInside ? '#4f46e5' : '#475569'};
+          color: white;
+          padding: 2px 7px;
+          border-radius: 9999px;
+          font-size: 10px;
+          font-weight: 700;
+          white-space: nowrap;
+          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5);
+          border: 1.5px solid white;
+          margin-bottom: 2px;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        ">
+          <span>${job.salary ? job.salary.split('-')[0].trim() : 'Job'}</span>
+          <span style="opacity: 0.9; font-size: 9px; background: rgba(0,0,0,0.3); padding: 0.5px 4px; border-radius: 4px;">
+            ${job.distanceKm}km
+          </span>
+        </div>
+        <div style="
+          width: 32px;
+          height: 32px;
+          background: ${isInside ? '#3730a3' : '#334155'};
+          border: 2px solid ${isInside ? '#818cf8' : '#94a3b8'};
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 0 ${isInside ? '14px rgba(99, 102, 241, 0.8)' : '4px rgba(0,0,0,0.4)'};
+        ">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+        </div>
+      </div>
+    `,
+    iconSize: [80, 58],
+    iconAnchor: [40, 48],
+    popupAnchor: [0, -45]
+  });
+};
+
+// Custom Leaflet DivIcon for Seeker Markers with Distance Badge
+const createSeekerIcon = (seeker) => {
+  const isInside = seeker.isInsideRadar;
+  return L.divIcon({
+    className: 'custom-seeker-icon',
+    html: `
+      <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform 0.2s;">
+        <div style="
+          background: ${isInside ? '#059669' : '#475569'};
+          color: white;
+          padding: 2px 6px;
+          border-radius: 9999px;
+          font-size: 9px;
+          font-weight: 700;
+          white-space: nowrap;
+          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5);
+          border: 1.5px solid white;
+          margin-bottom: 2px;
+          display: flex;
+          align-items: center;
+          gap: 3px;
+        ">
+          <span>${seeker.name.split(' ')[0]}</span>
+          <span style="opacity: 0.9; font-size: 8px; background: rgba(0,0,0,0.3); padding: 0.5px 3px; border-radius: 4px;">
+            ${seeker.distanceKm}km
+          </span>
+        </div>
+        <div style="
+          width: 30px;
+          height: 30px;
+          background: ${isInside ? '#065f46' : '#334155'};
+          border: 2px solid ${isInside ? '#34d399' : '#94a3b8'};
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 0 ${isInside ? '14px rgba(16, 185, 129, 0.8)' : '4px rgba(0,0,0,0.4)'};
+        ">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+      </div>
+    `,
+    iconSize: [70, 50],
+    iconAnchor: [35, 42],
+    popupAnchor: [0, -40]
+  });
+};
+
+// Radar Center GPS Beacon Icon (Draggable like Google Maps)
+const createUserLocationIcon = (isDragging = false) => {
+  return L.divIcon({
+    className: 'custom-user-icon',
+    html: `
+      <div style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: grab;">
+        <div style="
+          background: rgba(15, 23, 42, 0.92);
+          color: ${isDragging ? '#a5b4fc' : '#818cf8'};
+          padding: 2px 7px;
+          border-radius: 9999px;
+          font-size: 9px;
+          font-weight: 700;
+          white-space: nowrap;
+          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5);
+          border: 1px solid ${isDragging ? '#818cf8' : 'rgba(99, 102, 241, 0.6)'};
+          margin-bottom: 2px;
+          pointer-events: none;
+        ">
+          ${isDragging ? '📍 Moving Radar...' : '🖐️ Drag to Move'}
+        </div>
+        <div style="position: relative; display: flex; align-items: center; justify-content: center;">
+          <div style="
+            width: ${isDragging ? '26px' : '22px'};
+            height: ${isDragging ? '26px' : '22px'};
+            background: ${isDragging ? '#6366f1' : '#3b82f6'};
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 20px ${isDragging ? '#6366f1' : '#3b82f6'};
+            z-index: 10;
+            transition: all 0.2s;
+          "></div>
+          <div style="
+            position: absolute;
+            width: 48px;
+            height: 48px;
+            background: rgba(59, 130, 246, 0.35);
+            border-radius: 50%;
+            animation: pulseRadar 2s infinite;
+          "></div>
+        </div>
+      </div>
+    `,
+    iconSize: [110, 60],
+    iconAnchor: [55, 42]
+  });
+};
+
+export const UberJobMap = ({ 
+  jobs = [], 
+  seekers = [], 
+  onSelectJob, 
+  onSelectSeeker, 
+  onPostJobAtCoords 
+}) => {
+  const { user, isEmployer, updateLocation } = useAuth();
+  const { otherUserLocations, broadcastLocation, startCall, setActiveChatUser } = useSocket();
+
+  const initialLat = isWithinIndia(user?.lat, user?.lng) ? Number(user.lat) : 19.0760;
+  const initialLng = isWithinIndia(user?.lat, user?.lng) ? Number(user.lng) : 72.8777;
+
+  // Radar center coordinates (Defaults to user coordinates or Mumbai BKC)
+  const [centerCoords, setCenterCoords] = useState([initialLat, initialLng]);
+  const [activeLocationName, setActiveLocationName] = useState(
+    user?.address || 'Bandra Kurla Complex (BKC), Mumbai'
+  );
+
+  const [radiusKm, setRadiusKm] = useState(25);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [strictRadar, setStrictRadar] = useState(false); // Default false: show all pins across city, highlight inside radar
+  const [fitBoundsTrigger, setFitBoundsTrigger] = useState(0);
+  const [showJobsLayer, setShowJobsLayer] = useState(true);
+  const [showSeekersLayer, setShowSeekersLayer] = useState(true);
+  const [mapTheme, setMapTheme] = useState('voyager'); // 'voyager' | 'dark'
+  
+  // Drawer & Mobile Modals
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [activeTabDrawer, setActiveTabDrawer] = useState('jobs'); // 'jobs' | 'seekers'
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+
+  // Search Functionality States
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [liveGeocodedResults, setLiveGeocodedResults] = useState([]);
+  const [gpsLoading, setGpsLoading] = useState(false);
+  const [mapInstance, setMapInstance] = useState(null);
+  const [flyTrigger, setFlyTrigger] = useState(0);
+  const [showSearchThisArea, setShowSearchThisArea] = useState(false);
+  const [autoMoveRadar, setAutoMoveRadar] = useState(false);
+  const [isDraggingBeacon, setIsDraggingBeacon] = useState(false);
+  const searchContainerRef = useRef(null);
+
+  // Zoom In & Zoom Out Handlers
+  const handleZoomIn = () => {
+    if (mapInstance) {
+      mapInstance.zoomIn();
+    }
+  };
+
+  const handleZoomOut = () => {
+    if (mapInstance) {
+      mapInstance.zoomOut();
+    }
+  };
+
+  // Sync center when user profile coordinates change
+  useEffect(() => {
+    if (user?.lat && user?.lng && isWithinIndia(user.lat, user.lng)) {
+      setCenterCoords([Number(user.lat), Number(user.lng)]);
+      if (user.address) setActiveLocationName(user.address);
+    }
+  }, [user?.lat, user?.lng, user?.address]);
+
+  // Guaranteed safe finite coordinates for MapContainer & Leaflet layers
+  const safeCoords = useMemo(() => {
+    const lat = Number(centerCoords?.[0]);
+    const lng = Number(centerCoords?.[1]);
+    if (isWithinIndia(lat, lng)) {
+      return [lat, lng];
+    }
+    return [19.0760, 72.8777];
+  }, [centerCoords]);
+
+  // Close search dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
+        setIsSearchOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, []);
+
+  // Debounced Live Geocoding via OpenStreetMap Nominatim
+  useEffect(() => {
+    if (!searchQuery || searchQuery.trim().length < 3) {
+      setLiveGeocodedResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        setIsSearching(true);
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&countrycodes=in&limit=5`,
+          { headers: { 'Accept-Language': 'en' } }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          const parsed = data.map((item) => ({
+            name: item.display_name.split(',')[0],
+            city: item.display_name.split(',').slice(1, 3).join(', ').trim(),
+            state: 'India',
+            lat: parseFloat(item.lat),
+            lng: parseFloat(item.lon),
+            isGeocoded: true
+          }));
+          setLiveGeocodedResults(parsed);
+        }
+      } catch (err) {
+        console.warn('Geocode error:', err);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 380);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Combined Location Search Results (Curated Hubs + Live Geocoded)
+  const combinedSearchResults = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    
+    // Filter local curated hubs
+    const localMatches = q
+      ? POPULAR_LOCATIONS.filter(
+          (loc) =>
+            loc.name.toLowerCase().includes(q) ||
+            loc.city.toLowerCase().includes(q) ||
+            loc.state.toLowerCase().includes(q)
+        )
+      : POPULAR_LOCATIONS.slice(0, 8); // Default popular list when query is empty
+
+    // Merge with live geocoded results, avoiding lat/lng proximity duplicates
+    const combined = [...localMatches];
+    liveGeocodedResults.forEach((geo) => {
+      const exists = combined.some(
+        (loc) => Math.abs(loc.lat - geo.lat) < 0.01 && Math.abs(loc.lng - geo.lng) < 0.01
+      );
+      if (!exists) {
+        combined.push(geo);
+      }
+    });
+
+    return combined.slice(0, 8);
+  }, [searchQuery, liveGeocodedResults]);
+
+  // Handle Location Selection (Zooms to maximum zoom level 18)
+  const handleSelectLocation = (loc) => {
+    setCenterCoords([loc.lat, loc.lng]);
+    const fullName = `${loc.name}${loc.city ? `, ${loc.city}` : ''}`;
+    setActiveLocationName(fullName);
+    setSearchQuery(loc.name);
+    setIsSearchOpen(false);
+    updateLocation(loc.lat, loc.lng, fullName);
+    broadcastLocation(loc.lat, loc.lng, fullName);
+    setFlyTrigger((prev) => prev + 1);
+    if (mapInstance) {
+      mapInstance.flyTo([loc.lat, loc.lng], 18, { animate: true, duration: 1.2 });
+    }
+  };
+
+  // Submit search query on Enter (auto-select top match at max zoom 18)
+  const handleSearchSubmit = (e) => {
+    if (e) e.preventDefault();
+    if (combinedSearchResults && combinedSearchResults.length > 0) {
+      handleSelectLocation(combinedSearchResults[0]);
+    }
+  };
+
+  // Reverse geocode coordinates to location name
+  const reverseGeocode = async (lat, lng) => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=15`,
+        { headers: { 'Accept-Language': 'en' } }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        if (data.display_name) {
+          const parts = data.display_name.split(',');
+          return `${parts[0]?.trim() || ''}, ${parts[1]?.trim() || ''}`;
+        }
+      }
+    } catch (err) {
+      // ignore
+    }
+    return `Radar [${lat.toFixed(3)}, ${lng.toFixed(3)}]`;
+  };
+
+  // Move radar center when beacon marker is dragged (like Google Maps pin)
+  const handleMarkerDragEnd = async (latlng) => {
+    if (!latlng) return;
+    const lat = latlng.lat;
+    const lng = latlng.lng;
+    setCenterCoords([lat, lng]);
+    setShowSearchThisArea(false);
+    const newName = await reverseGeocode(lat, lng);
+    setActiveLocationName(newName);
+    setSearchQuery(newName);
+    updateLocation(lat, lng, newName);
+    broadcastLocation(lat, lng, newName);
+  };
+
+  // Move radar center to current visible map center (Google Maps "Search this area")
+  const handleMoveRadarToMapCenter = async () => {
+    if (mapInstance) {
+      const center = mapInstance.getCenter();
+      const lat = center.lat;
+      const lng = center.lng;
+      setCenterCoords([lat, lng]);
+      setShowSearchThisArea(false);
+      const newName = await reverseGeocode(lat, lng);
+      setActiveLocationName(newName);
+      setSearchQuery(newName);
+      updateLocation(lat, lng, newName);
+      broadcastLocation(lat, lng, newName);
+    }
+  };
+
+  // Directional pan controls to smoothly move map view (Google Maps D-pad)
+  const handlePan = (dx, dy) => {
+    if (mapInstance) {
+      mapInstance.panBy([dx, dy], { animate: true, duration: 0.35 });
+    }
+  };
+
+  // Handle map movement end (detects when user dragged or panned the map)
+  const handleMapMoveEnd = useCallback((center) => {
+    if (!center) return;
+    const dist = calculateDistance(safeCoords[0], safeCoords[1], center.lat, center.lng);
+    if (autoMoveRadar && dist > 0.15) {
+      setCenterCoords([center.lat, center.lng]);
+      setActiveLocationName(`Area [${center.lat.toFixed(3)}, ${center.lng.toFixed(3)}]`);
+      setShowSearchThisArea(false);
+    } else if (dist > 0.45) {
+      setShowSearchThisArea(true);
+    } else {
+      setShowSearchThisArea(false);
+    }
+  }, [safeCoords, autoMoveRadar]);
+
+
+  // Compute live distance for each job relative to centerCoords
+  const processedJobs = useMemo(() => {
+    return jobs.map((job) => {
+      const dist = calculateDistance(safeCoords[0], safeCoords[1], job.lat, job.lng);
+      return {
+        ...job,
+        distanceKm: dist,
+        isInsideRadar: dist <= radiusKm
+      };
+    });
+  }, [jobs, safeCoords, radiusKm]);
+
+  // Filtered Jobs: according to category + strict radar setting
+  const visibleJobs = useMemo(() => {
+    if (!showJobsLayer) return [];
+    return processedJobs
+      .filter((job) => {
+        const matchesCategory =
+          selectedCategory === 'All' 
+            ? true 
+            : job.category?.toLowerCase() === selectedCategory.toLowerCase();
+        if (!matchesCategory) return false;
+        return strictRadar ? job.isInsideRadar : true;
+      })
+      .sort((a, b) => a.distanceKm - b.distanceKm);
+  }, [processedJobs, selectedCategory, strictRadar, showJobsLayer]);
+
+  // Compute live distance for each seeker relative to centerCoords
+  const processedSeekers = useMemo(() => {
+    return seekers
+      .filter((s) => s.id !== user?.id) // Do not display oneself as a separate candidate marker
+      .map((seeker) => {
+        const livePos = otherUserLocations[seeker.id];
+        const lat = livePos?.lat ?? seeker.lat;
+        const lng = livePos?.lng ?? seeker.lng;
+        const dist = calculateDistance(safeCoords[0], safeCoords[1], lat, lng);
+        return {
+          ...seeker,
+          lat,
+          lng,
+          distanceKm: dist,
+          isInsideRadar: dist <= radiusKm
+        };
+      });
+  }, [seekers, user?.id, otherUserLocations, safeCoords, radiusKm]);
+
+  // Filtered Seekers: according to strict radar setting
+  const visibleSeekers = useMemo(() => {
+    if (!showSeekersLayer) return [];
+    return processedSeekers
+      .filter((seeker) => {
+        return strictRadar ? seeker.isInsideRadar : true;
+      })
+      .sort((a, b) => a.distanceKm - b.distanceKm);
+  }, [processedSeekers, strictRadar, showSeekersLayer]);
+
+  // Handle HTML5 GPS Geolocation
+  const locateMe = () => {
+    if (navigator.geolocation) {
+      setGpsLoading(true);
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          setCenterCoords([lat, lng]);
+          const gpsLabel = 'My GPS Location';
+          setActiveLocationName(gpsLabel);
+          setSearchQuery(gpsLabel);
+          updateLocation(lat, lng, gpsLabel);
+          broadcastLocation(lat, lng, gpsLabel);
+          setFlyTrigger((prev) => prev + 1);
+          if (mapInstance) {
+            mapInstance.flyTo([lat, lng], 18, { animate: true, duration: 1.2 });
+          }
+          setGpsLoading(false);
+        },
+        (err) => {
+          console.warn('Geolocation error:', err.message);
+          setGpsLoading(false);
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
+      );
+    }
+  };
+
+  // Map Click Handler: relocate radar center dynamically for exploration without mutating saved user profile
+  const handleMapClick = (latlng) => {
+    setCenterCoords([latlng.lat, latlng.lng]);
+    const clickedLabel = `Radar Center [${latlng.lat.toFixed(3)}, ${latlng.lng.toFixed(3)}]`;
+    setActiveLocationName(clickedLabel);
+  };
+
+  return (
+    <div 
+      className="relative w-full h-[calc(100dvh-4rem-3.75rem)] md:h-[calc(100vh-4rem)] bg-slate-950 overflow-hidden select-none"
+    >
+      
+      {/* ============================================================== */}
+      {/* TOP FLOATING SEARCH & RADAR BAR */}
+      {/* ============================================================== */}
+      <div className="absolute top-2 left-2 right-2 sm:top-3 sm:left-4 sm:right-4 z-[500] flex flex-col gap-2 pointer-events-none">
+        
+        {/* Row 1: Location Search Bar + GPS Button */}
+        <div className="flex items-center gap-2 pointer-events-auto max-w-3xl">
+          
+          {/* Autocomplete Search Input */}
+          <div ref={searchContainerRef} className="relative flex-1">
+            <div className="relative flex items-center bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 rounded-2xl shadow-2xl focus-within:border-indigo-500 transition-all">
+              <Search className="w-4 h-4 text-indigo-400 absolute left-3.5 pointer-events-none" />
+              
+              <form onSubmit={handleSearchSubmit} className="w-full">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  placeholder="Search city, area, or landmark (e.g. Bandra, Andheri, Delhi)..."
+                  onFocus={() => setIsSearchOpen(true)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setIsSearchOpen(true);
+                  }}
+                  className="w-full bg-transparent pl-10 pr-9 py-2.5 sm:py-2 text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none"
+                />
+              </form>
+
+              {/* Clear button or Loader */}
+              <div className="absolute right-3 flex items-center">
+                {isSearching ? (
+                  <Loader2 className="w-3.5 h-3.5 text-indigo-400 animate-spin" />
+                ) : searchQuery ? (
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setLiveGeocodedResults([]);
+                    }}
+                    className="p-1 rounded-full text-slate-400 hover:text-white"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                ) : null}
+              </div>
+            </div>
+
+            {/* Autocomplete Dropdown */}
+            {isSearchOpen && (
+              <div className="absolute top-full left-0 right-0 mt-1.5 bg-slate-900/95 backdrop-blur-2xl border border-slate-700/90 rounded-2xl shadow-2xl overflow-hidden z-[600] max-h-72 overflow-y-auto">
+                <div className="px-3 py-1.5 bg-slate-950/60 border-b border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                  <span>{searchQuery ? 'Location Results' : 'Suggested Hubs'}</span>
+                  <span className="text-indigo-400 font-semibold">{combinedSearchResults.length} found</span>
+                </div>
+
+                {combinedSearchResults.length === 0 ? (
+                  <div className="p-4 text-center text-xs text-slate-400">
+                    No matching location found. Try searching a major city or district.
+                  </div>
+                ) : (
+                  combinedSearchResults.map((loc, idx) => {
+                    const distFromCurrent = calculateDistance(safeCoords[0], safeCoords[1], loc.lat, loc.lng);
+                    return (
+                      <div
+                        key={idx}
+                        onClick={() => handleSelectLocation(loc)}
+                        className="px-3.5 py-2.5 hover:bg-indigo-600/20 hover:border-l-4 hover:border-indigo-500 cursor-pointer transition-all border-b border-slate-800/40 flex items-center justify-between gap-2"
+                      >
+                        <div className="flex items-center gap-2.5 truncate">
+                          <div className="p-1.5 rounded-lg bg-slate-800 text-indigo-400 flex-shrink-0">
+                            <MapPin className="w-3.5 h-3.5" />
+                          </div>
+                          <div className="truncate">
+                            <p className="text-xs font-bold text-white truncate">{loc.name}</p>
+                            <p className="text-[10px] text-slate-400 truncate">{loc.city ? `${loc.city}, ` : ''}{loc.state || 'India'}</p>
+                          </div>
+                        </div>
+
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-indigo-300 font-semibold whitespace-nowrap flex-shrink-0">
+                          {distFromCurrent > 0 ? `${distFromCurrent} km` : 'Current'}
+                        </span>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Quick GPS Geolocation Button */}
+          <button
+            onClick={locateMe}
+            title="Recenter radar to my current GPS location"
+            className="flex-shrink-0 px-3 py-2.5 sm:py-2 bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 rounded-2xl shadow-2xl hover:bg-slate-800 text-indigo-400 hover:text-white transition-all flex items-center gap-1.5 active:scale-95"
+          >
+            {gpsLoading ? (
+              <Loader2 className="w-4 h-4 text-indigo-400 animate-spin" />
+            ) : (
+              <Crosshair className="w-4 h-4 text-indigo-400" />
+            )}
+            <span className="text-xs font-bold hidden sm:inline">Curent Location</span>
+          </button>
+
+          {/* Map View Mode Toggle (Streets / Satellite Hybrid) */}
+          <button
+            onClick={() => setMapTheme(mapTheme === 'voyager' ? 'dark' : 'voyager')}
+            title="Switch between Google Streets and Satellite Hybrid view"
+            className="flex-shrink-0 px-2.5 py-2.5 sm:py-2 bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 rounded-2xl shadow-2xl hover:bg-slate-800 text-slate-200 transition-all flex items-center gap-1.5 active:scale-95"
+          >
+            <Layers className="w-4 h-4 text-indigo-400" />
+            <span className="text-xs font-bold hidden md:inline">{mapTheme === 'voyager' ? 'Satellite' : 'Streets'}</span>
+          </button>
+
+          {/* Mobile Filter Sheet Trigger Button */}
+          <button
+            onClick={() => setIsFilterModalOpen(true)}
+            className="md:hidden flex-shrink-0 px-3 py-2.5 bg-indigo-600 text-white rounded-2xl shadow-xl flex items-center gap-1.5 text-xs font-bold active:scale-95"
+          >
+            <Sliders className="w-3.5 h-3.5" />
+            <span>Radar</span>
+          </button>
+
+        </div>
+
+        {/* Row 2: Mobile Status Strip */}
+        <div className="md:hidden flex items-center justify-between gap-1 pointer-events-auto">
+          <div 
+            onClick={() => setIsFilterModalOpen(true)}
+            className="flex items-center gap-2 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-800 text-xs shadow-xl cursor-pointer"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span className="text-[11px] font-bold text-white whitespace-nowrap">
+              {radiusKm} km:
+            </span>
+            <span className="text-[11px] text-indigo-300 font-bold whitespace-nowrap">
+              {visibleJobs.length} Jobs • {visibleSeekers.length} Seekers
+            </span>
+          </div>
+
+          <button
+            onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+            className="px-2.5 py-1.5 bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl text-[11px] font-bold text-emerald-400 flex items-center gap-1 shadow-xl"
+          >
+            <span>List</span>
+            {isDrawerOpen ? <ChevronDown className="w-3 h-3" /> : <ChevronUp className="w-3 h-3" />}
+          </button>
+        </div>
+
+        {/* Desktop Full Floating Control Bars */}
+        <div className="hidden md:flex flex-wrap items-center justify-between gap-2 pointer-events-auto">
+          
+          {/* Main Radar Slider & Stats Card */}
+          <div className="flex items-center gap-2.5 bg-slate-900/95 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border border-slate-700/80 shadow-2xl">
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+              </span>
+              <span className="text-xs font-bold text-white tracking-wide whitespace-nowrap">
+                Radar: <span className="text-indigo-400 font-extrabold">{radiusKm} km</span>
+              </span>
+            </div>
+
+            <input
+              type="range"
+              min="2"
+              max="40"
+              step="1"
+              value={radiusKm}
+              onChange={(e) => setRadiusKm(Number(e.target.value))}
+              className="w-24 accent-indigo-500 cursor-pointer"
+              title="Drag to resize radar radius"
+            />
+
+            {/* Radius Quick Preset Buttons */}
+            <div className="flex items-center gap-1 border-l border-slate-700/80 pl-2">
+              {[5, 10, 15, 25].map((km) => (
+                <button
+                  key={km}
+                  onClick={() => setRadiusKm(km)}
+                  className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition-colors ${
+                    radiusKm === km
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {km}k
+                </button>
+              ))}
+            </div>
+
+            <div className="h-4 w-px bg-slate-700" />
+
+            {/* Live Filter Count Display */}
+            <div className="flex items-center gap-1.5 text-xs whitespace-nowrap">
+              <span className="px-2 py-0.5 bg-indigo-500/20 text-indigo-300 font-bold rounded-lg border border-indigo-500/30">
+                {visibleJobs.length} Jobs
+              </span>
+              <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 font-bold rounded-lg border border-emerald-500/30">
+                {visibleSeekers.length} Seekers
+              </span>
+            </div>
+
+            {/* Strict Radar Mode Toggle */}
+            <button
+              onClick={() => setStrictRadar(!strictRadar)}
+              className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all flex items-center gap-1.5 ${
+                strictRadar
+                  ? 'bg-emerald-600/90 text-white shadow-sm'
+                  : 'bg-slate-800 text-slate-400 hover:text-white'
+              }`}
+              title="Toggle whether pins outside radar radius are hidden"
+            >
+              {strictRadar ? <Eye className="w-3 h-3 text-emerald-200" /> : <EyeOff className="w-3 h-3 text-slate-400" />}
+              <span>{strictRadar ? 'Strict Radar ON' : 'Show All'}</span>
+            </button>
+          </div>
+
+          {/* Categories Filter Pills */}
+          <div className="flex items-center gap-1 bg-slate-900/95 backdrop-blur-md p-1.5 rounded-2xl border border-slate-700/80 shadow-2xl">
+            {['All', 'Technology', 'Design', 'Support', 'Logistics'].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-2.5 py-1 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                  selectedCategory === cat
+                    ? 'bg-indigo-600 text-white shadow-md'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* Layers Toggle (Show/Hide Jobs or Seekers) */}
+          <div className="flex items-center gap-1 bg-slate-900/95 backdrop-blur-md px-2 py-1.5 rounded-2xl border border-slate-700/80 shadow-2xl">
+            <button
+              onClick={() => setShowJobsLayer(!showJobsLayer)}
+              className={`px-2 py-0.5 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-colors ${
+                showJobsLayer ? 'bg-indigo-600 text-white' : 'text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              <Briefcase className="w-3 h-3" />
+              <span>Jobs</span>
+            </button>
+            <button
+              onClick={() => setShowSeekersLayer(!showSeekersLayer)}
+              className={`px-2 py-0.5 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-colors ${
+                showSeekersLayer ? 'bg-emerald-600 text-white' : 'text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              <User className="w-3 h-3" />
+              <span>Seekers</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* ============================================================== */}
+      {/* GOOGLE MAPS FLOATING PILL: "SEARCH THIS AREA / MOVE RADAR" */}
+      {/* ============================================================== */}
+      {showSearchThisArea && (
+        <div className="absolute top-28 sm:top-24 left-1/2 -translate-x-1/2 z-[500] pointer-events-auto flex items-center gap-1.5 animate-in fade-in slide-in-from-top-3 duration-200">
+          <button
+            onClick={handleMoveRadarToMapCenter}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600/80 hover:bg-indigo-600 backdrop-blur-md text-white text-xs font-bold rounded-full shadow-2xl border border-indigo-400/40 transition-all active:scale-95 hover:shadow-indigo-500/30"
+          >
+            <Compass className="w-3.5 h-3.5" />
+            <span>Search This Area / Move Radar Here</span>
+          </button>
+          
+          <button
+            onClick={() => setShowSearchThisArea(false)}
+            className="p-2 bg-slate-950/40 hover:bg-slate-900/80 backdrop-blur-md text-slate-300 hover:text-white rounded-full border border-white/10 shadow-xl transition-all"
+            title="Dismiss"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* MOBILE RADAR & FILTER BOTTOM SHEET MODAL */}
+      {/* ============================================================== */}
+      {isFilterModalOpen && (
+        <div className="fixed inset-0 z-[700] md:hidden bg-black/75 backdrop-blur-sm flex flex-col justify-end animate-in fade-in duration-150">
+          <div className="bg-slate-900 border-t border-slate-700 rounded-t-3xl p-5 shadow-2xl max-h-[85vh] overflow-y-auto space-y-4">
+            
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <Sliders className="w-4 h-4 text-indigo-400" />
+                <h3 className="font-extrabold text-sm text-white">Radar & Map Settings</h3>
+              </div>
+              <button
+                onClick={() => setIsFilterModalOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Radius Slider Section */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-slate-300">Radar Coverage Radius</span>
+                <span className="text-xs font-extrabold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-lg border border-indigo-500/20">
+                  {radiusKm} km
+                </span>
+              </div>
+              <input
+                type="range"
+                min="2"
+                max="40"
+                step="1"
+                value={radiusKm}
+                onChange={(e) => setRadiusKm(Number(e.target.value))}
+                className="w-full accent-indigo-500 h-2 bg-slate-800 rounded-lg cursor-pointer"
+              />
+              <div className="grid grid-cols-4 gap-2 mt-2">
+                {[5, 10, 15, 25].map((km) => (
+                  <button
+                    key={km}
+                    onClick={() => setRadiusKm(km)}
+                    className={`py-1.5 rounded-xl text-xs font-bold transition-all ${
+                      radiusKm === km
+                        ? 'bg-indigo-600 text-white'
+                        : 'bg-slate-800 text-slate-400'
+                    }`}
+                  >
+                    {km} km
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Strict Radar Mode */}
+            <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-between">
+              <div>
+                <h4 className="text-xs font-bold text-white">Strict Radar Filter</h4>
+                <p className="text-[10px] text-slate-400">Only show pins within {radiusKm} km circle</p>
+              </div>
+              <button
+                onClick={() => setStrictRadar(!strictRadar)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  strictRadar ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-400'
+                }`}
+              >
+                {strictRadar ? 'Active' : 'Show All'}
+              </button>
+            </div>
+
+            {/* Auto-Move Radar Mode (Google Maps style) */}
+            <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-between">
+              <div>
+                <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <Move className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>Auto-Move Radar with Map</span>
+                </h4>
+                <p className="text-[10px] text-slate-400">Shift radar dynamically as you pan & move map</p>
+              </div>
+              <button
+                onClick={() => setAutoMoveRadar(!autoMoveRadar)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  autoMoveRadar ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400'
+                }`}
+              >
+                {autoMoveRadar ? 'Active' : 'Manual'}
+              </button>
+            </div>
+
+            {/* Categories */}
+            <div>
+              <span className="text-xs font-bold text-slate-300 block mb-2">Job Categories</span>
+              <div className="flex flex-wrap gap-1.5">
+                {['All', 'Technology', 'Design', 'Support', 'Logistics'].map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold ${
+                      selectedCategory === cat
+                        ? 'bg-indigo-600 text-white'
+                        : 'bg-slate-800 text-slate-400'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Layer Toggles */}
+            <div>
+              <span className="text-xs font-bold text-slate-300 block mb-2">Display Layers</span>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => setShowJobsLayer(!showJobsLayer)}
+                  className={`py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 ${
+                    showJobsLayer ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400'
+                  }`}
+                >
+                  <Briefcase className="w-3.5 h-3.5" />
+                  <span>Jobs ({visibleJobs.length})</span>
+                </button>
+                <button
+                  onClick={() => setShowSeekersLayer(!showSeekersLayer)}
+                  className={`py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 ${
+                    showSeekersLayer ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-400'
+                  }`}
+                >
+                  <User className="w-3.5 h-3.5" />
+                  <span>Seekers ({visibleSeekers.length})</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Presets */}
+            <div>
+              <span className="text-xs font-bold text-slate-300 block mb-2">Quick City Hubs</span>
+              <div className="flex flex-wrap gap-1.5">
+                {POPULAR_LOCATIONS.slice(0, 8).map((p) => (
+                  <button
+                    key={p.name}
+                    onClick={() => {
+                      handleSelectLocation(p);
+                      setIsFilterModalOpen(false);
+                    }}
+                    className="px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-slate-800 text-slate-300 hover:text-white"
+                  >
+                    {p.label || p.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Close / Apply button */}
+            <button
+              onClick={() => setIsFilterModalOpen(false)}
+              className="w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-extrabold text-xs rounded-2xl shadow-xl transition-all"
+            >
+              Apply & View Map ({visibleJobs.length} Jobs • {visibleSeekers.length} Seekers)
+            </button>
+
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* FLOATING ACTION BUTTONS (Bottom Right) */}
+      {/* ============================================================== */}
+      <div className="absolute bottom-4 right-3 sm:bottom-6 sm:right-6 z-[500] flex flex-col gap-2.5 items-end pointer-events-auto">
+        
+        {/* Google Maps Style Move & Zoom Navigation Controller (Transparent Glassmorphic) */}
+        <div className="flex flex-col items-center bg-slate-950/25 hover:bg-slate-950/60 backdrop-blur-md border border-white/10 hover:border-white/20 rounded-2xl shadow-2xl p-1.5 gap-1 transition-all duration-200">
+          <div className="flex items-center gap-1 text-[9px] font-extrabold text-slate-300/80 uppercase tracking-wider px-1">
+            <Move className="w-2.5 h-2.5 text-indigo-400" />
+            <span>Move</span>
+          </div>
+
+          {/* D-Pad Pan Directional Controls */}
+          <div className="grid grid-cols-3 gap-1">
+            <div></div>
+            <button
+              type="button"
+              onClick={() => handlePan(0, -180)}
+              title="Move Map North / Up"
+              className="p-1.5 bg-black/20 hover:bg-indigo-600/80 hover:text-white text-slate-200 rounded-lg transition-all active:scale-90"
+              aria-label="Move Up"
+            >
+              <ChevronUp className="w-3.5 h-3.5" />
+            </button>
+            <div></div>
+            
+            <button
+              type="button"
+              onClick={() => handlePan(-180, 0)}
+              title="Move Map West / Left"
+              className="p-1.5 bg-black/20 hover:bg-indigo-600/80 hover:text-white text-slate-200 rounded-lg transition-all active:scale-90"
+              aria-label="Move Left"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={handleMoveRadarToMapCenter}
+              title="Center Radar at Current Map View (Search here)"
+              className="p-1.5 bg-indigo-500/25 hover:bg-indigo-600 hover:text-white text-indigo-300 rounded-lg transition-all active:scale-90"
+              aria-label="Center Radar at Current View"
+            >
+              <Crosshair className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => handlePan(180, 0)}
+              title="Move Map East / Right"
+              className="p-1.5 bg-black/20 hover:bg-indigo-600/80 hover:text-white text-slate-200 rounded-lg transition-all active:scale-90"
+              aria-label="Move Right"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+
+            <div></div>
+            <button
+              type="button"
+              onClick={() => handlePan(0, 180)}
+              title="Move Map South / Down"
+              className="p-1.5 bg-black/20 hover:bg-indigo-600/80 hover:text-white text-slate-200 rounded-lg transition-all active:scale-90"
+              aria-label="Move Down"
+            >
+              <ChevronDown className="w-3.5 h-3.5" />
+            </button>
+            <div></div>
+          </div>
+          
+          <div className="w-full border-t border-white/10 my-0.5" />
+
+          {/* Zoom Controls (+ / -) */}
+          <div className="flex w-full justify-between gap-1">
+            <button
+              type="button"
+              onClick={handleZoomIn}
+              title="Zoom In (+)"
+              className="flex-1 py-1 bg-black/20 hover:bg-indigo-600/80 hover:text-white text-slate-200 rounded-lg transition-all flex items-center justify-center active:scale-90"
+              aria-label="Zoom In"
+            >
+              <Plus className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={handleZoomOut}
+              title="Zoom Out (-)"
+              className="flex-1 py-1 bg-black/20 hover:bg-indigo-600/80 hover:text-white text-slate-200 rounded-lg transition-all flex items-center justify-center active:scale-90"
+              aria-label="Zoom Out"
+            >
+              <Minus className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Fit All Markers in View button */}
+        <button
+          onClick={() => setFitBoundsTrigger((prev) => prev + 1)}
+          title="Fit all active jobs and candidates into view"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-slate-950/30 hover:bg-slate-900/70 backdrop-blur-md text-indigo-300 hover:text-white border border-white/10 shadow-xl text-xs font-bold transition-all active:scale-95"
+        >
+          <Compass className="w-4 h-4 text-indigo-400" />
+          <span>Fit All Pins</span>
+        </button>
+
+        {/* Toggle Results List Drawer */}
+        <button
+          onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-slate-950/30 hover:bg-slate-900/70 backdrop-blur-md text-slate-100 border border-white/10 shadow-xl text-xs font-bold transition-all active:scale-95"
+        >
+          {isDrawerOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4 text-emerald-400" />}
+          <span>{isDrawerOpen ? 'Close List' : `Radar Matches (${visibleJobs.length + visibleSeekers.length})`}</span>
+        </button>
+
+        {/* Post Job button (if Employer) */}
+        {isEmployer && (
+          <button
+            onClick={() => onPostJobAtCoords({ lat: safeCoords[0], lng: safeCoords[1] })}
+            className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-2xl shadow-indigo-600/40 border border-indigo-400/30 transition-transform active:scale-95"
+          >
+            <Briefcase className="w-4 h-4" />
+            <span className="hidden sm:inline">Post Job at Radar</span>
+            <span className="sm:hidden">Post Job</span>
+          </button>
+        )}
+
+      </div>
+
+      {/* Map Guidance Tip (Desktop only) */}
+      <div className="absolute bottom-4 left-4 z-[500] pointer-events-none hidden lg:block">
+        <div className="bg-slate-900/85 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-800 text-[11px] text-slate-300 flex items-center gap-2 shadow-lg">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+          <span>Active Hub: <strong className="text-white">{activeLocationName}</strong> • {visibleJobs.length} jobs & {visibleSeekers.length} seekers in range</span>
+        </div>
+      </div>
+
+      {/* ============================================================== */}
+      {/* BOTTOM COLLAPSIBLE RADAR DISCOVERY DRAWER */}
+      {/* ============================================================== */}
+      {isDrawerOpen && (
+        <div className="absolute bottom-14 left-2 right-2 sm:bottom-20 sm:left-6 sm:right-6 max-h-60 sm:max-h-72 z-[500] bg-slate-900/95 backdrop-blur-xl border border-slate-700/90 rounded-3xl p-3 sm:p-4 shadow-2xl flex flex-col gap-2.5 animate-in slide-in-from-bottom duration-200 pointer-events-auto">
+          
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className="text-[11px] sm:text-xs font-bold text-white uppercase tracking-wider truncate">
+                Radar Matches ({radiusKm} km)
+              </span>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setActiveTabDrawer('jobs')}
+                  className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-xl text-xs font-bold transition-colors ${
+                    activeTabDrawer === 'jobs'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Jobs ({visibleJobs.length})
+                </button>
+                <button
+                  onClick={() => setActiveTabDrawer('seekers')}
+                  className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-xl text-xs font-bold transition-colors ${
+                    activeTabDrawer === 'seekers'
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Seekers ({visibleSeekers.length})
+                </button>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsDrawerOpen(false)}
+              className="text-xs font-semibold text-slate-400 hover:text-white"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Horizontal Card List */}
+          <div className="flex items-center gap-2.5 overflow-x-auto pb-1 pt-0.5">
+            {activeTabDrawer === 'jobs' && visibleJobs.length === 0 && (
+              <p className="text-xs text-slate-500 py-3 px-2">No jobs within this {radiusKm} km radar radius. Try increasing the radius slider.</p>
+            )}
+
+            {activeTabDrawer === 'jobs' && visibleJobs.map((job) => (
+              <div
+                key={job.id}
+                onClick={() => onSelectJob(job)}
+                className="min-w-[210px] sm:min-w-[230px] max-w-[230px] bg-slate-950 p-3 rounded-2xl border border-slate-800 hover:border-indigo-500/50 cursor-pointer transition-all flex flex-col justify-between flex-shrink-0"
+              >
+                <div>
+                  <div className="flex items-center justify-between text-[10px] text-indigo-400 font-bold mb-1">
+                    <span>{job.jobType}</span>
+                    <span className="text-slate-400">{job.distanceKm} km away</span>
+                  </div>
+                  <h4 className="text-xs font-bold text-white truncate">{job.title}</h4>
+                  <p className="text-[11px] text-slate-400 truncate">{job.company}</p>
+                </div>
+                <div className="mt-2 pt-2 border-t border-slate-900 flex items-center justify-between">
+                  <span className="text-xs font-bold text-emerald-400">{job.salary ? job.salary.split('-')[0].trim() : 'Active'}</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-600/30 text-indigo-300 font-bold">Apply</span>
+                </div>
+              </div>
+            ))}
+
+            {activeTabDrawer === 'seekers' && visibleSeekers.length === 0 && (
+              <p className="text-xs text-slate-500 py-3 px-2">No active seekers within this {radiusKm} km radar radius. Try increasing the radius slider.</p>
+            )}
+
+            {activeTabDrawer === 'seekers' && visibleSeekers.map((seeker) => (
+              <div
+                key={seeker.id}
+                onClick={() => onSelectSeeker(seeker)}
+                className="min-w-[210px] sm:min-w-[230px] max-w-[230px] bg-slate-950 p-3 rounded-2xl border border-slate-800 hover:border-emerald-500/50 cursor-pointer transition-all flex flex-col justify-between flex-shrink-0"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <img
+                    src={seeker.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${seeker.name}`}
+                    alt={seeker.name}
+                    className="w-8 h-8 rounded-full border border-emerald-500/40 object-cover"
+                  />
+                  <div className="truncate">
+                    <h4 className="text-xs font-bold text-white truncate">{seeker.name}</h4>
+                    <p className="text-[10px] text-emerald-400 truncate">{seeker.title || 'Job Seeker'}</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-900">
+                  <span className="text-slate-400 text-[10px]">{seeker.distanceKm} km away</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-600/30 text-emerald-300 font-bold">Connect</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* LEAFLET MAP CONTAINER */}
+      {/* ============================================================== */}
+      <MapContainer
+        center={safeCoords}
+        zoom={13}
+        zoomControl={false}
+        scrollWheelZoom={true}
+        dragging={true}
+        touchZoom={true}
+        doubleClickZoom={true}
+        keyboard={true}
+        style={{ height: '100%', width: '100%' }}
+        className="h-full w-full"
+      >
+        <MapResizer />
+        <MapController onMapReady={setMapInstance} />
+        <MapRecenter coords={safeCoords} flyTrigger={flyTrigger} />
+        <MapBoundsFitter 
+          boundsTrigger={fitBoundsTrigger} 
+          jobs={visibleJobs} 
+          seekers={visibleSeekers} 
+          centerCoords={safeCoords} 
+        />
+        <MapEventsHandler 
+          onMapClick={handleMapClick} 
+          onMapMoveEnd={handleMapMoveEnd} 
+        />
+
+        {/* Keyless High-Resolution Google Map Tiles (Streets & Satellite Hybrid) */}
+        <TileLayer
+          key={mapTheme}
+          subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
+          maxZoom={20}
+          attribution='&copy; Google Maps'
+          url={
+            mapTheme === 'dark'
+              ? 'https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}'
+              : 'https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'
+          }
+        />
+
+        {/* Primary Uber-style Radar Radius Circle */}
+        <Circle
+          center={safeCoords}
+          radius={radiusKm * 1000}
+          pathOptions={{
+            color: '#6366f1',
+            fillColor: '#4f46e5',
+            fillOpacity: 0.12,
+            weight: 2,
+            dashArray: '6, 6'
+          }}
+        />
+
+        {/* Inner Radar Pulse Range (40% radius) */}
+        <Circle
+          center={safeCoords}
+          radius={(radiusKm * 1000) * 0.4}
+          pathOptions={{
+            color: '#38bdf8',
+            fillColor: '#38bdf8',
+            fillOpacity: 0.06,
+            weight: 1,
+            dashArray: '3, 6'
+          }}
+        />
+
+        {/* User's Radar Center Beacon (Draggable like Google Maps Pin) */}
+        <Marker
+          position={safeCoords}
+          draggable={true}
+          autoPan={true}
+          eventHandlers={{
+            dragstart: () => setIsDraggingBeacon(true),
+            dragend: (e) => {
+              setIsDraggingBeacon(false);
+              const marker = e.target;
+              if (marker) {
+                handleMarkerDragEnd(marker.getLatLng());
+              }
+            }
+          }}
+          icon={createUserLocationIcon(isDraggingBeacon)}
+        >
+          <Popup>
+            <div className="p-1 text-center min-w-[170px]">
+              <span className="text-xs font-bold text-indigo-400 block">Radar Center Beacon</span>
+              <p className="text-[10px] text-slate-300 mt-0.5">
+                {user ? user.name : 'Guest Beacon'} ({user?.role === 'emp' ? 'Employer' : 'Job Seeker'})
+              </p>
+              <p className="text-[9px] text-indigo-300 font-semibold mt-1 bg-indigo-500/20 py-0.5 rounded">
+                🖐️ Drag pin to move radar anywhere
+              </p>
+              <div className="mt-1.5 pt-1.5 border-t border-slate-700/60 text-[10px] text-slate-400 truncate">
+                {activeLocationName}
+              </div>
+            </div>
+          </Popup>
+        </Marker>
+
+        {/* Job Markers */}
+        {visibleJobs.map((job) => (
+          <Marker
+            key={job.id}
+            position={[job.lat, job.lng]}
+            icon={createJobIcon(job)}
+          >
+            <Popup>
+              <div className="min-w-[210px] p-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">
+                    {job.jobType}
+                  </span>
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">
+                    {job.distanceKm} km away
+                  </span>
+                </div>
+                
+                <h4 className="font-bold text-sm text-white leading-tight mt-1">{job.title}</h4>
+                <p className="text-xs text-slate-400 mt-0.5">{job.company}</p>
+                
+                <div className="my-2 p-2 bg-slate-900 rounded-xl flex items-center justify-between text-xs">
+                  <span className="text-emerald-400 font-bold">{job.salary}</span>
+                  <span className="text-slate-400 flex items-center gap-1 text-[11px]">
+                    <Car className="w-3 h-3 text-slate-400" />
+                    ~{Math.max(2, Math.round(job.distanceKm * 2.5))} min
+                  </span>
+                </div>
+
+                <button
+                  onClick={() => onSelectJob(job)}
+                  className="w-full py-1.5 px-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-colors shadow-md"
+                >
+                  View Details & Apply
+                </button>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+
+        {/* Seeker Markers */}
+        {visibleSeekers.map((seeker) => (
+          <Marker
+            key={seeker.id}
+            position={[seeker.lat, seeker.lng]}
+            icon={createSeekerIcon(seeker)}
+          >
+            <Popup>
+              <div className="min-w-[200px] p-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <img
+                    src={seeker.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${seeker.name}`}
+                    alt={seeker.name}
+                    className="w-9 h-9 rounded-full border border-emerald-500/60 object-cover"
+                  />
+                  <div>
+                    <h4 className="font-bold text-sm text-white leading-tight">{seeker.name}</h4>
+                    <p className="text-[11px] text-emerald-400">{seeker.title || 'Available Candidate'}</p>
+                    <span className="text-[10px] text-slate-400 font-semibold">
+                      📍 {seeker.distanceKm} km away
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-1.5 my-2">
+                  <button
+                    onClick={() => {
+                      startCall(seeker, false);
+                    }}
+                    className="py-1 px-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition-colors"
+                  >
+                    <Phone className="w-3 h-3" /> Voice
+                  </button>
+                  <button
+                    onClick={() => {
+                      startCall(seeker, true);
+                    }}
+                    className="py-1 px-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition-colors"
+                  >
+                    <Video className="w-3 h-3" /> Video
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => onSelectSeeker(seeker)}
+                  className="w-full py-1.5 px-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition-colors border border-slate-700"
+                >
+                  View Profile & Skills
+                </button>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+
+      </MapContainer>
+
+    </div>
+  );
+};
