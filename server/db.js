@@ -5,7 +5,11 @@ import bcrypt from 'bcryptjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const DB_PATH = path.join(__dirname, 'data.json');
+const DB_PATH = process.env.DATA_PATH || path.join(__dirname, 'data.json');
+const dbDir = path.dirname(DB_PATH);
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+}
 
 // Default initial seeds with Multiple Employers & Multiple Seekers
 const getDefaultData = () => {

@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "Fullstack Uber-style Job Map Platform with Video/Voice Call and Chat",
   "scripts": {
-    "server": "cd server && npm start",
-    "client": "cd client && npm run dev",
-    "install-all": "cd server && npm install && cd ../client && npm install"
+    "start": "node server/server.js",
+    "build": "npm --prefix client install && npm --prefix client run build && npm --prefix server install",
+    "build:client": "npm --prefix client install && npm --prefix client run build",
+    "install:all": "npm --prefix server install && npm --prefix client install",
+    "server": "npm --prefix server start",
+    "client": "npm --prefix client run dev"
   },
   "keywords": ["react", "express", "webrtc", "socketio", "leaflet", "jobs", "map"],
   "author": "Antigravity",

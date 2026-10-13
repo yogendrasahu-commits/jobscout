@@ -112,8 +112,10 @@ export const SocketProvider = ({ children }) => {
 
   // 1. Initialize Socket
   useEffect(() => {
-    const s = io(window.location.origin, {
-      reconnectionAttempts: 5,
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL || window.location.origin;
+    const s = io(socketUrl, {
+      reconnectionAttempts: 10,
+      reconnectionDelay: 1000,
       transports: ['websocket', 'polling']
     });
 

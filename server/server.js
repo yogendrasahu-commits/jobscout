@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
@@ -15,16 +18,28 @@ import { setupSocket } from './socket.js';
 
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const server = http.createServer(app);
 
-// CORS configuration for REST & WebSockets
-const allowedOrigins = ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000'];
+// Dynamic CORS configuration for REST & WebSockets (supports online deployment e.g. Vercel, Render)
+const clientUrl = process.env.CLIENT_URL;
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:3000',
+  'http://localhost:5000',
+  ...(clientUrl ? clientUrl.split(',').map(s => s.trim()) : [])
+];
 
 app.use(cors({
   origin: (origin, callback) => {
-    // allow requests with no origin (like mobile apps, curl, postman)
-    if (!origin) return callback(null, true);
+    // Permissive for mobile browsers, curl, local dev, or when origin is in allowed list
+    if (!origin || allowedOrigins.includes(origin) || !clientUrl || process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
     return callback(null, true);
   },
   credentials: true
@@ -65,6 +80,19 @@ app.use('/api/messages', messagesRoutes);
 app.use('/api/posts', postsRoutes);
 app.use('/api/network', networkRoutes);
 app.use('/api/anon', anonRoutes);
+
+// Serve built React client in production if client/dist exists (Fullstack single-service deployment)
+const clientDistPath = path.resolve(__dirname, '../client/dist');
+if (fs.existsSync(clientDistPath)) {
+  console.log(`📦 Serving static client from: ${clientDistPath}`);
+  app.use(express.static(clientDistPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/socket.io')) {
+      return next();
+    }
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+}
 
 // Error Handling
 app.use((err, req, res, next) => {

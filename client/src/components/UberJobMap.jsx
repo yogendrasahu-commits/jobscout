@@ -72,8 +72,44 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return Math.round(dist * 10) / 10; // Round to 1 decimal place (e.g. 4.2 km)
 }
 
+// Strict Geographic boundaries of India (with slight coastal buffer)
+const INDIA_BOUNDS = [
+  [5.5, 67.0],  // South-West (Indian Ocean / Arabian Sea)
+  [37.5, 97.5]  // North-East (Kashmir / Arunachal Pradesh)
+];
+
+// National geographic center of India
+const INDIA_CENTER = [20.5937, 78.9629];
+
+// Quick City & National Region Presets across India
+const INDIA_CITY_PRESETS = [
+  { name: 'All India', label: 'All India', lat: 20.5937, lng: 78.9629, zoom: 5, isCountryView: true },
+  { name: 'Delhi NCR', label: 'Delhi NCR', lat: 28.6139, lng: 77.2090, zoom: 12 },
+  { name: 'Mumbai', label: 'Mumbai', lat: 19.0760, lng: 72.8777, zoom: 12 },
+  { name: 'Bengaluru', label: 'Bengaluru', lat: 12.9716, lng: 77.5946, zoom: 12 },
+  { name: 'Hyderabad', label: 'Hyderabad', lat: 17.3850, lng: 78.4867, zoom: 12 },
+  { name: 'Pune', label: 'Pune', lat: 18.5204, lng: 73.8567, zoom: 12 },
+  { name: 'Chennai', label: 'Chennai', lat: 13.0827, lng: 80.2707, zoom: 12 },
+  { name: 'Kolkata', label: 'Kolkata', lat: 22.5726, lng: 88.3639, zoom: 12 },
+  { name: 'Ahmedabad', label: 'Ahmedabad', lat: 23.0225, lng: 72.5714, zoom: 12 },
+  { name: 'Jaipur', label: 'Jaipur', lat: 26.9124, lng: 75.7873, zoom: 12 },
+  { name: 'Chandigarh', label: 'Chandigarh', lat: 30.7333, lng: 76.7794, zoom: 12 },
+  { name: 'Indore', label: 'Indore', lat: 22.7196, lng: 75.8577, zoom: 12 },
+  { name: 'Kochi', label: 'Kochi', lat: 9.9312, lng: 76.2673, zoom: 12 }
+];
+
 // Instant Pre-indexed Popular Locations & Tech/Business Hubs in India
 const POPULAR_LOCATIONS = [
+  // National View
+  { name: 'All India (National View)', city: 'All India', state: 'India', lat: 20.5937, lng: 78.9629, label: 'India' },
+
+  // Delhi NCR
+  { name: 'Connaught Place (CP)', city: 'New Delhi', state: 'Delhi', lat: 28.6304, lng: 77.2177, label: 'Delhi CP' },
+  { name: 'Cyber City, DLF Phase 2', city: 'Gurugram', state: 'Haryana', lat: 28.4900, lng: 77.0880, label: 'Gurugram' },
+  { name: 'Sector 62 IT Corridor', city: 'Noida', state: 'Uttar Pradesh', lat: 28.6258, lng: 77.3638, label: 'Noida 62' },
+  { name: 'South Extension & AIIMS', city: 'New Delhi', state: 'Delhi', lat: 28.5700, lng: 77.2200, label: 'South Ext' },
+  { name: 'Okhla Industrial Area Phase 3', city: 'New Delhi', state: 'Delhi', lat: 28.5355, lng: 77.2710, label: 'Okhla' },
+
   // Mumbai Hubs (Seed Job Area)
   { name: 'Bandra Kurla Complex (BKC)', city: 'Mumbai', state: 'Maharashtra', lat: 19.0760, lng: 72.8777, label: 'BKC' },
   { name: 'Andheri East (MIDC & SEEPZ)', city: 'Mumbai', state: 'Maharashtra', lat: 19.1136, lng: 72.8697, label: 'Andheri E' },
@@ -93,23 +129,41 @@ const POPULAR_LOCATIONS = [
   { name: 'Malad West (Mindspace Park)', city: 'Mumbai', state: 'Maharashtra', lat: 19.1860, lng: 72.8350, label: 'Malad' },
   { name: 'Borivali West & Station', city: 'Mumbai', state: 'Maharashtra', lat: 19.2307, lng: 72.8567, label: 'Borivali' },
 
-  // Delhi NCR
-  { name: 'Connaught Place (CP)', city: 'New Delhi', state: 'Delhi', lat: 28.6304, lng: 77.2177, label: 'Delhi CP' },
-  { name: 'Cyber City, DLF Phase 2', city: 'Gurugram', state: 'Haryana', lat: 28.4900, lng: 77.0880, label: 'Gurugram' },
-  { name: 'Sector 62 IT Corridor', city: 'Noida', state: 'Uttar Pradesh', lat: 28.6258, lng: 77.3638, label: 'Noida 62' },
-  { name: 'South Extension & AIIMS', city: 'New Delhi', state: 'Delhi', lat: 28.5700, lng: 77.2200, label: 'South Ext' },
-
   // Bengaluru
   { name: 'Koramangala Tech Corridor', city: 'Bengaluru', state: 'Karnataka', lat: 12.9352, lng: 77.6245, label: 'Koramangala' },
   { name: 'Indiranagar 100ft Road', city: 'Bengaluru', state: 'Karnataka', lat: 12.9784, lng: 77.6408, label: 'Indiranagar' },
   { name: 'HSR Layout Startup Hub', city: 'Bengaluru', state: 'Karnataka', lat: 12.9121, lng: 77.6446, label: 'HSR' },
   { name: 'Whitefield & ITPL', city: 'Bengaluru', state: 'Karnataka', lat: 12.9698, lng: 77.7500, label: 'Whitefield' },
+  { name: 'Electronic City Phase 1', city: 'Bengaluru', state: 'Karnataka', lat: 12.8452, lng: 77.6602, label: 'E-City' },
+  { name: 'Manyata Tech Park', city: 'Bengaluru', state: 'Karnataka', lat: 13.0475, lng: 77.6197, label: 'Manyata' },
 
-  // Pune & Hyderabad
+  // Hyderabad
+  { name: 'Hitec City & Madhapur', city: 'Hyderabad', state: 'Telangana', lat: 17.4474, lng: 78.3762, label: 'Hitec City' },
+  { name: 'Gachibowli Financial Dist', city: 'Hyderabad', state: 'Telangana', lat: 17.4401, lng: 78.3489, label: 'Gachibowli' },
+  { name: 'Kondapur & Botanical Garden', city: 'Hyderabad', state: 'Telangana', lat: 17.4646, lng: 78.3582, label: 'Kondapur' },
+
+  // Pune
   { name: 'Hinjawadi IT Park Phase 1', city: 'Pune', state: 'Maharashtra', lat: 18.5913, lng: 73.7389, label: 'Hinjawadi' },
   { name: 'Viman Nagar & Kharadi IT', city: 'Pune', state: 'Maharashtra', lat: 18.5679, lng: 73.9143, label: 'Viman Ngr' },
-  { name: 'Hitec City & Madhapur', city: 'Hyderabad', state: 'Telangana', lat: 17.4474, lng: 78.3762, label: 'Hitec City' },
-  { name: 'Gachibowli Financial Dist', city: 'Hyderabad', state: 'Telangana', lat: 17.4401, lng: 78.3489, label: 'Gachibowli' }
+  { name: 'Magarpatta Cybercity', city: 'Pune', state: 'Maharashtra', lat: 18.5132, lng: 73.9268, label: 'Magarpatta' },
+
+  // Chennai
+  { name: 'OMR IT Expressway (Taramani)', city: 'Chennai', state: 'Tamil Nadu', lat: 12.9863, lng: 80.2432, label: 'OMR' },
+  { name: 'T Nagar Commercial Hub', city: 'Chennai', state: 'Tamil Nadu', lat: 13.0418, lng: 80.2341, label: 'T Nagar' },
+  { name: 'Guindy & Olympia Tech Park', city: 'Chennai', state: 'Tamil Nadu', lat: 13.0067, lng: 80.2025, label: 'Guindy' },
+
+  // Kolkata
+  { name: 'Salt Lake Sector V IT Hub', city: 'Kolkata', state: 'West Bengal', lat: 22.5804, lng: 88.4378, label: 'Sector V' },
+  { name: 'New Town Action Area 1 & 2', city: 'Kolkata', state: 'West Bengal', lat: 22.5867, lng: 88.4754, label: 'New Town' },
+  { name: 'Park Street Business Dist', city: 'Kolkata', state: 'West Bengal', lat: 22.5516, lng: 88.3524, label: 'Park St' },
+
+  // Ahmedabad, Jaipur, Chandigarh, Indore, Kochi
+  { name: 'SG Highway & Prahlad Nagar', city: 'Ahmedabad', state: 'Gujarat', lat: 23.0125, lng: 72.5118, label: 'SG Highway' },
+  { name: 'GIFT City Fin-Tech Zone', city: 'Gandhinagar', state: 'Gujarat', lat: 23.1610, lng: 72.6842, label: 'GIFT City' },
+  { name: 'Malviya Nagar & World Trade Park', city: 'Jaipur', state: 'Rajasthan', lat: 26.8532, lng: 75.8052, label: 'Jaipur WTP' },
+  { name: 'Rajiv Gandhi Chandigarh IT Park', city: 'Chandigarh', state: 'Punjab/Haryana', lat: 30.7258, lng: 76.8454, label: 'Chd IT Park' },
+  { name: 'Vijay Nagar & Super Corridor IT', city: 'Indore', state: 'Madhya Pradesh', lat: 22.7533, lng: 75.8937, label: 'Indore IT' },
+  { name: 'Infopark Kakkanad', city: 'Kochi', state: 'Kerala', lat: 10.0104, lng: 76.3638, label: 'Infopark' }
 ];
 
 // Forces Leaflet to invalidate size and re-render tiles on mount and resize
@@ -179,7 +233,14 @@ function MapEventsHandler({ onMapClick, onMapMoveEnd }) {
 const isWithinIndia = (lat, lng) => {
   const nLat = Number(lat);
   const nLng = Number(lng);
-  return !isNaN(nLat) && !isNaN(nLng) && nLat >= 6 && nLat <= 38 && nLng >= 68 && nLng <= 98;
+  return !isNaN(nLat) && !isNaN(nLng) && nLat >= 6.0 && nLat <= 38.0 && nLng >= 68.0 && nLng <= 98.0;
+};
+
+// Clamp coordinates to stay within Indian territory
+const clampToIndia = (lat, lng) => {
+  const clampedLat = Math.min(Math.max(Number(lat), 7.0), 36.5);
+  const clampedLng = Math.min(Math.max(Number(lng), 68.5), 97.0);
+  return [clampedLat, clampedLng];
 };
 
 // Auto-fits map bounds to include all jobs, seekers, and the current center
@@ -380,18 +441,18 @@ export const UberJobMap = ({
   const { user, isEmployer, updateLocation } = useAuth();
   const { otherUserLocations, broadcastLocation, startCall, setActiveChatUser } = useSocket();
 
-  const initialLat = isWithinIndia(user?.lat, user?.lng) ? Number(user.lat) : 19.0760;
-  const initialLng = isWithinIndia(user?.lat, user?.lng) ? Number(user.lng) : 72.8777;
+  const initialLat = isWithinIndia(user?.lat, user?.lng) ? Number(user.lat) : INDIA_CENTER[0];
+  const initialLng = isWithinIndia(user?.lat, user?.lng) ? Number(user.lng) : INDIA_CENTER[1];
 
-  // Radar center coordinates (Defaults to user coordinates or Mumbai BKC)
+  // Radar center coordinates (Defaults to user coordinates or All India National Center)
   const [centerCoords, setCenterCoords] = useState([initialLat, initialLng]);
   const [activeLocationName, setActiveLocationName] = useState(
-    user?.address || 'Bandra Kurla Complex (BKC), Mumbai'
+    user?.address || 'India (National Live Map)'
   );
 
   const [radiusKm, setRadiusKm] = useState(25);
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [strictRadar, setStrictRadar] = useState(false); // Default false: show all pins across city, highlight inside radar
+  const [strictRadar, setStrictRadar] = useState(false); // Default false: show all pins across nation, highlight inside radar
   const [fitBoundsTrigger, setFitBoundsTrigger] = useState(0);
   const [showJobsLayer, setShowJobsLayer] = useState(true);
   const [showSeekersLayer, setShowSeekersLayer] = useState(true);
@@ -428,6 +489,29 @@ export const UberJobMap = ({
     }
   };
 
+  // Handle City & National Preset Selection (e.g. All India, Delhi, Mumbai, Bengaluru)
+  const handleSelectCityPreset = (preset) => {
+    const lat = preset.lat;
+    const lng = preset.lng;
+    setCenterCoords([lat, lng]);
+    const locName = preset.isCountryView ? 'India (National View)' : `${preset.name}, India`;
+    setActiveLocationName(locName);
+    setSearchQuery(preset.isCountryView ? 'India' : preset.name);
+    setIsSearchOpen(false);
+    setShowSearchThisArea(false);
+
+    if (preset.isCountryView) {
+      setStrictRadar(false);
+      if (mapInstance) {
+        mapInstance.flyTo([lat, lng], 5, { animate: true, duration: 1.2 });
+      }
+    } else {
+      if (mapInstance) {
+        mapInstance.flyTo([lat, lng], preset.zoom || 12, { animate: true, duration: 1.2 });
+      }
+    }
+  };
+
   // Sync center when user profile coordinates change
   useEffect(() => {
     if (user?.lat && user?.lng && isWithinIndia(user.lat, user.lng)) {
@@ -436,14 +520,14 @@ export const UberJobMap = ({
     }
   }, [user?.lat, user?.lng, user?.address]);
 
-  // Guaranteed safe finite coordinates for MapContainer & Leaflet layers
+  // Guaranteed safe finite coordinates within India for MapContainer & Leaflet layers
   const safeCoords = useMemo(() => {
     const lat = Number(centerCoords?.[0]);
     const lng = Number(centerCoords?.[1]);
     if (isWithinIndia(lat, lng)) {
       return [lat, lng];
     }
-    return [19.0760, 72.8777];
+    return [INDIA_CENTER[0], INDIA_CENTER[1]];
   }, [centerCoords]);
 
   // Close search dropdown on click outside
@@ -572,8 +656,7 @@ export const UberJobMap = ({
   // Move radar center when beacon marker is dragged (like Google Maps pin)
   const handleMarkerDragEnd = async (latlng) => {
     if (!latlng) return;
-    const lat = latlng.lat;
-    const lng = latlng.lng;
+    const [lat, lng] = clampToIndia(latlng.lat, latlng.lng);
     setCenterCoords([lat, lng]);
     setShowSearchThisArea(false);
     const newName = await reverseGeocode(lat, lng);
@@ -587,8 +670,7 @@ export const UberJobMap = ({
   const handleMoveRadarToMapCenter = async () => {
     if (mapInstance) {
       const center = mapInstance.getCenter();
-      const lat = center.lat;
-      const lng = center.lng;
+      const [lat, lng] = clampToIndia(center.lat, center.lng);
       setCenterCoords([lat, lng]);
       setShowSearchThisArea(false);
       const newName = await reverseGeocode(lat, lng);
@@ -709,8 +791,10 @@ export const UberJobMap = ({
 
   // Map Click Handler: relocate radar center dynamically for exploration without mutating saved user profile
   const handleMapClick = (latlng) => {
-    setCenterCoords([latlng.lat, latlng.lng]);
-    const clickedLabel = `Radar Center [${latlng.lat.toFixed(3)}, ${latlng.lng.toFixed(3)}]`;
+    if (!latlng) return;
+    const [lat, lng] = clampToIndia(latlng.lat, latlng.lng);
+    setCenterCoords([lat, lng]);
+    const clickedLabel = `Radar Center [${lat.toFixed(3)}, ${lng.toFixed(3)}]`;
     setActiveLocationName(clickedLabel);
   };
 
@@ -831,14 +915,37 @@ export const UberJobMap = ({
           </button>
 
           {/* Mobile Filter Sheet Trigger Button */}
-          <button
-            onClick={() => setIsFilterModalOpen(true)}
-            className="md:hidden flex-shrink-0 px-3 py-2.5 bg-indigo-600 text-white rounded-2xl shadow-xl flex items-center gap-1.5 text-xs font-bold active:scale-95"
-          >
-            <Sliders className="w-3.5 h-3.5" />
-            <span>Radar</span>
-          </button>
+        </div>
 
+        {/* Quick Indian Cities & National Hubs Selector Strip */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pointer-events-auto py-0.5 max-w-full">
+          {INDIA_CITY_PRESETS.map((city) => {
+            const isCurrent = 
+              Math.abs(safeCoords[0] - city.lat) < 0.15 && 
+              Math.abs(safeCoords[1] - city.lng) < 0.15;
+            return (
+              <button
+                key={city.name}
+                type="button"
+                onClick={() => handleSelectCityPreset(city)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shadow-md transition-all active:scale-95 flex items-center gap-1.5 border ${
+                  isCurrent
+                    ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-emerald-600 text-white border-amber-300/40 shadow-amber-500/25 ring-1 ring-amber-400'
+                    : 'bg-slate-900/90 hover:bg-slate-850 backdrop-blur-md text-slate-300 hover:text-white border-slate-700/80 hover:border-slate-600'
+                }`}
+                title={`Explore ${city.name}`}
+              >
+                {city.isCountryView ? (
+                  <span className="flex items-center gap-1 font-extrabold text-white">
+                    <span>🇮🇳</span>
+                    <span>All India</span>
+                  </span>
+                ) : (
+                  <span>{city.label}</span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         {/* Row 2: Mobile Status Strip */}
@@ -1139,20 +1246,21 @@ export const UberJobMap = ({
               </div>
             </div>
 
-            {/* Quick Presets */}
+            {/* Quick Indian Cities & National Hubs */}
             <div>
-              <span className="text-xs font-bold text-slate-300 block mb-2">Quick City Hubs</span>
+              <span className="text-xs font-bold text-slate-300 block mb-2">Explore Indian Cities & Hubs</span>
               <div className="flex flex-wrap gap-1.5">
-                {POPULAR_LOCATIONS.slice(0, 8).map((p) => (
+                {INDIA_CITY_PRESETS.map((p) => (
                   <button
                     key={p.name}
+                    type="button"
                     onClick={() => {
-                      handleSelectLocation(p);
+                      handleSelectCityPreset(p);
                       setIsFilterModalOpen(false);
                     }}
-                    className="px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-slate-800 text-slate-300 hover:text-white"
+                    className="px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white border border-slate-700 active:scale-95 transition-all"
                   >
-                    {p.label || p.name}
+                    {p.isCountryView ? '🇮🇳 All India' : p.label}
                   </button>
                 ))}
               </div>
@@ -1407,11 +1515,15 @@ export const UberJobMap = ({
       )}
 
       {/* ============================================================== */}
-      {/* LEAFLET MAP CONTAINER */}
+      {/* LEAFLET MAP CONTAINER (Bounded to India) */}
       {/* ============================================================== */}
       <MapContainer
         center={safeCoords}
-        zoom={13}
+        zoom={user?.lat && isWithinIndia(user.lat, user.lng) ? 12 : 5}
+        minZoom={4}
+        maxZoom={19}
+        maxBounds={INDIA_BOUNDS}
+        maxBoundsViscosity={1.0}
         zoomControl={false}
         scrollWheelZoom={true}
         dragging={true}

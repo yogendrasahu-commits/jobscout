@@ -232,12 +232,12 @@ export const Navbar = ({
   return (
     <header className="bg-slate-900/95 backdrop-blur-xl border-b border-slate-800/90 sticky top-0 z-[800] select-none shadow-xl w-full max-w-full">
       <div className="w-full max-w-[1700px] mx-auto px-2 sm:px-4 lg:px-6">
-        <div className="flex items-center justify-between h-16 gap-1 sm:gap-2 lg:gap-3">
+        <div className="flex md:grid md:grid-cols-[1fr_auto_1fr] items-center justify-between h-[68px] gap-2 sm:gap-4">
           
           {/* ========================================================== */}
           {/* 1. BRAND LOGO & LOCATION PILL & SEARCH BAR */}
           {/* ========================================================== */}
-          <div className="flex items-center gap-2 lg:gap-2.5 xl:gap-3 flex-shrink-0">
+          <div className="flex items-center gap-2 lg:gap-2.5 xl:gap-3 justify-start min-w-0">
             {/* Logo with Hover Name Tooltip */}
             <div 
               className="flex items-center gap-2 cursor-pointer group relative flex-shrink-0" 
@@ -260,7 +260,7 @@ export const Navbar = ({
                 <div className="hidden 2xl:flex items-center gap-1 text-[10px] text-slate-400 mt-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
                   <span className="truncate max-w-[110px]">
-                    {user?.address ? user.address.split(',')[0] : 'Mumbai BKC • GPS'}
+                    {user?.address ? user.address.split(',')[0] : 'India • GPS'}
                   </span>
                 </div>
               </div>
@@ -325,11 +325,11 @@ export const Navbar = ({
                         <span>React Developer Jobs ({jobsCount})</span>
                       </div>
                       <div 
-                        onClick={() => { setSearchQuery('Mumbai'); setCurrentTab('map'); setSearchFocused(false); }}
+                        onClick={() => { setSearchQuery('India'); setCurrentTab('map'); setSearchFocused(false); }}
                         className="flex items-center gap-2 px-2.5 py-1.5 text-xs text-slate-300 hover:bg-slate-800 rounded-xl cursor-pointer transition-colors"
                       >
                         <MapPin className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Explore Mumbai BKC Radar Map</span>
+                        <span>Explore India Live Radar Map</span>
                       </div>
                       <div 
                         onClick={() => { setSearchQuery('Engineer'); setCurrentTab('network'); setSearchFocused(false); }}
@@ -457,163 +457,165 @@ export const Navbar = ({
           </div>
 
           {/* ========================================================== */}
-          {/* 2. LAPTOP & DESKTOP NAVIGATION TABS (All options visible on laptop/desktop) */}
+          {/* 2. LAPTOP & DESKTOP NAVIGATION TABS (Centered in Header & Sized Up) */}
           {/* ========================================================== */}
-          <nav className="hidden md:flex items-center gap-0.5 lg:gap-1 bg-slate-950/80 p-0.5 lg:p-1 rounded-2xl border border-slate-800/90 shadow-inner flex-shrink-0">
-            
-            {/* 1. Feed (Home) */}
-            <button
-              onClick={() => setCurrentTab('feed')}
-              className={`group relative flex items-center gap-1 lg:gap-1.5 px-1.5 md:px-2 lg:px-2.5 xl:px-3 py-1.5 rounded-xl text-[11px] lg:text-xs font-semibold transition-all ${
-                currentTab === 'feed'
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
-              title="Feed (Home)"
-            >
-              <Home className="w-3.5 h-3.5 lg:w-4 lg:h-4 flex-shrink-0" />
-              <span>Feed</span>
+          <div className="hidden md:flex justify-center items-center">
+            <nav className="flex items-center gap-1 lg:gap-1.5 bg-slate-950/90 p-1 lg:p-1.5 rounded-2xl border border-slate-800/90 shadow-xl shadow-black/25">
+              
+              {/* 1. Feed (Home) */}
+              <button
+                onClick={() => setCurrentTab('feed')}
+                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] font-bold transition-all ${
+                  currentTab === 'feed'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/35 font-extrabold'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/70'
+                }`}
+                title="Feed (Home)"
+              >
+                <Home className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
+                <span>Feed</span>
 
-              {/* Hover Tooltip */}
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-slate-700/80 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-                Feed (Home)
-              </div>
-            </button>
+                {/* Hover Tooltip */}
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-slate-700/80 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+                  Feed (Home)
+                </div>
+              </button>
 
-            {/* 2. My Network */}
-            <button
-              onClick={() => setCurrentTab('network')}
-              className={`group relative flex items-center gap-1 lg:gap-1.5 px-1.5 md:px-2 lg:px-2.5 xl:px-3 py-1.5 rounded-xl text-[11px] lg:text-xs font-semibold transition-all ${
-                currentTab === 'network'
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
-              title="My Professional Network"
-            >
-              <Users className="w-3.5 h-3.5 lg:w-4 lg:h-4 flex-shrink-0" />
-              <span>Network</span>
+              {/* 2. My Network */}
+              <button
+                onClick={() => setCurrentTab('network')}
+                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] font-bold transition-all ${
+                  currentTab === 'network'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/35 font-extrabold'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/70'
+                }`}
+                title="My Professional Network"
+              >
+                <Users className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
+                <span>Network</span>
 
-              {/* Hover Tooltip */}
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-slate-700/80 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-                My Network ({seekersCount + employersCount})
-              </div>
-            </button>
+                {/* Hover Tooltip */}
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-slate-700/80 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+                  My Network ({seekersCount + employersCount})
+                </div>
+              </button>
 
-            {/* 3. Live Map Radar */}
-            <button
-              onClick={() => setCurrentTab('map')}
-              className={`group relative flex items-center gap-1 lg:gap-1.5 px-1.5 md:px-2 lg:px-2.5 xl:px-3 py-1.5 rounded-xl text-[11px] lg:text-xs font-semibold transition-all ${
-                currentTab === 'map'
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
-              title="Live Radar Map"
-            >
-              <MapPin className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-emerald-400 flex-shrink-0" />
-              <span>Radar</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping ml-0.5" />
+              {/* 3. Live Map Radar */}
+              <button
+                onClick={() => setCurrentTab('map')}
+                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] font-bold transition-all ${
+                  currentTab === 'map'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/35 font-extrabold'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/70'
+                }`}
+                title="Live Radar Map"
+              >
+                <MapPin className="w-4 h-4 lg:w-[18px] lg:h-[18px] text-emerald-400 flex-shrink-0" />
+                <span>Radar</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping ml-0.5" />
 
-              {/* Hover Tooltip */}
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-slate-700/80 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-                Live Radar Map
-              </div>
-            </button>
+                {/* Hover Tooltip */}
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-slate-700/80 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+                  Live Radar Map
+                </div>
+              </button>
 
-            {/* 4. Jobs & Applied */}
-            <button
-              onClick={() => setCurrentTab('jobs')}
-              className={`group relative flex items-center gap-1 lg:gap-1.5 px-2 md:px-2.5 lg:px-3 py-1.5 rounded-xl text-[11px] lg:text-xs font-semibold transition-all ${
-                currentTab === 'jobs' || currentTab === 'applications'
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
-              title="Job Board & Applications"
-            >
-              <Briefcase className="w-3.5 h-3.5 lg:w-4 lg:h-4 flex-shrink-0" />
-              <span>Jobs</span>
-              {jobsCount > 0 && (
-                <span className="text-[9px] lg:text-[10px] bg-slate-800 px-1.5 py-0.2 rounded-full text-indigo-300 border border-slate-700">
-                  {jobsCount}
+              {/* 4. Jobs & Applied */}
+              <button
+                onClick={() => setCurrentTab('jobs')}
+                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] font-bold transition-all ${
+                  currentTab === 'jobs' || currentTab === 'applications'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/35 font-extrabold'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/70'
+                }`}
+                title="Job Board & Applications"
+              >
+                <Briefcase className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
+                <span>Jobs</span>
+                {jobsCount > 0 && (
+                  <span className="text-[10px] lg:text-[11px] bg-slate-800 px-1.5 py-0.2 rounded-full text-indigo-300 border border-slate-700 font-extrabold">
+                    {jobsCount}
+                  </span>
+                )}
+
+                {/* Hover Tooltip */}
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-slate-700/80 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+                  Jobs & Applications ({jobsCount} openings)
+                </div>
+              </button>
+
+              {/* 5. Speed Connect Hub */}
+              <button
+                onClick={() => setCurrentTab('connect')}
+                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] font-bold transition-all ${
+                  currentTab === 'connect'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/35 font-extrabold'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/70'
+                }`}
+                title="Speed Connect Hub (Audio & Video Calls)"
+              >
+                <Radio className="w-4 h-4 lg:w-[18px] lg:h-[18px] text-emerald-400 animate-pulse flex-shrink-0" />
+                <span>Connect</span>
+
+                {/* Hover Tooltip */}
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-slate-700/80 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+                  Speed Connect (Calls & Chat)
+                </div>
+              </button>
+
+              {/* 6. Anonymous Discussions */}
+              <button
+                onClick={() => setCurrentTab('anon')}
+                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] font-bold transition-all ${
+                  currentTab === 'anon'
+                    ? 'bg-orange-600 text-white shadow-md shadow-orange-600/35 font-extrabold'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/70'
+                }`}
+                title="JobScout Anon Talk"
+              >
+                <div className="relative">
+                  <Flame className={`w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0 ${currentTab === 'anon' ? 'text-white' : 'text-orange-400'}`} />
+                  <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-orange-500 rounded-full animate-ping" />
+                </div>
+                <span>
+                  <span className="hidden xl:inline">Anon Talk</span>
+                  <span className="xl:hidden">Anon</span>
                 </span>
-              )}
 
-              {/* Hover Tooltip */}
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-slate-700/80 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-                Jobs & Applications ({jobsCount} openings)
-              </div>
-            </button>
+                {/* Hover Tooltip */}
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-slate-700/80 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+                  JobScout Anon Talk
+                </div>
+              </button>
 
-            {/* 5. Speed Connect Hub */}
-            <button
-              onClick={() => setCurrentTab('connect')}
-              className={`group relative flex items-center gap-1 lg:gap-1.5 px-1.5 md:px-2 lg:px-2.5 xl:px-3 py-1.5 rounded-xl text-[11px] lg:text-xs font-semibold transition-all ${
-                currentTab === 'connect'
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
-              title="Speed Connect Hub (Audio & Video Calls)"
-            >
-              <Radio className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-emerald-400 animate-pulse flex-shrink-0" />
-              <span>Connect</span>
+              {/* 7. Full-Page Messaging */}
+              <button
+                onClick={() => setCurrentTab('messages')}
+                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] font-bold transition-all ${
+                  currentTab === 'messages'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/35 font-extrabold'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/70'
+                }`}
+                title="Full-Page Messaging (चैट)"
+              >
+                <div className="relative">
+                  <MessageSquare className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
+                  <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-emerald-400 rounded-full" />
+                </div>
+                <span>Messages</span>
 
-              {/* Hover Tooltip */}
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-slate-700/80 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-                Speed Connect (Calls & Chat)
-              </div>
-            </button>
-
-            {/* 6. Anonymous Discussions */}
-            <button
-              onClick={() => setCurrentTab('anon')}
-              className={`group relative flex items-center gap-1 lg:gap-1.5 px-1.5 md:px-2 lg:px-2.5 xl:px-3 py-1.5 rounded-xl text-[11px] lg:text-xs font-semibold transition-all ${
-                currentTab === 'anon'
-                  ? 'bg-orange-600 text-white shadow-md shadow-orange-600/30 font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
-              title="JobScout Anon Talk"
-            >
-              <div className="relative">
-                <Flame className={`w-3.5 h-3.5 lg:w-4 lg:h-4 flex-shrink-0 ${currentTab === 'anon' ? 'text-white' : 'text-orange-400'}`} />
-                <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-orange-500 rounded-full animate-ping" />
-              </div>
-              <span>
-                <span className="hidden xl:inline">Anon Talk</span>
-                <span className="xl:hidden">Anon</span>
-              </span>
-
-              {/* Hover Tooltip */}
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-slate-700/80 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-                JobScout Anon Talk
-              </div>
-            </button>
-
-            {/* 8. Full-Page Messaging */}
-            <button
-              onClick={() => setCurrentTab('messages')}
-              className={`group relative flex items-center gap-1 lg:gap-1.5 px-1.5 md:px-2 lg:px-2.5 xl:px-3 py-1.5 rounded-xl text-[11px] lg:text-xs font-semibold transition-all ${
-                currentTab === 'messages'
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
-              title="Full-Page Messaging (चैट)"
-            >
-              <div className="relative">
-                <MessageSquare className="w-3.5 h-3.5 lg:w-4 lg:h-4 flex-shrink-0" />
-                <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-emerald-400 rounded-full" />
-              </div>
-              <span>Messages</span>
-
-              {/* Hover Tooltip */}
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-slate-700/80 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-                Full-Page Messaging (चैट)
-              </div>
-            </button>
-          </nav>
+                {/* Hover Tooltip */}
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-slate-700/80 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+                  Full-Page Messaging (चैट)
+                </div>
+              </button>
+            </nav>
+          </div>
 
           {/* ========================================================== */}
           {/* 3. RIGHT CONTROLS: MOBILE SEARCH, POST JOB, BELL, PROFILE, HAMBURGER */}
           {/* ========================================================== */}
-          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 justify-end flex-shrink-0">
             
             {/* Mobile Search Toggle Button (Phone Only) */}
             <div className="md:hidden relative" ref={mobileSearchRef}>
@@ -780,7 +782,7 @@ export const Navbar = ({
               <div className="relative group flex-shrink-0" ref={profileRef}>
                 <button
                   onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                  className="flex items-center gap-1.5 p-1 xl:px-2.5 xl:py-1 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 transition-all text-left flex-shrink-0"
+                  className="flex items-center gap-2 px-2 py-1 sm:px-2.5 sm:py-1 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 transition-all text-left flex-shrink-0 cursor-pointer shadow-sm hover:border-slate-600"
                   title="Profile & Settings"
                 >
                   <div className="relative flex-shrink-0">
@@ -794,17 +796,17 @@ export const Navbar = ({
                     }`} />
                   </div>
 
-                  <div className="hidden xl:block">
-                    <div className="text-xs font-bold text-white truncate max-w-[95px] 2xl:max-w-[120px] leading-tight">
+                  <div className="flex flex-col text-left min-w-0">
+                    <div className="text-xs font-bold text-white truncate max-w-[65px] sm:max-w-[95px] md:max-w-[110px] lg:max-w-[130px] xl:max-w-[150px] leading-tight">
                       {user.name}
                     </div>
-                    <div className="text-[10px] text-slate-400 flex items-center gap-1">
-                      <span className={`w-1.5 h-1.5 rounded-full ${isEmployer ? 'bg-indigo-400' : 'bg-emerald-400'}`} />
-                      <span>{isEmployer ? 'Recruiter' : 'Seeker'}</span>
+                    <div className="text-[10px] text-slate-400 flex items-center gap-1 leading-tight mt-0.5">
+                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isEmployer ? 'bg-indigo-400' : 'bg-emerald-400'}`} />
+                      <span className="truncate">{isEmployer ? 'Recruiter' : 'Seeker'}</span>
                     </div>
                   </div>
 
-                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden xl:block" />
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 flex-shrink-0 ml-0.5" />
                 </button>
 
                 {/* Hover Tooltip */}
@@ -861,7 +863,7 @@ export const Navbar = ({
                     {/* Location Info */}
                     <div className="px-2 py-1 text-xs text-slate-400 flex items-center gap-1.5 mb-2">
                       <MapPin className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
-                      <span className="truncate">{user.address || 'Active in Mumbai BKC'}</span>
+                      <span className="truncate">{user.address || 'Active in India'}</span>
                     </div>
 
                     {/* Account Type Indicator */}
@@ -942,36 +944,268 @@ export const Navbar = ({
       </div>
 
       {/* ========================================================== */}
-      {/* 4. FIXED HAMBURGER MENU DRAWER (Phone Only: md:hidden) */}
+      {/* 4. FIXED HAMBURGER MENU DRAWER (Teleported to document.body via Portal) */}
       {/* ========================================================== */}
-      {mobileDrawerOpen && (
-        <div className="fixed inset-0 z-[999] md:hidden animate-in fade-in duration-200">
-          {/* Backdrop */}
+      {mobileDrawerOpen && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[99999] md:hidden flex justify-end animate-in fade-in duration-200">
+          {/* Dark Backdrop */}
           <div 
-            className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity"
             onClick={() => setMobileDrawerOpen(false)}
+            aria-hidden="true"
           />
 
           {/* Drawer Panel */}
-          <div className="fixed inset-y-0 right-0 w-[88vw] max-w-sm bg-slate-900 border-l border-slate-800 shadow-2xl flex flex-col p-4 sm:p-5 overflow-y-auto animate-in slide-in-from-right duration-200 z-10">
+          <div className="relative w-[90vw] max-w-sm h-full max-h-[100dvh] bg-slate-900 border-l border-slate-800 shadow-2xl flex flex-col p-4 sm:p-5 overflow-y-auto z-10 animate-in slide-in-from-right duration-250">
             
             {/* Drawer Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-              <div className="flex items-center gap-2">
-                <JobScoutLogo size={28} />
-                <span className="font-extrabold text-white text-base">JobScout Navigation</span>
+            <div className="flex items-center justify-between pb-3.5 border-b border-slate-800 flex-shrink-0">
+              <div className="flex items-center gap-2.5">
+                <JobScoutLogo size={32} />
+                <div className="leading-tight">
+                  <span className="font-extrabold text-white text-base block">JobScout</span>
+                  <span className="text-[10px] text-slate-400 font-semibold">Navigation Menu</span>
+                </div>
               </div>
               <button 
                 onClick={() => setMobileDrawerOpen(false)}
-                className="p-1.5 rounded-xl bg-slate-800 text-slate-400 hover:text-white border border-slate-700 transition-colors"
+                className="p-2 rounded-xl bg-slate-800/90 text-slate-300 hover:text-white border border-slate-700 transition-colors active:scale-90"
                 title="Close Menu"
+                aria-label="Close navigation menu"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Search Input inside Hamburger Menu */}
-            <div className="my-4">
+            {/* 1. PRIMARY NAVIGATION OPTIONS (Placed at the TOP so user sees all nav options immediately!) */}
+            <div className="my-3 space-y-1.5 flex-shrink-0">
+              <div className="flex items-center justify-between px-1 mb-1">
+                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">
+                  Pages & Navigation
+                </span>
+                <span className="text-[10px] text-indigo-400 font-bold">
+                  Tap to open
+                </span>
+              </div>
+
+              {/* Feed (Home) */}
+              <button
+                onClick={() => { setCurrentTab('feed'); setMobileDrawerOpen(false); }}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
+                  currentTab === 'feed'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                    : 'text-slate-200 hover:bg-slate-800/90 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Home className={`w-4 h-4 flex-shrink-0 ${currentTab === 'feed' ? 'text-white' : 'text-indigo-400'}`} />
+                  <span>Feed (Home)</span>
+                </div>
+                <span className="text-[10px] text-slate-400 font-medium">Stories & Updates</span>
+              </button>
+
+              {/* Network */}
+              <button
+                onClick={() => { setCurrentTab('network'); setMobileDrawerOpen(false); }}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
+                  currentTab === 'network'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                    : 'text-slate-200 hover:bg-slate-800/90 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Users className={`w-4 h-4 flex-shrink-0 ${currentTab === 'network' ? 'text-white' : 'text-emerald-400'}`} />
+                  <span>My Network</span>
+                </div>
+                <span className="bg-slate-800 px-2 py-0.5 rounded-full text-[10px] text-slate-300 font-bold">
+                  {seekersCount + employersCount}
+                </span>
+              </button>
+
+              {/* Live Radar Map */}
+              <button
+                onClick={() => { setCurrentTab('map'); setMobileDrawerOpen(false); }}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
+                  currentTab === 'map'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                    : 'text-slate-200 hover:bg-slate-800/90 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <MapPin className={`w-4 h-4 flex-shrink-0 ${currentTab === 'map' ? 'text-white' : 'text-emerald-400'}`} />
+                  <span>Live Radar Map</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                  <span className="text-[10px] text-emerald-400 font-extrabold uppercase">Live</span>
+                </div>
+              </button>
+
+              {/* Job Board */}
+              <button
+                onClick={() => { setCurrentTab('jobs'); setMobileDrawerOpen(false); }}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
+                  currentTab === 'jobs'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                    : 'text-slate-200 hover:bg-slate-800/90 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Briefcase className={`w-4 h-4 flex-shrink-0 ${currentTab === 'jobs' ? 'text-white' : 'text-indigo-400'}`} />
+                  <span>Job Board (Openings)</span>
+                </div>
+                {jobsCount > 0 && (
+                  <span className="bg-indigo-500/20 border border-indigo-500/30 px-2 py-0.5 rounded-full text-[10px] text-indigo-300 font-bold">
+                    {jobsCount} jobs
+                  </span>
+                )}
+              </button>
+
+              {/* Applied Jobs / Candidate Applications */}
+              <button
+                onClick={() => { setCurrentTab('applications'); setMobileDrawerOpen(false); }}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
+                  currentTab === 'applications'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                    : 'text-slate-200 hover:bg-slate-800/90 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <FileText className={`w-4 h-4 flex-shrink-0 ${currentTab === 'applications' ? 'text-white' : 'text-indigo-400'}`} />
+                  <span>{isEmployer ? 'Candidate Applications' : 'Applied Jobs'}</span>
+                </div>
+                <span className="text-[10px] text-slate-400 font-semibold bg-slate-850 px-2 py-0.5 rounded-md">
+                  Status & Review
+                </span>
+              </button>
+
+              {/* Speed Connect Hub */}
+              <button
+                onClick={() => { setCurrentTab('connect'); setMobileDrawerOpen(false); }}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
+                  currentTab === 'connect'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                    : 'text-slate-200 hover:bg-slate-800/90 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Radio className={`w-4 h-4 flex-shrink-0 ${currentTab === 'connect' ? 'text-white' : 'text-emerald-400 animate-pulse'}`} />
+                  <span>Speed Connect</span>
+                </div>
+                <span className="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-bold uppercase">
+                  Calls
+                </span>
+              </button>
+
+              {/* Anon Talk */}
+              <button
+                onClick={() => { setCurrentTab('anon'); setMobileDrawerOpen(false); }}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
+                  currentTab === 'anon'
+                    ? 'bg-orange-600 text-white shadow-md shadow-orange-600/30'
+                    : 'text-slate-200 hover:bg-slate-800/90 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Flame className={`w-4 h-4 flex-shrink-0 ${currentTab === 'anon' ? 'text-white' : 'text-orange-400'}`} />
+                  <span>Anon Talk (गुमनाम चर्चा)</span>
+                </div>
+                <span className="text-[10px] bg-orange-500/20 text-orange-300 border border-orange-500/30 px-2 py-0.5 rounded-full font-bold">
+                  Community
+                </span>
+              </button>
+
+              {/* Full-Page Messaging */}
+              <button
+                onClick={() => { setCurrentTab('messages'); setMobileDrawerOpen(false); }}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
+                  currentTab === 'messages'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                    : 'text-slate-200 hover:bg-slate-800/90 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <MessageSquare className={`w-4 h-4 flex-shrink-0 ${currentTab === 'messages' ? 'text-white' : 'text-emerald-400'}`} />
+                  <span>Full-Page Messaging</span>
+                </div>
+                <span className="text-[10px] bg-indigo-600/30 text-indigo-300 px-2 py-0.5 rounded-full font-bold">
+                  Chat
+                </span>
+              </button>
+            </div>
+
+            {/* 2. USER PROFILE & ROLE SWITCH SECTION */}
+            {user ? (
+              <div className="my-2.5 p-3 rounded-2xl bg-slate-950 border border-slate-800 flex-shrink-0">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={user.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.name}`}
+                    alt={user.name}
+                    className="w-10 h-10 rounded-full border border-slate-700 object-cover bg-slate-800 flex-shrink-0"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <h4 className="font-bold text-xs text-white truncate">{user.name}</h4>
+                    <p className="text-[11px] text-indigo-400 truncate">{user.phone || '9876543210'}</p>
+                    <span className="inline-block text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 mt-0.5">
+                      {isEmployer ? '👔 Employer (#Hiring)' : '🔍 Seeker (#OpenToWork)'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 1-Tap Quick Role Switch */}
+                <div className="mt-2.5 pt-2 border-t border-slate-800/80">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase">1-TAP ROLE SWITCH:</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <button
+                      onClick={() => demoSwitch('emp')}
+                      className={`py-1.5 px-2 rounded-xl text-xs font-bold transition-all ${
+                        isEmployer ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-800 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      👔 Employer
+                    </button>
+                    <button
+                      onClick={() => demoSwitch('seeker')}
+                      className={`py-1.5 px-2 rounded-xl text-xs font-bold transition-all ${
+                        isSeeker ? 'bg-emerald-600 text-white shadow-md' : 'bg-slate-800 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      🔍 Seeker
+                    </button>
+                  </div>
+                </div>
+
+                {/* View Full Profile */}
+                <button
+                  onClick={() => {
+                    if (onOpenProfile) onOpenProfile(user);
+                    setMobileDrawerOpen(false);
+                  }}
+                  className="w-full mt-2 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 text-xs font-bold rounded-xl border border-indigo-500/30 flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  <User className="w-3.5 h-3.5" />
+                  <span>View Full Profile</span>
+                </button>
+              </div>
+            ) : (
+              <div className="my-2.5 p-3 rounded-2xl bg-slate-950 border border-slate-800 flex-shrink-0 text-center">
+                <p className="text-xs text-slate-400 mb-2">Sign in to apply for jobs and connect with candidates</p>
+                <button
+                  onClick={() => {
+                    onOpenAuth();
+                    setMobileDrawerOpen(false);
+                  }}
+                  className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition-all"
+                >
+                  Sign In to JobScout
+                </button>
+              </div>
+            )}
+
+            {/* 3. SEARCH & QUICK CHIPS */}
+            <div className="my-2 flex-shrink-0">
               <form onSubmit={handleSearchSubmit} className="relative">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                 <input
@@ -994,7 +1228,7 @@ export const Navbar = ({
 
               {/* Quick Suggestion Chips */}
               <div className="flex flex-wrap gap-1.5 mt-2">
-                {['React Developer', 'Mumbai BKC', 'Urgent Hiring', 'Full Stack'].map((tag) => (
+                {['React Developer', 'Mumbai BKC', 'Urgent Hiring'].map((tag) => (
                   <button
                     key={tag}
                     onClick={() => {
@@ -1010,190 +1244,8 @@ export const Navbar = ({
               </div>
             </div>
 
-            {/* Profile Info & 1-Tap Role Switch in Drawer */}
-            {user && (
-              <div className="mb-4 p-3.5 rounded-2xl bg-slate-950 border border-slate-800">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={user.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.name}`}
-                    alt={user.name}
-                    className="w-11 h-11 rounded-full border border-slate-700 object-cover bg-slate-800 flex-shrink-0"
-                  />
-                  <div className="min-w-0 flex-1">
-                    <h4 className="font-bold text-sm text-white truncate">{user.name}</h4>
-                    <p className="text-xs text-indigo-400 truncate">{user.phone || '9876543210'}</p>
-                    <span className="inline-block text-[9px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300 mt-1">
-                      {isEmployer ? '👔 Employer (#Hiring)' : '🔍 Seeker (#OpenToWork)'}
-                    </span>
-                  </div>
-                </div>
-
-                {/* 1-Tap Quick Role Switch */}
-                <div className="mt-3 pt-3 border-t border-slate-800/80">
-                  <span className="text-[10px] text-slate-400 font-bold block mb-1">QUICK ROLE SWITCH:</span>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      onClick={() => demoSwitch('emp')}
-                      className={`py-1.5 px-2 rounded-xl text-xs font-bold transition-all ${
-                        isEmployer ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-800 text-slate-400'
-                      }`}
-                    >
-                      👔 Employer
-                    </button>
-                    <button
-                      onClick={() => demoSwitch('seeker')}
-                      className={`py-1.5 px-2 rounded-xl text-xs font-bold transition-all ${
-                        isSeeker ? 'bg-emerald-600 text-white shadow-md' : 'bg-slate-800 text-slate-400'
-                      }`}
-                    >
-                      🔍 Seeker
-                    </button>
-                  </div>
-                </div>
-
-                {/* View Full Profile */}
-                <button
-                  onClick={() => {
-                    if (onOpenProfile) onOpenProfile(user);
-                    setMobileDrawerOpen(false);
-                  }}
-                  className="w-full mt-3 py-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 text-xs font-bold rounded-xl border border-indigo-500/30 flex items-center justify-center gap-1.5 transition-colors"
-                >
-                  <User className="w-3.5 h-3.5" />
-                  <span>View Full Profile</span>
-                </button>
-              </div>
-            )}
-
-            {/* Navigation Routes in Drawer */}
-            <div className="space-y-1 my-1">
-              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block px-2 mb-1">
-                Pages & Portals
-              </span>
-
-              {/* Feed */}
-              <button
-                onClick={() => { setCurrentTab('feed'); setMobileDrawerOpen(false); }}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                  currentTab === 'feed' ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800'
-                }`}
-              >
-                <Home className="w-4 h-4 text-indigo-400" />
-                <span>JobScout Feed</span>
-              </button>
-
-              {/* Network */}
-              <button
-                onClick={() => { setCurrentTab('network'); setMobileDrawerOpen(false); }}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                  currentTab === 'network' ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Users className="w-4 h-4 text-emerald-400" />
-                  <span>My Network</span>
-                </div>
-                <span className="bg-slate-800 px-2 py-0.5 rounded-full text-[10px] text-slate-300">
-                  {seekersCount + employersCount}
-                </span>
-              </button>
-
-              {/* Live Radar Map */}
-              <button
-                onClick={() => { setCurrentTab('map'); setMobileDrawerOpen(false); }}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                  currentTab === 'map' ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <MapPin className="w-4 h-4 text-emerald-400" />
-                  <span>Live Radar Map</span>
-                </div>
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              </button>
-
-              {/* Jobs */}
-              <button
-                onClick={() => { setCurrentTab('jobs'); setMobileDrawerOpen(false); }}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                  currentTab === 'jobs' ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Briefcase className="w-4 h-4 text-indigo-400" />
-                  <span>Job Board</span>
-                </div>
-                {jobsCount > 0 && (
-                  <span className="bg-indigo-500/20 border border-indigo-500/30 px-2 py-0.5 rounded-full text-[10px] text-indigo-300 font-bold">
-                    {jobsCount} jobs
-                  </span>
-                )}
-              </button>
-
-              {/* Speed Connect Hub */}
-              <button
-                onClick={() => { setCurrentTab('connect'); setMobileDrawerOpen(false); }}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                  currentTab === 'connect' ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
-                  <span>Speed Connect (Calls & Chat)</span>
-                </div>
-                <span className="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-bold uppercase">
-                  Live
-                </span>
-              </button>
-
-              {/* Anon Talk */}
-              <button
-                onClick={() => { setCurrentTab('anon'); setMobileDrawerOpen(false); }}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                  currentTab === 'anon' ? 'bg-orange-600 text-white' : 'text-slate-300 hover:bg-slate-800'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Flame className="w-4 h-4 text-orange-400" />
-                  <span>Anon Talk (गुमनाम चर्चा)</span>
-                </div>
-                <span className="text-[10px] bg-orange-500/20 text-orange-300 border border-orange-500/30 px-2 py-0.5 rounded-full font-bold">
-                  Community
-                </span>
-              </button>
-
-              {/* Full-Page Messaging */}
-              <button
-                onClick={() => { setCurrentTab('messages'); setMobileDrawerOpen(false); }}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                  currentTab === 'messages' ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <MessageSquare className="w-4 h-4 text-emerald-400" />
-                  <span>Full-Page Messaging (चैट)</span>
-                </div>
-                <span className="text-[10px] bg-indigo-600/30 text-indigo-300 px-2 py-0.5 rounded-full font-bold">
-                  Active
-                </span>
-              </button>
-
-              {/* Applications / Resumes */}
-              {user && (
-                <button
-                  onClick={() => { setCurrentTab('applications'); setMobileDrawerOpen(false); }}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                    currentTab === 'applications' ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800'
-                  }`}
-                >
-                  <FileText className="w-4 h-4 text-indigo-400" />
-                  <span>{isEmployer ? 'Candidates & Resumes' : 'My Applications'}</span>
-                </button>
-              )}
-            </div>
-
-            {/* Bottom Drawer Actions */}
-            <div className="mt-auto pt-4 border-t border-slate-800 space-y-2">
+            {/* 4. FOOTER ACTIONS */}
+            <div className="mt-auto pt-3 border-t border-slate-800 space-y-2 flex-shrink-0">
               {/* Employer Post Job */}
               {user && isEmployer && (
                 <button
@@ -1215,40 +1267,31 @@ export const Navbar = ({
                     onOpenSwitchAccount();
                     setMobileDrawerOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/30 text-xs font-bold"
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-slate-850 hover:bg-slate-800 text-indigo-300 hover:text-white text-xs font-semibold border border-slate-700/80 transition-colors"
                 >
-                  <Sparkles className="w-4 h-4 text-indigo-400" />
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
                   <span>Switch Demo Account (14 Profiles)</span>
                 </button>
               )}
 
-              {/* Sign In or Sign Out */}
-              {user ? (
+              {/* Sign Out */}
+              {user && (
                 <button
                   onClick={() => {
                     logout();
                     setMobileDrawerOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-rose-400 hover:bg-rose-500/10 text-xs font-bold transition-colors"
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-rose-400 hover:bg-rose-500/10 text-xs font-bold transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
-                  <span>Sign Out (लॉग आउट)</span>
-                </button>
-              ) : (
-                <button
-                  onClick={() => {
-                    onOpenAuth();
-                    setMobileDrawerOpen(false);
-                  }}
-                  className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all"
-                >
-                  Sign In (साइन इन)
+                  <span>Sign Out</span>
                 </button>
               )}
             </div>
 
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </header>

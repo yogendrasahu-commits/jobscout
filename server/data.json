@@ -12,9 +12,9 @@
       "hiringType": "Full-time & Contract",
       "phone": "+91 98765 43210",
       "avatar": "https://images.unsplash.com/photo-1549923746-c502d488b3ea?w=150",
-      "lat": 66.88409728668611,
-      "lng": 47.4609375,
-      "address": "Pinned [66.884, 47.461]",
+      "lat": 19.076,
+      "lng": 72.8777,
+      "address": "Bandra Kurla Complex, Mumbai",
       "isOnline": false,
       "createdAt": "2026-10-12T07:30:06.434Z"
     },
@@ -125,9 +125,9 @@
       ],
       "phone": "+91 91234 56789",
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
-      "lat": 23.7582439,
-      "lng": 75.9986713,
-      "address": "Narwal, Agar Tahsil,  Agar Malwa",
+      "lat": 28.5706333,
+      "lng": 77.3272147,
+      "address": "Noida, Dadri,  Gautam Buddha Nagar",
       "isOnline": false,
       "experience": "3+ Years",
       "expectedSalary": "₹14,00,000 / yr",
@@ -180,9 +180,9 @@
       ],
       "phone": "+91 97766 55443",
       "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-      "lat": 28.607536862182638,
-      "lng": 77.36927668613022,
-      "address": "My GPS Location",
+      "lat": 30.90222470517144,
+      "lng": 75.10253906250001,
+      "address": "Khosa Kotla, Dharamkot Tahsil",
       "isOnline": true,
       "experience": "2 Years",
       "expectedSalary": "₹30,000 / mo",
@@ -517,24 +517,6 @@
     }
   ],
   "jobs": [
-    {
-      "id": "job_1791812118840_cgbv",
-      "createdAt": "2026-10-12T13:35:18.840Z",
-      "status": "open",
-      "employerId": "usr_emp_1",
-      "employerName": "TechPulse Solutions",
-      "company": "TechPulse Solutions Pvt Ltd",
-      "title": "hhhdhhfhf",
-      "description": "",
-      "category": "Design",
-      "jobType": "Full-time",
-      "salary": "dhhdhdh",
-      "lat": 66.88409728668611,
-      "lng": 47.4609375,
-      "address": "Pinned [66.884, 47.461]",
-      "skills": [],
-      "urgent": true
-    },
     {
       "id": "job_1791791087859_kd3z",
       "createdAt": "2026-10-12T07:44:47.859Z",
@@ -883,6 +865,15 @@
       "receiverId": "usr_emp_1",
       "senderName": "Rahul Sharma",
       "message": "helllllfghjklpkjhgcx"
+    },
+    {
+      "id": "msg_1791891296206_byph",
+      "timestamp": "2026-10-13T11:34:56.206Z",
+      "read": false,
+      "senderId": "usr_seek_1",
+      "receiverId": "usr_seek_2",
+      "senderName": "Rahul Sharma",
+      "message": "Hi! I would like to discuss this opening."
     }
   ],
   "posts": [
