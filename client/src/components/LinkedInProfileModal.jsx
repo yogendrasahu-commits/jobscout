@@ -56,8 +56,8 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[800] flex items-center justify-center bg-black/75 backdrop-blur-sm p-3 sm:p-4 animate-in fade-in duration-150 overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-700/80 rounded-3xl shadow-2xl overflow-hidden my-8">
+    <div className="fixed inset-0 z-[950] flex items-center justify-center bg-black/75 backdrop-blur-sm p-3 sm:p-4 animate-in fade-in duration-150 overflow-y-auto">
+      <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-700/80 rounded-3xl shadow-2xl overflow-hidden max-h-[92dvh] overflow-y-auto my-auto">
         
         {/* Close Button */}
         <button

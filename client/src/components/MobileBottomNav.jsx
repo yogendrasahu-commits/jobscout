@@ -19,7 +19,7 @@ export const MobileBottomNav = ({
   const { incomingMessage } = useSocket();
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[800] bg-slate-900/95 backdrop-blur-xl border-t border-slate-800/90 py-1 px-1 shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.8)] select-none">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[800] bg-slate-900/95 backdrop-blur-xl border-t border-slate-800/90 py-1 pb-[max(0.25rem,env(safe-area-inset-bottom,0px))] px-1 shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.8)] select-none">
       <div className="grid grid-cols-5 items-center w-full max-w-md mx-auto">
         
         {/* 1. Feed (Home) */}

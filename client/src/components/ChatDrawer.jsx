@@ -209,14 +209,14 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
   }
 
   // ==========================================================
-  // CASE 1: DRAWER IS CLOSED -> RENDER PERSISTENT FLOATING LAUNCHER
+  // CASE 1: DRAWER IS CLOSED -> RENDER PERSISTENT FLOATING LAUNCHER (Desktop Only)
   // ==========================================================
   if (!isChatDrawerOpen) {
     if (!user) return null;
     return (
       <button
         onClick={() => setIsChatDrawerOpen(true)}
-        className="fixed bottom-20 right-4 sm:bottom-5 sm:right-6 z-30 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white rounded-2xl px-3.5 py-2.5 shadow-2xl flex items-center gap-2 border border-indigo-400/30 active:scale-95 transition-all select-none group"
+        className="hidden md:flex fixed bottom-5 right-6 z-30 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white rounded-2xl px-3.5 py-2.5 shadow-2xl items-center gap-2 border border-indigo-400/30 active:scale-95 transition-all select-none group"
         title="Open Chat List (चैट लिस्ट)"
       >
         <div className="relative">
@@ -229,7 +229,7 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
             <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-400 rounded-full" />
           )}
         </div>
-        <span className="text-xs font-bold hidden sm:inline">
+        <span className="text-xs font-bold">
           Messaging (चैट लिस्ट)
         </span>
       </button>
@@ -237,13 +237,13 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
   }
 
   // ==========================================================
-  // CASE 2: MINIMIZED FLOATING BAR
+  // CASE 2: MINIMIZED FLOATING BAR (Desktop Only)
   // ==========================================================
   if (isMinimized) {
     return (
       <div 
         onClick={() => setIsMinimized(false)}
-        className="fixed bottom-3 right-3 sm:bottom-4 sm:right-6 z-40 bg-slate-900 border border-indigo-500/40 rounded-2xl p-3 shadow-2xl flex items-center gap-3 cursor-pointer hover:bg-slate-850 hover:border-indigo-400 transition-all select-none animate-in fade-in"
+        className="hidden md:flex fixed bottom-4 right-6 z-40 bg-slate-900 border border-indigo-500/40 rounded-2xl p-3 shadow-2xl items-center gap-3 cursor-pointer hover:bg-slate-850 hover:border-indigo-400 transition-all select-none animate-in fade-in"
       >
         <div className="relative">
           <MessageSquare className="w-5 h-5 text-indigo-400" />
@@ -270,7 +270,7 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
   // CASE 3: FULL CHAT DRAWER OPEN
   // ==========================================================
   return (
-    <div className="fixed bottom-0 right-0 sm:bottom-4 sm:right-6 z-50 w-full sm:w-[410px] h-[560px] max-h-[90vh] bg-slate-900 border border-slate-700/80 sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-200">
+    <div className="fixed inset-0 sm:inset-auto sm:bottom-4 sm:right-6 z-[950] w-full sm:w-[410px] h-full sm:h-[560px] max-h-[100dvh] sm:max-h-[90vh] bg-slate-900 border-0 sm:border border-slate-700/80 sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-200">
       
       {/* ========================================================== */}
       {/* VIEW A: 1-ON-1 CONVERSATION VIEW (when activeChatUser is set) */}

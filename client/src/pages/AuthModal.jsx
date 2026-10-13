@@ -290,8 +290,8 @@ export const AuthModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-4 overflow-y-auto">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700/90 rounded-3xl p-5 sm:p-7 shadow-2xl animate-in zoom-in-95 duration-200 my-auto">
+    <div className="fixed inset-0 z-[950] flex items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-4 overflow-y-auto">
+      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700/90 rounded-3xl p-5 sm:p-7 shadow-2xl animate-in zoom-in-95 duration-200 max-h-[92dvh] overflow-y-auto my-auto">
         
         {/* Close Button */}
         <button

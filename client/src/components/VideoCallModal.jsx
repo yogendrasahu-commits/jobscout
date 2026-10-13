@@ -70,7 +70,7 @@ export const VideoCallModal = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-2 sm:p-4">
+    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/80 backdrop-blur-md p-2 sm:p-4">
       <div className={`relative bg-slate-900 border border-slate-700/80 rounded-3xl overflow-hidden shadow-2xl flex flex-col transition-all duration-300 ${
         isFullscreen ? 'w-full h-full' : 'w-full max-w-4xl h-[85vh] max-h-[720px]'
       }`}>

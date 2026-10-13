@@ -8,7 +8,7 @@ export const IncomingCallBanner = () => {
   if (!incomingCall) return null;
 
   return (
-    <div className="fixed top-20 right-4 sm:right-8 z-50 animate-bounce duration-1000 max-w-sm w-full">
+    <div className="fixed top-16 sm:top-20 left-3 right-3 sm:left-auto sm:right-8 z-[1000] animate-bounce duration-1000 max-w-sm sm:w-full">
       <div className="bg-slate-900/95 backdrop-blur-xl border-2 border-indigo-500/80 rounded-2xl p-4 shadow-2xl shadow-indigo-500/30 flex items-center justify-between gap-4">
         
         {/* Caller Avatar & Ring Effect */}

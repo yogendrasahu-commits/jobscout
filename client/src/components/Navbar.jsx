@@ -232,20 +232,20 @@ export const Navbar = ({
   return (
     <header className="bg-slate-900/95 backdrop-blur-xl border-b border-slate-800/90 sticky top-0 z-[800] select-none shadow-xl w-full max-w-full">
       <div className="w-full max-w-[1700px] mx-auto px-2 sm:px-4 lg:px-6">
-        <div className="flex md:grid md:grid-cols-[1fr_auto_1fr] items-center justify-between h-[68px] gap-2 sm:gap-4">
+        <div className="flex md:grid md:grid-cols-[1fr_auto_1fr] items-center justify-between h-[60px] md:h-[68px] gap-1.5 sm:gap-4">
           
           {/* ========================================================== */}
           {/* 1. BRAND LOGO & LOCATION PILL & SEARCH BAR */}
           {/* ========================================================== */}
-          <div className="flex items-center gap-2 lg:gap-2.5 xl:gap-3 justify-start min-w-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-2.5 xl:gap-3 justify-start min-w-0">
             {/* Logo with Hover Name Tooltip */}
             <div 
-              className="flex items-center gap-2 cursor-pointer group relative flex-shrink-0" 
+              className="flex items-center gap-1.5 sm:gap-2 cursor-pointer group relative flex-shrink-0" 
               onClick={() => setCurrentTab('feed')}
               title="JobScout - Jobs + discovery"
             >
               <div className="relative group-hover:scale-105 transition-transform flex-shrink-0 shadow-lg shadow-indigo-950/40">
-                <JobScoutLogo size={38} className="w-9 h-9 sm:w-10 sm:h-10" />
+                <JobScoutLogo size={36} className="w-8 h-8 sm:w-10 sm:h-10" />
               </div>
 
               <div className="leading-none">
@@ -633,7 +633,7 @@ export const Navbar = ({
 
               {/* Mobile Search Dropdown Input */}
               {mobileSearchOpen && (
-                <div className="fixed left-2 right-2 top-16 bg-slate-900 border border-slate-700/90 rounded-2xl p-3 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="fixed left-2 right-2 top-16 bg-slate-900 border border-slate-700/90 rounded-2xl p-3 shadow-2xl z-[900] animate-in fade-in zoom-in-95 duration-150">
                   <form onSubmit={handleSearchSubmit} className="relative">
                     <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                     <input
@@ -723,7 +723,7 @@ export const Navbar = ({
 
               {/* Notifications Dropdown */}
               {notificationsOpen && (
-                <div className="fixed left-3 right-3 top-16 sm:left-auto sm:right-0 sm:absolute sm:mt-2 sm:w-80 bg-slate-900 border border-slate-700/90 rounded-2xl p-3 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="fixed left-2 right-2 top-16 sm:left-auto sm:right-0 sm:absolute sm:mt-2 sm:w-80 bg-slate-900 border border-slate-700/90 rounded-2xl p-3 shadow-2xl z-[900] animate-in fade-in zoom-in-95 duration-150">
                   <div className="flex items-center justify-between pb-2 border-b border-slate-800 mb-2">
                     <div className="flex items-center gap-1.5">
                       <Bell className="w-4 h-4 text-indigo-400" />
@@ -782,7 +782,7 @@ export const Navbar = ({
               <div className="relative group flex-shrink-0" ref={profileRef}>
                 <button
                   onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                  className="flex items-center gap-2 px-2 py-1 sm:px-2.5 sm:py-1 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 transition-all text-left flex-shrink-0 cursor-pointer shadow-sm hover:border-slate-600"
+                  className="flex items-center gap-1.5 sm:gap-2 px-1.5 py-1 sm:px-2.5 sm:py-1 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 transition-all text-left flex-shrink-0 cursor-pointer shadow-sm hover:border-slate-600"
                   title="Profile & Settings"
                 >
                   <div className="relative flex-shrink-0">
@@ -797,10 +797,10 @@ export const Navbar = ({
                   </div>
 
                   <div className="flex flex-col text-left min-w-0">
-                    <div className="text-xs font-bold text-white truncate max-w-[65px] sm:max-w-[95px] md:max-w-[110px] lg:max-w-[130px] xl:max-w-[150px] leading-tight">
+                    <div className="text-xs font-bold text-white truncate max-w-[50px] xs:max-w-[75px] sm:max-w-[95px] md:max-w-[110px] lg:max-w-[130px] xl:max-w-[150px] leading-tight">
                       {user.name}
                     </div>
-                    <div className="text-[10px] text-slate-400 flex items-center gap-1 leading-tight mt-0.5">
+                    <div className="hidden xs:flex text-[10px] text-slate-400 items-center gap-1 leading-tight mt-0.5">
                       <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isEmployer ? 'bg-indigo-400' : 'bg-emerald-400'}`} />
                       <span className="truncate">{isEmployer ? 'Recruiter' : 'Seeker'}</span>
                     </div>
@@ -816,7 +816,7 @@ export const Navbar = ({
 
                 {/* Profile Dropdown Menu */}
                 {profileMenuOpen && (
-                  <div className="fixed left-3 right-3 top-16 sm:left-auto sm:right-0 sm:absolute sm:mt-2 sm:w-72 bg-slate-900 border border-slate-700/90 rounded-2xl p-3 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="fixed left-2 right-2 top-16 sm:left-auto sm:right-0 sm:absolute sm:mt-2 sm:w-72 bg-slate-900 border border-slate-700/90 rounded-2xl p-3 shadow-2xl z-[900] animate-in fade-in zoom-in-95 duration-150">
                     
                     {/* Profile Header Details */}
                     <div className="p-2 border-b border-slate-800 mb-2">

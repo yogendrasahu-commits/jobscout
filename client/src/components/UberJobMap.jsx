@@ -800,7 +800,7 @@ export const UberJobMap = ({
 
   return (
     <div 
-      className="relative w-full h-[calc(100dvh-4rem-3.75rem)] md:h-[calc(100vh-4rem)] bg-slate-950 overflow-hidden select-none"
+      className="relative w-full h-[calc(100dvh-60px-56px)] md:h-[calc(100vh-68px)] bg-slate-950 overflow-hidden select-none"
     >
       
       {/* ============================================================== */}
@@ -918,7 +918,7 @@ export const UberJobMap = ({
         </div>
 
         {/* Quick Indian Cities & National Hubs Selector Strip */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pointer-events-auto py-0.5 max-w-full">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar touch-pan-x pointer-events-auto py-0.5 max-w-full">
           {INDIA_CITY_PRESETS.map((city) => {
             const isCurrent = 
               Math.abs(safeCoords[0] - city.lat) < 0.15 && 
@@ -1415,7 +1415,7 @@ export const UberJobMap = ({
       {/* BOTTOM COLLAPSIBLE RADAR DISCOVERY DRAWER */}
       {/* ============================================================== */}
       {isDrawerOpen && (
-        <div className="absolute bottom-14 left-2 right-2 sm:bottom-20 sm:left-6 sm:right-6 max-h-60 sm:max-h-72 z-[500] bg-slate-900/95 backdrop-blur-xl border border-slate-700/90 rounded-3xl p-3 sm:p-4 shadow-2xl flex flex-col gap-2.5 animate-in slide-in-from-bottom duration-200 pointer-events-auto">
+        <div className="absolute bottom-2 left-2 right-2 sm:bottom-6 sm:left-6 sm:right-6 max-h-60 sm:max-h-72 z-[500] bg-slate-900/95 backdrop-blur-xl border border-slate-700/90 rounded-3xl p-3 sm:p-4 shadow-2xl flex flex-col gap-2.5 animate-in slide-in-from-bottom duration-200 pointer-events-auto">
           
           {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-800 pb-2">
