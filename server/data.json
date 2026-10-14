@@ -125,10 +125,10 @@
       ],
       "phone": "+91 91234 56789",
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
-      "lat": 28.5706333,
-      "lng": 77.3272147,
-      "address": "Noida, Dadri,  Gautam Buddha Nagar",
-      "isOnline": true,
+      "lat": 28.6304,
+      "lng": 77.2177,
+      "address": "Connaught Place (CP), New Delhi",
+      "isOnline": false,
       "experience": "3+ Years",
       "expectedSalary": "₹14,00,000 / yr",
       "availability": "Immediate (Ready Today)",
@@ -878,6 +878,23 @@
   ],
   "posts": [
     {
+      "id": "post_1791953803036_5i2t",
+      "createdAt": "2026-10-14T04:56:43.036Z",
+      "likes": 0,
+      "likedBy": [],
+      "comments": [],
+      "authorId": "usr_seek_1",
+      "authorName": "Rahul Sharma",
+      "authorRole": "seeker",
+      "authorTitle": "Full Stack React & WebRTC Developer",
+      "authorAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "content": "dhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh",
+      "image": null,
+      "tags": [
+        "#OpenToWork"
+      ]
+    },
+    {
       "id": "post_1791811900158_1nze",
       "createdAt": "2026-10-12T13:31:40.158Z",
       "likes": 1,
@@ -1131,15 +1148,31 @@
       "authorAlias": "Cyber Tiger #555",
       "authorAvatarSeed": "owl",
       "authorBadge": "Verified Job Seeker",
-      "score": 1,
-      "upvotes": 1,
-      "downvotes": 0,
-      "upvotedBy": [
+      "score": -1,
+      "upvotes": 0,
+      "downvotes": 1,
+      "upvotedBy": [],
+      "downvotedBy": [
         "usr_seek_1"
       ],
-      "downvotedBy": [],
-      "commentsCount": 0,
-      "comments": [],
+      "commentsCount": 1,
+      "comments": [
+        {
+          "id": "ac_1791953854415_sftx",
+          "authorAlias": "Cyber Wolf #178",
+          "authorAvatarSeed": "owl",
+          "authorBadge": "Verified Seeker",
+          "content": "hdhd",
+          "upvotes": 1,
+          "upvotedBy": [
+            "usr_seek_1"
+          ],
+          "reactions": {
+            "🔥": 1
+          },
+          "createdAt": "2026-10-14T04:57:34.415Z"
+        }
+      ],
       "views": 1,
       "createdAt": "2026-10-13T05:11:25.245Z"
     },

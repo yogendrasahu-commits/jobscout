@@ -42,7 +42,8 @@ import {
   Moon,
   Sun,
   Plus,
-  Minus
+  Minus,
+  ArrowLeft
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
@@ -1115,20 +1116,34 @@ export const UberJobMap = ({
       {/* MOBILE RADAR & FILTER BOTTOM SHEET MODAL */}
       {/* ============================================================== */}
       {isFilterModalOpen && (
-        <div className="fixed inset-0 z-[700] md:hidden bg-black/75 backdrop-blur-sm flex flex-col justify-end animate-in fade-in duration-150">
-          <div className="bg-slate-900 border-t border-slate-700 rounded-t-3xl p-5 shadow-2xl max-h-[85vh] overflow-y-auto space-y-4">
+        <div className="fixed inset-0 z-[950] md:hidden bg-black/80 backdrop-blur-md flex flex-col justify-end animate-in fade-in duration-150">
+          <div className="bg-slate-900 border-t border-slate-700 rounded-t-3xl p-5 shadow-2xl max-h-[88vh] overflow-y-auto space-y-4">
             
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2">
-                <Sliders className="w-4 h-4 text-indigo-400" />
-                <h3 className="font-extrabold text-sm text-white">Radar & Map Settings</h3>
+                <button
+                  type="button"
+                  onClick={() => setIsFilterModalOpen(false)}
+                  className="p-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 transition-all flex items-center gap-1 text-xs font-bold"
+                  title="Back"
+                >
+                  <ArrowLeft className="w-4 h-4 text-indigo-400" />
+                  <span>Back</span>
+                </button>
+                <div className="flex items-center gap-1.5 ml-1">
+                  <Sliders className="w-4 h-4 text-indigo-400" />
+                  <h3 className="font-extrabold text-sm text-white">Radar & Map Settings</h3>
+                </div>
               </div>
               <button
+                type="button"
                 onClick={() => setIsFilterModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 transition-colors"
+                title="Close dialog"
               >
-                <X className="w-5 h-5" />
+                <span className="text-[11px] font-semibold">Close (बंद करें)</span>
+                <X className="w-4 h-4" />
               </button>
             </div>
 
@@ -1266,13 +1281,24 @@ export const UberJobMap = ({
               </div>
             </div>
 
-            {/* Close / Apply button */}
-            <button
-              onClick={() => setIsFilterModalOpen(false)}
-              className="w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-extrabold text-xs rounded-2xl shadow-xl transition-all"
-            >
-              Apply & View Map ({visibleJobs.length} Jobs • {visibleSeekers.length} Seekers)
-            </button>
+            {/* Close / Apply buttons */}
+            <div className="flex items-center gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsFilterModalOpen(false)}
+                className="py-3 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs border border-slate-700/80 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95"
+              >
+                <ArrowLeft className="w-4 h-4 text-slate-400" />
+                <span>Close (रद्द करें)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsFilterModalOpen(false)}
+                className="flex-1 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-extrabold text-xs rounded-2xl shadow-xl transition-all active:scale-95 text-center truncate"
+              >
+                Apply & View ({visibleJobs.length} Jobs • {visibleSeekers.length} Seekers)
+              </button>
+            </div>
 
           </div>
         </div>
@@ -1448,10 +1474,13 @@ export const UberJobMap = ({
             </div>
 
             <button
+              type="button"
               onClick={() => setIsDrawerOpen(false)}
-              className="text-xs font-semibold text-slate-400 hover:text-white"
+              className="text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-slate-800 transition-colors"
+              title="Close drawer"
             >
-              ✕
+              <span className="hidden sm:inline">Close</span>
+              <X className="w-3.5 h-3.5" />
             </button>
           </div>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Briefcase, DollarSign, MapPin, Tag, Sparkles, Check } from 'lucide-react';
+import { X, Briefcase, DollarSign, MapPin, Tag, Sparkles, Check, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const PostJobModal = ({ isOpen, onClose, onJobCreated, defaultCoords }) => {
@@ -106,19 +106,30 @@ export const PostJobModal = ({ isOpen, onClose, onJobCreated, defaultCoords }) =
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-800">
           <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 transition-all sm:hidden"
+              title="Back / Close"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </button>
             <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
               <Briefcase className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-lg text-white">Post a New Job on Map</h3>
-              <p className="text-xs text-slate-400">Live coordinates will make this visible to nearby seekers</p>
+              <h3 className="font-bold text-base sm:text-lg text-white">Post a New Job on Map</h3>
+              <p className="text-[11px] sm:text-xs text-slate-400">Live coordinates will make this visible to nearby seekers</p>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 transition-colors"
+            title="Close dialog"
           >
-            <X className="w-5 h-5" />
+            <span className="text-[11px] font-semibold hidden sm:inline">Close (बंद करें)</span>
+            <X className="w-4 h-4" />
           </button>
         </div>
 
@@ -245,18 +256,19 @@ export const PostJobModal = ({ isOpen, onClose, onJobCreated, defaultCoords }) =
             </label>
           </div>
 
-          <div className="pt-2 flex items-center justify-end gap-3">
+          <div className="pt-3 flex items-center justify-between gap-2 border-t border-slate-800/80">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800"
+              className="py-2.5 px-3.5 sm:px-4 rounded-xl text-xs font-bold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700/80 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95"
             >
-              Cancel
+              <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
+              <span>Cancel / Back (रद्द करें)</span>
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-xs font-bold shadow-lg shadow-indigo-500/25 transition-all"
+              className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-xs font-bold shadow-lg shadow-indigo-500/25 transition-all flex items-center justify-center gap-2 active:scale-95"
             >
               {loading ? 'Publishing...' : 'Publish to Live Map'}
             </button>

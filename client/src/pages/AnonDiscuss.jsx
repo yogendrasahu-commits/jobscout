@@ -23,7 +23,8 @@ import {
   Code2, 
   Briefcase,
   HelpCircle,
-  Clock
+  Clock,
+  ArrowLeft
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
@@ -668,19 +669,33 @@ export const AnonDiscuss = () => {
       {/* 1. FULL THREAD DISCUSSION MODAL (COMMUNITY COMMENTS)           */}
       {/* ============================================================= */}
       {selectedThread && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-4 overflow-y-auto">
-          <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-700/90 rounded-3xl shadow-2xl p-4 sm:p-6 my-auto max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-[950] flex items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-4 overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-700/90 rounded-3xl shadow-2xl p-4 sm:p-6 my-auto max-h-[92dvh] flex flex-col animate-in zoom-in-95 duration-150">
             
-            {/* Close Button */}
+            {/* Top-Left Back / Close Button */}
             <button
+              type="button"
               onClick={() => setSelectedThread(null)}
-              className="absolute top-4 right-4 p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              className="absolute top-4 left-4 p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold border border-slate-700/60 transition-all flex items-center gap-1 shadow-md active:scale-95 z-20"
+              title="Back / Close discussion"
             >
-              <X className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4 text-orange-400" />
+              <span>Back (वापस)</span>
+            </button>
+
+            {/* Top-Right Close Button */}
+            <button
+              type="button"
+              onClick={() => setSelectedThread(null)}
+              className="absolute top-4 right-4 p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-700/60 transition-all flex items-center gap-1 active:scale-95 z-20"
+              title="Close discussion"
+            >
+              <span className="text-[11px] font-semibold hidden sm:inline">Close (बंद करें)</span>
+              <X className="w-4 h-4" />
             </button>
 
             {/* Scrollable Content */}
-            <div className="overflow-y-auto pr-1 space-y-4">
+            <div className="overflow-y-auto pr-1 space-y-4 pt-8 sm:pt-6">
               
               {/* Thread Header */}
               <div>
@@ -846,17 +861,32 @@ export const AnonDiscuss = () => {
       {/* 2. CREATE ANONYMOUS THREAD MODAL                               */}
       {/* ============================================================= */}
       {isPostModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-4 overflow-y-auto">
-          <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700/90 rounded-3xl shadow-2xl p-5 sm:p-6 my-auto animate-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-[950] flex items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-4 overflow-y-auto">
+          <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700/90 rounded-3xl shadow-2xl p-5 sm:p-6 my-auto max-h-[92dvh] overflow-y-auto animate-in zoom-in-95 duration-150">
             
+            {/* Top-Left Back / Close Button */}
             <button
+              type="button"
               onClick={() => setIsPostModalOpen(false)}
-              className="absolute top-5 right-5 p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              className="absolute top-4 left-4 p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold border border-slate-700/60 transition-all flex items-center gap-1 shadow-md active:scale-95"
+              title="Back / Close"
             >
-              <X className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4 text-orange-400" />
+              <span>Back</span>
             </button>
 
-            <div className="mb-4">
+            {/* Top-Right Close Button */}
+            <button
+              type="button"
+              onClick={() => setIsPostModalOpen(false)}
+              className="absolute top-4 right-4 p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 transition-all flex items-center gap-1 active:scale-95"
+              title="Close dialog"
+            >
+              <span className="text-[11px] font-semibold hidden sm:inline">Close (बंद करें)</span>
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="mb-4 pt-7 sm:pt-6">
               <span className="text-[10px] font-black uppercase tracking-wider text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded border border-orange-500/20">
                 🔒 Anonymous Submission
               </span>
@@ -957,13 +987,23 @@ export const AnonDiscuss = () => {
                 </label>
               </div>
 
-              <button
-                type="submit"
-                className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-extrabold text-xs shadow-lg shadow-orange-600/30 transition-all flex items-center justify-center gap-2 active:scale-95"
-              >
-                <span>Publish Anonymously to Community</span>
-                <Send className="w-3.5 h-3.5" />
-              </button>
+              <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setIsPostModalOpen(false)}
+                  className="py-2.5 px-3.5 sm:px-4 rounded-xl text-xs font-bold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700/80 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
+                  <span>Cancel / Back (रद्द करें)</span>
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 sm:flex-initial py-2.5 px-5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-extrabold text-xs shadow-lg shadow-orange-600/30 transition-all flex items-center justify-center gap-2 active:scale-95 whitespace-nowrap"
+                >
+                  <span>Publish Anonymously</span>
+                  <Send className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </form>
 
           </div>

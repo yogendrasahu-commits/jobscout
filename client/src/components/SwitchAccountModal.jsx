@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Building2, User, Check, ArrowRight, Sparkles, Phone, MapPin } from 'lucide-react';
+import { X, Building2, User, Check, ArrowRight, Sparkles, Phone, MapPin, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const SwitchAccountModal = ({ isOpen, onClose }) => {
@@ -52,12 +52,26 @@ export const SwitchAccountModal = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 z-[950] flex items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-4 overflow-y-auto">
       <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-700/90 rounded-3xl p-5 sm:p-7 shadow-2xl animate-in zoom-in-95 duration-150 max-h-[92dvh] overflow-y-auto my-auto">
         
-        {/* Close Button */}
+        {/* Top-Left Back / Close Button */}
         <button
+          type="button"
           onClick={onClose}
-          className="absolute top-5 right-5 p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+          className="absolute top-4 left-4 p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold border border-slate-700/60 transition-all flex items-center gap-1 shadow-md active:scale-95 sm:hidden"
+          title="Back / Close"
         >
-          <X className="w-5 h-5" />
+          <ArrowLeft className="w-4 h-4 text-indigo-400" />
+          <span>Back</span>
+        </button>
+
+        {/* Top-Right Close Button */}
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-4 right-4 p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 transition-all flex items-center gap-1 active:scale-95"
+          title="Close dialog"
+        >
+          <span className="text-[11px] font-semibold hidden sm:inline">Close (बंद करें)</span>
+          <X className="w-4 h-4" />
         </button>
 
         {/* Header */}
@@ -194,6 +208,21 @@ export const SwitchAccountModal = ({ isOpen, onClose }) => {
               );
             })
           )}
+        </div>
+
+        {/* Bottom Close Button */}
+        <div className="pt-4 mt-3 border-t border-slate-800 flex items-center justify-between gap-3">
+          <span className="text-[11px] text-slate-400">
+            Switching updates live sockets, radar position & chat persona.
+          </span>
+          <button
+            type="button"
+            onClick={onClose}
+            className="py-2 px-4 rounded-xl text-xs font-bold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700/80 transition-all flex items-center gap-1.5 whitespace-nowrap active:scale-95"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
+            <span>Close (बंद करें)</span>
+          </button>
         </div>
 
       </div>

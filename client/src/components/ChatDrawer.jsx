@@ -282,11 +282,13 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
             <div className="flex items-center gap-2 min-w-0">
               {/* Back to Chat List */}
               <button
+                type="button"
                 onClick={() => setActiveChatUser(null)}
-                title="Back to Chat List"
-                className="p-1.5 rounded-xl hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
+                title="Back to Chat List (चैट लिस्ट पर लौटें)"
+                className="py-1 px-2 rounded-xl bg-slate-700/60 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors flex items-center gap-1 text-xs font-semibold"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="w-4 h-4 text-indigo-400" />
+                <span>Back</span>
               </button>
 
               {/* Contact Avatar */}
@@ -485,10 +487,12 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
               </button>
 
               <button
+                type="button"
                 onClick={() => setIsChatDrawerOpen(false)}
-                title="Close"
-                className="p-1.5 rounded-xl hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
+                title="Close chat drawer (चैट बंद करें)"
+                className="py-1 px-2 rounded-xl hover:bg-slate-700 text-slate-400 hover:text-white transition-colors flex items-center gap-1 text-xs font-semibold"
               >
+                <span>Close</span>
                 <X className="w-4 h-4" />
               </button>
             </div>

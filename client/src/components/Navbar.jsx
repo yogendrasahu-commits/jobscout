@@ -1287,6 +1287,16 @@ export const Navbar = ({
                   <span>Sign Out</span>
                 </button>
               )}
+
+              {/* Close Menu Button */}
+              <button
+                type="button"
+                onClick={() => setMobileDrawerOpen(false)}
+                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-white text-xs font-bold border border-slate-700/80 transition-colors active:scale-95"
+              >
+                <X className="w-4 h-4 text-slate-400" />
+                <span>Close Menu (मेनू बंद करें)</span>
+              </button>
             </div>
 
           </div>

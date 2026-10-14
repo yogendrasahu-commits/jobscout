@@ -111,10 +111,21 @@ export const VideoCallModal = () => {
 
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={() => setIsFullscreen(!isFullscreen)}
               className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm transition-colors"
+              title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
             >
               {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+            </button>
+            <button
+              type="button"
+              onClick={endCall}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-lg transition-all active:scale-95"
+              title="End / Close Call (कॉल काटें / बंद करें)"
+            >
+              <PhoneOff className="w-3.5 h-3.5" />
+              <span>End Call (काटें)</span>
             </button>
           </div>
         </div>

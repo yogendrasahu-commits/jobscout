@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Send, Briefcase, MapPin, DollarSign, MessageSquare, Phone, Video } from 'lucide-react';
+import { X, Send, Briefcase, MapPin, DollarSign, MessageSquare, Phone, Video, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 
@@ -92,19 +92,32 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
       <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700 rounded-3xl p-5 sm:p-6 shadow-2xl animate-in zoom-in-95 duration-200 max-h-[92dvh] overflow-y-auto my-auto">
         
         {/* Header */}
-        <div className="flex items-start justify-between pb-4 border-b border-slate-800">
-          <div>
-            <span className="text-[11px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20 uppercase">
-              {job.jobType}
-            </span>
-            <h3 className="font-bold text-lg text-white mt-1.5">{job.title}</h3>
-            <p className="text-xs text-slate-400">{job.company} • {job.address}</p>
+        <div className="flex items-start justify-between pb-4 border-b border-slate-800 gap-2">
+          <div className="flex items-start gap-2.5">
+            <button
+              type="button"
+              onClick={onClose}
+              className="mt-1 p-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 transition-all sm:hidden"
+              title="Back / Close"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+            <div>
+              <span className="text-[11px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20 uppercase">
+                {job.jobType}
+              </span>
+              <h3 className="font-bold text-base sm:text-lg text-white mt-1.5 leading-snug">{job.title}</h3>
+              <p className="text-xs text-slate-400">{job.company} • {job.address}</p>
+            </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 transition-colors flex-shrink-0"
+            title="Close dialog"
           >
-            <X className="w-5 h-5" />
+            <span className="text-[11px] font-semibold hidden sm:inline">Close (बंद करें)</span>
+            <X className="w-4 h-4" />
           </button>
         </div>
 
@@ -200,23 +213,24 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
             />
           </div>
 
-          <div className="flex items-center justify-between gap-3 pt-2 border-t border-slate-800">
-            <span className="text-[10px] text-slate-400 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              Your verified profile & contact are auto-attached
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-800">
+            <span className="text-[10px] text-slate-400 flex items-center gap-1 order-2 sm:order-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0" />
+              Verified profile & contact auto-attached
             </span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 order-1 sm:order-2 w-full sm:w-auto">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-3 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white"
+                className="flex-1 sm:flex-initial py-2.5 px-3.5 sm:px-4 rounded-xl text-xs font-bold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700/80 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95"
               >
-                Cancel
+                <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
+                <span>Cancel / Back (रद्द करें)</span>
               </button>
               <button
                 type="submit"
                 disabled={loading || success}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 text-white text-xs font-extrabold shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 transition-all"
+                className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 text-white text-xs font-extrabold shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-1.5 transition-all active:scale-95 whitespace-nowrap"
               >
                 <span>⚡</span>
                 <span>{loading ? 'Submitting...' : '1-Click Easy Apply'}</span>

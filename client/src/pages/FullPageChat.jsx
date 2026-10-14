@@ -401,13 +401,15 @@ export const FullPageChat = ({ onOpenProfile }) => {
               {/* Active Chat Header */}
               <div className="p-3.5 sm:p-4 bg-slate-900 border-b border-slate-800 flex items-center justify-between gap-3 shadow-md z-10">
                 <div className="flex items-center gap-3 min-w-0">
-                  {/* Back button (Mobile) */}
+                  {/* Back button (Mobile & Tablet) */}
                   <button
+                    type="button"
                     onClick={() => setActiveChatUser(null)}
-                    className="md:hidden p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
-                    title="Back to conversation list"
+                    className="md:hidden py-1.5 px-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors flex items-center gap-1 text-xs font-bold border border-slate-700/60"
+                    title="Back to conversation list (चैट लिस्ट पर लौटें)"
                   >
-                    <ArrowLeft className="w-4 h-4" />
+                    <ArrowLeft className="w-4 h-4 text-indigo-400" />
+                    <span>Back</span>
                   </button>
 
                   <div 

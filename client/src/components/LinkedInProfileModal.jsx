@@ -16,7 +16,8 @@ import {
   ShieldCheck,
   Share2,
   ThumbsUp,
-  Download
+  Download,
+  ArrowLeft
 } from 'lucide-react';
 import { useSocket } from '../context/SocketContext';
 import { useAuth } from '../context/AuthContext';
@@ -59,18 +60,32 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
     <div className="fixed inset-0 z-[950] flex items-center justify-center bg-black/75 backdrop-blur-sm p-3 sm:p-4 animate-in fade-in duration-150 overflow-y-auto">
       <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-700/80 rounded-3xl shadow-2xl overflow-hidden max-h-[92dvh] overflow-y-auto my-auto">
         
-        {/* Close Button */}
+        {/* Top-Left Back Button */}
         <button
+          type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 z-20 p-2 rounded-full bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white transition-all shadow-md"
+          className="absolute top-3 left-4 z-20 px-3 py-1.5 rounded-full bg-slate-900/85 hover:bg-slate-800 text-white font-bold text-xs transition-all shadow-lg border border-white/10 flex items-center gap-1.5 active:scale-95"
+          title="Back / Close Profile"
         >
-          <X className="w-5 h-5" />
+          <ArrowLeft className="w-4 h-4 text-emerald-400" />
+          <span>Back (वापस)</span>
+        </button>
+
+        {/* Top-Right Close Button */}
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-3 right-4 z-20 px-3 py-1.5 rounded-full bg-slate-900/85 hover:bg-slate-800 text-slate-300 hover:text-white font-bold text-xs transition-all shadow-lg border border-white/10 flex items-center gap-1.5 active:scale-95"
+          title="Close dialog"
+        >
+          <span className="hidden sm:inline">Close (बंद करें)</span>
+          <X className="w-4 h-4" />
         </button>
 
         {/* Cover Photo */}
         <div className="h-32 sm:h-40 bg-gradient-to-r from-indigo-900 via-indigo-700 to-emerald-800 relative">
-          <div className="absolute top-3 left-4 flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md text-[10px] font-bold text-emerald-300 border border-white/10">
+          <div className="absolute bottom-3 left-4 flex items-center gap-2">
+            <span className="px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md text-[10px] font-bold text-emerald-300 border border-white/10">
               Verified Professional
             </span>
           </div>
@@ -284,6 +299,21 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Bottom Close Button */}
+          <div className="pt-5 mt-4 border-t border-slate-800 flex items-center justify-between gap-3">
+            <span className="text-[11px] text-slate-400">
+              Verified JobScout professional profile
+            </span>
+            <button
+              type="button"
+              onClick={onClose}
+              className="py-2.5 px-4 rounded-xl text-xs font-bold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700/80 transition-all flex items-center gap-1.5 whitespace-nowrap active:scale-95"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
+              <span>Close Profile (बंद करें)</span>
+            </button>
           </div>
 
         </div>
