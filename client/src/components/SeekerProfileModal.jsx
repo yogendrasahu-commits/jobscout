@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Phone, Video, MessageSquare, MapPin, Briefcase, Award, Sparkles, User, ArrowLeft } from 'lucide-react';
+import { X, Phone, Video, MessageSquare, MapPin, Briefcase, Award, Sparkles, User, ArrowLeft, Mail } from 'lucide-react';
 import { useSocket } from '../context/SocketContext';
 
 export const SeekerProfileModal = ({ seeker, isOpen, onClose }) => {
@@ -58,9 +58,29 @@ export const SeekerProfileModal = ({ seeker, isOpen, onClose }) => {
 
           <h3 className="font-extrabold text-xl text-white">{seeker.name}</h3>
           <p className="text-xs font-semibold text-emerald-400 mt-0.5">{seeker.title || 'Job Seeker'}</p>
-          <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-1">
-            <MapPin className="w-3.5 h-3.5 text-slate-500" />
-            <span>{seeker.address || 'Active Nearby'}</span>
+          <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-slate-400 mt-1.5">
+            <span className="flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5 text-slate-500" />
+              <span>{seeker.address || 'Active Nearby'}</span>
+            </span>
+            {seeker.email && (
+              <>
+                <span>•</span>
+                <span className="flex items-center gap-1 text-indigo-300">
+                  <Mail className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>{seeker.email}</span>
+                </span>
+              </>
+            )}
+            {seeker.phone && (
+              <>
+                <span>•</span>
+                <span className="flex items-center gap-1 text-slate-300">
+                  <Phone className="w-3 h-3 text-emerald-400" />
+                  <span>+91 {seeker.phone}</span>
+                </span>
+              </>
+            )}
           </div>
         </div>
 

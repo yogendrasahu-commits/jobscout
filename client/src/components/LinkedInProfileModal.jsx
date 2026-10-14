@@ -16,11 +16,13 @@ import {
   ShieldCheck,
   Share2,
   ThumbsUp,
-  Download,
-  ArrowLeft
+  ArrowLeft,
+  Mail,
+  Edit3
 } from 'lucide-react';
 import { useSocket } from '../context/SocketContext';
 import { useAuth } from '../context/AuthContext';
+import { UpdateEmailModal } from './UpdateEmailModal';
 
 export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
   const { user } = useAuth();
@@ -28,6 +30,7 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
 
   const [isConnected, setIsConnected] = useState(false);
   const [endorsedSkills, setEndorsedSkills] = useState({});
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
 
   if (!isOpen || !profileUser) return null;
 
@@ -185,6 +188,21 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
               <span className="text-indigo-400 font-bold">500+ Connections</span>
               <span>•</span>
               <span className="text-slate-400">{profileUser.phone || '+91 98765 43210'}</span>
+              <span>•</span>
+              <span className="flex items-center gap-1 text-slate-300">
+                <Mail className="w-3.5 h-3.5 text-indigo-400" />
+                <span>{profileUser.email || (user?.id === profileUser.id ? 'No email linked' : 'Verified candidate')}</span>
+              </span>
+              {user && user.id === profileUser.id && (
+                <button
+                  type="button"
+                  onClick={() => setIsEmailModalOpen(true)}
+                  className="px-2 py-0.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white text-[11px] font-bold border border-indigo-500/30 transition-all flex items-center gap-1 active:scale-95 ml-1"
+                >
+                  <Edit3 className="w-3 h-3" />
+                  <span>Update Email (ईमेल बदलें)</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -319,6 +337,16 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
         </div>
 
       </div>
+
+      {isEmailModalOpen && (
+        <UpdateEmailModal
+          isOpen={isEmailModalOpen}
+          onClose={() => setIsEmailModalOpen(false)}
+          onUpdated={(newEmail) => {
+            if (profileUser) profileUser.email = newEmail;
+          }}
+        />
+      )}
     </div>
   );
 };

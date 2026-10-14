@@ -193,6 +193,34 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateProfile = async (updates) => {
+    if (!token) return { success: false, error: 'Not authenticated' };
+    try {
+      const res = await fetch('/api/auth/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(updates)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to update profile');
+      }
+      if (data.token && data.user) {
+        saveAuthSession(data.token, data.user);
+      } else if (data.user) {
+        setUser(data.user);
+        localStorage.setItem('jobradar_user', JSON.stringify(data.user));
+      }
+      return { success: true, user: data.user, message: data.message };
+    } catch (err) {
+      console.error('Update profile error:', err);
+      return { success: false, error: err.message };
+    }
+  };
+
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -216,6 +244,7 @@ export const AuthProvider = ({ children }) => {
         checkPhone,
         demoSwitch,
         updateLocation,
+        updateProfile,
         logout,
         isEmployer: user?.role === 'emp',
         isSeeker: user?.role === 'seeker'

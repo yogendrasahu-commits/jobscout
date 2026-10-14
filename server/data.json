@@ -111,7 +111,7 @@
     {
       "id": "usr_seek_1",
       "name": "Rahul Sharma",
-      "email": "rahul.sharma@example.com",
+      "email": "yogendrasahu6636@gmail.com",
       "password": "$2a$10$JgjyTNZI8F.OZz7euaIrze0jAzn0zek8LOwGR94FAZh6Ue1s6yDIS",
       "role": "seeker",
       "companyName": "",
@@ -745,7 +745,7 @@
   "applications": [
     {
       "id": "app_1791885640720_y5n6",
-      "status": "pending",
+      "status": "offered",
       "createdAt": "2026-10-13T10:00:40.720Z",
       "jobId": "job_9",
       "jobTitle": "Customer Care & Medical Telecaller",
@@ -753,10 +753,27 @@
       "employerName": "PrimeCare Diagnostic Centers",
       "seekerId": "usr_seek_1",
       "seekerName": "Rahul Sharma",
-      "seekerEmail": "rahul.sharma@example.com",
+      "seekerEmail": "yogendrasahu6636@gmail.com",
       "seekerPhone": "+91 91234 56789",
       "seekerAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
-      "coverNote": "I am interested in this role and available for immediate discussion."
+      "coverNote": "I am interested in this role and available for immediate discussion.",
+      "offerLetter": {
+        "refNo": "JS-OFFER-349408",
+        "candidateName": "Rahul Sharma",
+        "candidateEmail": "yogendrasahu6636@gmail.com",
+        "candidatePhone": "+91 91234 56789",
+        "designation": "Customer Care & Medical Telecaller",
+        "salary": "₹14,00,000 / yr",
+        "joiningDate": "Immediate (Within 7-15 Days)",
+        "location": "Bandra Kurla Complex (BKC), Mumbai / Hybrid",
+        "terms": "Standard company employment policies, 3 months probation period, 30 days notice period.",
+        "customNote": "We were extremely impressed by your experience and are thrilled to welcome you to our engineering team!",
+        "issuedAt": "2026-10-14T05:22:29.408Z",
+        "employerName": "PrimeCare Diagnostic Centers",
+        "companyName": "PrimeCare Diagnostic Centers",
+        "status": "offered"
+      },
+      "updatedAt": "2026-10-14T05:22:29.408Z"
     },
     {
       "id": "app_1791791104210_8456",
@@ -768,7 +785,7 @@
       "employerName": "TechPulse Solutions",
       "seekerId": "usr_seek_1",
       "seekerName": "Rahul Sharma",
-      "seekerEmail": "rahul.sharma@example.com",
+      "seekerEmail": "yogendrasahu6636@gmail.com",
       "seekerPhone": "+91 91234 56789",
       "seekerAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
       "coverNote": "I am interested in this role and available for immediate discussion."
@@ -780,7 +797,7 @@
       "employerId": "usr_emp_1",
       "seekerId": "usr_seek_1",
       "seekerName": "Rahul Sharma",
-      "seekerEmail": "rahul.sharma@example.com",
+      "seekerEmail": "yogendrasahu6636@gmail.com",
       "seekerPhone": "+91 91234 56789",
       "seekerAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
       "coverNote": "I have 3+ years building real-time collaboration apps with React, Leaflet, and WebRTC. Located in Kurla West nearby!",
@@ -874,6 +891,14 @@
       "receiverId": "usr_seek_2",
       "senderName": "Rahul Sharma",
       "message": "Hi! I would like to discuss this opening."
+    },
+    {
+      "id": "msg_1791955349419_y2yd",
+      "timestamp": "2026-10-14T05:22:29.419Z",
+      "read": false,
+      "senderId": "usr_emp_6",
+      "receiverId": "usr_seek_1",
+      "content": "🎉 Congratulations Rahul Sharma! We have issued your formal Job Offer Letter for \"Customer Care & Medical Telecaller\" at PrimeCare Diagnostic Centers with compensation of ₹14,00,000 / yr. An official copy has been dispatched to your email (yogendrasahu6636@gmail.com). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!"
     }
   ],
   "posts": [

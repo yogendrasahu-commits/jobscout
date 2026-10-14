@@ -453,6 +453,75 @@ router.put('/location', authenticateToken, (req, res) => {
   res.json({ user: safeUser });
 });
 
+// Update User Profile (Email, Name, Title, Skills, Bio, etc.)
+router.put('/profile', authenticateToken, (req, res) => {
+  const user = db.findUserById(req.user.id);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  const { email, name, title, bio, skills, experience, expectedSalary, availability, companyName, website, industry, address, avatar } = req.body;
+
+  const updates = {};
+
+  if (email !== undefined) {
+    const trimmedEmail = String(email).trim().toLowerCase();
+    if (trimmedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      return res.status(400).json({ error: 'Please enter a valid email address (e.g. name@example.com)' });
+    }
+    // Check if another user already has this email
+    if (trimmedEmail) {
+      const existingUserWithEmail = db.findUserByEmail(trimmedEmail);
+      if (existingUserWithEmail && existingUserWithEmail.id !== req.user.id) {
+        return res.status(400).json({ error: 'This email is already associated with another account' });
+      }
+    }
+    updates.email = trimmedEmail;
+  }
+
+  if (name && String(name).trim().length >= 2) {
+    updates.name = String(name).trim();
+  }
+  if (title !== undefined) updates.title = String(title).trim();
+  if (bio !== undefined) updates.bio = String(bio).trim();
+  if (skills !== undefined) {
+    updates.skills = Array.isArray(skills) ? skills : String(skills).split(',').map(s => s.trim()).filter(Boolean);
+  }
+  if (experience !== undefined) updates.experience = String(experience).trim();
+  if (expectedSalary !== undefined) updates.expectedSalary = String(expectedSalary).trim();
+  if (availability !== undefined) updates.availability = String(availability).trim();
+  if (companyName !== undefined) updates.companyName = String(companyName).trim();
+  if (website !== undefined) updates.website = String(website).trim();
+  if (industry !== undefined) updates.industry = String(industry).trim();
+  if (address !== undefined) updates.address = String(address).trim();
+  if (avatar !== undefined) updates.avatar = String(avatar).trim();
+
+  const updated = db.updateUser(req.user.id, updates);
+  if (!updated) {
+    return res.status(500).json({ error: 'Failed to update profile' });
+  }
+
+  // Also sync seeker email on any active applications by this seeker if email was updated
+  if (updates.email) {
+    const allApps = db.getAllApplications();
+    allApps.forEach(app => {
+      if (app.seekerId === req.user.id) {
+        app.seekerEmail = updates.email;
+      }
+    });
+    db.save();
+  }
+
+  const { password: _, ...safeUser } = updated;
+
+  // Generate refreshed token with updated email/name
+  const token = jwt.sign(
+    { id: safeUser.id, email: safeUser.email, role: safeUser.role, name: safeUser.name, phone: safeUser.phone },
+    JWT_SECRET,
+    { expiresIn: '7d' }
+  );
+
+  res.json({ user: safeUser, token, message: 'Profile updated successfully' });
+});
+
 // Get all employers (visible to seekers on the live map and Connect Hub)
 router.get('/employers', (req, res) => {
   const employers = db.getEmployers().map(u => {
