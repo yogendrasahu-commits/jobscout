@@ -124,7 +124,7 @@ router.post('/:id/offer', authenticateToken, async (req, res) => {
   }
 
   const seeker = db.findUserById(app.seekerId);
-  const targetEmail = (candidateEmail && String(candidateEmail).trim().toLowerCase()) || app.seekerEmail || (seeker && seeker.email);
+  const targetEmail = (candidateEmail && String(candidateEmail).trim().toLowerCase()) || (seeker && seeker.email) || app.seekerEmail;
 
   if (!targetEmail || !targetEmail.includes('@')) {
     return res.status(400).json({
@@ -132,8 +132,8 @@ router.post('/:id/offer', authenticateToken, async (req, res) => {
     });
   }
 
-  // If candidate email wasn't saved in user record yet, update it
-  if (seeker && (!seeker.email || seeker.email !== targetEmail)) {
+  // Ensure seeker's profile email is always updated to targetEmail
+  if (seeker && seeker.email !== targetEmail) {
     db.updateUser(seeker.id, { email: targetEmail });
   }
 

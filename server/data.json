@@ -15,13 +15,13 @@
       "lat": 19.076,
       "lng": 72.8777,
       "address": "Bandra Kurla Complex, Mumbai",
-      "isOnline": false,
+      "isOnline": true,
       "createdAt": "2026-10-12T07:30:06.434Z"
     },
     {
       "id": "usr_emp_2",
       "name": "Nexus Cloud Innovations",
-      "email": "hr@nexuscloud.com",
+      "email": "fagip93140@herclan.com",
       "password": "$2a$10$JgjyTNZI8F.OZz7euaIrze0jAzn0zek8LOwGR94FAZh6Ue1s6yDIS",
       "role": "emp",
       "companyName": "Nexus Cloud Innovations",
@@ -33,7 +33,7 @@
       "lat": 19.1136,
       "lng": 72.8697,
       "address": "MIDC Industrial Area, Andheri East, Mumbai",
-      "isOnline": false,
+      "isOnline": true,
       "createdAt": "2026-10-12T07:30:06.434Z"
     },
     {
@@ -128,7 +128,7 @@
       "lat": 28.6304,
       "lng": 77.2177,
       "address": "Connaught Place (CP), New Delhi",
-      "isOnline": false,
+      "isOnline": true,
       "experience": "3+ Years",
       "expectedSalary": "₹14,00,000 / yr",
       "availability": "Immediate (Ready Today)",
@@ -744,8 +744,53 @@
   ],
   "applications": [
     {
-      "id": "app_1791956500035_h63p",
+      "id": "app_1791959944673_jd7b",
+      "status": "pending",
+      "createdAt": "2026-10-14T06:39:04.673Z",
+      "jobId": "job_7",
+      "jobTitle": "Lead Product UI/UX Designer",
+      "employerId": "usr_emp_4",
+      "employerName": "PixelCraft Design Lab",
+      "seekerId": "usr_seek_1",
+      "seekerName": "Rahul Sharma",
+      "seekerEmail": "yogendrasahu6636@gmail.com",
+      "seekerPhone": "+91 91234 56789",
+      "seekerAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "coverNote": "I am interested in this role and available for immediate discussion."
+    },
+    {
+      "id": "app_1791959940489_7euf",
+      "status": "pending",
+      "createdAt": "2026-10-14T06:39:00.490Z",
+      "jobId": "job_8",
+      "jobTitle": "Store Operations & Billing Lead",
+      "employerId": "usr_emp_5",
+      "employerName": "QuickServe Retail Supermarts",
+      "seekerId": "usr_seek_1",
+      "seekerName": "Rahul Sharma",
+      "seekerEmail": "yogendrasahu6636@gmail.com",
+      "seekerPhone": "+91 91234 56789",
+      "seekerAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "coverNote": "I am interested in this role and available for immediate discussion."
+    },
+    {
+      "id": "app_1791959925091_y9lz",
       "status": "accepted",
+      "createdAt": "2026-10-14T06:38:45.091Z",
+      "jobId": "job_4",
+      "jobTitle": "DevOps & Kubernetes Infrastructure Engineer",
+      "employerId": "usr_emp_2",
+      "employerName": "Nexus Cloud Innovations",
+      "seekerId": "usr_seek_1",
+      "seekerName": "Rahul Sharma",
+      "seekerEmail": "yogendrasahu6636@gmail.com",
+      "seekerPhone": "+91 91234 56789",
+      "seekerAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "coverNote": "I am interested in this role and available for immediate discussion."
+    },
+    {
+      "id": "app_1791956500035_h63p",
+      "status": "hired",
       "createdAt": "2026-10-14T05:41:40.035Z",
       "jobId": "job_2",
       "jobTitle": "On-Demand Field IT Diagnostics Engineer",
@@ -756,7 +801,25 @@
       "seekerEmail": "yogendrasahu6636@gmail.com",
       "seekerPhone": "+91 91234 56789",
       "seekerAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
-      "coverNote": "I am interested in this role and available for immediate discussion."
+      "coverNote": "I am interested in this role and available for immediate discussion.",
+      "offerLetter": {
+        "refNo": "JS-OFFER-311865",
+        "candidateName": "Rahul Sharma",
+        "candidateEmail": "yogendrasahu6636@gmail.com",
+        "candidatePhone": "+91 91234 56789",
+        "designation": "On-Demand Field IT Diagnostics Engineer",
+        "salary": "₹14,00,000 / yr",
+        "joiningDate": "Immediate (Within 7-15 Days)",
+        "location": "Bandra Kurla Complex (BKC), Mumbai / Hybrid",
+        "terms": "Standard company employment policies, 3 months probation period, 30 days notice period.",
+        "customNote": "We were extremely impressed by your experience and are thrilled to welcome you to our engineering team!",
+        "issuedAt": "2026-10-14T06:28:31.865Z",
+        "employerName": "TechPulse Solutions",
+        "companyName": "TechPulse Solutions",
+        "status": "offered",
+        "acceptedAt": "2026-10-14T06:28:42.974Z"
+      },
+      "updatedAt": "2026-10-14T06:28:42.974Z"
     },
     {
       "id": "app_1791956073018_f9kp",
@@ -1070,6 +1133,22 @@
       "senderId": "usr_seek_1",
       "receiverId": "usr_emp_3",
       "content": "🤝 I am thrilled to formally accept your Job Offer Letter for \"Fulfillment Hub Inventory Supervisor\"! Looking forward to joining Apex Express Logistics on Immediate (Within 7-15 Days)."
+    },
+    {
+      "id": "msg_1791959311869_ihmq",
+      "timestamp": "2026-10-14T06:28:31.869Z",
+      "read": false,
+      "senderId": "usr_emp_1",
+      "receiverId": "usr_seek_1",
+      "content": "🎉 Congratulations Rahul Sharma! We have issued your formal Job Offer Letter for \"On-Demand Field IT Diagnostics Engineer\" at TechPulse Solutions with compensation of ₹14,00,000 / yr. An official copy has been dispatched to your email (yogendrasahu6636@gmail.com). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!"
+    },
+    {
+      "id": "msg_1791959322979_f4s8",
+      "timestamp": "2026-10-14T06:28:42.979Z",
+      "read": false,
+      "senderId": "usr_seek_1",
+      "receiverId": "usr_emp_1",
+      "content": "🤝 I am thrilled to formally accept your Job Offer Letter for \"On-Demand Field IT Diagnostics Engineer\"! Looking forward to joining TechPulse Solutions on Immediate (Within 7-15 Days)."
     }
   ],
   "posts": [

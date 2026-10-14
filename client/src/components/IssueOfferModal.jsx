@@ -95,13 +95,19 @@ export const IssueOfferModal = ({ application, isOpen, onClose, onSuccess }) => 
         throw new Error(data.error || 'Failed to dispatch offer letter');
       }
 
-      setSuccess(`🎉 आधिकारिक ऑफर लेटर सफलतापूर्वक ${cleanEmail} पर प्रेषित कर दिया गया है!`);
+      const emailStatus = data.emailResult;
+      if (emailStatus?.sentReal) {
+        setSuccess(`🎉 आधिकारिक ऑफर लेटर सफलतापूर्वक ${cleanEmail} के ईमेल इनबॉक्स में भेज दिया गया है! (Message ID: ${emailStatus.messageId || 'OK'})`);
+      } else {
+        setSuccess(`✅ पोर्टल में ऑफर लेटर सफलतापूर्वक जारी हो गया है! (सीधे ${cleanEmail} के इनबॉक्स में वास्तविक मेल पहुंचाने के लिए 'Email Sender Setup' में Gmail App Password जोड़ें)`);
+      }
+
       if (onSuccess) {
         onSuccess(data.application);
       }
       setTimeout(() => {
         onClose();
-      }, 1500);
+      }, 2200);
     } catch (err) {
       setError(err.message || 'ऑफर लेटर भेजने में त्रुटि हुई।');
     } finally {

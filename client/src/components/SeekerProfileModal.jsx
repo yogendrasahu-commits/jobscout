@@ -1,9 +1,13 @@
-import React from 'react';
-import { X, Phone, Video, MessageSquare, MapPin, Briefcase, Award, Sparkles, User, ArrowLeft, Mail } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Phone, Video, MessageSquare, MapPin, Briefcase, Award, Sparkles, User, ArrowLeft, Mail, Edit3 } from 'lucide-react';
 import { useSocket } from '../context/SocketContext';
+import { useAuth } from '../context/AuthContext';
+import { UpdateEmailModal } from './UpdateEmailModal';
 
 export const SeekerProfileModal = ({ seeker, isOpen, onClose }) => {
+  const { user } = useAuth();
   const { setActiveChatUser, startCall } = useSocket();
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
 
   if (!isOpen || !seeker) return null;
 
@@ -63,14 +67,21 @@ export const SeekerProfileModal = ({ seeker, isOpen, onClose }) => {
               <MapPin className="w-3.5 h-3.5 text-slate-500" />
               <span>{seeker.address || 'Active Nearby'}</span>
             </span>
-            {seeker.email && (
-              <>
-                <span>•</span>
-                <span className="flex items-center gap-1 text-indigo-300">
-                  <Mail className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>{seeker.email}</span>
-                </span>
-              </>
+            <span>•</span>
+            <span className="flex items-center gap-1 text-indigo-300">
+              <Mail className="w-3.5 h-3.5 text-indigo-400" />
+              <span>{seeker.email || (user?.id === seeker.id ? 'No email linked' : 'Verified email')}</span>
+            </span>
+            {user?.id === seeker.id && (
+              <button
+                type="button"
+                onClick={() => setIsEmailModalOpen(true)}
+                className="px-2 py-0.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white text-[11px] font-bold border border-indigo-500/30 transition-all flex items-center gap-1 active:scale-95"
+                title="Update Email"
+              >
+                <Edit3 className="w-3 h-3" />
+                <span>{seeker.email ? 'Edit' : 'Add Email'}</span>
+              </button>
             )}
             {seeker.phone && (
               <>
@@ -156,6 +167,15 @@ export const SeekerProfileModal = ({ seeker, isOpen, onClose }) => {
             <span>Close (प्रोफाइल बंद करें)</span>
           </button>
         </div>
+
+        {/* Update Email Modal */}
+        <UpdateEmailModal
+          isOpen={isEmailModalOpen}
+          onClose={() => setIsEmailModalOpen(false)}
+          onUpdated={(newEmail) => {
+            if (seeker) seeker.email = newEmail;
+          }}
+        />
 
       </div>
     </div>

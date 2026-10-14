@@ -996,11 +996,33 @@ class Database {
   }
 
   getApplicationsBySeekerId(seekerId) {
-    return this.data.applications.filter(a => a.seekerId === seekerId);
+    return this.data.applications
+      .filter(a => a.seekerId === seekerId)
+      .map(app => {
+        const employer = this.findUserById(app.employerId);
+        const seeker = this.findUserById(app.seekerId);
+        return {
+          ...app,
+          seekerEmail: (seeker && seeker.email) || app.seekerEmail || '',
+          employerName: (employer && (employer.companyName || employer.name)) || app.employerName || '',
+          employerEmail: (employer && employer.email) || ''
+        };
+      });
   }
 
   getApplicationsByEmployerId(employerId) {
-    return this.data.applications.filter(a => a.employerId === employerId);
+    return this.data.applications
+      .filter(a => a.employerId === employerId)
+      .map(app => {
+        const seeker = this.findUserById(app.seekerId);
+        return {
+          ...app,
+          seekerEmail: (seeker && seeker.email) || app.seekerEmail || '',
+          seekerPhone: (seeker && seeker.phone) || app.seekerPhone || '',
+          seekerAvatar: (seeker && seeker.avatar) || app.seekerAvatar || '',
+          seekerName: (seeker && seeker.name) || app.seekerName || ''
+        };
+      });
   }
 
   createApplication(appData) {

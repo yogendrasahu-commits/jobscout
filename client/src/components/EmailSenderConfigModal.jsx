@@ -15,7 +15,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 
 export const EmailSenderConfigModal = ({ isOpen, onClose, onConfigSaved }) => {
-  const { token } = useAuth();
+  const { user, token } = useAuth();
 
   const [useCustomSmtp, setUseCustomSmtp] = useState(false);
   const [gmailUser, setGmailUser] = useState('');
@@ -40,6 +40,9 @@ export const EmailSenderConfigModal = ({ isOpen, onClose, onConfigSaved }) => {
     if (!isOpen) return;
     setError('');
     setSuccess('');
+    if (!gmailUser && user?.email && user.email.includes('@')) {
+      setGmailUser(user.email);
+    }
     const fetchStatus = async () => {
       try {
         const res = await fetch('/api/settings/email');
@@ -48,6 +51,8 @@ export const EmailSenderConfigModal = ({ isOpen, onClose, onConfigSaved }) => {
           setStatus(data);
           if (data.senderEmail && data.serviceType === 'Gmail') {
             setGmailUser(data.senderEmail);
+          } else if (!gmailUser && user?.email && user.email.includes('@')) {
+            setGmailUser(user.email);
           }
         }
       } catch (e) {
