@@ -15,7 +15,7 @@
       "lat": 19.076,
       "lng": 72.8777,
       "address": "Bandra Kurla Complex, Mumbai",
-      "isOnline": true,
+      "isOnline": false,
       "createdAt": "2026-10-12T07:30:06.434Z"
     },
     {
@@ -1694,5 +1694,14 @@
       "views": 540,
       "createdAt": "2026-10-11T07:44:07.826Z"
     }
-  ]
+  ],
+  "emailConfig": {
+    "gmailUser": "",
+    "gmailPass": "",
+    "smtpHost": "",
+    "smtpPort": "",
+    "smtpUser": "",
+    "smtpPass": "",
+    "emailFrom": ""
+  }
 }

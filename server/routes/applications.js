@@ -1,6 +1,7 @@
 import express from 'express';
 import { db } from '../db.js';
 import { authenticateToken } from './auth.js';
+import { sendOfferLetterEmail, sendOfferAcceptedEmail } from '../email.js';
 
 const router = express.Router();
 
@@ -65,8 +66,6 @@ router.get('/employer', authenticateToken, (req, res) => {
   const apps = db.getApplicationsByEmployerId(req.user.id);
   res.json({ applications: apps });
 });
-
-import { sendOfferLetterEmail } from '../email.js';
 
 // Update application status (Employer only)
 router.put('/:id/status', authenticateToken, (req, res) => {
@@ -227,6 +226,22 @@ router.post('/:id/accept-offer', authenticateToken, (req, res) => {
   if (req.io) {
     req.io.emit('application:updated', app);
     req.io.emit('message:received', chatMsg);
+  }
+
+  // Also send an email notification to the Employer
+  const employer = db.findUserById(app.employerId);
+  if (employer && employer.email) {
+    sendOfferAcceptedEmail({
+      employerEmail: employer.email,
+      employerName: employer.name,
+      companyName: app.offerLetter?.companyName || employer.companyName || employer.name,
+      candidateName: app.seekerName,
+      candidateEmail: app.seekerEmail || req.user.email,
+      jobTitle: app.offerLetter?.designation || app.jobTitle,
+      salary: app.offerLetter?.salary || app.jobSalary,
+      joiningDate: app.offerLetter?.joiningDate || 'Immediate',
+      refNo: app.offerLetter?.refNo || `OFFER-${app.id?.slice(-6)}`
+    }).catch(err => console.warn('[EmailService] Offer accepted email notification failed:', err));
   }
 
   res.json({

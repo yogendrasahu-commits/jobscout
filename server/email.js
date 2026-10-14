@@ -224,7 +224,14 @@ export async function sendOfferLetterEmail({
         to: candidateEmail,
         subject: `🎉 Job Offer Letter: ${jobTitle} at ${effectiveCompany}`,
         text: `Dear ${candidateName},\n\nCongratulations! You have received a formal offer for ${jobTitle} at ${effectiveCompany} with CTC of ${salary}.\nJoining Date: ${effectiveJoiningDate}.\nReference: ${effectiveRefNo}.\n\nPlease check your JobScout portal to review, view printable letterhead with ${effectiveCompany} watermark, and accept the offer.`,
-        html: htmlContent
+        html: htmlContent,
+        attachments: [
+          {
+            filename: `Offer_Letter_${effectiveRefNo}.html`,
+            content: htmlContent,
+            contentType: 'text/html'
+          }
+        ]
       });
 
       console.log(`[EmailService] REAL offer letter email sent to ${candidateEmail}. MessageId: ${info.messageId}`);
@@ -256,3 +263,91 @@ export async function sendOfferLetterEmail({
     };
   }
 }
+
+/**
+ * Sends notification to employer when candidate accepts the offer letter.
+ */
+export async function sendOfferAcceptedEmail({
+  employerEmail,
+  employerName,
+  companyName,
+  candidateName,
+  candidateEmail,
+  jobTitle,
+  salary,
+  joiningDate,
+  refNo
+}) {
+  if (!employerEmail || !employerEmail.includes('@')) return { success: false };
+
+  const dbConfig = db.getEmailConfig ? db.getEmailConfig() : {};
+  const senderEmail = (dbConfig.emailFrom || process.env.EMAIL_FROM || dbConfig.gmailUser || process.env.GMAIL_USER || dbConfig.smtpUser || process.env.SMTP_USER || 'offers@jobscout.io').trim();
+  const effectiveCompany = companyName || employerName || 'Hiring Enterprise';
+  const effectiveRefNo = refNo || `OFFER-${Date.now().toString().slice(-6)}`;
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Offer Accepted - ${candidateName}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0f172a; margin: 0; padding: 24px; color: #334155; }
+    .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2); }
+    .header { background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 32px; color: #ffffff; text-align: center; }
+    .header h1 { margin: 0; font-size: 22px; font-weight: 800; }
+    .content { padding: 32px; font-size: 14px; line-height: 1.6; color: #1e293b; }
+    .card { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 20px; margin: 20px 0; }
+    .row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #cbd5e1; font-size: 13px; }
+    .row:last-child { border-bottom: none; }
+    .btn { display: inline-block; background: #059669; color: #ffffff !important; text-decoration: none; padding: 12px 28px; border-radius: 10px; font-weight: 700; font-size: 14px; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🤝 Offer Accepted!</h1>
+      <p style="margin: 6px 0 0; opacity: 0.9; font-size: 14px;">Candidate has formally accepted your Job Offer</p>
+    </div>
+    <div class="content">
+      <p>Dear <strong>${employerName || effectiveCompany}</strong>,</p>
+      <p>Great news! <strong>${candidateName}</strong> has officially accepted your offer letter for the position of <strong>${jobTitle}</strong> at <strong>${effectiveCompany}</strong>.</p>
+      
+      <div class="card">
+        <div class="row"><span>Candidate:</span><strong>${candidateName} (${candidateEmail})</strong></div>
+        <div class="row"><span>Position:</span><strong>${jobTitle}</strong></div>
+        <div class="row"><span>Offered CTC:</span><strong>${salary}</strong></div>
+        <div class="row"><span>Joining Date:</span><strong>${joiningDate || 'Immediate'}</strong></div>
+        <div class="row"><span>Offer Reference:</span><strong style="font-family: monospace;">${effectiveRefNo}</strong></div>
+        <div class="row"><span>Status:</span><strong style="color: #059669;">Officially Hired (स्वीकृत)</strong></div>
+      </div>
+
+      <div style="text-align: center;">
+        <a href="https://jobscout.onrender.com" class="btn">View Candidate in JobScout Dashboard</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+
+  try {
+    const transporter = await getTransporter();
+    if (transporter) {
+      const fromHeader = senderEmail.includes('<') ? senderEmail : `"${effectiveCompany}" <${senderEmail}>`;
+      await transporter.sendMail({
+        from: fromHeader,
+        to: employerEmail,
+        subject: `🤝 Offer Accepted: ${candidateName} has accepted offer for ${jobTitle} at ${effectiveCompany}`,
+        text: `Congratulations! ${candidateName} has accepted your job offer for ${jobTitle} at ${effectiveCompany}.\nReference: ${effectiveRefNo}`,
+        html
+      });
+      console.log(`[EmailService] Offer accepted email sent to employer: ${employerEmail}`);
+      return { success: true, sentReal: true };
+    }
+  } catch (err) {
+    console.warn(`[EmailService] Failed to send offer accepted email:`, err);
+  }
+  return { success: true, sentReal: false };
+}
+
