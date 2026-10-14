@@ -29,7 +29,9 @@ export async function getTransporter() {
 
   if (rawGmailUser && rawGmailPass) {
     return nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
       auth: {
         user: rawGmailUser,
         pass: rawGmailPass
@@ -63,7 +65,9 @@ export async function verifyEmailConfig(config) {
     });
   } else if (gmailUser && gmailPass) {
     transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
       auth: { user: gmailUser, pass: gmailPass }
     });
   } else {
