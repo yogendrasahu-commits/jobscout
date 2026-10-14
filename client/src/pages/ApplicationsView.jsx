@@ -17,13 +17,15 @@ import {
   Award,
   ArrowRight,
   ShieldCheck,
-  Building
+  Building,
+  Settings
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { IssueOfferModal } from '../components/IssueOfferModal';
 import { ViewOfferLetterModal } from '../components/ViewOfferLetterModal';
 import { UpdateEmailModal } from '../components/UpdateEmailModal';
+import { EmailSenderConfigModal } from '../components/EmailSenderConfigModal';
 
 export const ApplicationsView = ({ 
   onOpenProfile, 
@@ -41,6 +43,7 @@ export const ApplicationsView = ({
   const [selectedAppForOffer, setSelectedAppForOffer] = useState(null);
   const [selectedAppForView, setSelectedAppForView] = useState(null);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [isSenderConfigOpen, setIsSenderConfigOpen] = useState(false);
 
   const fetchApplications = async () => {
     if (!token) {
@@ -226,28 +229,43 @@ export const ApplicationsView = ({
           </p>
         </div>
 
-        {/* Profile Email Indicator with Update Button */}
-        <div className="flex items-center gap-2.5 p-2 sm:px-3.5 sm:py-2 rounded-2xl bg-slate-900/90 border border-slate-700/80 shadow-md">
-          <div className="w-8 h-8 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center flex-shrink-0">
-            <Mail className="w-4 h-4" />
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Profile Email Indicator with Update Button */}
+          <div className="flex items-center gap-2.5 p-2 sm:px-3.5 sm:py-2 rounded-2xl bg-slate-900/90 border border-slate-700/80 shadow-md">
+            <div className="w-8 h-8 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center flex-shrink-0">
+              <Mail className="w-4 h-4" />
+            </div>
+            <div className="min-w-0 pr-1">
+              <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider leading-none">
+                {isEmployer ? 'Your Employer Email:' : 'Your Inbox for Offers:'}
+              </span>
+              <span className="text-xs font-bold text-white truncate max-w-[170px] sm:max-w-[220px] block mt-0.5">
+                {user.email || <span className="text-amber-400 italic">No email linked</span>}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsEmailModalOpen(true)}
+              className="px-2.5 py-1.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white text-[11px] font-bold border border-indigo-500/40 transition-all flex items-center gap-1 active:scale-95 whitespace-nowrap ml-auto"
+              title="Update Profile Email"
+            >
+              <Edit3 className="w-3 h-3" />
+              <span>Update Email (ईमेल बदलें)</span>
+            </button>
           </div>
-          <div className="min-w-0 pr-1">
-            <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider leading-none">
-              Your Inbox for Offers:
-            </span>
-            <span className="text-xs font-bold text-white truncate max-w-[170px] sm:max-w-[220px] block mt-0.5">
-              {user.email || <span className="text-amber-400 italic">No email linked</span>}
-            </span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setIsEmailModalOpen(true)}
-            className="px-2.5 py-1.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white text-[11px] font-bold border border-indigo-500/40 transition-all flex items-center gap-1 active:scale-95 whitespace-nowrap ml-auto"
-            title="Update Profile Email"
-          >
-            <Edit3 className="w-3 h-3" />
-            <span>Update Email (ईमेल बदलें)</span>
-          </button>
+
+          {/* Employer Email Sender Setup Button */}
+          {isEmployer && (
+            <button
+              type="button"
+              onClick={() => setIsSenderConfigOpen(true)}
+              className="px-3 py-2 rounded-2xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 shadow-md whitespace-nowrap"
+              title="Configure Gmail App Password or SMTP to send real emails to candidates"
+            >
+              <Settings className="w-4 h-4 text-amber-400" />
+              <span>Email Sender Setup (Gmail)</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -549,6 +567,14 @@ export const ApplicationsView = ({
         <UpdateEmailModal
           isOpen={isEmailModalOpen}
           onClose={() => setIsEmailModalOpen(false)}
+        />
+      )}
+
+      {/* 4. Modal to Configure Real Gmail / SMTP Sender */}
+      {isSenderConfigOpen && (
+        <EmailSenderConfigModal
+          isOpen={isSenderConfigOpen}
+          onClose={() => setIsSenderConfigOpen(false)}
         />
       )}
 

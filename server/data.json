@@ -15,7 +15,7 @@
       "lat": 19.076,
       "lng": 72.8777,
       "address": "Bandra Kurla Complex, Mumbai",
-      "isOnline": false,
+      "isOnline": true,
       "createdAt": "2026-10-12T07:30:06.434Z"
     },
     {
@@ -51,7 +51,7 @@
       "lat": 19.091,
       "lng": 72.886,
       "address": "Sakinaka Junction, Kurla, Mumbai",
-      "isOnline": true,
+      "isOnline": false,
       "createdAt": "2026-10-12T07:30:06.434Z"
     },
     {
@@ -105,7 +105,7 @@
       "lat": 19.12,
       "lng": 72.905,
       "address": "Hiranandani Business Park, Powai, Mumbai",
-      "isOnline": true,
+      "isOnline": false,
       "createdAt": "2026-10-12T07:30:06.434Z"
     },
     {
@@ -744,8 +744,104 @@
   ],
   "applications": [
     {
+      "id": "app_1791956500035_h63p",
+      "status": "accepted",
+      "createdAt": "2026-10-14T05:41:40.035Z",
+      "jobId": "job_2",
+      "jobTitle": "On-Demand Field IT Diagnostics Engineer",
+      "employerId": "usr_emp_1",
+      "employerName": "TechPulse Solutions",
+      "seekerId": "usr_seek_1",
+      "seekerName": "Rahul Sharma",
+      "seekerEmail": "yogendrasahu6636@gmail.com",
+      "seekerPhone": "+91 91234 56789",
+      "seekerAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "coverNote": "I am interested in this role and available for immediate discussion."
+    },
+    {
+      "id": "app_1791956073018_f9kp",
+      "status": "hired",
+      "createdAt": "2026-10-14T05:34:33.018Z",
+      "jobId": "job_5",
+      "jobTitle": "Express Delivery Rider & Fleet Specialist",
+      "employerId": "usr_emp_3",
+      "employerName": "Apex Express Logistics",
+      "seekerId": "usr_seek_1",
+      "seekerName": "Rahul Sharma",
+      "seekerEmail": "yogendrasahu6636@gmail.com",
+      "seekerPhone": "+91 91234 56789",
+      "seekerAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "coverNote": "I am interested in this role and available for immediate discussion.",
+      "offerLetter": {
+        "refNo": "JS-OFFER-214485",
+        "candidateName": "Rahul Sharma",
+        "candidateEmail": "yogendrasahu6636@gmail.com",
+        "candidatePhone": "+91 91234 56789",
+        "designation": "Express Delivery Rider & Fleet Specialist",
+        "salary": "₹14,00,000 / yr",
+        "joiningDate": "Immediate (Within 7-15 Days)",
+        "location": "Bandra Kurla Complex (BKC), Mumbai / Hybrid",
+        "terms": "Standard company employment policies, 3 months probation period, 30 days notice period.",
+        "customNote": "We were extremely impressed by your experience and are thrilled to welcome you to our engineering team!",
+        "issuedAt": "2026-10-14T05:36:54.485Z",
+        "employerName": "Apex Express Logistics",
+        "companyName": "Apex Express Logistics",
+        "status": "offered",
+        "acceptedAt": "2026-10-14T05:37:40.244Z"
+      },
+      "updatedAt": "2026-10-14T05:37:40.244Z"
+    },
+    {
+      "id": "app_1791956068340_t6eq",
+      "status": "pending",
+      "createdAt": "2026-10-14T05:34:28.340Z",
+      "jobId": "job_3",
+      "jobTitle": "Backend Node.js & Microservices Architect",
+      "employerId": "usr_emp_2",
+      "employerName": "Nexus Cloud Innovations",
+      "seekerId": "usr_seek_1",
+      "seekerName": "Rahul Sharma",
+      "seekerEmail": "yogendrasahu6636@gmail.com",
+      "seekerPhone": "+91 91234 56789",
+      "seekerAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "coverNote": "I am interested in this role and available for immediate discussion."
+    },
+    {
+      "id": "app_1791956063579_bxfj",
+      "status": "hired",
+      "createdAt": "2026-10-14T05:34:23.579Z",
+      "jobId": "job_6",
+      "jobTitle": "Fulfillment Hub Inventory Supervisor",
+      "employerId": "usr_emp_3",
+      "employerName": "Apex Express Logistics",
+      "seekerId": "usr_seek_1",
+      "seekerName": "Rahul Sharma",
+      "seekerEmail": "yogendrasahu6636@gmail.com",
+      "seekerPhone": "+91 91234 56789",
+      "seekerAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "coverNote": "I am interested in this role and available for immediate discussion.",
+      "offerLetter": {
+        "refNo": "JS-OFFER-220878",
+        "candidateName": "Rahul Sharma",
+        "candidateEmail": "yogendrasahu6636@gmail.com",
+        "candidatePhone": "+91 91234 56789",
+        "designation": "Fulfillment Hub Inventory Supervisor",
+        "salary": "₹14,00,000 / yr",
+        "joiningDate": "Immediate (Within 7-15 Days)",
+        "location": "Bandra Kurla Complex (BKC), Mumbai / Hybrid",
+        "terms": "Standard company employment policies, 3 months probation period, 30 days notice period.",
+        "customNote": "We were extremely impressed by your experience and are thrilled to welcome you to our engineering team!",
+        "issuedAt": "2026-10-14T05:37:00.878Z",
+        "employerName": "Apex Express Logistics",
+        "companyName": "Apex Express Logistics",
+        "status": "offered",
+        "acceptedAt": "2026-10-14T05:38:05.805Z"
+      },
+      "updatedAt": "2026-10-14T05:38:05.805Z"
+    },
+    {
       "id": "app_1791885640720_y5n6",
-      "status": "offered",
+      "status": "hired",
       "createdAt": "2026-10-13T10:00:40.720Z",
       "jobId": "job_9",
       "jobTitle": "Customer Care & Medical Telecaller",
@@ -771,13 +867,14 @@
         "issuedAt": "2026-10-14T05:22:29.408Z",
         "employerName": "PrimeCare Diagnostic Centers",
         "companyName": "PrimeCare Diagnostic Centers",
-        "status": "offered"
+        "status": "offered",
+        "acceptedAt": "2026-10-14T05:33:46.018Z"
       },
-      "updatedAt": "2026-10-14T05:22:29.408Z"
+      "updatedAt": "2026-10-14T05:33:46.018Z"
     },
     {
       "id": "app_1791791104210_8456",
-      "status": "rejected",
+      "status": "hired",
       "createdAt": "2026-10-12T07:45:04.210Z",
       "jobId": "job_1791791087859_kd3z",
       "jobTitle": "hii",
@@ -788,7 +885,25 @@
       "seekerEmail": "yogendrasahu6636@gmail.com",
       "seekerPhone": "+91 91234 56789",
       "seekerAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
-      "coverNote": "I am interested in this role and available for immediate discussion."
+      "coverNote": "I am interested in this role and available for immediate discussion.",
+      "offerLetter": {
+        "refNo": "JS-OFFER-417608",
+        "candidateName": "Rahul Sharma",
+        "candidateEmail": "rahul.verified@gmail.com",
+        "candidatePhone": "+91 91234 56789",
+        "designation": "Lead Full-Stack Architect",
+        "salary": "₹18,50,000 / yr",
+        "joiningDate": "Within 7 Days",
+        "location": "Bandra Kurla Complex (BKC), Mumbai",
+        "terms": "Standard terms, 3 months probation, 30 days notice",
+        "customNote": "Welcome to the team Rahul!",
+        "issuedAt": "2026-10-14T05:23:37.608Z",
+        "employerName": "TechPulse Solutions",
+        "companyName": "TechPulse Solutions",
+        "status": "offered",
+        "acceptedAt": "2026-10-14T05:23:37.625Z"
+      },
+      "updatedAt": "2026-10-14T05:23:37.625Z"
     },
     {
       "id": "app_1",
@@ -899,6 +1014,62 @@
       "senderId": "usr_emp_6",
       "receiverId": "usr_seek_1",
       "content": "🎉 Congratulations Rahul Sharma! We have issued your formal Job Offer Letter for \"Customer Care & Medical Telecaller\" at PrimeCare Diagnostic Centers with compensation of ₹14,00,000 / yr. An official copy has been dispatched to your email (yogendrasahu6636@gmail.com). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!"
+    },
+    {
+      "id": "msg_1791955417611_x97g",
+      "timestamp": "2026-10-14T05:23:37.611Z",
+      "read": false,
+      "senderId": "usr_emp_1",
+      "receiverId": "usr_seek_1",
+      "content": "🎉 Congratulations Rahul Sharma! We have issued your formal Job Offer Letter for \"Lead Full-Stack Architect\" at TechPulse Solutions with compensation of ₹18,50,000 / yr. An official copy has been dispatched to your email (rahul.verified@gmail.com). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!"
+    },
+    {
+      "id": "msg_1791955417627_8bzr",
+      "timestamp": "2026-10-14T05:23:37.627Z",
+      "read": false,
+      "senderId": "usr_seek_1",
+      "receiverId": "usr_emp_1",
+      "content": "🤝 I am thrilled to formally accept your Job Offer Letter for \"Lead Full-Stack Architect\"! Looking forward to joining TechPulse Solutions on Within 7 Days."
+    },
+    {
+      "id": "msg_1791956026020_z6e8",
+      "timestamp": "2026-10-14T05:33:46.020Z",
+      "read": false,
+      "senderId": "usr_seek_1",
+      "receiverId": "usr_emp_6",
+      "content": "🤝 I am thrilled to formally accept your Job Offer Letter for \"Customer Care & Medical Telecaller\"! Looking forward to joining PrimeCare Diagnostic Centers on Immediate (Within 7-15 Days)."
+    },
+    {
+      "id": "msg_1791956214490_apni",
+      "timestamp": "2026-10-14T05:36:54.490Z",
+      "read": false,
+      "senderId": "usr_emp_3",
+      "receiverId": "usr_seek_1",
+      "content": "🎉 Congratulations Rahul Sharma! We have issued your formal Job Offer Letter for \"Express Delivery Rider & Fleet Specialist\" at Apex Express Logistics with compensation of ₹14,00,000 / yr. An official copy has been dispatched to your email (yogendrasahu6636@gmail.com). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!"
+    },
+    {
+      "id": "msg_1791956220882_pgv1",
+      "timestamp": "2026-10-14T05:37:00.882Z",
+      "read": false,
+      "senderId": "usr_emp_3",
+      "receiverId": "usr_seek_1",
+      "content": "🎉 Congratulations Rahul Sharma! We have issued your formal Job Offer Letter for \"Fulfillment Hub Inventory Supervisor\" at Apex Express Logistics with compensation of ₹14,00,000 / yr. An official copy has been dispatched to your email (yogendrasahu6636@gmail.com). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!"
+    },
+    {
+      "id": "msg_1791956260248_49vr",
+      "timestamp": "2026-10-14T05:37:40.248Z",
+      "read": false,
+      "senderId": "usr_seek_1",
+      "receiverId": "usr_emp_3",
+      "content": "🤝 I am thrilled to formally accept your Job Offer Letter for \"Express Delivery Rider & Fleet Specialist\"! Looking forward to joining Apex Express Logistics on Immediate (Within 7-15 Days)."
+    },
+    {
+      "id": "msg_1791956285811_zawl",
+      "timestamp": "2026-10-14T05:38:05.811Z",
+      "read": false,
+      "senderId": "usr_seek_1",
+      "receiverId": "usr_emp_3",
+      "content": "🤝 I am thrilled to formally accept your Job Offer Letter for \"Fulfillment Hub Inventory Supervisor\"! Looking forward to joining Apex Express Logistics on Immediate (Within 7-15 Days)."
     }
   ],
   "posts": [

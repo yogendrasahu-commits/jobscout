@@ -2,6 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { db } from '../db.js';
+import { verifyEmailConfig } from '../email.js';
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'jobradar_secret_jwt_key_2026';
@@ -567,12 +568,58 @@ router.post('/switch-user/:id', (req, res) => {
   res.json({ token, user: safeUser });
 });
 
-// Get user by ID (for chat/calling target)
-router.get('/user/:id', (req, res) => {
-  const user = db.findUserById(req.params.id);
-  if (!user) return res.status(404).json({ error: 'User not found' });
-  const { password: _, ...safeUser } = user;
-  res.json({ user: safeUser });
+// Get current email sender configuration status
+router.get('/settings/email', (req, res) => {
+  const cfg = db.getEmailConfig();
+  const isConfigured = Boolean(
+    (cfg.gmailUser && cfg.gmailPass) ||
+    (cfg.smtpHost && cfg.smtpUser && cfg.smtpPass)
+  );
+  res.json({
+    configured: isConfigured,
+    senderEmail: cfg.gmailUser || cfg.smtpUser || cfg.emailFrom || '',
+    serviceType: cfg.gmailUser ? 'Gmail' : cfg.smtpHost ? 'Custom SMTP' : 'Not Configured (Simulation Mode)'
+  });
+});
+
+// Update & verify email sender configuration
+router.post('/settings/email', async (req, res) => {
+  const { gmailUser, gmailPass, smtpHost, smtpPort, smtpUser, smtpPass, emailFrom } = req.body;
+
+  try {
+    // If user provided credentials, verify them before saving
+    if ((gmailUser && gmailPass) || (smtpHost && smtpUser && smtpPass)) {
+      await verifyEmailConfig({
+        gmailUser,
+        gmailPass,
+        smtpHost,
+        smtpPort,
+        smtpUser,
+        smtpPass
+      });
+    }
+
+    const saved = db.saveEmailConfig({
+      gmailUser: (gmailUser || '').trim(),
+      gmailPass: (gmailPass || '').trim(),
+      smtpHost: (smtpHost || '').trim(),
+      smtpPort: smtpPort || '',
+      smtpUser: (smtpUser || '').trim(),
+      smtpPass: (smtpPass || '').trim(),
+      emailFrom: (emailFrom || '').trim()
+    });
+
+    res.json({
+      success: true,
+      message: 'Email sender successfully connected and verified! Real emails will now be delivered directly to inboxes.',
+      configured: Boolean((saved.gmailUser && saved.gmailPass) || (saved.smtpHost && saved.smtpUser && saved.smtpPass))
+    });
+  } catch (err) {
+    console.error('Email verification error:', err);
+    res.status(400).json({
+      error: `Connection verification failed: ${err.message}. Please check your Gmail address and 16-character App Password.`
+    });
+  }
 });
 
 export default router;

@@ -1306,6 +1306,30 @@ class Database {
     this.save();
     return { post, comment };
   }
+
+  getEmailConfig() {
+    if (!this.data.emailConfig) {
+      this.data.emailConfig = {
+        gmailUser: process.env.GMAIL_USER || '',
+        gmailPass: process.env.GMAIL_PASS || '',
+        smtpHost: process.env.SMTP_HOST || '',
+        smtpPort: process.env.SMTP_PORT || '',
+        smtpUser: process.env.SMTP_USER || '',
+        smtpPass: process.env.SMTP_PASS || '',
+        emailFrom: process.env.EMAIL_FROM || ''
+      };
+    }
+    return this.data.emailConfig;
+  }
+
+  saveEmailConfig(config) {
+    this.data.emailConfig = {
+      ...(this.data.emailConfig || {}),
+      ...config
+    };
+    this.save();
+    return this.data.emailConfig;
+  }
 }
 
 export const db = new Database();

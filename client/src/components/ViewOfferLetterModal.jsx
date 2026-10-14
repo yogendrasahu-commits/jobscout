@@ -117,6 +117,8 @@ export const ViewOfferLetterModal = ({
           }
           #official-offer-letter-doc, #official-offer-letter-doc * {
             visibility: visible;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
           #official-offer-letter-doc {
             position: absolute;
@@ -125,9 +127,15 @@ export const ViewOfferLetterModal = ({
             width: 100%;
             background: white !important;
             color: black !important;
-            padding: 20px !important;
+            padding: 24px !important;
             box-shadow: none !important;
-            border: none !important;
+            border: 1px solid #cbd5e1 !important;
+          }
+          .company-watermark {
+            display: flex !important;
+            opacity: 0.08 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
           .no-print {
             display: none !important;
@@ -199,15 +207,26 @@ export const ViewOfferLetterModal = ({
             id="official-offer-letter-doc"
             className="bg-white text-slate-900 rounded-2xl p-6 sm:p-8 md:p-10 shadow-2xl border border-slate-200 relative overflow-hidden font-sans"
           >
-            {/* Background Security Watermark */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-[0.03] rotate-[-25deg]">
-              <span className="text-7xl sm:text-9xl font-black uppercase text-slate-900 tracking-widest">
-                OFFICIAL OFFER
-              </span>
+            {/* Background Security Watermark with Company Name */}
+            <div className="company-watermark absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none overflow-hidden z-0">
+              <div className="rotate-[-28deg] text-center space-y-16 sm:space-y-24 opacity-[0.06] sm:opacity-[0.07] select-none pointer-events-none">
+                <div className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-[0.25em] text-slate-900 whitespace-nowrap">
+                  {offer.companyName || application.employerName || 'OFFICIAL OFFER'}
+                </div>
+                <div className="text-4xl sm:text-6xl md:text-7xl font-black uppercase tracking-[0.25em] text-indigo-900 whitespace-nowrap">
+                  {offer.companyName || application.employerName || 'OFFICIAL OFFER'}
+                </div>
+                <div className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-[0.25em] text-slate-900 whitespace-nowrap">
+                  {offer.companyName || application.employerName || 'OFFICIAL OFFER'}
+                </div>
+              </div>
             </div>
 
-            {/* Letterhead Top Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b-2 border-indigo-900/20">
+            {/* Foreground Content */}
+            <div className="relative z-10 space-y-5">
+
+              {/* Letterhead Top Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b-2 border-indigo-900/20">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-700 to-indigo-900 text-white flex items-center justify-center font-black text-xl shadow-md">
                   {offer.companyName?.slice(0, 2).toUpperCase() || 'JS'}
@@ -342,6 +361,8 @@ export const ViewOfferLetterModal = ({
                     ⏳ Awaiting Candidate Acceptance
                   </div>
                 )}
+              </div>
+
               </div>
 
             </div>

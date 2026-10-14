@@ -25,12 +25,14 @@ import {
   Building2,
   ArrowRight,
   Mail,
-  Edit3
+  Edit3,
+  Settings
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { JobScoutLogo } from './JobScoutLogo';
 import { UpdateEmailModal } from './UpdateEmailModal';
+import { EmailSenderConfigModal } from './EmailSenderConfigModal';
 
 export const Navbar = ({ 
   currentTab, 
@@ -60,6 +62,7 @@ export const Navbar = ({
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [isSenderConfigOpen, setIsSenderConfigOpen] = useState(false);
   
   // Search state (synced with App.jsx if provided)
   const [internalSearchQuery, setInternalSearchQuery] = useState('');
@@ -887,6 +890,24 @@ export const Navbar = ({
                       <ArrowRight className="w-3 h-3 text-slate-500" />
                     </button>
 
+                    {/* Email Sender Setup (for Real Gmail Delivery) */}
+                    {isEmployer && (
+                      <button
+                        onClick={() => {
+                          setIsSenderConfigOpen(true);
+                          setProfileMenuOpen(false);
+                        }}
+                        className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-amber-300 hover:text-white bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-colors mb-2"
+                        title="Configure Gmail App Password"
+                      >
+                        <span className="flex items-center gap-1.5">
+                          <Settings className="w-3.5 h-3.5 text-amber-400" />
+                          <span>Email Sender Setup (Gmail)</span>
+                        </span>
+                        <ArrowRight className="w-3 h-3 text-amber-400" />
+                      </button>
+                    )}
+
                     {/* Location Info */}
                     <div className="px-2 py-1 text-xs text-slate-400 flex items-center gap-1.5 mb-2">
                       <MapPin className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
@@ -1349,6 +1370,14 @@ export const Navbar = ({
         <UpdateEmailModal
           isOpen={isEmailModalOpen}
           onClose={() => setIsEmailModalOpen(false)}
+        />
+      )}
+
+      {/* Email Sender Configuration Modal */}
+      {isSenderConfigOpen && (
+        <EmailSenderConfigModal
+          isOpen={isSenderConfigOpen}
+          onClose={() => setIsSenderConfigOpen(false)}
         />
       )}
 

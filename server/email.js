@@ -1,36 +1,78 @@
 import nodemailer from 'nodemailer';
+import { db } from './db.js';
 
 /**
  * Creates and returns an active email transporter.
- * Supports custom SMTP, Gmail App Passwords, or auto-fallback to Ethereal / simulated mode.
+ * Supports custom SMTP, Gmail App Passwords, or auto-fallback to simulated mode.
  */
 export async function getTransporter() {
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT) || 587;
-  const user = process.env.SMTP_USER || process.env.GMAIL_USER;
-  const pass = process.env.SMTP_PASS || process.env.GMAIL_PASS;
+  const dbConfig = db.getEmailConfig ? db.getEmailConfig() : {};
 
-  if (host && user && pass) {
+  // Custom SMTP takes precedence if all fields exist
+  const host = (dbConfig.smtpHost || process.env.SMTP_HOST || '').trim();
+  const port = Number(dbConfig.smtpPort || process.env.SMTP_PORT) || 587;
+  const smtpUser = (dbConfig.smtpUser || process.env.SMTP_USER || '').trim();
+  const smtpPass = (dbConfig.smtpPass || process.env.SMTP_PASS || '').trim();
+
+  if (host && smtpUser && smtpPass) {
     return nodemailer.createTransport({
       host,
       port,
       secure: port === 465,
-      auth: { user, pass }
+      auth: { user: smtpUser, pass: smtpPass }
     });
   }
 
-  if (process.env.GMAIL_USER && process.env.GMAIL_PASS) {
+  // Gmail App Password
+  const rawGmailUser = (dbConfig.gmailUser || process.env.GMAIL_USER || '').trim();
+  const rawGmailPass = (dbConfig.gmailPass || process.env.GMAIL_PASS || '').replace(/\s+/g, '');
+
+  if (rawGmailUser && rawGmailPass) {
     return nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS
+        user: rawGmailUser,
+        pass: rawGmailPass
       }
     });
   }
 
   // Fallback to simulated / logging mode
   return null;
+}
+
+/**
+ * Verifies email credentials by pinging the SMTP server
+ */
+export async function verifyEmailConfig(config) {
+  let transporter;
+  const host = (config.smtpHost || '').trim();
+  const port = Number(config.smtpPort) || 587;
+  const smtpUser = (config.smtpUser || '').trim();
+  const smtpPass = (config.smtpPass || '').trim();
+
+  const gmailUser = (config.gmailUser || '').trim();
+  const gmailPass = (config.gmailPass || '').replace(/\s+/g, '');
+
+  if (host && smtpUser && smtpPass) {
+    transporter = nodemailer.createTransport({
+      host,
+      port,
+      secure: port === 465,
+      auth: { user: smtpUser, pass: smtpPass }
+    });
+  } else if (gmailUser && gmailPass) {
+    transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user: gmailUser, pass: gmailPass }
+    });
+  } else {
+    throw new Error('Please provide either Gmail User & App Password, or full SMTP host credentials');
+  }
+
+  // Test connection
+  await transporter.verify();
+  return true;
 }
 
 /**
@@ -55,7 +97,8 @@ export async function sendOfferLetterEmail({
     };
   }
 
-  const senderEmail = process.env.EMAIL_FROM || process.env.SMTP_USER || 'offers@jobscout.io';
+  const dbConfig = db.getEmailConfig ? db.getEmailConfig() : {};
+  const senderEmail = (dbConfig.emailFrom || process.env.EMAIL_FROM || dbConfig.gmailUser || process.env.GMAIL_USER || dbConfig.smtpUser || process.env.SMTP_USER || 'offers@jobscout.io').trim();
   const effectiveCompany = companyName || employerName || 'Hiring Enterprise';
   const effectiveRefNo = refNo || `OFFER-${Date.now().toString().slice(-6)}`;
   const effectiveJoiningDate = joiningDate || 'Immediate / Within 10 Days';
@@ -68,12 +111,13 @@ export async function sendOfferLetterEmail({
   <title>Formal Offer of Employment - ${effectiveCompany}</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0f172a; margin: 0; padding: 24px; color: #334155; }
-    .container { max-width: 640px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2); }
-    .header { background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%); padding: 36px 32px; color: #ffffff; text-align: center; }
+    .container { max-width: 640px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2); position: relative; }
+    .watermark { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 54px; font-weight: 900; color: rgba(15, 23, 42, 0.05); text-transform: uppercase; letter-spacing: 4px; pointer-events: none; z-index: 1; text-align: center; width: 100%; white-space: nowrap; }
+    .header { background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%); padding: 36px 32px; color: #ffffff; text-align: center; position: relative; z-index: 2; }
     .header h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
     .header p { margin: 8px 0 0 0; font-size: 14px; opacity: 0.9; }
     .badge { display: inline-block; background: rgba(255,255,255,0.2); backdrop-filter: blur(4px); padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 12px; }
-    .content { padding: 32px; font-size: 14px; line-height: 1.6; color: #1e293b; }
+    .content { padding: 32px; font-size: 14px; line-height: 1.6; color: #1e293b; position: relative; z-index: 2; }
     .salutation { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: #0f172a; }
     .details-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin: 24px 0; }
     .details-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #cbd5e1; }
@@ -84,11 +128,14 @@ export async function sendOfferLetterEmail({
     .terms-box { background: #f1f5f9; border-left: 4px solid #4f46e5; padding: 14px 18px; border-radius: 4px 8px 8px 4px; font-size: 12px; color: #475569; margin: 20px 0; line-height: 1.5; }
     .btn-container { text-align: center; margin: 32px 0 24px; }
     .btn { display: inline-block; background: #4f46e5; color: #ffffff !important; text-decoration: none; padding: 14px 32px; border-radius: 12px; font-weight: 700; font-size: 14px; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35); }
-    .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px 32px; text-align: center; font-size: 11px; color: #94a3b8; }
+    .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px 32px; text-align: center; font-size: 11px; color: #94a3b8; position: relative; z-index: 2; }
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- Company Name Watermark in Email -->
+    <div class="watermark">${effectiveCompany}</div>
+
     <div class="header">
       <span class="badge">Official Offer Letter</span>
       <h1>${effectiveCompany}</h1>
@@ -109,6 +156,10 @@ export async function sendOfferLetterEmail({
         <div class="details-row">
           <span class="details-label">Reference ID:</span>
           <span class="details-value font-mono">${effectiveRefNo}</span>
+        </div>
+        <div class="details-row">
+          <span class="details-label">Company Name:</span>
+          <span class="details-value">${effectiveCompany}</span>
         </div>
         <div class="details-row">
           <span class="details-label">Designation:</span>
@@ -140,7 +191,7 @@ export async function sendOfferLetterEmail({
       ` : ''}
 
       <p>
-        Please log in to your <strong>JobScout Account</strong> to view the formal printable letterhead, download your PDF copy, and confirm your acceptance.
+        Please log in to your <strong>JobScout Account</strong> to view the formal printable letterhead (with Company Watermark), download your signed PDF copy, and confirm your acceptance.
       </p>
 
       <div class="btn-container">
@@ -167,38 +218,41 @@ export async function sendOfferLetterEmail({
     const transporter = await getTransporter();
 
     if (transporter) {
+      const fromHeader = senderEmail.includes('<') ? senderEmail : `"${effectiveCompany}" <${senderEmail}>`;
       const info = await transporter.sendMail({
-        from: `"${effectiveCompany}" <${senderEmail}>`,
+        from: fromHeader,
         to: candidateEmail,
         subject: `🎉 Job Offer Letter: ${jobTitle} at ${effectiveCompany}`,
-        text: `Dear ${candidateName},\n\nCongratulations! You have received a formal offer for ${jobTitle} at ${effectiveCompany} with CTC of ${salary}.\nJoining Date: ${effectiveJoiningDate}.\nReference: ${effectiveRefNo}.\n\nPlease check your JobScout portal to review and accept the offer.`,
+        text: `Dear ${candidateName},\n\nCongratulations! You have received a formal offer for ${jobTitle} at ${effectiveCompany} with CTC of ${salary}.\nJoining Date: ${effectiveJoiningDate}.\nReference: ${effectiveRefNo}.\n\nPlease check your JobScout portal to review, view printable letterhead with ${effectiveCompany} watermark, and accept the offer.`,
         html: htmlContent
       });
 
-      console.log(`[EmailService] Offer letter email sent to ${candidateEmail}. MessageId: ${info.messageId}`);
+      console.log(`[EmailService] REAL offer letter email sent to ${candidateEmail}. MessageId: ${info.messageId}`);
       return {
         success: true,
         sentReal: true,
         messageId: info.messageId,
-        candidateEmail
+        candidateEmail,
+        message: `Official Offer Letter successfully delivered to ${candidateEmail} inbox!`
       };
     } else {
-      // Realistic simulation mode (when no SMTP credentials are in .env yet)
-      console.log(`[EmailService] Simulated Offer Letter Email dispatched successfully to: ${candidateEmail}`);
-      console.log(`[EmailService] Subject: 🎉 Job Offer Letter: ${jobTitle} at ${effectiveCompany}`);
+      // Simulation mode
+      console.log(`[EmailService] Simulated Offer Letter Email dispatched to: ${candidateEmail}`);
+      console.log(`[EmailService] Note: To send real email to candidate Gmail, configure Gmail User & App Password in Email Settings.`);
       return {
         success: true,
         sentReal: false,
         simulated: true,
         candidateEmail,
-        message: `Offer letter email dispatched to ${candidateEmail} (Simulated mode active; copy available in candidate dashboard).`
+        message: `Offer letter issued in portal! To deliver directly to recipient's Gmail inbox, connect your Gmail App Password in Email Settings.`
       };
     }
   } catch (err) {
     console.error(`[EmailService] Failed to send email to ${candidateEmail}:`, err);
     return {
       success: false,
-      error: err.message || 'Failed to dispatch email'
+      sentReal: false,
+      error: `Email sending failed: ${err.message}`
     };
   }
 }

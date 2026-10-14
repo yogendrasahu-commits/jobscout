@@ -15,6 +15,8 @@ import postsRoutes from './routes/posts.js';
 import networkRoutes from './routes/network.js';
 import anonRoutes from './routes/anon.js';
 import { setupSocket } from './socket.js';
+import { db } from './db.js';
+import { verifyEmailConfig } from './email.js';
 
 dotenv.config();
 
@@ -80,6 +82,58 @@ app.use('/api/messages', messagesRoutes);
 app.use('/api/posts', postsRoutes);
 app.use('/api/network', networkRoutes);
 app.use('/api/anon', anonRoutes);
+
+// Email Sender Settings Endpoints
+app.get('/api/settings/email', (req, res) => {
+  const cfg = db.getEmailConfig();
+  const isConfigured = Boolean(
+    (cfg.gmailUser && cfg.gmailPass) ||
+    (cfg.smtpHost && cfg.smtpUser && cfg.smtpPass)
+  );
+  res.json({
+    configured: isConfigured,
+    senderEmail: cfg.gmailUser || cfg.smtpUser || cfg.emailFrom || '',
+    serviceType: cfg.gmailUser ? 'Gmail' : cfg.smtpHost ? 'Custom SMTP' : 'Not Configured (Simulation Mode)'
+  });
+});
+
+app.post('/api/settings/email', async (req, res) => {
+  const { gmailUser, gmailPass, smtpHost, smtpPort, smtpUser, smtpPass, emailFrom } = req.body;
+
+  try {
+    if ((gmailUser && gmailPass) || (smtpHost && smtpUser && smtpPass)) {
+      await verifyEmailConfig({
+        gmailUser,
+        gmailPass,
+        smtpHost,
+        smtpPort,
+        smtpUser,
+        smtpPass
+      });
+    }
+
+    const saved = db.saveEmailConfig({
+      gmailUser: (gmailUser || '').trim(),
+      gmailPass: (gmailPass || '').trim(),
+      smtpHost: (smtpHost || '').trim(),
+      smtpPort: smtpPort || '',
+      smtpUser: (smtpUser || '').trim(),
+      smtpPass: (smtpPass || '').trim(),
+      emailFrom: (emailFrom || '').trim()
+    });
+
+    res.json({
+      success: true,
+      message: 'Email sender successfully connected and verified! Real emails will now be delivered directly to inboxes.',
+      configured: Boolean((saved.gmailUser && saved.gmailPass) || (saved.smtpHost && saved.smtpUser && saved.smtpPass))
+    });
+  } catch (err) {
+    console.error('Email verification error:', err);
+    res.status(400).json({
+      error: `Connection verification failed: ${err.message}. Please check your Gmail address and 16-character App Password.`
+    });
+  }
+});
 
 // Serve built React client in production if client/dist exists (Fullstack single-service deployment)
 const clientDistPath = path.resolve(__dirname, '../client/dist');
