@@ -1,5 +1,12 @@
 import nodemailer from 'nodemailer';
+import dns from 'node:dns';
 import { db } from './db.js';
+
+try {
+  dns.setDefaultResultOrder('ipv4first');
+} catch (e) {
+  // Ignore in environments where not supported
+}
 
 /**
  * Creates and returns an active email transporter.
@@ -19,6 +26,7 @@ export async function getTransporter() {
       host,
       port,
       secure: port === 465,
+      family: 4,
       auth: { user: smtpUser, pass: smtpPass }
     });
   }
@@ -32,6 +40,7 @@ export async function getTransporter() {
       host: 'smtp.gmail.com',
       port: 465,
       secure: true,
+      family: 4,
       auth: {
         user: rawGmailUser,
         pass: rawGmailPass
@@ -61,6 +70,7 @@ export async function verifyEmailConfig(config) {
       host,
       port,
       secure: port === 465,
+      family: 4,
       auth: { user: smtpUser, pass: smtpPass }
     });
   } else if (gmailUser && gmailPass) {
@@ -68,6 +78,7 @@ export async function verifyEmailConfig(config) {
       host: 'smtp.gmail.com',
       port: 465,
       secure: true,
+      family: 4,
       auth: { user: gmailUser, pass: gmailPass }
     });
   } else {
