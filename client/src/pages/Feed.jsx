@@ -215,10 +215,10 @@ export const Feed = ({
         <div className="hidden lg:block lg:col-span-3 space-y-4">
           
           {/* Profile Identity Card */}
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
+          <div className="bg-[#090d16]/85 backdrop-blur-2xl border border-white/[0.08] rounded-3xl overflow-hidden shadow-2xl">
             {/* Cover photo */}
-            <div className="h-20 bg-gradient-to-r from-indigo-900 via-indigo-700 to-emerald-700 relative">
-              <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-black/40 text-[10px] text-emerald-300 font-bold backdrop-blur-sm">
+            <div className="h-20 bg-gradient-to-r from-indigo-900/60 via-indigo-600/50 to-emerald-600/50 relative">
+              <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-black/50 text-[10px] text-emerald-300 font-bold backdrop-blur-md border border-emerald-500/30">
                 Live GPS Active
               </span>
             </div>
@@ -229,16 +229,16 @@ export const Feed = ({
                 <img
                   src={user?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${user?.name || 'visitor'}`}
                   alt={user?.name || 'User'}
-                  className="w-16 h-16 rounded-full border-4 border-slate-900 object-cover shadow-2xl bg-slate-800"
+                  className="w-16 h-16 rounded-full border-4 border-[#07090e] object-cover shadow-2xl bg-slate-900 ring-2 ring-indigo-500/20"
                 />
                 {/* Profile Signature Frame */}
                 {isSeeker && (
-                  <span className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-full bg-emerald-600 border-2 border-slate-900 text-[8px] font-extrabold text-white tracking-wider">
+                  <span className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-full bg-emerald-600 border-2 border-[#07090e] text-[8px] font-extrabold text-white tracking-wider shadow-[0_0_8px_rgba(5,150,105,0.7)]">
                     #OPENTOWORK
                   </span>
                 )}
                 {isEmployer && (
-                  <span className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-full bg-indigo-600 border-2 border-slate-900 text-[8px] font-extrabold text-white tracking-wider">
+                  <span className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-full bg-indigo-600 border-2 border-[#07090e] text-[8px] font-extrabold text-white tracking-wider shadow-[0_0_8px_rgba(79,70,229,0.7)]">
                     #HIRING
                   </span>
                 )}
@@ -263,7 +263,7 @@ export const Feed = ({
               {user && (
                 <button
                   onClick={() => onOpenProfile && onOpenProfile(user)}
-                  className="w-full mt-1 py-1.5 px-3 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                  className="w-full mt-1 py-1.5 px-3 bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
                 >
                   <UserCheck className="w-3.5 h-3.5" />
                   <span>View My Full Profile</span>
@@ -272,7 +272,7 @@ export const Feed = ({
             </div>
 
             {/* Professional Connection Metrics */}
-            <div className="border-t border-slate-800/80 px-4 py-3 space-y-2 text-xs">
+            <div className="border-t border-white/[0.08] px-4 py-3 space-y-2 text-xs">
               <div className="flex items-center justify-between text-slate-400 hover:text-white cursor-pointer transition-colors">
                 <span>Connections</span>
                 <span className="font-extrabold text-indigo-400">540+</span>
@@ -288,10 +288,10 @@ export const Feed = ({
             </div>
 
             {/* Quick Map Radar Jump */}
-            <div className="p-3 bg-slate-950/70 border-t border-slate-800">
+            <div className="p-3 bg-black/40 border-t border-white/[0.08]">
               <button
                 onClick={onNavigateToMap}
-                className="w-full py-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                className="w-full py-2 bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
               >
                 <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
                 <span>Open Live Radar Map</span>
@@ -300,7 +300,7 @@ export const Feed = ({
           </div>
 
           {/* Quick Shortcuts */}
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-xl text-xs space-y-2.5">
+          <div className="bg-[#090d16]/85 backdrop-blur-2xl border border-white/[0.08] rounded-3xl p-4 shadow-2xl text-xs space-y-2.5">
             <h4 className="font-bold text-slate-400 text-[11px] uppercase tracking-wider mb-2">My Shortcuts</h4>
             <div className="flex items-center gap-2 text-slate-300 hover:text-indigo-400 cursor-pointer">
               <Bookmark className="w-4 h-4 text-indigo-400" />
@@ -323,16 +323,16 @@ export const Feed = ({
         <div className="lg:col-span-6 space-y-5">
           
           {/* Start a Post Input Box */}
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-xl">
+          <div className="bg-[#090d16]/85 backdrop-blur-2xl border border-white/[0.08] rounded-3xl p-4 shadow-2xl">
             <div className="flex items-center gap-3">
               <img
                 src={user?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${user?.name || 'user'}`}
                 alt="Avatar"
-                className="w-10 h-10 rounded-full border border-slate-700 object-cover"
+                className="w-10 h-10 rounded-full border border-white/20 object-cover ring-2 ring-indigo-500/20"
               />
               <button
                 onClick={() => setIsCreateOpen(true)}
-                className="flex-1 text-left px-4 py-2.5 bg-slate-950 hover:bg-slate-800/80 text-slate-400 hover:text-slate-300 rounded-2xl border border-slate-700/80 text-xs font-medium transition-all"
+                className="flex-1 text-left px-4 py-2.5 bg-black/40 hover:bg-black/60 text-slate-400 hover:text-slate-300 rounded-2xl border border-white/[0.08] hover:border-white/[0.16] text-xs font-medium transition-all"
               >
                 {isEmployer 
                   ? "Share a job opening, hiring announcement, or update..." 
@@ -341,7 +341,7 @@ export const Feed = ({
             </div>
 
             {/* Quick Action Buttons */}
-            <div className="flex items-center justify-around pt-3 mt-3 border-t border-slate-800/80">
+            <div className="flex items-center justify-around pt-3 mt-3 border-t border-white/[0.08]">
               <button
                 onClick={() => setIsCreateOpen(true)}
                 className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-indigo-400 transition-colors font-semibold py-1 px-2 rounded-xl"
@@ -367,9 +367,9 @@ export const Feed = ({
           </div>
 
           {/* Anon Talk Spotlight Banner */}
-          <div className="bg-gradient-to-r from-orange-950/40 via-slate-900 to-amber-950/40 border border-orange-500/30 rounded-3xl p-4 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in">
+          <div className="bg-gradient-to-r from-amber-950/25 via-[#0c121e]/90 to-orange-950/25 border border-orange-500/25 rounded-3xl p-4 shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in backdrop-blur-2xl">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-orange-500/20 text-orange-400 border border-orange-500/30 flex items-center justify-center flex-shrink-0 shadow-inner">
+              <div className="w-10 h-10 rounded-2xl bg-orange-500/20 text-orange-400 border border-orange-500/30 flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(249,115,22,0.3)]">
                 <Flame className="w-5 h-5 text-orange-400" />
               </div>
               <div>
@@ -413,7 +413,7 @@ export const Feed = ({
               return (
                 <article
                   key={post.id}
-                  className="bg-slate-900 border border-slate-800/90 rounded-3xl p-5 shadow-xl hover:border-slate-700 transition-all"
+                  className="bg-[#090d16]/85 backdrop-blur-2xl border border-white/[0.08] hover:border-white/[0.18] rounded-3xl p-5 shadow-2xl transition-all"
                 >
                   
                   {/* Post Author Header */}
@@ -674,7 +674,7 @@ export const Feed = ({
           </div>
 
           {/* Quick Connect People Widget */}
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-xl">
+          <div className="bg-[#090d16]/85 backdrop-blur-2xl border border-white/[0.08] rounded-3xl p-4 shadow-2xl">
             <h4 className="font-extrabold text-xs text-white uppercase tracking-wider mb-3">
               Recommended Professionals
             </h4>
@@ -713,7 +713,7 @@ export const Feed = ({
       {/* ========================================================== */}
       {isCreateOpen && (
         <div className="fixed inset-0 z-[950] flex items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-150">
-          <div className="bg-slate-900 border border-slate-700/90 rounded-3xl p-5 sm:p-6 w-full max-w-lg shadow-2xl space-y-4 max-h-[92dvh] overflow-y-auto my-auto">
+          <div className="bg-[#0c121e]/95 backdrop-blur-2xl border border-white/[0.12] rounded-3xl p-5 sm:p-6 w-full max-w-lg shadow-[0_20px_50px_rgba(0,0,0,0.9)] space-y-4 max-h-[92dvh] overflow-y-auto my-auto">
             
             {/* Header */}
             <div className="flex items-center justify-between border-b border-slate-800 pb-3 gap-2">

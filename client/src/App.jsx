@@ -178,7 +178,7 @@ function MainApp() {
   }, [currentTab]);
 
   return (
-    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-950 text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#07090e] text-slate-100 flex flex-col font-sans antialiased">
       
       {/* Top Desktop/Tablet Navbar */}
       <Navbar
