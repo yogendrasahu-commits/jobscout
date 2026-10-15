@@ -60,14 +60,14 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[950] flex items-center justify-center bg-black/75 backdrop-blur-sm p-3 sm:p-4 animate-in fade-in duration-150 overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-700/80 rounded-3xl shadow-2xl overflow-hidden max-h-[92dvh] overflow-y-auto my-auto">
+    <div className="fixed inset-0 z-[950] flex items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-4 animate-in fade-in duration-150 overflow-y-auto">
+      <div className="relative w-full max-w-2xl bg-[#0c121e]/95 backdrop-blur-2xl border border-white/[0.12] rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden max-h-[92dvh] overflow-y-auto my-auto">
         
         {/* Top-Left Back Button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-3 left-4 z-20 px-3 py-1.5 rounded-full bg-slate-900/85 hover:bg-slate-800 text-white font-bold text-xs transition-all shadow-lg border border-white/10 flex items-center gap-1.5 active:scale-95"
+          className="absolute top-3 left-4 z-20 px-3 py-1.5 rounded-full bg-black/60 hover:bg-black/80 text-white font-bold text-xs transition-all shadow-lg border border-white/15 flex items-center gap-1.5 active:scale-95 backdrop-blur-md"
           title="Back / Close Profile"
         >
           <ArrowLeft className="w-4 h-4 text-emerald-400" />
@@ -78,7 +78,7 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-3 right-4 z-20 px-3 py-1.5 rounded-full bg-slate-900/85 hover:bg-slate-800 text-slate-300 hover:text-white font-bold text-xs transition-all shadow-lg border border-white/10 flex items-center gap-1.5 active:scale-95"
+          className="absolute top-3 right-4 z-20 px-3 py-1.5 rounded-full bg-black/60 hover:bg-black/80 text-slate-300 hover:text-white font-bold text-xs transition-all shadow-lg border border-white/15 flex items-center gap-1.5 active:scale-95 backdrop-blur-md"
           title="Close dialog"
         >
           <span className="hidden sm:inline">Close (बंद करें)</span>
@@ -86,9 +86,9 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
         </button>
 
         {/* Cover Photo */}
-        <div className="h-32 sm:h-40 bg-gradient-to-r from-indigo-900 via-indigo-700 to-emerald-800 relative">
+        <div className="h-32 sm:h-40 bg-gradient-to-r from-indigo-900/70 via-indigo-700/60 to-emerald-800/60 relative">
           <div className="absolute bottom-3 left-4 flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md text-[10px] font-bold text-emerald-300 border border-white/10">
+            <span className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-emerald-300 border border-emerald-400/30 shadow-[0_0_8px_rgba(52,211,153,0.3)]">
               Verified Professional
             </span>
           </div>
@@ -249,7 +249,7 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
           {/* About / Summary Section */}
           <div className="mb-6">
             <h3 className="font-extrabold text-sm text-white uppercase tracking-wider mb-2">About</h3>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed bg-slate-950 p-4 rounded-2xl border border-slate-800">
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed bg-black/40 p-4 rounded-2xl border border-white/[0.08]">
               {profileUser.bio || (isSeeker 
                 ? "Results-oriented software engineer with expertise in building real-time collaboration tools, high-concurrency Node.js microservices, and interactive geospatial web applications with React and Leaflet."
                 : "Leading technology enterprise specializing in high-performance cloud infrastructure, low-latency WebSockets, and real-time geospatial applications in India.")}
@@ -278,7 +278,7 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
                 return (
                   <div
                     key={idx}
-                    className="p-3 bg-slate-950 border border-slate-800 rounded-2xl flex items-center justify-between hover:border-indigo-500/40 transition-colors"
+                    className="p-3 bg-black/40 border border-white/[0.08] rounded-2xl flex items-center justify-between hover:border-indigo-400/50 transition-colors"
                   >
                     <div>
                       <h4 className="font-bold text-xs text-white">{skill}</h4>
@@ -304,8 +304,8 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
           <div>
             <h3 className="font-extrabold text-sm text-white uppercase tracking-wider mb-3">Experience</h3>
             <div className="space-y-3">
-              <div className="p-3.5 bg-slate-950 border border-slate-800 rounded-2xl flex items-start gap-3">
-                <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-indigo-400 mt-0.5">
+              <div className="p-3.5 bg-black/40 border border-white/[0.08] rounded-2xl flex items-start gap-3">
+                <div className="p-2 rounded-xl bg-white/[0.05] border border-white/[0.08] text-indigo-400 mt-0.5">
                   <Briefcase className="w-4 h-4" />
                 </div>
                 <div>
@@ -320,14 +320,14 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
           </div>
 
           {/* Bottom Close Button */}
-          <div className="pt-5 mt-4 border-t border-slate-800 flex items-center justify-between gap-3">
+          <div className="pt-5 mt-4 border-t border-white/[0.08] flex items-center justify-between gap-3">
             <span className="text-[11px] text-slate-400">
               Verified JobScout professional profile
             </span>
             <button
               type="button"
               onClick={onClose}
-              className="py-2.5 px-4 rounded-xl text-xs font-bold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700/80 transition-all flex items-center gap-1.5 whitespace-nowrap active:scale-95"
+              className="py-2.5 px-4 rounded-xl text-xs font-bold text-slate-300 hover:text-white bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.1] transition-all flex items-center gap-1.5 whitespace-nowrap active:scale-95"
             >
               <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
               <span>Close Profile (बंद करें)</span>

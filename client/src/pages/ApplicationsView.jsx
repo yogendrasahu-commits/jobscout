@@ -231,7 +231,7 @@ export const ApplicationsView = ({
 
         <div className="flex flex-wrap items-center gap-2">
           {/* Profile Email Indicator with Update Button */}
-          <div className="flex items-center gap-2.5 p-2 sm:px-3.5 sm:py-2 rounded-2xl bg-slate-900/90 border border-slate-700/80 shadow-md">
+          <div className="flex items-center gap-2.5 p-2 sm:px-3.5 sm:py-2 rounded-2xl bg-[#090d16]/90 backdrop-blur-2xl border border-white/[0.1] shadow-xl">
             <div className="w-8 h-8 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center flex-shrink-0">
               <Mail className="w-4 h-4" />
             </div>
@@ -293,12 +293,12 @@ export const ApplicationsView = ({
             return (
               <div
                 key={app.id}
-                className={`bg-slate-900 border rounded-2xl p-5 shadow-lg transition-all ${
+                className={`bg-[#090d16]/85 backdrop-blur-2xl border rounded-2xl p-5 shadow-2xl transition-all ${
                   isAppOffered 
-                    ? 'border-amber-500/40 ring-1 ring-amber-500/20' 
+                    ? 'border-amber-500/50 ring-1 ring-amber-500/30 shadow-[0_0_20px_rgba(245,158,11,0.15)]' 
                     : isAppHired
-                    ? 'border-emerald-500/40 ring-1 ring-emerald-500/20'
-                    : 'border-slate-800 hover:border-slate-700'
+                    ? 'border-emerald-500/50 ring-1 ring-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.15)]'
+                    : 'border-white/[0.08] hover:border-white/[0.18]'
                 }`}
               >
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

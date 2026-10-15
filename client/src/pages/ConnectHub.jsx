@@ -63,10 +63,10 @@ export const ConnectHub = ({ seekers = [], employers = [], jobs = [], onSelectSe
     <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
       
       {/* 1. Header Banner with Live Stats */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 mb-8 shadow-2xl">
+      <div className="relative overflow-hidden bg-gradient-to-r from-[#090d16]/95 via-indigo-950/30 to-[#090d16]/95 border border-white/[0.08] backdrop-blur-2xl rounded-3xl p-6 sm:p-8 mb-8 shadow-2xl">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/25 text-cyan-300 text-xs font-bold mb-3 shadow-[0_0_12px_rgba(34,211,238,0.2)]">
               <Radio className="w-3.5 h-3.5 animate-pulse text-emerald-400" />
               <span>Speed Connect Hub • WebRTC Voice & HD Video</span>
             </div>
@@ -82,17 +82,17 @@ export const ConnectHub = ({ seekers = [], employers = [], jobs = [], onSelectSe
 
           {/* Quick Stats Badges */}
           <div className="flex items-center gap-3">
-            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl px-4 py-3 text-center min-w-[100px] shadow-lg">
+            <div className="bg-[#090d16]/90 backdrop-blur-2xl border border-white/[0.08] rounded-2xl px-4 py-3 text-center min-w-[100px] shadow-xl">
               <div className="flex items-center justify-center gap-1.5 text-emerald-400 font-extrabold text-xl">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
                 <span>{filteredList.length}</span>
               </div>
               <div className="text-[11px] text-slate-400 font-semibold mt-0.5">Ready to Call</div>
             </div>
 
-            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl px-4 py-3 text-center min-w-[100px] shadow-lg">
+            <div className="bg-[#090d16]/90 backdrop-blur-2xl border border-white/[0.08] rounded-2xl px-4 py-3 text-center min-w-[100px] shadow-xl">
               <div className="flex items-center justify-center gap-1.5 text-indigo-400 font-extrabold text-xl">
-                <Zap className="w-4 h-4 text-amber-400" />
+                <Zap className="w-4 h-4 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
                 <span>0s</span>
               </div>
               <div className="text-[11px] text-slate-400 font-semibold mt-0.5">Wait Time</div>
@@ -102,11 +102,11 @@ export const ConnectHub = ({ seekers = [], employers = [], jobs = [], onSelectSe
 
         {/* Background glow effects */}
         <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -left-20 -top-20 w-80 h-80 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -left-20 -top-20 w-80 h-80 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       {/* 2. Search & Filter Bar */}
-      <div className="bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-2xl p-4 mb-6 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="bg-[#090d16]/85 backdrop-blur-2xl border border-white/[0.08] rounded-2xl p-4 mb-6 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
         
         {/* Search Input */}
         <div className="relative w-full sm:w-96">
@@ -116,7 +116,7 @@ export const ConnectHub = ({ seekers = [], employers = [], jobs = [], onSelectSe
             placeholder={isEmployer ? "Search candidates by role, skills, name..." : "Search companies, recruiters, titles..."}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+            className="w-full bg-black/40 border border-white/[0.08] hover:border-white/[0.16] rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/20 transition-all"
           />
         </div>
 
@@ -132,8 +132,8 @@ export const ConnectHub = ({ seekers = [], employers = [], jobs = [], onSelectSe
               onClick={() => setActiveFilter(f.id)}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
                 activeFilter === f.id
-                  ? 'bg-indigo-600 text-white shadow-md'
-                  : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                  ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-[0_0_15px_rgba(99,102,241,0.35)] border border-indigo-400/30'
+                  : 'bg-black/40 text-slate-400 hover:text-white border border-white/[0.08]'
               }`}
             >
               {f.label}
@@ -148,7 +148,7 @@ export const ConnectHub = ({ seekers = [], employers = [], jobs = [], onSelectSe
         {filteredList.map((target) => (
           <div
             key={target.id}
-            className="group bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-indigo-500/40 rounded-3xl p-5 shadow-xl hover:shadow-2xl hover:shadow-indigo-500/10 transition-all flex flex-col justify-between"
+            className="group bg-[#090d16]/85 hover:bg-[#0c121e]/95 backdrop-blur-2xl border border-white/[0.08] hover:border-white/[0.18] rounded-3xl p-5 shadow-2xl hover:shadow-[0_15px_30px_rgba(99,102,241,0.15)] transition-all flex flex-col justify-between"
           >
             <div>
               {/* Header: Avatar, Name, Online Status */}
@@ -197,11 +197,11 @@ export const ConnectHub = ({ seekers = [], employers = [], jobs = [], onSelectSe
                 <div className="space-y-2 mb-4">
                   {/* Experience & Expected Salary */}
                   <div className="grid grid-cols-2 gap-2 text-center text-xs">
-                    <div className="p-2 bg-slate-950/70 rounded-xl border border-slate-800">
+                    <div className="p-2 bg-black/40 rounded-xl border border-white/[0.08]">
                       <span className="text-[10px] text-slate-500 uppercase block">Exp</span>
                       <strong className="text-slate-200">{target.experience || '2+ Yrs'}</strong>
                     </div>
-                    <div className="p-2 bg-slate-950/70 rounded-xl border border-slate-800">
+                    <div className="p-2 bg-black/40 rounded-xl border border-white/[0.08]">
                       <span className="text-[10px] text-slate-500 uppercase block">Expected</span>
                       <strong className="text-emerald-400">{target.expectedSalary || 'Negotiable'}</strong>
                     </div>
@@ -211,7 +211,7 @@ export const ConnectHub = ({ seekers = [], employers = [], jobs = [], onSelectSe
                   {parseSkills(target.skills).length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">
                       {parseSkills(target.skills).slice(0, 3).map((s, idx) => (
-                        <span key={idx} className="px-2 py-0.5 text-[10px] bg-slate-800 text-slate-300 rounded-md border border-slate-700">
+                        <span key={idx} className="px-2 py-0.5 text-[10px] bg-white/[0.04] text-slate-300 rounded-md border border-white/[0.06]">
                           {s}
                         </span>
                       ))}
@@ -220,11 +220,11 @@ export const ConnectHub = ({ seekers = [], employers = [], jobs = [], onSelectSe
                 </div>
               ) : (
                 <div className="space-y-2 mb-4">
-                  <div className="p-2.5 bg-slate-950/70 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
+                  <div className="p-2.5 bg-black/40 rounded-xl border border-white/[0.08] flex items-center justify-between text-xs">
                     <span className="text-slate-400">Industry:</span>
                     <strong className="text-slate-200">{target.industry || 'Technology'}</strong>
                   </div>
-                  <div className="p-2.5 bg-slate-950/70 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
+                  <div className="p-2.5 bg-black/40 rounded-xl border border-white/[0.08] flex items-center justify-between text-xs">
                     <span className="text-slate-400">Active Openings:</span>
                     <span className="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
                       {target.activeOpenings || 2} Jobs Open

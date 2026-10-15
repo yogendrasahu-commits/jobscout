@@ -112,20 +112,20 @@ export const JobsList = ({
       </div>
 
       {/* Segmented Sub-Tab Switcher: Explore Jobs vs Applied Jobs */}
-      <div className="flex items-center gap-2 mb-6 border-b border-slate-800/80 pb-4">
+      <div className="flex items-center gap-2 mb-6 border-b border-white/[0.08] pb-4">
         <button
           type="button"
           onClick={() => setActiveSubTab('browse')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
             activeSubTab === 'browse'
-              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-              : 'bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800'
+              ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-[0_0_20px_rgba(99,102,241,0.35)] border border-indigo-400/30'
+              : 'bg-[#090d16]/80 hover:bg-[#0c121e]/90 text-slate-400 hover:text-white border border-white/[0.08]'
           }`}
         >
           <Briefcase className="w-4 h-4" />
           <span>Explore Openings</span>
           <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
-            activeSubTab === 'browse' ? 'bg-indigo-700 text-indigo-100' : 'bg-slate-800 text-slate-400'
+            activeSubTab === 'browse' ? 'bg-indigo-700/80 text-white' : 'bg-white/[0.06] text-slate-400'
           }`}>
             {jobs.length}
           </span>
@@ -136,15 +136,15 @@ export const JobsList = ({
           onClick={() => setActiveSubTab('applied')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
             activeSubTab === 'applied'
-              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-              : 'bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800'
+              ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-[0_0_20px_rgba(99,102,241,0.35)] border border-indigo-400/30'
+              : 'bg-[#090d16]/80 hover:bg-[#0c121e]/90 text-slate-400 hover:text-white border border-white/[0.08]'
           }`}
         >
           <FileText className="w-4 h-4" />
           <span>{isEmployer ? 'Candidate Applications' : 'Applied Jobs'}</span>
           {applicationsCount > 0 && (
             <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
-              activeSubTab === 'applied' ? 'bg-indigo-700 text-indigo-100' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+              activeSubTab === 'applied' ? 'bg-indigo-700/80 text-white' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
             }`}>
               {applicationsCount}
             </span>
@@ -163,60 +163,60 @@ export const JobsList = ({
       ) : (
         <>
           {/* Filter and Search Bar */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 mb-6 shadow-xl space-y-3">
+          <div className="bg-[#090d16]/85 backdrop-blur-2xl border border-white/[0.08] rounded-2xl p-4 mb-6 shadow-2xl space-y-3">
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-            <input
-              type="text"
-              placeholder="Search by job title, company, skills, or location..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
-            />
-          </div>
+                <input
+                  type="text"
+                  placeholder="Search by job title, company, skills, or location..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full bg-black/40 border border-white/[0.08] hover:border-white/[0.16] rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                />
+              </div>
 
-          <div className="flex gap-2">
-            <select
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              className="bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
-            >
-              <option value="All">All Types</option>
-              <option value="Full-time">Full-time</option>
-              <option value="Part-time">Part-time</option>
-              <option value="Contract / Gig">Gig / Contract</option>
-              <option value="Hourly">Hourly</option>
-            </select>
+              <div className="flex gap-2">
+                <select
+                  value={selectedType}
+                  onChange={(e) => setSelectedType(e.target.value)}
+                  className="bg-black/40 border border-white/[0.08] hover:border-white/[0.16] rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500/80 transition-all"
+                >
+                  <option value="All" className="bg-[#0c121e]">All Types</option>
+                  <option value="Full-time" className="bg-[#0c121e]">Full-time</option>
+                  <option value="Part-time" className="bg-[#0c121e]">Part-time</option>
+                  <option value="Contract / Gig" className="bg-[#0c121e]">Gig / Contract</option>
+                  <option value="Hourly" className="bg-[#0c121e]">Hourly</option>
+                </select>
 
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
-            >
-              <option value="All">All Categories</option>
-              <option value="Technology">Technology</option>
-              <option value="Design">Design</option>
-              <option value="Support">Support & IT</option>
-              <option value="Logistics">Logistics</option>
-            </select>
-          </div>
-        </div>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="bg-black/40 border border-white/[0.08] hover:border-white/[0.16] rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500/80 transition-all"
+                >
+                  <option value="All" className="bg-[#0c121e]">All Categories</option>
+                  <option value="Technology" className="bg-[#0c121e]">Technology</option>
+                  <option value="Design" className="bg-[#0c121e]">Design</option>
+                  <option value="Support" className="bg-[#0c121e]">Support & IT</option>
+                  <option value="Logistics" className="bg-[#0c121e]">Logistics</option>
+                </select>
+              </div>
+            </div>
 
-        {searchTerm && (
-          <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-xs">
-            <span className="text-slate-400">
-              Filtering by: <strong className="text-white bg-slate-800 px-2 py-0.5 rounded-md">"{searchTerm}"</strong> ({filteredJobs.length} results)
-            </span>
-            <button
-              onClick={() => setSearchTerm('')}
-              className="text-indigo-400 hover:text-indigo-300 font-semibold underline text-xs"
-            >
-              Clear search filter
-            </button>
+            {searchTerm && (
+              <div className="flex items-center justify-between pt-2 border-t border-white/[0.08] text-xs">
+                <span className="text-slate-400">
+                  Filtering by: <strong className="text-white bg-white/[0.06] px-2 py-0.5 rounded-md border border-white/[0.08]">"{searchTerm}"</strong> ({filteredJobs.length} results)
+                </span>
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="text-indigo-400 hover:text-indigo-300 font-semibold underline text-xs"
+                >
+                  Clear search filter
+                </button>
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
       {/* Jobs Grid */}
       {filteredJobs.length === 0 ? (
@@ -231,7 +231,7 @@ export const JobsList = ({
             <div
               key={job.id}
               onClick={() => onSelectJob(job)}
-              className="group bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-indigo-500/50 rounded-2xl p-5 shadow-lg hover:shadow-2xl hover:shadow-indigo-500/10 transition-all cursor-pointer flex flex-col justify-between"
+              className="group bg-[#090d16]/85 hover:bg-[#0c121e]/95 backdrop-blur-2xl border border-white/[0.08] hover:border-white/[0.18] rounded-2xl p-5 shadow-2xl hover:shadow-[0_15px_30px_rgba(99,102,241,0.15)] transition-all cursor-pointer flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-start justify-between gap-3 mb-2.5">
@@ -273,7 +273,7 @@ export const JobsList = ({
                     {job.skills.slice(0, 3).map((s, idx) => (
                       <span
                         key={idx}
-                        className="px-2 py-0.5 text-[10px] font-medium bg-slate-950 text-slate-300 rounded border border-slate-800"
+                        className="px-2 py-0.5 text-[10px] font-medium bg-black/40 text-slate-300 rounded border border-white/[0.06]"
                       >
                         {s}
                       </span>
@@ -287,7 +287,7 @@ export const JobsList = ({
                 )}
               </div>
 
-              <div className="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+              <div className="mt-5 pt-3 border-t border-white/[0.08] flex items-center justify-between text-xs">
                 <span className="flex items-center gap-1 text-emerald-400 font-extrabold text-[11px] bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/20">
                   <Zap className="w-3 h-3 fill-emerald-400 text-emerald-400" /> Easy Apply
                 </span>

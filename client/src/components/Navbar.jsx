@@ -251,23 +251,24 @@ export const Navbar = ({
               onClick={() => setCurrentTab('feed')}
               title="JobScout - Live Radar & Speed Connect"
             >
-              <div className="relative group-hover:scale-105 transition-all duration-300 flex-shrink-0 drop-shadow-[0_0_16px_rgba(56,189,248,0.35)]">
-                <JobScoutLogo size={34} className="w-7 h-7 sm:w-9 sm:h-9" />
+              <div className="relative group-hover:scale-105 transition-all duration-300 flex-shrink-0 drop-shadow-[0_0_20px_rgba(56,189,248,0.45)]">
+                <JobScoutLogo size={38} className="w-8 h-8 sm:w-10 sm:h-10" />
               </div>
 
               <div className="leading-none">
-                <div className="flex items-center gap-1 sm:gap-2">
-                  <span className="font-extrabold text-sm sm:text-base lg:text-lg tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-indigo-200 group-hover:to-cyan-300 transition-colors">
-                    JobScout
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <span className="font-black text-base sm:text-lg lg:text-xl tracking-tight text-white flex items-center">
+                    Job<span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-indigo-400 to-violet-400 ml-0.5">Scout</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 ml-1 shadow-[0_0_8px_rgba(56,189,248,0.9)] animate-pulse" />
                   </span>
-                  <span className="hidden 2xl:inline-block text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-gradient-to-r from-indigo-500/20 via-violet-500/20 to-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-sm">
+                  <span className="hidden xl:inline-block text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-400/30 shadow-[0_0_12px_rgba(34,211,238,0.25)]">
                     RADAR
                   </span>
                 </div>
                 <div className="hidden 2xl:flex items-center gap-1.5 text-[10px] text-slate-400 mt-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-                  <span className="truncate max-w-[110px] font-medium text-slate-300">
-                    {user?.address ? user.address.split(',')[0] : 'India • GPS'}
+                  <span className="truncate max-w-[120px] font-medium text-slate-300">
+                    {user?.address ? user.address.split(',')[0] : 'India • GPS Radar'}
                   </span>
                 </div>
               </div>
