@@ -33,7 +33,7 @@
       "lat": 19.1136,
       "lng": 72.8697,
       "address": "MIDC Industrial Area, Andheri East, Mumbai",
-      "isOnline": true,
+      "isOnline": false,
       "createdAt": "2026-10-12T07:30:06.434Z"
     },
     {
@@ -874,7 +874,7 @@
     },
     {
       "id": "app_1791956068340_t6eq",
-      "status": "pending",
+      "status": "hired",
       "createdAt": "2026-10-14T05:34:28.340Z",
       "jobId": "job_3",
       "jobTitle": "Backend Node.js & Microservices Architect",
@@ -885,7 +885,25 @@
       "seekerEmail": "yogendrasahu6636@gmail.com",
       "seekerPhone": "+91 91234 56789",
       "seekerAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
-      "coverNote": "I am interested in this role and available for immediate discussion."
+      "coverNote": "I am interested in this role and available for immediate discussion.",
+      "offerLetter": {
+        "refNo": "JS-OFFER-306499",
+        "candidateName": "Rahul Sharma",
+        "candidateEmail": "yogendrasahu6636@gmail.com",
+        "candidatePhone": "+91 91234 56789",
+        "designation": "Backend Node.js & Microservices Architect",
+        "salary": "₹14,00,000 / yr",
+        "joiningDate": "Immediate (Within 7-15 Days)",
+        "location": "Bandra Kurla Complex (BKC), Mumbai / Hybrid",
+        "terms": "Standard company employment policies, 3 months probation period, 30 days notice period.",
+        "customNote": "We were extremely impressed by your experience and are thrilled to welcome you to our engineering team!",
+        "issuedAt": "2026-10-14T07:01:46.499Z",
+        "employerName": "Nexus Cloud Innovations",
+        "companyName": "Nexus Cloud Innovations",
+        "status": "offered",
+        "acceptedAt": "2026-10-14T07:02:56.570Z"
+      },
+      "updatedAt": "2026-10-14T07:02:56.570Z"
     },
     {
       "id": "app_1791956063579_bxfj",
@@ -1183,6 +1201,22 @@
       "senderId": "usr_seek_1",
       "receiverId": "usr_emp_2",
       "content": "🤝 I am thrilled to formally accept your Job Offer Letter for \"DevOps & Kubernetes Infrastructure Engineer\"! Looking forward to joining Nexus Cloud Innovations on Immediate (Within 7-15 Days)."
+    },
+    {
+      "id": "msg_1791961340215_5vp6",
+      "timestamp": "2026-10-14T07:02:20.215Z",
+      "read": false,
+      "senderId": "usr_emp_2",
+      "receiverId": "usr_seek_1",
+      "content": "🎉 Congratulations Rahul Sharma! We have issued your formal Job Offer Letter for \"Backend Node.js & Microservices Architect\" at Nexus Cloud Innovations with compensation of ₹14,00,000 / yr. An official copy has been dispatched to your email (yogendrasahu6636@gmail.com). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!"
+    },
+    {
+      "id": "msg_1791961376573_bdli",
+      "timestamp": "2026-10-14T07:02:56.573Z",
+      "read": false,
+      "senderId": "usr_seek_1",
+      "receiverId": "usr_emp_2",
+      "content": "🤝 I am thrilled to formally accept your Job Offer Letter for \"Backend Node.js & Microservices Architect\"! Looking forward to joining Nexus Cloud Innovations on Immediate (Within 7-15 Days)."
     }
   ],
   "posts": [

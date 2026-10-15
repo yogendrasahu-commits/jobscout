@@ -52,37 +52,36 @@ export const SwitchAccountModal = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 z-[950] flex items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-4 overflow-y-auto">
       <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-700/90 rounded-3xl p-5 sm:p-7 shadow-2xl animate-in zoom-in-95 duration-150 max-h-[92dvh] overflow-y-auto my-auto">
         
-        {/* Top-Left Back / Close Button */}
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute top-4 left-4 p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold border border-slate-700/60 transition-all flex items-center gap-1 shadow-md active:scale-95 sm:hidden"
-          title="Back / Close"
-        >
-          <ArrowLeft className="w-4 h-4 text-indigo-400" />
-          <span>Back</span>
-        </button>
-
-        {/* Top-Right Close Button */}
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 transition-all flex items-center gap-1 active:scale-95"
-          title="Close dialog"
-        >
-          <span className="text-[11px] font-semibold hidden sm:inline">Close (बंद करें)</span>
-          <X className="w-4 h-4" />
-        </button>
-
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2.5 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30">
-            <Sparkles className="w-5 h-5" />
+        {/* Top Header Row with Back, Title, and Close */}
+        <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-4 gap-2">
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold border border-slate-700/60 transition-all flex items-center gap-1 shadow-md active:scale-95"
+              title="Back / Close"
+            >
+              <ArrowLeft className="w-4 h-4 text-indigo-400" />
+              <span>Back</span>
+            </button>
+            <div className="p-2 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-base sm:text-lg text-white">Multi-User Directory & Switcher</h3>
+              <p className="text-[11px] sm:text-xs text-slate-400 hidden sm:block">Select any Employer or Seeker to test real-time calling and messaging</p>
+            </div>
           </div>
-          <div>
-            <h3 className="font-extrabold text-lg text-white">Multi-User Directory & Fast Switcher</h3>
-            <p className="text-xs text-slate-400">Select any Employer or Seeker to test real-time calling and messaging</p>
-          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 transition-all flex items-center gap-1 active:scale-95 flex-shrink-0"
+            title="Close dialog"
+          >
+            <span className="text-[11px] font-semibold hidden sm:inline">Close (बंद करें)</span>
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Role Segmented Tabs */}

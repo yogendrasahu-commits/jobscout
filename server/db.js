@@ -1052,15 +1052,21 @@ class Database {
     return this.data.messages.filter(
       m => (m.senderId === user1 && m.receiverId === user2) ||
            (m.senderId === user2 && m.receiverId === user1)
-    ).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    ).sort((a, b) => new Date(a.timestamp || a.createdAt) - new Date(b.timestamp || b.createdAt));
   }
 
   createMessage(msgData) {
+    const text = msgData.message || msgData.content || '';
+    const now = new Date().toISOString();
+    const time = msgData.timestamp || msgData.createdAt || now;
     const newMsg = {
       id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
-      timestamp: new Date().toISOString(),
+      timestamp: time,
+      createdAt: time,
       read: false,
-      ...msgData
+      ...msgData,
+      message: text,
+      content: text
     };
     this.data.messages.push(newMsg);
     this.save();

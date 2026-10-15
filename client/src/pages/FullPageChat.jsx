@@ -134,13 +134,16 @@ export const FullPageChat = ({ onOpenProfile }) => {
     sendMessage(activeChatUser.id, messageText);
 
     // Optimistic UI push
+    const nowIso = new Date().toISOString();
     const tempMsg = {
       id: `tmp_${Date.now()}`,
       senderId: user.id,
       receiverId: activeChatUser.id,
       senderName: user.name,
       message: messageText,
-      createdAt: new Date().toISOString()
+      content: messageText,
+      timestamp: nowIso,
+      createdAt: nowIso
     };
     setMessages(prev => [...prev, tempMsg]);
 
@@ -401,15 +404,16 @@ export const FullPageChat = ({ onOpenProfile }) => {
               {/* Active Chat Header */}
               <div className="p-3.5 sm:p-4 bg-slate-900 border-b border-slate-800 flex items-center justify-between gap-3 shadow-md z-10">
                 <div className="flex items-center gap-3 min-w-0">
-                  {/* Back button (Mobile & Tablet) */}
+                  {/* Back / Close button (All devices) */}
                   <button
                     type="button"
                     onClick={() => setActiveChatUser(null)}
-                    className="md:hidden py-1.5 px-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors flex items-center gap-1 text-xs font-bold border border-slate-700/60"
+                    className="py-1.5 px-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors flex items-center gap-1 text-xs font-bold border border-slate-700/60 active:scale-95"
                     title="Back to conversation list (चैट लिस्ट पर लौटें)"
                   >
                     <ArrowLeft className="w-4 h-4 text-indigo-400" />
-                    <span>Back</span>
+                    <span className="hidden sm:inline">Close</span>
+                    <span className="sm:hidden">Back</span>
                   </button>
 
                   <div 
@@ -527,12 +531,12 @@ export const FullPageChat = ({ onOpenProfile }) => {
                                 : 'bg-slate-800 text-slate-100 rounded-bl-none border border-slate-700/80'
                             }`}
                           >
-                            {msg.message}
+                            {msg.message || msg.content}
                           </div>
                           <div className="flex items-center gap-1 text-[10px] text-slate-500 mt-1 px-1">
                             <span>
-                              {msg.createdAt
-                                ? new Date(msg.createdAt).toLocaleTimeString([], {
+                              {(msg.createdAt || msg.timestamp)
+                                ? new Date(msg.createdAt || msg.timestamp).toLocaleTimeString([], {
                                     hour: '2-digit',
                                     minute: '2-digit'
                                   })

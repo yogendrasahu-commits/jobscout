@@ -721,10 +721,11 @@ export const Feed = ({
                 <button
                   type="button"
                   onClick={() => { setIsCreateOpen(false); setPostError(''); }}
-                  className="p-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 transition-all sm:hidden"
+                  className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold border border-slate-700/60 transition-all flex items-center gap-1 shadow-md active:scale-95"
                   title="Back / Close"
                 >
-                  <ArrowLeft className="w-4 h-4" />
+                  <ArrowLeft className="w-4 h-4 text-indigo-400" />
+                  <span>Back</span>
                 </button>
                 <img
                   src={user?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${user?.name || 'user'}`}

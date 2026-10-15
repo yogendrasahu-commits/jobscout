@@ -97,10 +97,11 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
             <button
               type="button"
               onClick={onClose}
-              className="mt-1 p-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 transition-all sm:hidden"
+              className="mt-1 p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold border border-slate-700/60 transition-all flex items-center gap-1 shadow-md active:scale-95"
               title="Back / Close"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4 text-indigo-400" />
+              <span>Back</span>
             </button>
             <div>
               <span className="text-[11px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20 uppercase">

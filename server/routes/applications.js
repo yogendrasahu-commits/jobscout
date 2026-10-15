@@ -177,10 +177,13 @@ router.post('/:id/offer', authenticateToken, async (req, res) => {
   });
 
   // Also send an automated congratulatory in-app chat message from Employer to Candidate
+  const offerMsgText = `🎉 Congratulations ${app.seekerName}! We have issued your formal Job Offer Letter for "${offerDetails.designation}" at ${offerDetails.companyName} with compensation of ${offerDetails.salary}. An official copy has been dispatched to your email (${targetEmail}). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!`;
   const chatMsg = db.createMessage({
     senderId: req.user.id,
     receiverId: app.seekerId,
-    content: `🎉 Congratulations ${app.seekerName}! We have issued your formal Job Offer Letter for "${offerDetails.designation}" at ${offerDetails.companyName} with compensation of ${offerDetails.salary}. An official copy has been dispatched to your email (${targetEmail}). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!`
+    senderName: req.user.companyName || req.user.name,
+    message: offerMsgText,
+    content: offerMsgText
   });
 
   if (req.io) {
@@ -217,10 +220,13 @@ router.post('/:id/accept-offer', authenticateToken, (req, res) => {
   app.updatedAt = new Date().toISOString();
   db.save();
 
+  const acceptMsgText = `🤝 I am thrilled to formally accept your Job Offer Letter for "${app.offerLetter?.designation || app.jobTitle}"! Looking forward to joining ${app.offerLetter?.companyName || app.employerName} on ${app.offerLetter?.joiningDate || 'the agreed date'}.`;
   const chatMsg = db.createMessage({
     senderId: req.user.id,
     receiverId: app.employerId,
-    content: `🤝 I am thrilled to formally accept your Job Offer Letter for "${app.offerLetter?.designation || app.jobTitle}"! Looking forward to joining ${app.offerLetter?.companyName || app.employerName} on ${app.offerLetter?.joiningDate || 'the agreed date'}.`
+    senderName: req.user.name,
+    message: acceptMsgText,
+    content: acceptMsgText
   });
 
   if (req.io) {

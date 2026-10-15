@@ -16,6 +16,9 @@ router.get('/threads/all', authenticateToken, (req, res) => {
 
   allMessages.forEach(m => {
     const otherId = m.senderId === userId ? m.receiverId : m.senderId;
+    const msgText = m.message || m.content || '';
+    const msgTime = m.timestamp || m.createdAt || new Date().toISOString();
+
     if (!contactMap.has(otherId)) {
       const otherUser = db.findUserById(otherId);
       contactMap.set(otherId, {
@@ -30,15 +33,15 @@ router.get('/threads/all', authenticateToken, (req, res) => {
           phone: otherUser.phone,
           isOnline: otherUser.isOnline !== false
         } : { id: otherId, name: 'User' },
-        lastMessage: m.message,
-        lastTimestamp: m.timestamp,
+        lastMessage: msgText,
+        lastTimestamp: msgTime,
         unreadCount: (m.receiverId === userId && !m.read) ? 1 : 0
       });
     } else {
       const existing = contactMap.get(otherId);
-      if (new Date(m.timestamp) > new Date(existing.lastTimestamp)) {
-        existing.lastMessage = m.message;
-        existing.lastTimestamp = m.timestamp;
+      if (new Date(msgTime) > new Date(existing.lastTimestamp)) {
+        existing.lastMessage = msgText;
+        existing.lastTimestamp = msgTime;
       }
       if (m.receiverId === userId && !m.read) {
         existing.unreadCount += 1;
@@ -69,8 +72,9 @@ router.get('/threads/all', authenticateToken, (req, res) => {
 
 // 2. Post a message (REST API endpoint)
 router.post('/', authenticateToken, (req, res) => {
-  const { receiverId, message } = req.body;
-  const trimmedMsg = message ? String(message).trim() : '';
+  const { receiverId, message, content } = req.body;
+  const rawMsg = message !== undefined ? message : content;
+  const trimmedMsg = rawMsg ? String(rawMsg).trim() : '';
   if (!receiverId || !trimmedMsg) {
     return res.status(400).json({ error: 'Receiver ID and non-empty message are required' });
   }
@@ -85,8 +89,13 @@ router.post('/', authenticateToken, (req, res) => {
     senderId: req.user.id,
     receiverId,
     senderName: req.user.name,
-    message: trimmedMsg
+    message: trimmedMsg,
+    content: trimmedMsg
   });
+
+  if (req.io) {
+    req.io.emit('message:received', newMsg);
+  }
 
   res.status(201).json({ message: newMsg });
 });
@@ -96,8 +105,20 @@ router.get('/:otherUserId', authenticateToken, (req, res) => {
   const currentUserId = req.user.id;
   const otherUserId = req.params.otherUserId;
 
-  const messages = db.getConversation(currentUserId, otherUserId);
+  const rawMessages = db.getConversation(currentUserId, otherUserId);
   db.markMessagesRead(otherUserId, currentUserId);
+
+  const messages = rawMessages.map(m => {
+    const text = m.message || m.content || '';
+    const time = m.timestamp || m.createdAt || new Date().toISOString();
+    return {
+      ...m,
+      message: text,
+      content: text,
+      timestamp: time,
+      createdAt: time
+    };
+  });
 
   res.json({ messages });
 });

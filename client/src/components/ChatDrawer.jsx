@@ -409,10 +409,10 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
                           : 'bg-slate-800 text-slate-200 border border-slate-700/80 rounded-bl-xs'
                       }`}
                     >
-                      {m.message}
+                      {m.message || m.content}
                     </div>
                     <div className="flex items-center gap-1 mt-1 text-[10px] text-slate-500 px-1">
-                      <span>{new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      <span>{new Date(m.timestamp || m.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       {isMe && <CheckCheck className="w-3 h-3 text-indigo-400" />}
                     </div>
                   </div>

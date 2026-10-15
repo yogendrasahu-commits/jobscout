@@ -167,40 +167,54 @@ const POPULAR_LOCATIONS = [
   { name: 'Infopark Kakkanad', city: 'Kochi', state: 'Kerala', lat: 10.0104, lng: 76.3638, label: 'Infopark' }
 ];
 
-// Forces Leaflet to invalidate size and re-render tiles on mount and resize
+// Forces Leaflet to invalidate size and re-render tiles on mount, resize, orientation, and tab changes
 function MapResizer() {
   const map = useMap();
   useEffect(() => {
     map.invalidateSize();
-    const t1 = setTimeout(() => map.invalidateSize(), 100);
-    const t2 = setTimeout(() => map.invalidateSize(), 400);
+    const t1 = setTimeout(() => map.invalidateSize(), 80);
+    const t2 = setTimeout(() => map.invalidateSize(), 300);
+    const t3 = setTimeout(() => map.invalidateSize(), 700);
     const handleResize = () => map.invalidateSize();
     window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
+      clearTimeout(t3);
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
     };
   }, [map]);
   return null;
 }
 
-// Smoothly pan & fly the map when center coordinates change, zooming to maximum on search
-function MapRecenter({ coords, flyTrigger }) {
+// Smoothly pan & fly the map when center coordinates change, honoring preset zooms and search zooms
+function MapRecenter({ coords, flyTrigger, targetZoom }) {
   const map = useMap();
   const prevCoordsRef = useRef(coords);
+  const prevTriggerRef = useRef(flyTrigger);
+
   useEffect(() => {
     if (coords && coords[0] && coords[1]) {
       const prev = prevCoordsRef.current;
       const changed = !prev || prev[0] !== coords[0] || prev[1] !== coords[1];
-      if (changed || flyTrigger > 0) {
+      const triggerChanged = flyTrigger !== prevTriggerRef.current;
+
+      if (changed || triggerChanged) {
         prevCoordsRef.current = coords;
-        // Fly to maximum zoom (18) on searched locations
-        const targetZoom = flyTrigger > 0 ? 18 : Math.max(map.getZoom(), 16);
-        map.flyTo(coords, targetZoom, { animate: true, duration: 1.2 });
+        prevTriggerRef.current = flyTrigger;
+
+        let desiredZoom = map.getZoom();
+        if (typeof targetZoom === 'number') {
+          desiredZoom = targetZoom;
+        } else if (triggerChanged && flyTrigger > 0) {
+          desiredZoom = 17;
+        }
+        map.flyTo(coords, desiredZoom, { animate: true, duration: 1.0 });
       }
     }
-  }, [coords, flyTrigger, map]);
+  }, [coords, flyTrigger, targetZoom, map]);
   return null;
 }
 
@@ -472,6 +486,7 @@ export const UberJobMap = ({
   const [gpsLoading, setGpsLoading] = useState(false);
   const [mapInstance, setMapInstance] = useState(null);
   const [flyTrigger, setFlyTrigger] = useState(0);
+  const [targetZoomLevel, setTargetZoomLevel] = useState(null);
   const [showSearchThisArea, setShowSearchThisArea] = useState(false);
   const [autoMoveRadar, setAutoMoveRadar] = useState(false);
   const [isDraggingBeacon, setIsDraggingBeacon] = useState(false);
@@ -494,6 +509,8 @@ export const UberJobMap = ({
   const handleSelectCityPreset = (preset) => {
     const lat = preset.lat;
     const lng = preset.lng;
+    const zoom = preset.isCountryView ? 5 : (preset.zoom || 12);
+    setTargetZoomLevel(zoom);
     setCenterCoords([lat, lng]);
     const locName = preset.isCountryView ? 'India (National View)' : `${preset.name}, India`;
     setActiveLocationName(locName);
@@ -503,13 +520,10 @@ export const UberJobMap = ({
 
     if (preset.isCountryView) {
       setStrictRadar(false);
-      if (mapInstance) {
-        mapInstance.flyTo([lat, lng], 5, { animate: true, duration: 1.2 });
-      }
-    } else {
-      if (mapInstance) {
-        mapInstance.flyTo([lat, lng], preset.zoom || 12, { animate: true, duration: 1.2 });
-      }
+    }
+    setFlyTrigger((prev) => prev + 1);
+    if (mapInstance) {
+      mapInstance.flyTo([lat, lng], zoom, { animate: true, duration: 1.0 });
     }
   };
 
@@ -611,8 +625,9 @@ export const UberJobMap = ({
     return combined.slice(0, 8);
   }, [searchQuery, liveGeocodedResults]);
 
-  // Handle Location Selection (Zooms to maximum zoom level 18)
+  // Handle Location Selection (Zooms to maximum zoom level 17)
   const handleSelectLocation = (loc) => {
+    setTargetZoomLevel(17);
     setCenterCoords([loc.lat, loc.lng]);
     const fullName = `${loc.name}${loc.city ? `, ${loc.city}` : ''}`;
     setActiveLocationName(fullName);
@@ -622,7 +637,7 @@ export const UberJobMap = ({
     broadcastLocation(loc.lat, loc.lng, fullName);
     setFlyTrigger((prev) => prev + 1);
     if (mapInstance) {
-      mapInstance.flyTo([loc.lat, loc.lng], 18, { animate: true, duration: 1.2 });
+      mapInstance.flyTo([loc.lat, loc.lng], 17, { animate: true, duration: 1.0 });
     }
   };
 
@@ -767,8 +782,12 @@ export const UberJobMap = ({
       setGpsLoading(true);
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
+          let lat = pos.coords.latitude;
+          let lng = pos.coords.longitude;
+          if (!isWithinIndia(lat, lng)) {
+            [lat, lng] = clampToIndia(lat, lng);
+          }
+          setTargetZoomLevel(17);
           setCenterCoords([lat, lng]);
           const gpsLabel = 'My GPS Location';
           setActiveLocationName(gpsLabel);
@@ -777,7 +796,7 @@ export const UberJobMap = ({
           broadcastLocation(lat, lng, gpsLabel);
           setFlyTrigger((prev) => prev + 1);
           if (mapInstance) {
-            mapInstance.flyTo([lat, lng], 18, { animate: true, duration: 1.2 });
+            mapInstance.flyTo([lat, lng], 17, { animate: true, duration: 1.0 });
           }
           setGpsLoading(false);
         },
@@ -794,6 +813,7 @@ export const UberJobMap = ({
   const handleMapClick = (latlng) => {
     if (!latlng) return;
     const [lat, lng] = clampToIndia(latlng.lat, latlng.lng);
+    setTargetZoomLevel(null); // Keep user's current zoom level
     setCenterCoords([lat, lng]);
     const clickedLabel = `Radar Center [${lat.toFixed(3)}, ${lng.toFixed(3)}]`;
     setActiveLocationName(clickedLabel);
@@ -902,7 +922,7 @@ export const UberJobMap = ({
             ) : (
               <Crosshair className="w-4 h-4 text-indigo-400" />
             )}
-            <span className="text-xs font-bold hidden sm:inline">Curent Location</span>
+            <span className="text-xs font-bold hidden sm:inline">Current Location</span>
           </button>
 
           {/* Map View Mode Toggle (Streets / Satellite Hybrid) */}
@@ -1441,7 +1461,7 @@ export const UberJobMap = ({
       {/* BOTTOM COLLAPSIBLE RADAR DISCOVERY DRAWER */}
       {/* ============================================================== */}
       {isDrawerOpen && (
-        <div className="absolute bottom-2 left-2 right-2 sm:bottom-6 sm:left-6 sm:right-6 max-h-60 sm:max-h-72 z-[500] bg-slate-900/95 backdrop-blur-xl border border-slate-700/90 rounded-3xl p-3 sm:p-4 shadow-2xl flex flex-col gap-2.5 animate-in slide-in-from-bottom duration-200 pointer-events-auto">
+        <div className="absolute bottom-2 left-2 right-2 sm:bottom-6 sm:left-6 sm:right-auto sm:w-[480px] lg:w-[540px] max-w-[calc(100vw-1.5rem)] max-h-64 sm:max-h-72 z-[520] bg-slate-900/95 backdrop-blur-xl border border-slate-700/90 rounded-3xl p-3 sm:p-4 shadow-2xl flex flex-col gap-2.5 animate-in slide-in-from-bottom duration-200 pointer-events-auto">
           
           {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-800 pb-2">
@@ -1564,7 +1584,7 @@ export const UberJobMap = ({
       >
         <MapResizer />
         <MapController onMapReady={setMapInstance} />
-        <MapRecenter coords={safeCoords} flyTrigger={flyTrigger} />
+        <MapRecenter coords={safeCoords} flyTrigger={flyTrigger} targetZoom={targetZoomLevel} />
         <MapBoundsFitter 
           boundsTrigger={fitBoundsTrigger} 
           jobs={visibleJobs} 
