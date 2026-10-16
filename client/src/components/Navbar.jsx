@@ -62,7 +62,7 @@ export const Navbar = ({
   employersCount = 0
 }) => {
   const { user, isEmployer, isSeeker, demoSwitch, logout } = useAuth();
-  const { setActiveChatUser } = useSocket();
+  const { setActiveChatUser, socket } = useSocket();
 
   // Dropdown & Drawer states
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -205,6 +205,63 @@ export const Navbar = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  // Real-time socket events syncing into Notifications
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewJob = (newJob) => {
+      setNotifications(prev => [
+        {
+          id: `notif_job_${Date.now()}`,
+          title: `New Hot Job: ${newJob.title}`,
+          desc: `${newJob.company} is hiring near ${newJob.address || 'you'} (${newJob.salary})`,
+          time: 'Just now',
+          read: false,
+          tab: 'jobs'
+        },
+        ...prev
+      ]);
+    };
+
+    const handleNewMsg = (msg) => {
+      setNotifications(prev => [
+        {
+          id: `notif_msg_${Date.now()}`,
+          title: `New message from ${msg.senderName || 'Peer'}`,
+          desc: msg.content?.slice(0, 60) + '...',
+          time: 'Just now',
+          read: false,
+          tab: 'messages'
+        },
+        ...prev
+      ]);
+    };
+
+    const handleAppUpdate = (app) => {
+      setNotifications(prev => [
+        {
+          id: `notif_app_${Date.now()}`,
+          title: `Application Status: ${app.jobTitle}`,
+          desc: `Status updated to ${app.status?.toUpperCase()}`,
+          time: 'Just now',
+          read: false,
+          tab: 'jobs'
+        },
+        ...prev
+      ]);
+    };
+
+    socket.on('job:new', handleNewJob);
+    socket.on('message:receive', handleNewMsg);
+    socket.on('application:updated', handleAppUpdate);
+
+    return () => {
+      socket.off('job:new', handleNewJob);
+      socket.off('message:receive', handleNewMsg);
+      socket.off('application:updated', handleAppUpdate);
+    };
+  }, [socket]);
 
   // Mark all notifications as read
   const markAllNotifsRead = () => {
@@ -751,38 +808,54 @@ export const Navbar = ({
                         </span>
                       )}
                     </div>
-                    {unreadNotifsCount > 0 && (
-                      <button
-                        onClick={markAllNotifsRead}
-                        className="text-[10px] text-indigo-600 hover:text-indigo-800 font-semibold"
-                      >
-                        Mark all read
-                      </button>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {unreadNotifsCount > 0 && (
+                        <button
+                          onClick={markAllNotifsRead}
+                          className="text-[10px] text-indigo-600 hover:text-indigo-800 font-semibold"
+                        >
+                          Mark read
+                        </button>
+                      )}
+                      {notifications.length > 0 && (
+                        <button
+                          onClick={() => setNotifications([])}
+                          className="text-[10px] text-slate-400 hover:text-slate-700 font-semibold"
+                        >
+                          Clear
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div className="space-y-1.5 max-h-72 overflow-y-auto">
-                    {notifications.map((n) => (
-                      <div
-                        key={n.id}
-                        onClick={() => handleNotificationClick(n)}
-                        className={`p-2.5 rounded-xl text-left cursor-pointer transition-colors ${
-                          n.read
-                            ? 'bg-slate-50/70 hover:bg-slate-100/80 text-slate-600'
-                            : 'bg-indigo-50/70 hover:bg-indigo-50 border border-indigo-200/70 text-slate-900'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="font-bold text-xs text-slate-900 leading-tight">
-                            {n.title}
-                          </span>
-                          <span className="text-[10px] text-slate-400">{n.time}</span>
-                        </div>
-                        <p className="text-[11px] text-slate-600 mt-1 leading-snug">
-                          {n.desc}
-                        </p>
+                    {notifications.length === 0 ? (
+                      <div className="text-center py-8 text-slate-400 text-xs">
+                        No notifications right now
                       </div>
-                    ))}
+                    ) : (
+                      notifications.map((n) => (
+                        <div
+                          key={n.id}
+                          onClick={() => handleNotificationClick(n)}
+                          className={`p-2.5 rounded-xl text-left cursor-pointer transition-colors ${
+                            n.read
+                              ? 'bg-slate-50/70 hover:bg-slate-100/80 text-slate-600'
+                              : 'bg-indigo-50/70 hover:bg-indigo-50 border border-indigo-200/70 text-slate-900'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-xs text-slate-900 leading-tight">
+                              {n.title}
+                            </span>
+                            <span className="text-[10px] text-slate-400">{n.time}</span>
+                          </div>
+                          <p className="text-[11px] text-slate-600 mt-1 leading-snug">
+                            {n.desc}
+                          </p>
+                        </div>
+                      ))
+                    )}
                   </div>
 
                   <div className="pt-2 border-t border-slate-100 mt-2 text-center">

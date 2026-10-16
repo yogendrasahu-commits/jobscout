@@ -26,6 +26,7 @@ import { IssueOfferModal } from '../components/IssueOfferModal';
 import { ViewOfferLetterModal } from '../components/ViewOfferLetterModal';
 import { UpdateEmailModal } from '../components/UpdateEmailModal';
 import { EmailSenderConfigModal } from '../components/EmailSenderConfigModal';
+import { ResumePreviewModal } from '../components/ResumePreviewModal';
 
 export const ApplicationsView = ({ 
   onOpenProfile, 
@@ -42,6 +43,7 @@ export const ApplicationsView = ({
   // Modal states
   const [selectedAppForOffer, setSelectedAppForOffer] = useState(null);
   const [selectedAppForView, setSelectedAppForView] = useState(null);
+  const [selectedCandidateForCV, setSelectedCandidateForCV] = useState(null);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [isSenderConfigOpen, setIsSenderConfigOpen] = useState(false);
 
@@ -412,6 +414,29 @@ export const ApplicationsView = ({
                       >
                         <MessageSquare className="w-4 h-4" />
                       </button>
+
+                      {/* View & Print Candidate CV Button */}
+                      <button
+                        onClick={() =>
+                          setSelectedCandidateForCV({
+                            id: isEmployer ? app.seekerId : app.employerId,
+                            name: isEmployer ? app.seekerName : app.employerName,
+                            avatar: app.seekerAvatar,
+                            title: app.jobTitle,
+                            experience: '3.5+ Years Verified',
+                            expectedSalary: app.salary || 'Competitive',
+                            skills: ['Fullstack Architecture', 'React & Node.js', 'System Design', 'Problem Solving'],
+                            bio: app.coverLetter || 'Results-driven professional with verified credentials and identity on JobScout.',
+                            email: app.seekerEmail || 'verified.candidate@jobscout.io',
+                            phone: app.seekerPhone || '9876543210',
+                            address: app.jobLocation || 'Mumbai, India'
+                          })
+                        }
+                        title="View & Download Professional CV (बायोडाटा)"
+                        className="p-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 transition-colors shadow-xs"
+                      >
+                        <FileText className="w-4 h-4" />
+                      </button>
                     </div>
 
                     {/* Employer Review / Accept / Issue Offer Workflow */}
@@ -575,6 +600,15 @@ export const ApplicationsView = ({
         <EmailSenderConfigModal
           isOpen={isSenderConfigOpen}
           onClose={() => setIsSenderConfigOpen(false)}
+        />
+      )}
+
+      {/* 5. Modal to Preview Candidate CV */}
+      {selectedCandidateForCV && (
+        <ResumePreviewModal
+          candidate={selectedCandidateForCV}
+          isOpen={Boolean(selectedCandidateForCV)}
+          onClose={() => setSelectedCandidateForCV(null)}
         />
       )}
 

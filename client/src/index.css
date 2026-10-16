@@ -190,3 +190,14 @@ body {
 .leaflet-control-attribution a {
   color: #6366f1 !important;
 }
+
+/* Print optimization for Executive CV Preview */
+@media print {
+  header, nav, .leaflet-container, button, .no-print {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+}

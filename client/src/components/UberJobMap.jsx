@@ -1526,14 +1526,27 @@ export const UberJobMap = ({
                 <div>
                   <div className="flex items-center justify-between text-[10px] text-indigo-600 font-bold mb-1">
                     <span>{job.jobType}</span>
-                    <span className="text-slate-500">{job.distanceKm} km away</span>
+                    <span className="text-slate-500 font-semibold">{job.distanceKm} km away</span>
                   </div>
                   <h4 className="text-xs font-bold text-slate-900 truncate">{job.title}</h4>
                   <p className="text-[11px] text-slate-500 truncate">{job.company}</p>
                 </div>
                 <div className="mt-2 pt-2 border-t border-slate-200 flex items-center justify-between">
                   <span className="text-xs font-bold text-emerald-700">{job.salary ? job.salary.split('-')[0].trim() : 'Active'}</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold">Apply</span>
+                  <div className="flex items-center gap-1.5">
+                    <a
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${job.lat},${job.lng}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-[10px] text-slate-600 hover:text-indigo-600 flex items-center gap-1 bg-white hover:bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200 shadow-2xs font-semibold"
+                      title="Open Directions in Google Maps"
+                    >
+                      <Navigation className="w-2.5 h-2.5 text-indigo-500" />
+                      <span>Route</span>
+                    </a>
+                    <span className="text-[10px] px-2 py-0.5 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold">Apply</span>
+                  </div>
                 </div>
               </div>
             ))}
@@ -1704,12 +1717,24 @@ export const UberJobMap = ({
                   </span>
                 </div>
 
-                <button
-                  onClick={() => onSelectJob(job)}
-                  className="w-full py-1.5 px-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-colors shadow-md"
-                >
-                  View Details & Apply
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => onSelectJob(job)}
+                    className="flex-1 py-1.5 px-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-colors shadow-md"
+                  >
+                    View & Apply
+                  </button>
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${job.lat},${job.lng}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-colors flex items-center justify-center gap-1 text-[11px] font-semibold"
+                    title="Open Directions in Google Maps"
+                  >
+                    <Navigation className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Route</span>
+                  </a>
+                </div>
               </div>
             </Popup>
           </Marker>

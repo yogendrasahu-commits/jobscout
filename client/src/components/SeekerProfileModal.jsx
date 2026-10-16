@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { X, Phone, Video, MessageSquare, MapPin, Briefcase, Award, Sparkles, User, ArrowLeft, Mail, Edit3 } from 'lucide-react';
+import { X, Phone, Video, MessageSquare, MapPin, Briefcase, Award, Sparkles, User, ArrowLeft, Mail, Edit3, FileText } from 'lucide-react';
 import { useSocket } from '../context/SocketContext';
 import { useAuth } from '../context/AuthContext';
 import { UpdateEmailModal } from './UpdateEmailModal';
+import { ResumePreviewModal } from './ResumePreviewModal';
 
 export const SeekerProfileModal = ({ seeker, isOpen, onClose }) => {
   const { user } = useAuth();
   const { setActiveChatUser, startCall } = useSocket();
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
 
   if (!isOpen || !seeker) return null;
 
@@ -157,6 +159,17 @@ export const SeekerProfileModal = ({ seeker, isOpen, onClose }) => {
             Send Direct Message
           </button>
 
+          {/* View & Download Professional CV Button */}
+          <button
+            type="button"
+            onClick={() => setIsResumeModalOpen(true)}
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-indigo-50 to-violet-50 hover:from-indigo-100 hover:to-violet-100 text-indigo-700 font-bold text-xs border border-indigo-200/90 transition-all shadow-xs active:scale-95"
+            title="View & Download Candidate Resume"
+          >
+            <FileText className="w-4 h-4 text-indigo-600" />
+            <span>View & Print Professional CV (बायोडाटा)</span>
+          </button>
+
           {/* Close Profile Button */}
           <button
             type="button"
@@ -175,6 +188,13 @@ export const SeekerProfileModal = ({ seeker, isOpen, onClose }) => {
           onUpdated={(newEmail) => {
             if (seeker) seeker.email = newEmail;
           }}
+        />
+
+        {/* Professional Resume / CV Preview Modal */}
+        <ResumePreviewModal
+          candidate={seeker}
+          isOpen={isResumeModalOpen}
+          onClose={() => setIsResumeModalOpen(false)}
         />
 
       </div>
