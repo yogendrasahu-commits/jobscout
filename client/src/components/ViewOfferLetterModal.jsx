@@ -107,7 +107,7 @@ export const ViewOfferLetterModal = ({
   const isRejected = application.status === 'rejected';
 
   return (
-    <div className="fixed inset-0 z-[950] flex items-center justify-center bg-black/85 backdrop-blur-sm p-2 sm:p-4 md:p-6 overflow-y-auto animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-[950] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-2 sm:p-4 md:p-6 overflow-y-auto animate-in fade-in duration-150">
       
       {/* Print-specific style overrides */}
       <style>{`
@@ -143,21 +143,21 @@ export const ViewOfferLetterModal = ({
         }
       `}</style>
 
-      <div className="relative w-full max-w-3xl bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl flex flex-col max-h-[94dvh] overflow-hidden my-auto animate-in zoom-in-95 duration-150">
+      <div className="relative w-full max-w-3xl bg-white border border-slate-200/90 rounded-3xl shadow-2xl flex flex-col max-h-[94dvh] overflow-hidden my-auto animate-in zoom-in-95 duration-150 text-slate-900">
         
         {/* Top Bar with Responsive Back and Close Buttons */}
-        <div className="no-print px-4 sm:px-6 py-3.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between gap-3">
+        <div className="no-print px-4 sm:px-6 py-3.5 bg-slate-50/90 border-b border-slate-200/80 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold border border-slate-700/80 transition-all flex items-center gap-1.5 active:scale-95"
+              className="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 text-xs font-semibold border border-slate-200 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm"
               title="Back / Close"
             >
-              <ArrowLeft className="w-4 h-4 text-emerald-400" />
+              <ArrowLeft className="w-4 h-4 text-emerald-600" />
               <span>Back (वापस)</span>
             </button>
-            <span className="text-xs font-bold text-white hidden sm:inline">
+            <span className="text-xs font-bold text-slate-900 hidden sm:inline">
               Official Employment Offer Letter
             </span>
           </div>
@@ -167,7 +167,7 @@ export const ViewOfferLetterModal = ({
             <button
               type="button"
               onClick={handlePrint}
-              className="px-3 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white text-xs font-bold border border-indigo-500/30 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm"
+              className="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white text-xs font-bold border border-indigo-200 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm"
               title="Print or Save as PDF"
             >
               <Printer className="w-3.5 h-3.5" />
@@ -177,7 +177,7 @@ export const ViewOfferLetterModal = ({
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 sm:px-3 sm:py-1.5 rounded-xl text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700/80 transition-all flex items-center gap-1.5 active:scale-95"
+              className="p-1.5 sm:px-3 sm:py-1.5 rounded-xl text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-200 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm"
               title="Close modal"
             >
               <span className="text-[11px] font-semibold hidden sm:inline">Close</span>
@@ -187,17 +187,17 @@ export const ViewOfferLetterModal = ({
         </div>
 
         {/* Scrollable Letter Document Content */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 bg-slate-900/95 text-slate-100">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 bg-slate-50/60 text-slate-900">
           
           {feedback && (
             <div className={`no-print mb-4 p-3.5 rounded-2xl border text-xs font-semibold flex items-center gap-2.5 ${
               feedback.type === 'success' 
-                ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
                 : feedback.type === 'error'
-                ? 'bg-rose-500/15 border-rose-500/30 text-rose-300'
-                : 'bg-indigo-500/15 border-indigo-500/30 text-indigo-300'
+                ? 'bg-rose-50 border-rose-200 text-rose-800'
+                : 'bg-indigo-50 border-indigo-200 text-indigo-800'
             }`}>
-              {feedback.type === 'success' ? <CheckCircle className="w-4 h-4 flex-shrink-0" /> : <XCircle className="w-4 h-4 flex-shrink-0" />}
+              {feedback.type === 'success' ? <CheckCircle className="w-4 h-4 flex-shrink-0 text-emerald-600" /> : <XCircle className="w-4 h-4 flex-shrink-0 text-rose-600" />}
               <span>{feedback.text}</span>
             </div>
           )}
@@ -205,7 +205,7 @@ export const ViewOfferLetterModal = ({
           {/* Letterhead Container */}
           <div 
             id="official-offer-letter-doc"
-            className="bg-white text-slate-900 rounded-2xl p-6 sm:p-8 md:p-10 shadow-2xl border border-slate-200 relative overflow-hidden font-sans"
+            className="bg-white text-slate-900 rounded-2xl p-6 sm:p-8 md:p-10 shadow-lg border border-slate-200 relative overflow-hidden font-sans"
           >
             {/* Background Security Watermark with Company Name */}
             <div className="company-watermark absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none overflow-hidden z-0">
@@ -371,13 +371,13 @@ export const ViewOfferLetterModal = ({
 
           {/* Action Callouts for Seeker (Only visible when status is 'offered' and user is candidate) */}
           {isSeeker && isOffered && (
-            <div className="no-print mt-6 p-4 sm:p-5 rounded-2xl bg-indigo-950/60 border border-indigo-500/40 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="no-print mt-6 p-4 sm:p-5 rounded-2xl bg-indigo-50/80 border border-indigo-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>
-                <h4 className="font-extrabold text-sm text-white flex items-center gap-2">
-                  <Award className="w-5 h-5 text-emerald-400" />
+                <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                  <Award className="w-5 h-5 text-emerald-600" />
                   <span>क्या आप इस जॉब ऑफर को स्वीकार करना चाहते हैं?</span>
                 </h4>
-                <p className="text-xs text-slate-300 mt-0.5">
+                <p className="text-xs text-slate-600 mt-0.5">
                   स्वीकार करने पर आपकी नियुक्ति फाइनल हो जाएगी और नियोक्ता को तुरंत सूचित कर दिया जाएगा।
                 </p>
               </div>
@@ -387,7 +387,7 @@ export const ViewOfferLetterModal = ({
                   type="button"
                   onClick={handleDeclineOffer}
                   disabled={actionLoading}
-                  className="w-1/2 sm:w-auto px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-rose-950/50 hover:text-rose-300 text-slate-300 font-bold text-xs border border-slate-700 transition-all"
+                  className="w-1/2 sm:w-auto px-4 py-2.5 rounded-xl bg-white hover:bg-rose-50 hover:text-rose-700 text-slate-700 font-bold text-xs border border-slate-200 transition-all shadow-sm"
                 >
                   Decline
                 </button>
@@ -395,7 +395,7 @@ export const ViewOfferLetterModal = ({
                   type="button"
                   onClick={handleAcceptOffer}
                   disabled={actionLoading}
-                  className="w-1/2 sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-extrabold text-xs shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-1.5 active:scale-95"
+                  className="w-1/2 sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-extrabold text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-1.5 active:scale-95"
                 >
                   <CheckCircle className="w-4 h-4" />
                   <span>Accept Offer (स्वीकार करें)</span>
@@ -406,18 +406,18 @@ export const ViewOfferLetterModal = ({
 
           {/* If already hired */}
           {isHired && (
-            <div className="no-print mt-5 p-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 flex items-center justify-between gap-3">
+            <div className="no-print mt-5 p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
-                <UserCheck className="w-6 h-6 text-emerald-400 flex-shrink-0" />
+                <UserCheck className="w-6 h-6 text-emerald-600 flex-shrink-0" />
                 <div>
-                  <h4 className="font-extrabold text-xs text-white">Officially Hired & Joined!</h4>
-                  <p className="text-[11px] text-slate-300">यह ऑफर लेटर दोनों पक्षों द्वारा सत्यापित है। आप इसे कभी भी डाउनलोड या प्रिंट कर सकते हैं।</p>
+                  <h4 className="font-extrabold text-xs text-slate-900">Officially Hired & Joined!</h4>
+                  <p className="text-[11px] text-slate-600">यह ऑफर लेटर दोनों पक्षों द्वारा सत्यापित है। आप इसे कभी भी डाउनलोड या प्रिंट कर सकते हैं।</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={handlePrint}
-                className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-md flex items-center gap-1.5 whitespace-nowrap"
+                className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 whitespace-nowrap"
               >
                 <Printer className="w-3.5 h-3.5" />
                 <span>Print Document</span>

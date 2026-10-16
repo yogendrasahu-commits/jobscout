@@ -128,7 +128,7 @@
       "lat": 28.6304,
       "lng": 77.2177,
       "address": "Connaught Place (CP), New Delhi",
-      "isOnline": true,
+      "isOnline": false,
       "experience": "3+ Years",
       "expectedSalary": "₹14,00,000 / yr",
       "availability": "Immediate (Ready Today)",
@@ -1109,7 +1109,7 @@
     {
       "id": "msg_1791955349419_y2yd",
       "timestamp": "2026-10-14T05:22:29.419Z",
-      "read": false,
+      "read": true,
       "senderId": "usr_emp_6",
       "receiverId": "usr_seek_1",
       "content": "🎉 Congratulations Rahul Sharma! We have issued your formal Job Offer Letter for \"Customer Care & Medical Telecaller\" at PrimeCare Diagnostic Centers with compensation of ₹14,00,000 / yr. An official copy has been dispatched to your email (yogendrasahu6636@gmail.com). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!"
@@ -1117,7 +1117,7 @@
     {
       "id": "msg_1791955417611_x97g",
       "timestamp": "2026-10-14T05:23:37.611Z",
-      "read": false,
+      "read": true,
       "senderId": "usr_emp_1",
       "receiverId": "usr_seek_1",
       "content": "🎉 Congratulations Rahul Sharma! We have issued your formal Job Offer Letter for \"Lead Full-Stack Architect\" at TechPulse Solutions with compensation of ₹18,50,000 / yr. An official copy has been dispatched to your email (rahul.verified@gmail.com). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!"
@@ -1141,7 +1141,7 @@
     {
       "id": "msg_1791956214490_apni",
       "timestamp": "2026-10-14T05:36:54.490Z",
-      "read": false,
+      "read": true,
       "senderId": "usr_emp_3",
       "receiverId": "usr_seek_1",
       "content": "🎉 Congratulations Rahul Sharma! We have issued your formal Job Offer Letter for \"Express Delivery Rider & Fleet Specialist\" at Apex Express Logistics with compensation of ₹14,00,000 / yr. An official copy has been dispatched to your email (yogendrasahu6636@gmail.com). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!"
@@ -1149,7 +1149,7 @@
     {
       "id": "msg_1791956220882_pgv1",
       "timestamp": "2026-10-14T05:37:00.882Z",
-      "read": false,
+      "read": true,
       "senderId": "usr_emp_3",
       "receiverId": "usr_seek_1",
       "content": "🎉 Congratulations Rahul Sharma! We have issued your formal Job Offer Letter for \"Fulfillment Hub Inventory Supervisor\" at Apex Express Logistics with compensation of ₹14,00,000 / yr. An official copy has been dispatched to your email (yogendrasahu6636@gmail.com). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!"
@@ -1173,7 +1173,7 @@
     {
       "id": "msg_1791959311869_ihmq",
       "timestamp": "2026-10-14T06:28:31.869Z",
-      "read": false,
+      "read": true,
       "senderId": "usr_emp_1",
       "receiverId": "usr_seek_1",
       "content": "🎉 Congratulations Rahul Sharma! We have issued your formal Job Offer Letter for \"On-Demand Field IT Diagnostics Engineer\" at TechPulse Solutions with compensation of ₹14,00,000 / yr. An official copy has been dispatched to your email (yogendrasahu6636@gmail.com). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!"
@@ -1189,7 +1189,7 @@
     {
       "id": "msg_1791960120844_etw9",
       "timestamp": "2026-10-14T06:42:00.844Z",
-      "read": false,
+      "read": true,
       "senderId": "usr_emp_2",
       "receiverId": "usr_seek_1",
       "content": "🎉 Congratulations Rahul Sharma! We have issued your formal Job Offer Letter for \"DevOps & Kubernetes Infrastructure Engineer\" at Nexus Cloud Innovations with compensation of ₹14,00,000 / yr. An official copy has been dispatched to your email (yogendrasahu6636@gmail.com). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!"
@@ -1205,7 +1205,7 @@
     {
       "id": "msg_1791961340215_5vp6",
       "timestamp": "2026-10-14T07:02:20.215Z",
-      "read": false,
+      "read": true,
       "senderId": "usr_emp_2",
       "receiverId": "usr_seek_1",
       "content": "🎉 Congratulations Rahul Sharma! We have issued your formal Job Offer Letter for \"Backend Node.js & Microservices Architect\" at Nexus Cloud Innovations with compensation of ₹14,00,000 / yr. An official copy has been dispatched to your email (yogendrasahu6636@gmail.com). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!"

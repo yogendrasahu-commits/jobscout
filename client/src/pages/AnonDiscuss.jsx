@@ -361,52 +361,52 @@ export const AnonDiscuss = () => {
   const currentVoterId = user?.id || 'anon_device_' + window.navigator.userAgent.slice(0, 15);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 pb-24 md:pb-12">
+    <div className="min-h-screen bg-slate-50 text-slate-900 pb-24 md:pb-12">
       
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-20 right-4 z-[999] bg-gradient-to-r from-orange-600 to-amber-600 text-white font-bold text-xs px-4 py-2.5 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-top-4 duration-200">
+        <div className="fixed top-20 right-4 z-[999] bg-gradient-to-r from-orange-600 to-amber-600 text-white font-bold text-xs px-4 py-2.5 rounded-2xl shadow-xl animate-in fade-in slide-in-from-top-4 duration-200">
           {toastMessage}
         </div>
       )}
 
       {/* Top Banner / Privacy Guarantee */}
-      <div className="bg-gradient-to-b from-slate-900 via-slate-900/90 to-slate-950 border-b border-slate-800/80 px-4 py-6 sm:py-8">
+      <div className="bg-white/90 backdrop-blur-2xl border-b border-slate-200/80 px-4 py-6 sm:py-8 shadow-xs">
         <div className="max-w-[1400px] w-full mx-auto">
           
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1.5">
-                <span className="px-2.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30 text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
-                  <Flame className="w-3.5 h-3.5 text-orange-400" />
+                <span className="px-2.5 py-0.5 rounded-full bg-orange-50 text-orange-700 border border-orange-200 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shadow-xs">
+                  <Flame className="w-3.5 h-3.5 text-orange-500" />
                   JobScout Community Forum
                 </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold flex items-center gap-1">
-                  <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold flex items-center gap-1 shadow-xs">
+                  <ShieldCheck className="w-3 h-3 text-emerald-600" />
                   100% Encrypted & Anonymous
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-2">
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
                 <span>JobScout Anon Talk</span>
-                <span className="text-slate-400 font-normal text-sm sm:text-base">(गुमनाम चर्चा)</span>
+                <span className="text-slate-500 font-normal text-sm sm:text-base">(गुमनाम चर्चा)</span>
               </h1>
-              <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl leading-relaxed">
                 Discuss actual salaries, interview round leaks, workplace realities, and unvarnished career confessions. Your real name, phone number, and profile are completely stripped.
               </p>
             </div>
 
             {/* User Anonymous Persona Pill & New Thread Button */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-              <div className="flex items-center justify-between bg-slate-950/80 px-3 py-2 rounded-2xl border border-slate-800 text-xs">
+              <div className="flex items-center justify-between bg-white px-3 py-2 rounded-2xl border border-slate-200 shadow-xs text-xs">
                 <div className="flex items-center gap-2">
                   <img 
                     src={`https://api.dicebear.com/7.x/bottts/svg?seed=${myPersona.seed}`} 
                     alt="avatar" 
-                    className="w-6 h-6 rounded-lg bg-orange-950/50 p-0.5 border border-orange-500/30"
+                    className="w-6 h-6 rounded-lg bg-orange-50 p-0.5 border border-orange-200"
                   />
                   <div>
                     <span className="text-[10px] text-slate-400 block leading-tight">Your Anon Alias:</span>
-                    <strong className="text-orange-400 text-xs font-mono">{myPersona.alias}</strong>
+                    <strong className="text-orange-600 text-xs font-mono">{myPersona.alias}</strong>
                   </div>
                 </div>
                 <button
@@ -417,7 +417,7 @@ export const AnonDiscuss = () => {
                     showToast(`🎲 Switched to ${newP.alias}`);
                   }}
                   title="Randomize Anonymous Persona"
-                  className="ml-2.5 p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
+                  className="ml-2.5 p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-colors"
                 >
                   <Dice5 className="w-3.5 h-3.5" />
                 </button>
@@ -425,7 +425,7 @@ export const AnonDiscuss = () => {
 
               <button
                 onClick={() => setIsPostModalOpen(true)}
-                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-extrabold text-xs shadow-lg shadow-orange-600/30 transition-all active:scale-95 whitespace-nowrap"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-extrabold text-xs shadow-md shadow-orange-500/20 transition-all active:scale-95 whitespace-nowrap"
               >
                 <Plus className="w-4 h-4" />
                 <span>Start Anonymous Thread</span>
@@ -445,7 +445,7 @@ export const AnonDiscuss = () => {
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all border ${
                     isActive 
                       ? 'bg-orange-500 text-white border-orange-400 shadow-md shadow-orange-500/20' 
-                      : 'bg-slate-900/80 text-slate-400 hover:text-white border-slate-800 hover:bg-slate-800'
+                      : 'bg-white text-slate-600 hover:text-slate-900 border-slate-200 hover:bg-slate-50 shadow-xs'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -462,59 +462,59 @@ export const AnonDiscuss = () => {
       <div className="max-w-[1400px] w-full mx-auto px-3 sm:px-4 mt-4">
         
         {/* Sort & Search Toolbar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-slate-900/60 p-2.5 rounded-2xl border border-slate-800/80 mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-white p-2.5 rounded-2xl border border-slate-200 shadow-xs mb-4">
           
           {/* Community Sort Modes: Hot, New, Top */}
-          <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800/80 text-xs">
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
             <button
               onClick={() => setSortMode('hot')}
               className={`flex items-center gap-1.5 px-3 py-1 rounded-lg font-bold transition-all ${
                 sortMode === 'hot' 
-                  ? 'bg-orange-600 text-white shadow-sm' 
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-white text-orange-600 shadow-xs' 
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <Flame className="w-3.5 h-3.5 text-orange-400" />
+              <Flame className="w-3.5 h-3.5 text-orange-500" />
               <span>Hot (चर्चित)</span>
             </button>
             <button
               onClick={() => setSortMode('new')}
               className={`flex items-center gap-1.5 px-3 py-1 rounded-lg font-bold transition-all ${
                 sortMode === 'new' 
-                  ? 'bg-orange-600 text-white shadow-sm' 
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-white text-orange-600 shadow-xs' 
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
               <span>New (नवीनतम)</span>
             </button>
             <button
               onClick={() => setSortMode('top')}
               className={`flex items-center gap-1.5 px-3 py-1 rounded-lg font-bold transition-all ${
                 sortMode === 'top' 
-                  ? 'bg-orange-600 text-white shadow-sm' 
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-white text-orange-600 shadow-xs' 
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+              <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
               <span>Top (सबसे लोकप्रिय)</span>
             </button>
           </div>
 
           {/* Search Box */}
           <div className="relative flex-1 sm:max-w-xs">
-            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
             <input 
               type="text"
               placeholder="Search salaries, interviews, tags..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-8 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-8 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-orange-500"
             />
             {searchQuery && (
               <button 
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-2 text-slate-400 hover:text-white"
+                className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -526,19 +526,19 @@ export const AnonDiscuss = () => {
         {loading ? (
           <div className="space-y-3">
             {[1, 2, 3].map(i => (
-              <div key={i} className="h-28 bg-slate-900/40 rounded-2xl animate-pulse border border-slate-800" />
+              <div key={i} className="h-28 bg-white/70 rounded-2xl animate-pulse border border-slate-200" />
             ))}
           </div>
         ) : discussions.length === 0 ? (
-          <div className="p-12 text-center bg-slate-900/40 rounded-3xl border border-slate-800/80">
-            <Coffee className="w-10 h-10 text-orange-400 mx-auto mb-3 opacity-60" />
-            <h3 className="text-base font-bold text-white">No discussions found in this channel</h3>
-            <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
+          <div className="p-12 text-center bg-white rounded-3xl border border-slate-200 shadow-xs">
+            <Coffee className="w-10 h-10 text-orange-500 mx-auto mb-3 opacity-60" />
+            <h3 className="text-base font-bold text-slate-900">No discussions found in this channel</h3>
+            <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
               Be the first to ask a candid question, reveal interview secrets, or discuss salary packages anonymously!
             </p>
             <button
               onClick={() => setIsPostModalOpen(true)}
-              className="mt-4 px-4 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs shadow-lg transition-all"
+              className="mt-4 px-4 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs shadow-md transition-all active:scale-95"
             >
               Post the first thread
             </button>
@@ -552,25 +552,25 @@ export const AnonDiscuss = () => {
               return (
                 <div 
                   key={item.id}
-                  className="flex bg-slate-900/70 hover:bg-slate-900/90 border border-slate-800 hover:border-slate-700/80 rounded-2xl overflow-hidden transition-all duration-150 group shadow-md"
+                  className="flex bg-white/95 hover:bg-white border border-slate-200/90 hover:border-orange-300 rounded-2xl overflow-hidden transition-all duration-150 group shadow-sm hover:shadow-md"
                 >
                   {/* Left Column: Community Upvote & Downvote Counter */}
-                  <div className="w-11 sm:w-12 bg-slate-950/60 p-2 flex flex-col items-center justify-start border-r border-slate-800/80 flex-shrink-0">
+                  <div className="w-11 sm:w-12 bg-slate-50/80 p-2 flex flex-col items-center justify-start border-r border-slate-100 flex-shrink-0">
                     <button
                       type="button"
                       onClick={() => handleVote(item.id, 1)}
                       title="Upvote"
                       className={`p-1 rounded-md transition-colors ${
                         hasUpvoted 
-                          ? 'text-orange-500 bg-orange-500/10' 
-                          : 'text-slate-400 hover:text-orange-400 hover:bg-slate-800'
+                          ? 'text-orange-500 bg-orange-50' 
+                          : 'text-slate-400 hover:text-orange-600 hover:bg-slate-200/70'
                       }`}
                     >
                       <ArrowBigUp className={`w-5 h-5 ${hasUpvoted ? 'fill-orange-500' : ''}`} />
                     </button>
 
                     <span className={`text-xs font-black my-1 select-none font-mono ${
-                      hasUpvoted ? 'text-orange-400' : hasDownvoted ? 'text-indigo-400' : 'text-slate-300'
+                      hasUpvoted ? 'text-orange-600' : hasDownvoted ? 'text-indigo-600' : 'text-slate-700'
                     }`}>
                       {item.score || 0}
                     </span>
@@ -581,11 +581,11 @@ export const AnonDiscuss = () => {
                       title="Downvote"
                       className={`p-1 rounded-md transition-colors ${
                         hasDownvoted 
-                          ? 'text-indigo-500 bg-indigo-500/10' 
-                          : 'text-slate-400 hover:text-indigo-400 hover:bg-slate-800'
+                          ? 'text-indigo-600 bg-indigo-50' 
+                          : 'text-slate-400 hover:text-indigo-600 hover:bg-slate-200/70'
                       }`}
                     >
-                      <ArrowBigDown className={`w-5 h-5 ${hasDownvoted ? 'fill-indigo-500' : ''}`} />
+                      <ArrowBigDown className={`w-5 h-5 ${hasDownvoted ? 'fill-indigo-600' : ''}`} />
                     </button>
                   </div>
 
@@ -594,24 +594,24 @@ export const AnonDiscuss = () => {
                     
                     {/* Channel & Author Meta Bar */}
                     <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-orange-400 font-mono">
+                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-orange-50 border border-orange-200 text-orange-700 font-mono shadow-xs">
                         {item.channel?.startsWith('#') ? item.channel : `#${(item.channel || '').replace(/^r\//i, '')}`}
                       </span>
 
-                      <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                      <div className="flex items-center gap-1.5 text-xs text-slate-500">
                         <img 
                           src={`https://api.dicebear.com/7.x/bottts/svg?seed=${item.authorAvatarSeed || 'fox'}`} 
                           alt="avatar" 
-                          className="w-4 h-4 rounded-full bg-slate-800 border border-slate-700"
+                          className="w-4 h-4 rounded-full bg-slate-100 border border-slate-200"
                         />
-                        <span className="font-semibold text-slate-300">{item.authorAlias}</span>
+                        <span className="font-semibold text-slate-800">{item.authorAlias}</span>
                         {item.authorBadge && (
-                          <span className="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.2 rounded font-medium border border-slate-700/60 hidden sm:inline">
+                          <span className="text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded font-medium border border-slate-200 hidden sm:inline">
                             {item.authorBadge}
                           </span>
                         )}
                         <span>•</span>
-                        <span className="text-[11px] text-slate-500 flex items-center gap-1">
+                        <span className="text-[11px] text-slate-400 flex items-center gap-1">
                           <Clock className="w-3 h-3 inline" />
                           {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
@@ -619,23 +619,23 @@ export const AnonDiscuss = () => {
                     </div>
 
                     {/* Title */}
-                    <h2 className="text-sm sm:text-base font-bold text-white group-hover:text-orange-300 transition-colors leading-snug">
+                    <h2 className="text-sm sm:text-base font-bold text-slate-900 group-hover:text-orange-600 transition-colors leading-snug">
                       {item.title}
                     </h2>
 
                     {/* Content Excerpt */}
-                    <p className="text-xs text-slate-300/90 mt-1.5 line-clamp-2 sm:line-clamp-3 leading-relaxed whitespace-pre-line font-sans">
+                    <p className="text-xs text-slate-600 mt-1.5 line-clamp-2 sm:line-clamp-3 leading-relaxed whitespace-pre-line font-sans">
                       {item.content}
                     </p>
 
                     {/* Action Footer */}
-                    <div className="flex items-center gap-4 mt-3 pt-2 border-t border-slate-800/60 text-xs text-slate-400">
-                      <div className="flex items-center gap-1.5 hover:text-white transition-colors">
-                        <MessageSquare className="w-3.5 h-3.5 text-orange-400" />
+                    <div className="flex items-center gap-4 mt-3 pt-2 border-t border-slate-100 text-xs text-slate-500">
+                      <div className="flex items-center gap-1.5 hover:text-slate-900 transition-colors">
+                        <MessageSquare className="w-3.5 h-3.5 text-orange-500" />
                         <span className="font-bold">{item.commentsCount || 0} Comments</span>
                       </div>
 
-                      <div className="flex items-center gap-1 text-[11px] text-slate-500">
+                      <div className="flex items-center gap-1 text-[11px] text-slate-400">
                         <Eye className="w-3.5 h-3.5" />
                         <span>{item.views || 1} views</span>
                       </div>
@@ -649,7 +649,7 @@ export const AnonDiscuss = () => {
                             showToast('📋 Discussion link copied to clipboard!');
                           }
                         }}
-                        className="flex items-center gap-1 hover:text-white transition-colors ml-auto text-[11px]"
+                        className="flex items-center gap-1 hover:text-slate-900 transition-colors ml-auto text-[11px]"
                       >
                         <Share2 className="w-3.5 h-3.5" />
                         <span>Share</span>
@@ -669,17 +669,17 @@ export const AnonDiscuss = () => {
       {/* 1. FULL THREAD DISCUSSION MODAL (COMMUNITY COMMENTS)           */}
       {/* ============================================================= */}
       {selectedThread && (
-        <div className="fixed inset-0 z-[950] flex items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-4 overflow-y-auto">
-          <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-700/90 rounded-3xl shadow-2xl p-4 sm:p-6 my-auto max-h-[92dvh] flex flex-col animate-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-[950] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-white border border-slate-200/90 rounded-3xl shadow-2xl p-4 sm:p-6 my-auto max-h-[92dvh] flex flex-col animate-in zoom-in-95 duration-150 text-slate-900">
             
             {/* Top-Left Back / Close Button */}
             <button
               type="button"
               onClick={() => setSelectedThread(null)}
-              className="absolute top-4 left-4 p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold border border-slate-700/60 transition-all flex items-center gap-1 shadow-md active:scale-95 z-20"
+              className="absolute top-4 left-4 p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-semibold border border-slate-200 transition-all flex items-center gap-1 shadow-xs active:scale-95 z-20"
               title="Back / Close discussion"
             >
-              <ArrowLeft className="w-4 h-4 text-orange-400" />
+              <ArrowLeft className="w-4 h-4 text-orange-600" />
               <span>Back (वापस)</span>
             </button>
 
@@ -687,7 +687,7 @@ export const AnonDiscuss = () => {
             <button
               type="button"
               onClick={() => setSelectedThread(null)}
-              className="absolute top-4 right-4 p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-700/60 transition-all flex items-center gap-1 active:scale-95 z-20"
+              className="absolute top-4 right-4 p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 border border-slate-200 transition-all flex items-center gap-1 active:scale-95 z-20"
               title="Close discussion"
             >
               <span className="text-[11px] font-semibold hidden sm:inline">Close (बंद करें)</span>
@@ -700,68 +700,68 @@ export const AnonDiscuss = () => {
               {/* Thread Header */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-orange-400 font-mono">
+                  <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-orange-50 border border-orange-200 text-orange-700 font-mono">
                     {selectedThread.channel?.startsWith('#') ? selectedThread.channel : `#${(selectedThread.channel || '').replace(/^r\//i, '')}`}
                   </span>
-                  <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                  <div className="flex items-center gap-1.5 text-xs text-slate-500">
                     <img 
                       src={`https://api.dicebear.com/7.x/bottts/svg?seed=${selectedThread.authorAvatarSeed || 'fox'}`} 
                       alt="avatar" 
-                      className="w-4 h-4 rounded-full bg-slate-800"
+                      className="w-4 h-4 rounded-full bg-slate-100 border border-slate-200"
                     />
-                    <span className="font-bold text-slate-200">{selectedThread.authorAlias}</span>
-                    <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.2 rounded font-medium border border-slate-700">
+                    <span className="font-bold text-slate-800">{selectedThread.authorAlias}</span>
+                    <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded font-medium border border-slate-200">
                       {selectedThread.authorBadge || 'Verified'}
                     </span>
                   </div>
                 </div>
 
-                <h1 className="text-lg sm:text-xl font-extrabold text-white leading-snug">
+                <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 leading-snug">
                   {selectedThread.title}
                 </h1>
                 
-                <div className="p-3.5 bg-slate-950/70 border border-slate-800/80 rounded-2xl text-xs sm:text-sm text-slate-200 mt-2.5 whitespace-pre-line leading-relaxed">
+                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm text-slate-700 mt-2.5 whitespace-pre-line leading-relaxed">
                   {selectedThread.content}
                 </div>
 
                 {/* Vote Bar */}
                 <div className="flex items-center gap-3 mt-3 text-xs">
-                  <div className="flex items-center bg-slate-950 px-2.5 py-1 rounded-xl border border-slate-800">
+                  <div className="flex items-center bg-slate-50 px-2.5 py-1 rounded-xl border border-slate-200">
                     <button
                       type="button"
                       onClick={() => handleVote(selectedThread.id, 1)}
-                      className="text-slate-400 hover:text-orange-400 p-0.5"
+                      className="text-slate-400 hover:text-orange-600 p-0.5"
                     >
                       <ArrowBigUp className="w-4 h-4" />
                     </button>
-                    <span className="font-black px-2 font-mono text-orange-400">{selectedThread.score || 0}</span>
+                    <span className="font-black px-2 font-mono text-orange-600">{selectedThread.score || 0}</span>
                     <button
                       type="button"
                       onClick={() => handleVote(selectedThread.id, -1)}
-                      className="text-slate-400 hover:text-indigo-400 p-0.5"
+                      className="text-slate-400 hover:text-indigo-600 p-0.5"
                     >
                       <ArrowBigDown className="w-4 h-4" />
                     </button>
                   </div>
 
-                  <span className="text-slate-400 text-xs flex items-center gap-1">
-                    <MessageSquare className="w-3.5 h-3.5 text-orange-400" />
+                  <span className="text-slate-500 text-xs flex items-center gap-1">
+                    <MessageSquare className="w-3.5 h-3.5 text-orange-500" />
                     <strong>{selectedThread.commentsCount || 0} Comments</strong>
                   </span>
                 </div>
               </div>
 
               {/* Comment Composer */}
-              <form onSubmit={handleAddComment} className="p-3 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-2">
-                <div className="flex items-center justify-between text-xs text-slate-400">
+              <form onSubmit={handleAddComment} className="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+                <div className="flex items-center justify-between text-xs text-slate-500">
                   <div className="flex items-center gap-1.5">
                     <span className="text-[11px]">Replying anonymously as:</span>
-                    <strong className="text-orange-400 text-xs font-mono">{myPersona.alias}</strong>
+                    <strong className="text-orange-600 text-xs font-mono">{myPersona.alias}</strong>
                   </div>
                   <button
                     type="button"
                     onClick={() => setMyPersona(generateRandomAlias())}
-                    className="text-[10px] text-slate-400 hover:text-white flex items-center gap-1 bg-slate-800 px-2 py-0.5 rounded-md"
+                    className="text-[10px] text-slate-600 hover:text-slate-900 flex items-center gap-1 bg-white border border-slate-200 px-2 py-0.5 rounded-md shadow-xs"
                   >
                     <Dice5 className="w-3 h-3" /> Change Alias
                   </button>
@@ -774,12 +774,12 @@ export const AnonDiscuss = () => {
                     placeholder="Add your anonymous insight, counter-opinion, or advice..."
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
-                    className="flex-1 bg-slate-900 border border-slate-700/80 rounded-xl p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 resize-none"
+                    className="flex-1 bg-white border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 resize-none shadow-xs"
                   />
                   <button
                     type="submit"
                     disabled={submittingComment || !commentText.trim()}
-                    className="px-4 bg-orange-600 hover:bg-orange-500 disabled:opacity-40 text-white rounded-xl font-bold text-xs shadow-md transition-all flex items-center justify-center flex-shrink-0"
+                    className="px-4 bg-orange-600 hover:bg-orange-500 disabled:opacity-40 text-white rounded-xl font-bold text-xs shadow-md shadow-orange-600/20 transition-all flex items-center justify-center flex-shrink-0 active:scale-95"
                   >
                     <Send className="w-4 h-4" />
                   </button>
@@ -788,39 +788,39 @@ export const AnonDiscuss = () => {
 
               {/* Threaded Comments List */}
               <div className="space-y-2.5 pt-1">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Community Discussion ({selectedThread.comments?.length || 0})
                 </h3>
 
                 {(selectedThread.comments || []).length === 0 ? (
-                  <p className="text-xs text-slate-500 py-3 text-center">No replies yet. Be the first to chime in!</p>
+                  <p className="text-xs text-slate-400 py-3 text-center">No replies yet. Be the first to chime in!</p>
                 ) : (
                   (selectedThread.comments || []).map(comment => (
                     <div 
                       key={comment.id}
-                      className="p-3 bg-slate-950/50 border border-slate-800/80 rounded-2xl text-xs space-y-1.5 animate-in fade-in"
+                      className="p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs space-y-1.5 animate-in fade-in"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
                           <img 
                             src={`https://api.dicebear.com/7.x/bottts/svg?seed=${comment.authorAvatarSeed || 'ninja'}`} 
                             alt="avatar" 
-                            className="w-4 h-4 rounded-full bg-slate-800"
+                            className="w-4 h-4 rounded-full bg-slate-100 border border-slate-200"
                           />
-                          <strong className="text-slate-200">{comment.authorAlias}</strong>
+                          <strong className="text-slate-800">{comment.authorAlias}</strong>
                           {comment.authorBadge && (
-                            <span className="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.2 rounded font-mono">
+                            <span className="text-[9px] bg-white border border-slate-200 text-slate-600 px-1.5 py-0.2 rounded font-mono shadow-xs">
                               {comment.authorBadge}
                             </span>
                           )}
                         </div>
 
-                        <span className="text-[10px] text-slate-500">
+                        <span className="text-[10px] text-slate-400">
                           {new Date(comment.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
 
-                      <p className="text-slate-300 leading-relaxed pl-5 whitespace-pre-line">
+                      <p className="text-slate-700 leading-relaxed pl-5 whitespace-pre-line">
                         {comment.content}
                       </p>
 
@@ -835,8 +835,8 @@ export const AnonDiscuss = () => {
                               onClick={() => handleCommentReact(selectedThread.id, comment.id, emoji)}
                               className={`px-2 py-0.5 rounded-lg border text-[11px] font-bold transition-transform active:scale-125 flex items-center gap-1 ${
                                 count > 0 
-                                  ? 'bg-slate-800/80 border-slate-700 text-slate-200' 
-                                  : 'bg-transparent border-slate-800 text-slate-500 hover:text-slate-300'
+                                  ? 'bg-white border-orange-200 text-orange-700 shadow-xs' 
+                                  : 'bg-white/60 border-slate-200 text-slate-500 hover:text-slate-800'
                               }`}
                             >
                               <span>{emoji}</span>
@@ -861,17 +861,17 @@ export const AnonDiscuss = () => {
       {/* 2. CREATE ANONYMOUS THREAD MODAL                               */}
       {/* ============================================================= */}
       {isPostModalOpen && (
-        <div className="fixed inset-0 z-[950] flex items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-4 overflow-y-auto">
-          <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700/90 rounded-3xl shadow-2xl p-5 sm:p-6 my-auto max-h-[92dvh] overflow-y-auto animate-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-[950] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
+          <div className="relative w-full max-w-lg bg-white border border-slate-200/90 rounded-3xl shadow-2xl p-5 sm:p-6 my-auto max-h-[92dvh] overflow-y-auto animate-in zoom-in-95 duration-150 text-slate-900">
             
             {/* Top-Left Back / Close Button */}
             <button
               type="button"
               onClick={() => setIsPostModalOpen(false)}
-              className="absolute top-4 left-4 p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold border border-slate-700/60 transition-all flex items-center gap-1 shadow-md active:scale-95"
+              className="absolute top-4 left-4 p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-semibold border border-slate-200 transition-all flex items-center gap-1 shadow-xs active:scale-95"
               title="Back / Close"
             >
-              <ArrowLeft className="w-4 h-4 text-orange-400" />
+              <ArrowLeft className="w-4 h-4 text-orange-600" />
               <span>Back</span>
             </button>
 
@@ -879,7 +879,7 @@ export const AnonDiscuss = () => {
             <button
               type="button"
               onClick={() => setIsPostModalOpen(false)}
-              className="absolute top-4 right-4 p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 transition-all flex items-center gap-1 active:scale-95"
+              className="absolute top-4 right-4 p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all flex items-center gap-1 active:scale-95"
               title="Close dialog"
             >
               <span className="text-[11px] font-semibold hidden sm:inline">Close (बंद करें)</span>
@@ -887,13 +887,13 @@ export const AnonDiscuss = () => {
             </button>
 
             <div className="mb-4 pt-7 sm:pt-6">
-              <span className="text-[10px] font-black uppercase tracking-wider text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded border border-orange-500/20">
+              <span className="text-[10px] font-black uppercase tracking-wider text-orange-700 bg-orange-50 px-2 py-0.5 rounded border border-orange-200">
                 🔒 Anonymous Submission
               </span>
-              <h2 className="text-xl font-extrabold text-white mt-1">
+              <h2 className="text-xl font-extrabold text-slate-900 mt-1">
                 Start an Anonymous Discussion
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-500 mt-0.5">
                 Post without disclosing your name, phone, or company.
               </p>
             </div>
@@ -901,23 +901,23 @@ export const AnonDiscuss = () => {
             <form onSubmit={handleCreatePost} className="space-y-3.5">
               
               {/* Persona Customizer Card */}
-              <div className="p-3 bg-slate-950 border border-slate-800 rounded-2xl flex items-center justify-between text-xs">
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
                   <img 
                     src={`https://api.dicebear.com/7.x/bottts/svg?seed=${myPersona.seed}`} 
                     alt="avatar" 
-                    className="w-8 h-8 rounded-xl bg-orange-950/60 p-0.5 border border-orange-500/30"
+                    className="w-8 h-8 rounded-xl bg-orange-50 p-0.5 border border-orange-200"
                   />
                   <div>
-                    <span className="text-[10px] text-slate-400 block">Posting As:</span>
-                    <strong className="text-orange-400 text-xs font-mono">{myPersona.alias}</strong>
+                    <span className="text-[10px] text-slate-500 block">Posting As:</span>
+                    <strong className="text-orange-600 text-xs font-mono">{myPersona.alias}</strong>
                   </div>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => setMyPersona(generateRandomAlias())}
-                  className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs flex items-center gap-1.5 transition-colors"
+                  className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200 shadow-xs flex items-center gap-1.5 transition-colors"
                 >
                   <Dice5 className="w-3.5 h-3.5" />
                   <span>Re-roll Alias</span>
@@ -926,13 +926,13 @@ export const AnonDiscuss = () => {
 
               {/* Topic Channel Selector */}
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Choose Community Channel (चैनल चुनें):
                 </label>
                 <select
                   value={postChannel}
                   onChange={(e) => setPostChannel(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-orange-500"
                 >
                   <option value="#SalaryTalk">💰 #SalaryTalk — In-hand pay, increments, offers</option>
                   <option value="#InterviewLeaks">🎯 #InterviewLeaks — Exact interview questions asked</option>
@@ -945,7 +945,7 @@ export const AnonDiscuss = () => {
 
               {/* Title */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Discussion Title *
                 </label>
                 <input
@@ -954,13 +954,13 @@ export const AnonDiscuss = () => {
                   placeholder="e.g. Real in-hand salary for 3 YOE Fullstack Dev in Mumbai BKC"
                   value={postTitle}
                   onChange={(e) => setPostTitle(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 font-medium"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-orange-500 font-medium"
                 />
               </div>
 
               {/* Body Content */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Detailed Experience / Question / Story *
                 </label>
                 <textarea
@@ -969,36 +969,36 @@ export const AnonDiscuss = () => {
                   placeholder="Share breakdown of compensation, rounds of interview, or candid thoughts..."
                   value={postContent}
                   onChange={(e) => setPostContent(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700/80 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 resize-none font-sans leading-relaxed"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-orange-500 resize-none font-sans leading-relaxed"
                 />
               </div>
 
               {/* Verified Role Flair Toggle */}
-              <div className="flex items-center gap-2 p-2.5 bg-slate-950/60 rounded-xl border border-slate-800 text-xs text-slate-300">
+              <div className="flex items-center gap-2 p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700">
                 <input
                   type="checkbox"
                   id="flairCheck"
                   checked={useVerifiedBadge}
                   onChange={(e) => setUseVerifiedBadge(e.target.checked)}
-                  className="w-4 h-4 rounded bg-slate-900 border-slate-700 text-orange-500 focus:ring-0"
+                  className="w-4 h-4 rounded bg-white border-slate-300 text-orange-600 focus:ring-0"
                 />
                 <label htmlFor="flairCheck" className="cursor-pointer select-none">
-                  Display verified flair badge: <span className="text-orange-400 font-bold">{isEmployer ? '[Verified Recruiter]' : '[Verified Seeker]'}</span> (identity stays 100% hidden)
+                  Display verified flair badge: <span className="text-orange-600 font-bold">{isEmployer ? '[Verified Recruiter]' : '[Verified Seeker]'}</span> (identity stays 100% hidden)
                 </label>
               </div>
 
-              <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-800">
+              <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setIsPostModalOpen(false)}
-                  className="py-2.5 px-3.5 sm:px-4 rounded-xl text-xs font-bold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700/80 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95"
+                  className="py-2.5 px-3.5 sm:px-4 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95"
                 >
-                  <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
+                  <ArrowLeft className="w-3.5 h-3.5 text-slate-500" />
                   <span>Cancel / Back (रद्द करें)</span>
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 sm:flex-initial py-2.5 px-5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-extrabold text-xs shadow-lg shadow-orange-600/30 transition-all flex items-center justify-center gap-2 active:scale-95 whitespace-nowrap"
+                  className="flex-1 sm:flex-initial py-2.5 px-5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-extrabold text-xs shadow-md shadow-orange-600/20 transition-all flex items-center justify-center gap-2 active:scale-95 whitespace-nowrap"
                 >
                   <span>Publish Anonymously</span>
                   <Send className="w-3.5 h-3.5" />

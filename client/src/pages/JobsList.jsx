@@ -86,12 +86,12 @@ export const JobsList = ({
       {/* Top Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             {activeSubTab === 'browse'
               ? 'Discover Live Nearby Jobs'
               : (isEmployer ? 'Candidate Applications & Resumes' : 'My Applied Jobs')}
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-slate-500 mt-1">
             {activeSubTab === 'browse'
               ? 'Realtime location-matched openings ready for instant chat & interviews'
               : (isEmployer 
@@ -103,7 +103,7 @@ export const JobsList = ({
         {isEmployer && (
           <button
             onClick={onOpenPostJob}
-            className="self-start md:self-auto px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-2"
+            className="self-start md:self-auto px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center gap-2 active:scale-95"
           >
             <Briefcase className="w-4 h-4" />
             Post New Opening
@@ -112,20 +112,20 @@ export const JobsList = ({
       </div>
 
       {/* Segmented Sub-Tab Switcher: Explore Jobs vs Applied Jobs */}
-      <div className="flex items-center gap-2 mb-6 border-b border-white/[0.08] pb-4">
+      <div className="flex items-center gap-2 mb-6 border-b border-slate-200 pb-4">
         <button
           type="button"
           onClick={() => setActiveSubTab('browse')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
             activeSubTab === 'browse'
-              ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-[0_0_20px_rgba(99,102,241,0.35)] border border-indigo-400/30'
-              : 'bg-[#090d16]/80 hover:bg-[#0c121e]/90 text-slate-400 hover:text-white border border-white/[0.08]'
+              ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-600/20 border border-indigo-400/30'
+              : 'bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/90 shadow-xs'
           }`}
         >
           <Briefcase className="w-4 h-4" />
           <span>Explore Openings</span>
           <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
-            activeSubTab === 'browse' ? 'bg-indigo-700/80 text-white' : 'bg-white/[0.06] text-slate-400'
+            activeSubTab === 'browse' ? 'bg-indigo-700/80 text-white' : 'bg-slate-100 text-slate-600'
           }`}>
             {jobs.length}
           </span>
@@ -136,15 +136,15 @@ export const JobsList = ({
           onClick={() => setActiveSubTab('applied')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
             activeSubTab === 'applied'
-              ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-[0_0_20px_rgba(99,102,241,0.35)] border border-indigo-400/30'
-              : 'bg-[#090d16]/80 hover:bg-[#0c121e]/90 text-slate-400 hover:text-white border border-white/[0.08]'
+              ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-600/20 border border-indigo-400/30'
+              : 'bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/90 shadow-xs'
           }`}
         >
           <FileText className="w-4 h-4" />
           <span>{isEmployer ? 'Candidate Applications' : 'Applied Jobs'}</span>
           {applicationsCount > 0 && (
             <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
-              activeSubTab === 'applied' ? 'bg-indigo-700/80 text-white' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+              activeSubTab === 'applied' ? 'bg-indigo-700/80 text-white' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
             }`}>
               {applicationsCount}
             </span>
@@ -163,7 +163,7 @@ export const JobsList = ({
       ) : (
         <>
           {/* Filter and Search Bar */}
-          <div className="bg-[#090d16]/85 backdrop-blur-2xl border border-white/[0.08] rounded-2xl p-4 mb-6 shadow-2xl space-y-3">
+          <div className="bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-2xl p-4 mb-6 shadow-sm space-y-3">
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -172,7 +172,7 @@ export const JobsList = ({
                   placeholder="Search by job title, company, skills, or location..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-black/40 border border-white/[0.08] hover:border-white/[0.16] rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                  className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
                 />
               </div>
 
@@ -180,37 +180,37 @@ export const JobsList = ({
                 <select
                   value={selectedType}
                   onChange={(e) => setSelectedType(e.target.value)}
-                  className="bg-black/40 border border-white/[0.08] hover:border-white/[0.16] rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500/80 transition-all"
+                  className="bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-indigo-500 transition-all"
                 >
-                  <option value="All" className="bg-[#0c121e]">All Types</option>
-                  <option value="Full-time" className="bg-[#0c121e]">Full-time</option>
-                  <option value="Part-time" className="bg-[#0c121e]">Part-time</option>
-                  <option value="Contract / Gig" className="bg-[#0c121e]">Gig / Contract</option>
-                  <option value="Hourly" className="bg-[#0c121e]">Hourly</option>
+                  <option value="All" className="bg-white text-slate-900">All Types</option>
+                  <option value="Full-time" className="bg-white text-slate-900">Full-time</option>
+                  <option value="Part-time" className="bg-white text-slate-900">Part-time</option>
+                  <option value="Contract / Gig" className="bg-white text-slate-900">Gig / Contract</option>
+                  <option value="Hourly" className="bg-white text-slate-900">Hourly</option>
                 </select>
 
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="bg-black/40 border border-white/[0.08] hover:border-white/[0.16] rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500/80 transition-all"
+                  className="bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-indigo-500 transition-all"
                 >
-                  <option value="All" className="bg-[#0c121e]">All Categories</option>
-                  <option value="Technology" className="bg-[#0c121e]">Technology</option>
-                  <option value="Design" className="bg-[#0c121e]">Design</option>
-                  <option value="Support" className="bg-[#0c121e]">Support & IT</option>
-                  <option value="Logistics" className="bg-[#0c121e]">Logistics</option>
+                  <option value="All" className="bg-white text-slate-900">All Categories</option>
+                  <option value="Technology" className="bg-white text-slate-900">Technology</option>
+                  <option value="Design" className="bg-white text-slate-900">Design</option>
+                  <option value="Support" className="bg-white text-slate-900">Support & IT</option>
+                  <option value="Logistics" className="bg-white text-slate-900">Logistics</option>
                 </select>
               </div>
             </div>
 
             {searchTerm && (
-              <div className="flex items-center justify-between pt-2 border-t border-white/[0.08] text-xs">
-                <span className="text-slate-400">
-                  Filtering by: <strong className="text-white bg-white/[0.06] px-2 py-0.5 rounded-md border border-white/[0.08]">"{searchTerm}"</strong> ({filteredJobs.length} results)
+              <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                <span className="text-slate-500">
+                  Filtering by: <strong className="text-slate-900 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200">"{searchTerm}"</strong> ({filteredJobs.length} results)
                 </span>
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="text-indigo-400 hover:text-indigo-300 font-semibold underline text-xs"
+                  className="text-indigo-600 hover:text-indigo-800 font-semibold underline text-xs"
                 >
                   Clear search filter
                 </button>
@@ -220,10 +220,10 @@ export const JobsList = ({
 
       {/* Jobs Grid */}
       {filteredJobs.length === 0 ? (
-        <div className="text-center py-16 bg-slate-900/50 border border-slate-800 rounded-3xl p-8">
-          <Briefcase className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-          <h3 className="text-lg font-bold text-white mb-1">No Jobs Found</h3>
-          <p className="text-xs text-slate-400">Try adjusting your search criteria or switch to the live map.</p>
+        <div className="text-center py-16 bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
+          <Briefcase className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+          <h3 className="text-lg font-bold text-slate-900 mb-1">No Jobs Found</h3>
+          <p className="text-xs text-slate-500">Try adjusting your search criteria or switch to the live map.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-5">
@@ -231,40 +231,40 @@ export const JobsList = ({
             <div
               key={job.id}
               onClick={() => onSelectJob(job)}
-              className="group bg-[#090d16]/85 hover:bg-[#0c121e]/95 backdrop-blur-2xl border border-white/[0.08] hover:border-white/[0.18] rounded-2xl p-5 shadow-2xl hover:shadow-[0_15px_30px_rgba(99,102,241,0.15)] transition-all cursor-pointer flex flex-col justify-between"
+              className="group bg-white/95 hover:bg-white backdrop-blur-2xl border border-slate-200/90 hover:border-indigo-300 rounded-2xl p-5 shadow-sm hover:shadow-xl transition-all cursor-pointer flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-start justify-between gap-3 mb-2.5">
-                  <span className="px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                  <span className="px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200">
                     {job.jobType}
                   </span>
                   {job.urgent && (
-                    <span className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-md">
-                      <Flame className="w-3 h-3" /> Urgent
+                    <span className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-md">
+                      <Flame className="w-3 h-3 text-amber-500" /> Urgent
                     </span>
                   )}
                 </div>
 
-                <h3 className="font-bold text-base text-white group-hover:text-indigo-400 transition-colors line-clamp-1">
+                <h3 className="font-bold text-base text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">
                   {job.title}
                 </h3>
-                <p className="text-xs text-slate-400 font-medium mt-0.5">{job.company}</p>
+                <p className="text-xs text-slate-600 font-medium mt-0.5">{job.company}</p>
 
-                <div className="mt-3 flex items-center gap-1.5 text-xs text-emerald-400 font-bold">
+                <div className="mt-3 flex items-center gap-1.5 text-xs text-emerald-700 font-bold">
                   <span>{job.salary}</span>
                 </div>
 
-                <div className="mt-2 flex items-center gap-1 text-[11px] text-slate-400">
-                  <MapPin className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
+                <div className="mt-2 flex items-center gap-1 text-[11px] text-slate-500">
+                  <MapPin className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                   <span className="truncate">{job.address}</span>
                   {job.distanceKm && (
-                    <span className="ml-auto text-[10px] font-bold text-indigo-400 bg-indigo-950/60 px-1.5 py-0.5 rounded border border-indigo-500/30">
+                    <span className="ml-auto text-[10px] font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200">
                       {job.distanceKm} km
                     </span>
                   )}
                 </div>
 
-                <p className="mt-3 text-xs text-slate-300 line-clamp-2 leading-relaxed">
+                <p className="mt-3 text-xs text-slate-600 line-clamp-2 leading-relaxed">
                   {job.description}
                 </p>
 
@@ -273,13 +273,13 @@ export const JobsList = ({
                     {job.skills.slice(0, 3).map((s, idx) => (
                       <span
                         key={idx}
-                        className="px-2 py-0.5 text-[10px] font-medium bg-black/40 text-slate-300 rounded border border-white/[0.06]"
+                        className="px-2 py-0.5 text-[10px] font-medium bg-slate-50 text-slate-700 rounded border border-slate-200"
                       >
                         {s}
                       </span>
                     ))}
                     {job.skills.length > 3 && (
-                      <span className="px-1.5 py-0.5 text-[10px] text-slate-500">
+                      <span className="px-1.5 py-0.5 text-[10px] text-slate-400">
                         +{job.skills.length - 3}
                       </span>
                     )}
@@ -287,11 +287,11 @@ export const JobsList = ({
                 )}
               </div>
 
-              <div className="mt-5 pt-3 border-t border-white/[0.08] flex items-center justify-between text-xs">
-                <span className="flex items-center gap-1 text-emerald-400 font-extrabold text-[11px] bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/20">
-                  <Zap className="w-3 h-3 fill-emerald-400 text-emerald-400" /> Easy Apply
+              <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="flex items-center gap-1 text-emerald-700 font-extrabold text-[11px] bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
+                  <Zap className="w-3 h-3 fill-emerald-600 text-emerald-600" /> Easy Apply
                 </span>
-                <span className="text-slate-400 font-semibold group-hover:text-indigo-400 flex items-center gap-1 transition-colors">
+                <span className="text-slate-500 font-semibold group-hover:text-indigo-600 flex items-center gap-1 transition-colors">
                   Details <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </span>
               </div>

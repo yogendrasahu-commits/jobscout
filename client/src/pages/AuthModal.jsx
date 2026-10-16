@@ -291,28 +291,28 @@ export const AuthModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[950] flex items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-4 overflow-y-auto">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700/90 rounded-3xl p-5 sm:p-7 shadow-2xl animate-in zoom-in-95 duration-200 max-h-[92dvh] overflow-y-auto my-auto">
+    <div className="fixed inset-0 z-[950] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
+      <div className="relative w-full max-w-lg bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-7 shadow-2xl animate-in zoom-in-95 duration-200 max-h-[92dvh] overflow-y-auto my-auto text-slate-900">
         
         {/* Top-Left Back / Close Button */}
         {mode === 'register' ? (
           <button
             type="button"
             onClick={() => { setMode('login'); setError(''); setSuccessMsg(''); }}
-            className="absolute top-4 left-4 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold border border-slate-700/80 transition-all shadow-md active:scale-95"
+            className="absolute top-4 left-4 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 text-xs font-bold border border-slate-200 transition-all shadow-sm active:scale-95"
             title="Go back to Sign In"
           >
-            <ArrowLeft className="w-3.5 h-3.5 text-indigo-400" />
+            <ArrowLeft className="w-3.5 h-3.5 text-indigo-600" />
             <span>Back (लॉगिन)</span>
           </button>
         ) : (
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-4 left-4 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold border border-slate-700/80 transition-all shadow-md active:scale-95"
+            className="absolute top-4 left-4 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 text-xs font-bold border border-slate-200 transition-all shadow-sm active:scale-95"
             title="Close dialog"
           >
-            <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
+            <ArrowLeft className="w-3.5 h-3.5 text-slate-500" />
             <span>Back / Close</span>
           </button>
         )}
@@ -321,7 +321,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-700/60 transition-all active:scale-95"
+          className="absolute top-4 right-4 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-500 hover:text-slate-800 border border-slate-200 transition-all active:scale-95 shadow-sm"
           title="Close dialog"
         >
           <span className="text-[11px] font-semibold hidden sm:inline">Close (बंद करें)</span>
@@ -330,13 +330,13 @@ export const AuthModal = ({ isOpen, onClose }) => {
 
         {/* Brand / Title Header */}
         <div className="text-center mb-4">
-          <div className="inline-flex items-center justify-center mb-2 shadow-lg shadow-indigo-950/50 rounded-2xl">
+          <div className="inline-flex items-center justify-center mb-2 shadow-sm rounded-2xl">
             <JobScoutLogo size={46} />
           </div>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
             {mode === 'login' ? 'JobScout Account Login' : 'Create Tailored Account'}
           </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5">
             {mode === 'login'
               ? 'Sign in via Mobile OTP or Password'
               : 'Sign up with distinct Employer or Job Seeker options'}
@@ -344,22 +344,22 @@ export const AuthModal = ({ isOpen, onClose }) => {
         </div>
 
         {/* Fast Demo Bar */}
-        <div className="p-2.5 bg-slate-950/80 rounded-2xl border border-slate-800 mb-4">
-          <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block text-center mb-1.5">
+        <div className="p-2.5 bg-slate-50 rounded-2xl border border-slate-200 mb-4">
+          <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider block text-center mb-1.5">
             ⚡ 1-Click Demo Login
           </span>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={() => handleDemo('emp')}
-              className="py-1.5 px-3 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 font-bold text-xs transition-colors"
+              className="py-1.5 px-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold text-xs transition-colors shadow-sm"
             >
               👔 Recruiter Demo
             </button>
             <button
               type="button"
               onClick={() => handleDemo('seeker')}
-              className="py-1.5 px-3 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 font-bold text-xs transition-colors"
+              className="py-1.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold text-xs transition-colors shadow-sm"
             >
               🔍 Seeker Demo
             </button>
@@ -367,7 +367,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
         </div>
 
         {/* Tab Toggle: Login vs Sign Up */}
-        <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800 mb-4">
+        <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 mb-4">
           <button
             type="button"
             onClick={() => { 
@@ -376,7 +376,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
               setSuccessMsg(''); 
             }}
             className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              mode === 'login' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
+              mode === 'login' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'
             }`}
           >
             Sign In (लॉगिन)
@@ -389,7 +389,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
               setSuccessMsg(''); 
             }}
             className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              mode === 'register' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
+              mode === 'register' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'
             }`}
           >
             Sign Up (नया खाता)
@@ -398,13 +398,13 @@ export const AuthModal = ({ isOpen, onClose }) => {
 
         {/* Alerts */}
         {error && (
-          <div className="mb-3.5 p-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs text-center font-medium">
+          <div className="mb-3.5 p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs text-center font-medium">
             {error}
           </div>
         )}
 
         {successMsg && (
-          <div className="mb-3.5 p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs text-center font-medium">
+          <div className="mb-3.5 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs text-center font-medium">
             {successMsg}
           </div>
         )}
@@ -420,20 +420,20 @@ export const AuthModal = ({ isOpen, onClose }) => {
                 onClick={() => { setLoginMethod('otp'); setError(''); }}
                 className={`pb-1 border-b-2 transition-all ${
                   loginMethod === 'otp'
-                    ? 'border-indigo-500 text-white font-bold'
-                    : 'border-transparent text-slate-400 hover:text-slate-200'
+                    ? 'border-indigo-600 text-slate-900 font-bold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700'
                 }`}
               >
                 📱 Login with OTP
               </button>
-              <span className="text-slate-600">•</span>
+              <span className="text-slate-300">•</span>
               <button
                 type="button"
                 onClick={() => { setLoginMethod('password'); setError(''); }}
                 className={`pb-1 border-b-2 transition-all ${
                   loginMethod === 'password'
-                    ? 'border-indigo-500 text-white font-bold'
-                    : 'border-transparent text-slate-400 hover:text-slate-200'
+                    ? 'border-indigo-600 text-slate-900 font-bold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700'
                 }`}
               >
                 🔑 Login with Password
@@ -443,11 +443,11 @@ export const AuthModal = ({ isOpen, onClose }) => {
             {loginMethod === 'otp' ? (
               <form onSubmit={handleLoginOtp} className="space-y-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
                     Mobile Number
                   </label>
                   <div className="flex gap-2">
-                    <div className="flex items-center bg-slate-950 border border-slate-700/80 rounded-xl px-3 text-xs text-slate-300 font-bold select-none">
+                    <div className="flex items-center bg-slate-100 border border-slate-200 rounded-xl px-3 text-xs text-slate-700 font-bold select-none">
                       🇮🇳 +91
                     </div>
                     <input
@@ -456,13 +456,13 @@ export const AuthModal = ({ isOpen, onClose }) => {
                       placeholder="98765 43210"
                       value={phone}
                       onChange={(e) => setPhone(cleanNumber(e.target.value))}
-                      className="flex-1 bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                      className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500"
                     />
                     <button
                       type="button"
                       disabled={loading || phone.length !== 10 || timer > 0}
                       onClick={() => handleSendOtp('login')}
-                      className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-indigo-400 font-bold text-xs border border-slate-700 whitespace-nowrap"
+                      className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-indigo-700 font-bold text-xs border border-slate-200 whitespace-nowrap shadow-sm"
                     >
                       {timer > 0 ? `${timer}s` : otpSent ? 'Resend' : 'Get OTP'}
                     </button>
@@ -470,29 +470,29 @@ export const AuthModal = ({ isOpen, onClose }) => {
 
                   {/* Login Phone Feedback */}
                   {phoneCheck?.exists && (
-                    <div className="mt-1.5 p-2 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-center justify-between text-xs text-emerald-300 animate-in fade-in">
+                    <div className="mt-1.5 p-2 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between text-xs text-emerald-800 animate-in fade-in">
                       <div className="flex items-center gap-1.5 truncate">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
                         <span className="truncate">
-                          खाता मिला: <strong className="text-white">{phoneCheck.name}</strong> (
+                          खाता मिला: <strong className="text-slate-900">{phoneCheck.name}</strong> (
                           {phoneCheck.role === 'emp' ? '👔 Employer' : '🔍 Job Seeker'})
                         </span>
                       </div>
-                      <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-md font-bold uppercase tracking-wider flex-shrink-0">
+                      <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md font-bold uppercase tracking-wider flex-shrink-0 border border-emerald-200">
                         Registered
                       </span>
                     </div>
                   )}
 
                   {phoneCheck && !phoneCheck.exists && !phoneCheck.checking && phone.length === 10 && (
-                    <div className="mt-1.5 p-2 bg-blue-500/10 border border-blue-500/30 rounded-xl flex items-center justify-between text-xs text-blue-300 animate-in fade-in">
+                    <div className="mt-1.5 p-2 bg-sky-50 border border-sky-200 rounded-xl flex items-center justify-between text-xs text-sky-800 animate-in fade-in">
                       <span className="truncate">
                         ℹ️ यह नंबर रजिस्टर्ड नहीं है।
                       </span>
                       <button
                         type="button"
                         onClick={() => { setMode('register'); setError(''); }}
-                        className="text-[10px] bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-0.5 rounded-md font-bold transition-colors whitespace-nowrap ml-2"
+                        className="text-[10px] bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-0.5 rounded-md font-bold transition-colors whitespace-nowrap ml-2 shadow-sm"
                       >
                         नया खाता बनाएं (Sign Up)
                       </button>
@@ -505,20 +505,20 @@ export const AuthModal = ({ isOpen, onClose }) => {
                     {simulatedOtp && (
                       <div
                         onClick={() => setOtp(simulatedOtp)}
-                        className="cursor-pointer p-2 bg-indigo-500/10 border border-indigo-500/30 rounded-xl flex items-center justify-between text-xs text-indigo-300 hover:bg-indigo-500/20 transition-colors"
+                        className="cursor-pointer p-2 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-between text-xs text-indigo-700 hover:bg-indigo-100 transition-colors shadow-sm"
                       >
                         <span className="flex items-center gap-1.5">
-                          <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-                          Demo OTP: <strong className="text-white tracking-widest">{simulatedOtp}</strong>
+                          <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                          Demo OTP: <strong className="text-slate-900 tracking-widest">{simulatedOtp}</strong>
                         </span>
-                        <span className="text-[10px] bg-indigo-600/30 px-2 py-0.5 rounded text-white font-bold">
+                        <span className="text-[10px] bg-indigo-600 px-2 py-0.5 rounded text-white font-bold shadow-sm">
                           Click to Fill
                         </span>
                       </div>
                     )}
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1">
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
                         Enter 6-Digit OTP
                       </label>
                       <input
@@ -527,7 +527,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
                         placeholder="••••••"
                         value={otp}
                         onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
-                        className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2 text-sm text-center text-white tracking-widest placeholder-slate-600 focus:outline-none focus:border-indigo-500 font-mono"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-center text-slate-900 tracking-widest placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 font-mono"
                       />
                     </div>
                   </div>
@@ -537,7 +537,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
                   <button
                     type="button"
                     onClick={onClose}
-                    className="py-2.5 px-3.5 sm:px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs border border-slate-700/80 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95"
+                    className="py-2.5 px-3.5 sm:px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95"
                   >
                     <X className="w-3.5 h-3.5" />
                     <span>Cancel (रद्द करें)</span>
@@ -545,7 +545,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 active:scale-95"
+                    className="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 active:scale-95"
                   >
                     {loading ? 'Verifying...' : otpSent ? 'Verify OTP & Enter' : 'Send OTP to Login'}
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -555,11 +555,11 @@ export const AuthModal = ({ isOpen, onClose }) => {
             ) : (
               <form onSubmit={handleLoginPassword} className="space-y-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
                     Mobile Number
                   </label>
                   <div className="flex gap-2">
-                    <div className="flex items-center bg-slate-950 border border-slate-700/80 rounded-xl px-3 text-xs text-slate-300 font-bold select-none">
+                    <div className="flex items-center bg-slate-100 border border-slate-200 rounded-xl px-3 text-xs text-slate-700 font-bold select-none">
                       🇮🇳 +91
                     </div>
                     <input
@@ -568,35 +568,35 @@ export const AuthModal = ({ isOpen, onClose }) => {
                       placeholder="98765 43210"
                       value={phone}
                       onChange={(e) => setPhone(cleanNumber(e.target.value))}
-                      className="flex-1 bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                      className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500"
                     />
                   </div>
 
                   {/* Password Form Phone Feedback */}
                   {phoneCheck?.exists && (
-                    <div className="mt-1.5 p-2 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-center justify-between text-xs text-emerald-300 animate-in fade-in">
+                    <div className="mt-1.5 p-2 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between text-xs text-emerald-800 animate-in fade-in">
                       <div className="flex items-center gap-1.5 truncate">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
                         <span className="truncate">
-                          खाता मिला: <strong className="text-white">{phoneCheck.name}</strong> (
+                          खाता मिला: <strong className="text-slate-900">{phoneCheck.name}</strong> (
                           {phoneCheck.role === 'emp' ? '👔 Employer' : '🔍 Job Seeker'})
                         </span>
                       </div>
-                      <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-md font-bold uppercase tracking-wider flex-shrink-0">
+                      <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md font-bold uppercase tracking-wider flex-shrink-0 border border-emerald-200">
                         Registered
                       </span>
                     </div>
                   )}
 
                   {phoneCheck && !phoneCheck.exists && !phoneCheck.checking && phone.length === 10 && (
-                    <div className="mt-1.5 p-2 bg-blue-500/10 border border-blue-500/30 rounded-xl flex items-center justify-between text-xs text-blue-300 animate-in fade-in">
+                    <div className="mt-1.5 p-2 bg-sky-50 border border-sky-200 rounded-xl flex items-center justify-between text-xs text-sky-800 animate-in fade-in">
                       <span className="truncate">
                         ℹ️ यह नंबर रजिस्टर्ड नहीं है।
                       </span>
                       <button
                         type="button"
                         onClick={() => { setMode('register'); setError(''); }}
-                        className="text-[10px] bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-0.5 rounded-md font-bold transition-colors whitespace-nowrap ml-2"
+                        className="text-[10px] bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-0.5 rounded-md font-bold transition-colors whitespace-nowrap ml-2 shadow-sm"
                       >
                         नया खाता बनाएं (Sign Up)
                       </button>
@@ -605,18 +605,18 @@ export const AuthModal = ({ isOpen, onClose }) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
                     Password
                   </label>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                     <input
                       type="password"
                       required
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500"
                     />
                   </div>
                 </div>
@@ -625,7 +625,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
                   <button
                     type="button"
                     onClick={onClose}
-                    className="py-2.5 px-3.5 sm:px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs border border-slate-700/80 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95"
+                    className="py-2.5 px-3.5 sm:px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95"
                   >
                     <X className="w-3.5 h-3.5" />
                     <span>Cancel (रद्द करें)</span>
@@ -633,7 +633,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 active:scale-95"
+                    className="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 active:scale-95"
                   >
                     {loading ? 'Signing In...' : 'Sign In with Password'}
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -652,7 +652,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
             
             {/* 1. Distinct Role Selector */}
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5">
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
                 Select Profile Type (प्रोफाइल प्रकार चुनें):
               </label>
               <div className="grid grid-cols-2 gap-2.5">
@@ -661,22 +661,22 @@ export const AuthModal = ({ isOpen, onClose }) => {
                 <button
                   type="button"
                   onClick={() => setRole('seeker')}
-                  className={`p-3 rounded-2xl border text-left transition-all ${
+                  className={`p-3 rounded-2xl border text-left transition-all shadow-sm ${
                     role === 'seeker'
-                      ? 'bg-emerald-950/40 border-emerald-500 shadow-md shadow-emerald-500/10'
-                      : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700'
+                      ? 'bg-emerald-50/80 border-2 border-emerald-600'
+                      : 'bg-slate-50/80 border-slate-200 text-slate-600 hover:border-slate-300'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-base">🔍</span>
                     {role === 'seeker' && (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                     )}
                   </div>
-                  <div className={`text-xs font-bold ${role === 'seeker' ? 'text-white' : 'text-slate-300'}`}>
+                  <div className={`text-xs font-bold ${role === 'seeker' ? 'text-slate-900' : 'text-slate-700'}`}>
                     Job Seeker (उम्मीदवार)
                   </div>
-                  <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
+                  <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">
                     Nearby jobs dhoondhein aur spot-hiring ke liye apply karein
                   </p>
                 </button>
@@ -685,22 +685,22 @@ export const AuthModal = ({ isOpen, onClose }) => {
                 <button
                   type="button"
                   onClick={() => setRole('emp')}
-                  className={`p-3 rounded-2xl border text-left transition-all ${
+                  className={`p-3 rounded-2xl border text-left transition-all shadow-sm ${
                     role === 'emp'
-                      ? 'bg-indigo-950/40 border-indigo-500 shadow-md shadow-indigo-500/10'
-                      : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700'
+                      ? 'bg-indigo-50/80 border-2 border-indigo-600'
+                      : 'bg-slate-50/80 border-slate-200 text-slate-600 hover:border-slate-300'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-base">👔</span>
                     {role === 'emp' && (
-                      <CheckCircle2 className="w-4 h-4 text-indigo-400" />
+                      <CheckCircle2 className="w-4 h-4 text-indigo-600" />
                     )}
                   </div>
-                  <div className={`text-xs font-bold ${role === 'emp' ? 'text-white' : 'text-slate-300'}`}>
+                  <div className={`text-xs font-bold ${role === 'emp' ? 'text-slate-900' : 'text-slate-700'}`}>
                     Employer (नियोक्ता/कंपनी)
                   </div>
-                  <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
+                  <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">
                     Nayi opening post karein aur seekers ko call karein
                   </p>
                 </button>
@@ -710,11 +710,11 @@ export const AuthModal = ({ isOpen, onClose }) => {
 
             {/* 2. Mobile Number & Verification */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-bold text-slate-700 mb-1">
                 Mobile Number *
               </label>
               <div className="flex gap-2">
-                <div className="flex items-center bg-slate-950 border border-slate-700/80 rounded-xl px-2.5 text-xs text-slate-300 font-bold select-none">
+                <div className="flex items-center bg-slate-100 border border-slate-200 rounded-xl px-2.5 text-xs text-slate-700 font-bold select-none">
                   +91
                 </div>
                 <input
@@ -723,13 +723,13 @@ export const AuthModal = ({ isOpen, onClose }) => {
                   placeholder="98765 43210"
                   value={phone}
                   onChange={(e) => setPhone(cleanNumber(e.target.value))}
-                  className="flex-1 bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                  className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500"
                 />
                 <button
                   type="button"
                   disabled={loading || phone.length !== 10 || timer > 0 || phoneCheck?.exists}
                   onClick={() => handleSendOtp('register')}
-                  className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-indigo-400 font-bold text-xs border border-slate-700 whitespace-nowrap"
+                  className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-indigo-700 font-bold text-xs border border-slate-200 whitespace-nowrap shadow-sm"
                 >
                   {timer > 0 ? `${timer}s` : otpSent ? 'Resend' : 'Send OTP'}
                 </button>
@@ -737,21 +737,21 @@ export const AuthModal = ({ isOpen, onClose }) => {
 
               {/* Already Registered Warning & 1-Click Login Action */}
               {phoneCheck?.exists && (
-                <div className="mt-2.5 p-3 bg-amber-500/15 border border-amber-500/40 rounded-2xl text-xs text-amber-200 animate-in fade-in space-y-2">
+                <div className="mt-2.5 p-3 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-900 animate-in fade-in space-y-2">
                   <div className="flex items-start gap-2">
                     <span className="text-base flex-shrink-0">⚠️</span>
                     <div className="flex-1">
-                      <div className="font-bold text-amber-100">
+                      <div className="font-bold text-amber-900">
                         यह नंबर पहले से रजिस्टर्ड है! (Already Registered)
                       </div>
-                      <p className="text-[11px] text-amber-300/90 mt-0.5 leading-snug">
-                        यह मोबाइल नंबर <strong className="text-white">+91 {phone}</strong> पहले से ही{' '}
-                        <span className="font-bold underline text-white">
+                      <p className="text-[11px] text-amber-800 mt-0.5 leading-snug">
+                        यह मोबाइल नंबर <strong className="text-slate-900">+91 {phone}</strong> पहले से ही{' '}
+                        <span className="font-bold underline text-indigo-700">
                           {phoneCheck.role === 'emp' ? '👔 Employer (कंपनी/नियोक्ता)' : '🔍 Job Seeker (उम्मीदवार)'}
                         </span>{' '}
                         के रूप में <strong>"{phoneCheck.name}"</strong> के नाम पर पंजीकृत है।
                       </p>
-                      <p className="text-[10px] text-amber-400/90 mt-1">
+                      <p className="text-[10px] text-amber-700 mt-1">
                         🔒 नियम: 1 मोबाइल नंबर = केवल 1 खाता (Single Account Rule).
                       </p>
                     </div>
@@ -760,7 +760,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
                     <button
                       type="button"
                       onClick={handleSwitchToLogin}
-                      className="flex-1 py-1.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs transition-all flex items-center justify-center gap-1 shadow-md shadow-amber-500/20"
+                      className="flex-1 py-1.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-white font-extrabold text-xs transition-all flex items-center justify-center gap-1 shadow-sm"
                     >
                       <span>👉 इसी नंबर से लॉगिन करें (Login Now)</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -768,7 +768,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
                     <button
                       type="button"
                       onClick={() => { setPhone(''); setPhoneCheck(null); }}
-                      className="py-1.5 px-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold"
+                      className="py-1.5 px-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200"
                     >
                       दूसरा नंबर डालें
                     </button>
@@ -783,10 +783,10 @@ export const AuthModal = ({ isOpen, onClose }) => {
                 {simulatedOtp && (
                   <div
                     onClick={() => setOtp(simulatedOtp)}
-                    className="cursor-pointer mb-2 p-1.5 bg-indigo-500/10 border border-indigo-500/30 rounded-lg flex items-center justify-between text-[11px] text-indigo-300"
+                    className="cursor-pointer mb-2 p-1.5 bg-indigo-50 border border-indigo-200 rounded-lg flex items-center justify-between text-[11px] text-indigo-700 shadow-sm"
                   >
-                    <span>Demo OTP: <strong className="text-white">{simulatedOtp}</strong></span>
-                    <span className="text-[9px] bg-indigo-600/30 px-1.5 py-0.5 rounded text-white font-bold">Auto-Fill</span>
+                    <span>Demo OTP: <strong className="text-slate-900">{simulatedOtp}</strong></span>
+                    <span className="text-[9px] bg-indigo-600 px-1.5 py-0.5 rounded text-white font-bold">Auto-Fill</span>
                   </div>
                 )}
                 <div className="flex gap-2">
@@ -796,10 +796,10 @@ export const AuthModal = ({ isOpen, onClose }) => {
                     placeholder="Enter 6-digit OTP *"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
-                    className="flex-1 bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white tracking-wider focus:outline-none focus:border-indigo-500 font-mono"
+                    className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 tracking-wider focus:outline-none focus:bg-white focus:border-indigo-500 font-mono"
                   />
-                  <div className="flex items-center text-xs text-emerald-400 font-semibold px-2">
-                    <CheckCircle2 className="w-4 h-4 mr-1 text-emerald-400" /> Ready
+                  <div className="flex items-center text-xs text-emerald-600 font-semibold px-2">
+                    <CheckCircle2 className="w-4 h-4 mr-1 text-emerald-600" /> Ready
                   </div>
                 </div>
               </div>
@@ -807,18 +807,18 @@ export const AuthModal = ({ isOpen, onClose }) => {
 
             {/* Basic Info: Full Name */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-bold text-slate-700 mb-1">
                 {role === 'emp' ? 'Contact Person / HR Name *' : 'Your Full Name *'}
               </label>
               <div className="relative">
-                <User className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                <User className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                 <input
                   type="text"
                   required
                   placeholder={role === 'emp' ? 'e.g. Vikram Singhania' : 'e.g. Rahul Sharma'}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500"
                 />
               </div>
             </div>
@@ -827,14 +827,14 @@ export const AuthModal = ({ isOpen, onClose }) => {
             {/* CASE A: DISTINCT EMPLOYER PROFILE OPTIONS                 */}
             {/* ========================================================= */}
             {role === 'emp' && (
-              <div className="p-3 bg-indigo-950/20 border border-indigo-500/30 rounded-2xl space-y-2.5">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-300">
-                  <Building2 className="w-4 h-4 text-indigo-400" />
+              <div className="p-3 bg-indigo-50/50 border border-indigo-200 rounded-2xl space-y-2.5 shadow-sm">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-700">
+                  <Building2 className="w-4 h-4 text-indigo-600" />
                   <span>Company & Hiring Profile (कंपनी विवरण)</span>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
                     Company / Firm Name *
                   </label>
                   <input
@@ -843,19 +843,19 @@ export const AuthModal = ({ isOpen, onClose }) => {
                     placeholder="e.g. TechPulse Solutions Pvt Ltd"
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
                       Industry Sector
                     </label>
                     <select
                       value={industry}
                       onChange={(e) => setIndustry(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                      className="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
                     >
                       <option value="Technology & IT">Technology & IT</option>
                       <option value="Logistics & Delivery">Logistics & Delivery</option>
@@ -867,13 +867,13 @@ export const AuthModal = ({ isOpen, onClose }) => {
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
                       Team Size
                     </label>
                     <select
                       value={companySize}
                       onChange={(e) => setCompanySize(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                      className="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
                     >
                       <option value="1-10 Employees">1-10 Employees</option>
                       <option value="11-50 Employees">11-50 Employees</option>
@@ -885,13 +885,13 @@ export const AuthModal = ({ isOpen, onClose }) => {
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
                       Hiring Model
                     </label>
                     <select
                       value={hiringType}
                       onChange={(e) => setHiringType(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                      className="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
                     >
                       <option value="Immediate Spot Hiring">Immediate Spot Hiring</option>
                       <option value="Full-time Permanent">Full-time Permanent</option>
@@ -900,7 +900,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
                       Office Area
                     </label>
                     <input
@@ -908,7 +908,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
                       placeholder="e.g. BKC, Mumbai"
                       value={officeAddress}
                       onChange={(e) => setOfficeAddress(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-2.5 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                      className="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                 </div>
@@ -919,14 +919,14 @@ export const AuthModal = ({ isOpen, onClose }) => {
             {/* CASE B: DISTINCT JOB SEEKER PROFILE OPTIONS               */}
             {/* ========================================================= */}
             {role === 'seeker' && (
-              <div className="p-3 bg-emerald-950/20 border border-emerald-500/30 rounded-2xl space-y-2.5">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-300">
-                  <Briefcase className="w-4 h-4 text-emerald-400" />
+              <div className="p-3 bg-emerald-50/50 border border-emerald-200 rounded-2xl space-y-2.5 shadow-sm">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700">
+                  <Briefcase className="w-4 h-4 text-emerald-600" />
                   <span>Job Seeker Candidate Profile (कार्य विवरण)</span>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
                     Primary Profession / Job Role *
                   </label>
                   <input
@@ -935,19 +935,19 @@ export const AuthModal = ({ isOpen, onClose }) => {
                     placeholder="e.g. React Developer, Delivery Executive, Graphic Designer"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
                       Experience Level
                     </label>
                     <select
                       value={experience}
                       onChange={(e) => setExperience(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500"
+                      className="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-emerald-500"
                     >
                       <option value="Fresher / Entry Level">Fresher / 0-1 yr</option>
                       <option value="1 - 3 Years">1 - 3 Years</option>
@@ -957,7 +957,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
                       Expected Salary
                     </label>
                     <input
@@ -965,13 +965,13 @@ export const AuthModal = ({ isOpen, onClose }) => {
                       placeholder="e.g. ₹25,000/mo or ₹1,500/day"
                       value={expectedSalary}
                       onChange={(e) => setExpectedSalary(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-2.5 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                      className="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
                     Top Skills (comma separated)
                   </label>
                   <input
@@ -979,7 +979,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
                     placeholder="e.g. React, Node.js, Leaflet, Driving License"
                     value={skills}
                     onChange={(e) => setSkills(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500"
                   />
                 </div>
 
@@ -990,15 +990,15 @@ export const AuthModal = ({ isOpen, onClose }) => {
                       id="hasBike"
                       checked={hasVehicle}
                       onChange={(e) => setHasVehicle(e.target.checked)}
-                      className="w-4 h-4 rounded bg-slate-950 border-slate-700 text-emerald-600 focus:ring-0"
+                      className="w-4 h-4 rounded bg-white border-slate-300 text-emerald-600 focus:ring-0"
                     />
-                    <label htmlFor="hasBike" className="text-[11px] text-slate-300 cursor-pointer flex items-center gap-1">
-                      <Bike className="w-3.5 h-3.5 text-emerald-400" />
+                    <label htmlFor="hasBike" className="text-[11px] text-slate-700 cursor-pointer flex items-center gap-1">
+                      <Bike className="w-3.5 h-3.5 text-emerald-600" />
                       <span>Has Bike / Two Wheeler (Field/Delivery)</span>
                     </label>
                   </div>
 
-                  <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/20">
+                  <span className="text-[10px] text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200">
                     Immediate
                   </span>
                 </div>
@@ -1007,18 +1007,18 @@ export const AuthModal = ({ isOpen, onClose }) => {
 
             {/* Create Password */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-bold text-slate-700 mb-1">
                 Create Password *
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                 <input
                   type="password"
                   required
                   placeholder="Set your account password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500"
                 />
               </div>
             </div>
@@ -1028,16 +1028,16 @@ export const AuthModal = ({ isOpen, onClose }) => {
               <button
                 type="button"
                 onClick={() => { setMode('login'); setError(''); setSuccessMsg(''); }}
-                className="py-2.5 px-3 sm:px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs border border-slate-700/80 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95"
+                className="py-2.5 px-3 sm:px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95 shadow-sm"
                 title="Go back to Sign In"
               >
-                <ArrowLeft className="w-3.5 h-3.5 text-indigo-400" />
+                <ArrowLeft className="w-3.5 h-3.5 text-indigo-600" />
                 <span>Back (लॉगिन)</span>
               </button>
               <button
                 type="button"
                 onClick={onClose}
-                className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs border border-slate-700/80 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95"
+                className="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95 shadow-sm"
                 title="Cancel & close modal"
               >
                 <X className="w-3.5 h-3.5" />
@@ -1046,10 +1046,10 @@ export const AuthModal = ({ isOpen, onClose }) => {
               <button
                 type="submit"
                 disabled={loading || phoneCheck?.exists}
-                className={`flex-1 py-2.5 px-3.5 sm:px-4 rounded-xl text-white font-bold text-xs shadow-lg transition-all active:scale-95 flex items-center justify-center gap-1.5 ${
+                className={`flex-1 py-2.5 px-3.5 sm:px-4 rounded-xl text-white font-bold text-xs shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5 ${
                   role === 'emp'
-                    ? 'bg-gradient-to-r from-indigo-500 to-indigo-700 hover:from-indigo-600 hover:to-indigo-800 shadow-indigo-600/30'
-                    : 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-emerald-500/25'
+                    ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 shadow-indigo-600/20'
+                    : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-500/20'
                 }`}
               >
                 <span className="truncate">

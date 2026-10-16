@@ -216,21 +216,23 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
     return (
       <button
         onClick={() => setIsChatDrawerOpen(true)}
-        className="hidden md:flex fixed bottom-5 right-6 z-30 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white rounded-2xl px-3.5 py-2.5 shadow-2xl items-center gap-2 border border-indigo-400/30 active:scale-95 transition-all select-none group"
+        className="hidden md:flex fixed bottom-5 right-6 z-30 bg-white/95 hover:bg-white text-slate-800 hover:text-slate-950 rounded-2xl px-4 py-2.5 shadow-xl items-center gap-2.5 border border-slate-200/90 active:scale-95 transition-all select-none group backdrop-blur-md"
         title="Open Chat List (चैट लिस्ट)"
       >
         <div className="relative">
-          <MessageSquare className="w-5 h-5 text-white" />
+          <div className="w-7 h-7 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+            <MessageSquare className="w-4 h-4" />
+          </div>
           {totalUnread > 0 ? (
-            <span className="absolute -top-1.5 -right-2 bg-rose-500 text-[10px] font-black text-white px-1.5 py-0.2 rounded-full border border-slate-900 animate-pulse">
+            <span className="absolute -top-1.5 -right-2 bg-rose-500 text-[10px] font-black text-white px-1.5 py-0.2 rounded-full border border-white animate-pulse">
               {totalUnread}
             </span>
           ) : (
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-400 rounded-full" />
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-500 rounded-full" />
           )}
         </div>
         <span className="text-xs font-bold">
-          Messaging (चैट लिस्ट)
+          Messaging (चैट)
         </span>
       </button>
     );
@@ -243,22 +245,24 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
     return (
       <div 
         onClick={() => setIsMinimized(false)}
-        className="hidden md:flex fixed bottom-4 right-6 z-40 bg-slate-900 border border-indigo-500/40 rounded-2xl p-3 shadow-2xl items-center gap-3 cursor-pointer hover:bg-slate-850 hover:border-indigo-400 transition-all select-none animate-in fade-in"
+        className="hidden md:flex fixed bottom-4 right-6 z-40 bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-2xl p-3 shadow-xl items-center gap-3 cursor-pointer hover:bg-slate-50 transition-all select-none animate-in fade-in text-slate-800"
       >
         <div className="relative">
-          <MessageSquare className="w-5 h-5 text-indigo-400" />
+          <div className="w-7 h-7 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
+            <MessageSquare className="w-4 h-4" />
+          </div>
           {totalUnread > 0 && (
             <span className="absolute -top-1.5 -right-2 bg-rose-500 text-[10px] font-extrabold text-white px-1.5 rounded-full animate-pulse">
               {totalUnread}
             </span>
           )}
         </div>
-        <div className="text-xs font-bold text-white">
+        <div className="text-xs font-bold text-slate-900">
           {activeChatUser?.name || 'Messaging (चैट)'}
         </div>
         <button 
           onClick={(e) => { e.stopPropagation(); setIsChatDrawerOpen(false); }}
-          className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white"
+          className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700"
         >
           <X className="w-3.5 h-3.5" />
         </button>
@@ -270,7 +274,7 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
   // CASE 3: FULL CHAT DRAWER OPEN
   // ==========================================================
   return (
-    <div className="fixed inset-0 sm:inset-auto sm:bottom-4 sm:right-6 z-[950] w-full sm:w-[410px] h-full sm:h-[560px] max-h-[100dvh] sm:max-h-[90vh] bg-slate-900 border-0 sm:border border-slate-700/80 sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-200">
+    <div className="fixed inset-0 sm:inset-auto sm:bottom-4 sm:right-6 z-[950] w-full sm:w-[410px] h-full sm:h-[560px] max-h-[100dvh] sm:max-h-[90vh] bg-white border-0 sm:border border-slate-200/90 sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-200 text-slate-900">
       
       {/* ========================================================== */}
       {/* VIEW A: 1-ON-1 CONVERSATION VIEW (when activeChatUser is set) */}
@@ -278,16 +282,16 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
       {activeChatUser ? (
         <>
           {/* Chat Header */}
-          <div className="p-3 bg-slate-800/95 border-b border-slate-700/80 flex items-center justify-between">
+          <div className="p-3 bg-white/95 border-b border-slate-200/80 flex items-center justify-between">
             <div className="flex items-center gap-2 min-w-0">
               {/* Back to Chat List */}
               <button
                 type="button"
                 onClick={() => setActiveChatUser(null)}
                 title="Back to Chat List (चैट लिस्ट पर लौटें)"
-                className="py-1 px-2 rounded-xl bg-slate-700/60 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors flex items-center gap-1 text-xs font-semibold"
+                className="py-1 px-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 transition-colors flex items-center gap-1 text-xs font-semibold border border-slate-200"
               >
-                <ArrowLeft className="w-4 h-4 text-indigo-400" />
+                <ArrowLeft className="w-4 h-4 text-indigo-600" />
                 <span>Back</span>
               </button>
 
@@ -296,17 +300,17 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
                 <img
                   src={activeChatUser.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(activeChatUser.name || 'User')}`}
                   alt="Avatar"
-                  className="w-9 h-9 rounded-full object-cover border border-slate-600 bg-slate-800"
+                  className="w-9 h-9 rounded-full object-cover border border-slate-200 bg-slate-100 shadow-sm"
                 />
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 border-2 border-slate-900 rounded-full" />
+                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full" />
               </div>
 
               {/* Contact Info */}
               <div className="min-w-0">
-                <h4 className="font-bold text-sm text-white truncate leading-tight">
+                <h4 className="font-bold text-sm text-slate-900 truncate leading-tight">
                   {activeChatUser.name || 'User'}
                 </h4>
-                <p className="text-[10px] text-slate-400 truncate">
+                <p className="text-[10px] text-slate-500 truncate">
                   {activeChatUser.companyName || activeChatUser.title || (activeChatUser.role === 'emp' ? 'Recruiter' : 'Job Seeker')}
                 </p>
               </div>
@@ -317,7 +321,7 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
               <button
                 onClick={() => startCall(activeChatUser, false)}
                 title="Start Voice Call"
-                className="p-2 rounded-xl bg-slate-700/60 hover:bg-emerald-600/30 text-emerald-400 hover:text-emerald-300 transition-colors"
+                className="p-2 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-slate-200 transition-colors"
               >
                 <Phone className="w-4 h-4" />
               </button>
@@ -325,7 +329,7 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
               <button
                 onClick={() => startCall(activeChatUser, true)}
                 title="Start Video Call"
-                className="p-2 rounded-xl bg-slate-700/60 hover:bg-indigo-600/30 text-indigo-400 hover:text-indigo-300 transition-colors"
+                className="p-2 rounded-xl bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-700 border border-slate-200 transition-colors"
               >
                 <Video className="w-4 h-4" />
               </button>
@@ -337,7 +341,7 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
                     onOpenFullPageChat();
                   }}
                   title="Open Full Page Chat (फुल पेज चैट)"
-                  className="p-2 rounded-xl bg-slate-700/60 hover:bg-indigo-600/30 text-indigo-300 hover:text-white transition-colors"
+                  className="p-2 rounded-xl bg-slate-100 hover:bg-indigo-50 text-indigo-600 hover:text-indigo-700 border border-slate-200 transition-colors"
                 >
                   <Maximize2 className="w-4 h-4" />
                 </button>
@@ -346,7 +350,7 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
               <button
                 onClick={() => setIsMinimized(true)}
                 title="Minimize"
-                className="p-2 rounded-xl hover:bg-slate-700 text-slate-400 hover:text-white transition-colors hidden sm:block"
+                className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors hidden sm:block"
               >
                 <Minimize2 className="w-4 h-4" />
               </button>
@@ -354,7 +358,7 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
               <button
                 onClick={() => { setActiveChatUser(null); setIsChatDrawerOpen(false); }}
                 title="Close"
-                className="p-2 rounded-xl hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
+                className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -362,18 +366,18 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-950/60">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/60">
             {loadingMessages ? (
               <div className="flex items-center justify-center h-full text-xs text-slate-500">
                 Loading messages...
               </div>
             ) : messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center text-slate-500 p-4">
-                <Briefcase className="w-10 h-10 mb-2 opacity-30 text-indigo-400" />
-                <h5 className="font-bold text-slate-300 text-xs mb-1">
+                <Briefcase className="w-10 h-10 mb-2 opacity-30 text-indigo-600" />
+                <h5 className="font-bold text-slate-800 text-xs mb-1">
                   Start Conversation with {activeChatUser.name || 'User'}
                 </h5>
-                <p className="text-[11px] max-w-[240px] text-slate-400">
+                <p className="text-[11px] max-w-[240px] text-slate-500">
                   Send a direct message or start a live WebRTC audio/video call.
                 </p>
 
@@ -387,7 +391,7 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
                     <button
                       key={idx}
                       onClick={() => setInputText(chip)}
-                      className="text-[10px] px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 hover:bg-indigo-600/30 hover:text-indigo-300 border border-slate-700 transition-colors"
+                      className="text-[10px] px-2.5 py-1 rounded-full bg-white text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 border border-slate-200 shadow-sm transition-colors"
                     >
                       {chip}
                     </button>
@@ -403,17 +407,17 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
                     className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
                   >
                     <div
-                      className={`max-w-[82%] rounded-2xl px-3.5 py-2 text-xs leading-relaxed shadow-sm break-words ${
+                      className={`max-w-[82%] rounded-2xl px-3.5 py-2 text-xs leading-relaxed break-words ${
                         isMe
-                          ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-br-xs'
-                          : 'bg-slate-800 text-slate-200 border border-slate-700/80 rounded-bl-xs'
+                          ? 'bg-indigo-600 text-white rounded-br-xs shadow-sm'
+                          : 'bg-white text-slate-800 border border-slate-200/90 rounded-bl-xs shadow-sm'
                       }`}
                     >
                       {m.message || m.content}
                     </div>
-                    <div className="flex items-center gap-1 mt-1 text-[10px] text-slate-500 px-1">
+                    <div className="flex items-center gap-1 mt-1 text-[10px] text-slate-400 px-1">
                       <span>{new Date(m.timestamp || m.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                      {isMe && <CheckCheck className="w-3 h-3 text-indigo-400" />}
+                      {isMe && <CheckCheck className="w-3 h-3 text-indigo-600" />}
                     </div>
                   </div>
                 );
@@ -423,13 +427,13 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
           </div>
 
           {/* Chat Input Bar */}
-          <form onSubmit={handleSend} className="p-2.5 bg-slate-900 border-t border-slate-800 flex items-center gap-2">
+          <form onSubmit={handleSend} className="p-2.5 bg-white border-t border-slate-200/80 flex items-center gap-2">
             <input
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder={`Message ${activeChatUser?.name ? activeChatUser.name.split(' ')[0] : 'User'}...`}
-              className="flex-1 bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 transition-colors"
             />
             <button
               type="submit"
@@ -446,15 +450,15 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
         /* ========================================================== */
         <>
           {/* List Header */}
-          <div className="p-3.5 bg-slate-800/95 border-b border-slate-700/80 flex items-center justify-between">
+          <div className="p-3.5 bg-white/95 border-b border-slate-200/80 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+              <div className="w-8 h-8 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
                 <MessageSquare className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="font-extrabold text-sm text-white flex items-center gap-1.5">
+                <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-1.5">
                   <span>Chat List</span>
-                  <span className="text-[10px] text-slate-400 font-normal">(चैट लिस्ट)</span>
+                  <span className="text-[10px] text-slate-500 font-normal">(चैट लिस्ट)</span>
                   {totalUnread > 0 && (
                     <span className="bg-rose-500 text-[10px] text-white px-1.5 rounded-full font-bold">
                       {totalUnread}
@@ -472,7 +476,7 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
                     onOpenFullPageChat();
                   }}
                   title="Open Full Page Messaging (फुल पेज चैट)"
-                  className="p-1.5 rounded-xl hover:bg-slate-700 text-indigo-300 hover:text-white transition-colors"
+                  className="p-1.5 rounded-xl hover:bg-slate-100 text-indigo-600 hover:text-indigo-700 transition-colors"
                 >
                   <Maximize2 className="w-4 h-4" />
                 </button>
@@ -481,7 +485,7 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
               <button
                 onClick={() => setIsMinimized(true)}
                 title="Minimize"
-                className="p-1.5 rounded-xl hover:bg-slate-700 text-slate-400 hover:text-white transition-colors hidden sm:block"
+                className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors hidden sm:block"
               >
                 <Minimize2 className="w-4 h-4" />
               </button>
@@ -490,7 +494,7 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
                 type="button"
                 onClick={() => setIsChatDrawerOpen(false)}
                 title="Close chat drawer (चैट बंद करें)"
-                className="py-1 px-2 rounded-xl hover:bg-slate-700 text-slate-400 hover:text-white transition-colors flex items-center gap-1 text-xs font-semibold"
+                className="py-1 px-2 rounded-xl hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-1 text-xs font-semibold"
               >
                 <span>Close</span>
                 <X className="w-4 h-4" />
@@ -499,7 +503,7 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
           </div>
 
           {/* Search Contacts & Threads */}
-          <div className="p-2.5 bg-slate-900 border-b border-slate-800">
+          <div className="p-2.5 bg-slate-50/80 border-b border-slate-200/80">
             <div className="relative">
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
               <input
@@ -507,18 +511,18 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
                 placeholder="Search messages or people..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/80 transition-all"
+                className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
               />
             </div>
 
             {/* Segmented Switcher: Conversations vs All Contacts */}
-            <div className="flex items-center gap-1 mt-2 p-1 bg-slate-950 rounded-xl border border-slate-800/80">
+            <div className="flex items-center gap-1 mt-2 p-1 bg-slate-100 rounded-xl border border-slate-200/80">
               <button
                 onClick={() => setActiveTab('threads')}
                 className={`flex-1 py-1 text-xs font-bold rounded-lg transition-all ${
                   activeTab === 'threads'
-                    ? 'bg-indigo-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
                 Conversations ({threads.length})
@@ -527,8 +531,8 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
                 onClick={() => setActiveTab('contacts')}
                 className={`flex-1 py-1 text-xs font-bold rounded-lg transition-all ${
                   activeTab === 'contacts'
-                    ? 'bg-indigo-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
                 All Users ({contacts.length})
@@ -537,25 +541,25 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
           </div>
 
           {/* Content Area */}
-          <div className="flex-1 overflow-y-auto divide-y divide-slate-800/80 bg-slate-950/40">
+          <div className="flex-1 overflow-y-auto divide-y divide-slate-100 bg-white">
             
             {/* TAB 1: CONVERSATIONS / ACTIVE THREADS */}
             {activeTab === 'threads' && (
               <>
                 {loadingThreads ? (
-                  <div className="p-6 text-center text-xs text-slate-500">
+                  <div className="p-6 text-center text-xs text-slate-400">
                     Loading conversations...
                   </div>
                 ) : filteredThreads.length === 0 ? (
-                  <div className="p-6 text-center text-slate-400">
-                    <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-30 text-indigo-400" />
-                    <p className="text-xs font-semibold text-slate-300">No conversations found</p>
+                  <div className="p-6 text-center text-slate-500">
+                    <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-30 text-indigo-600" />
+                    <p className="text-xs font-semibold text-slate-800">No conversations found</p>
                     <p className="text-[11px] text-slate-500 mt-1">
                       Switch to "All Users" tab to start a new chat with any candidate or employer.
                     </p>
                     <button
                       onClick={() => setActiveTab('contacts')}
-                      className="mt-3 px-3 py-1.5 rounded-xl bg-indigo-600/20 text-indigo-300 text-xs font-bold border border-indigo-500/30 hover:bg-indigo-600/30 transition-all"
+                      className="mt-3 px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-200 hover:bg-indigo-100 transition-all"
                     >
                       View Available Users ({contacts.length})
                     </button>
@@ -565,35 +569,35 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
                     <div
                       key={thread.userId}
                       onClick={() => setActiveChatUser(thread.user)}
-                      className="p-3 flex items-center justify-between gap-3 hover:bg-slate-800/50 cursor-pointer transition-colors group"
+                      className="p-3 flex items-center justify-between gap-3 hover:bg-slate-50/90 cursor-pointer transition-colors group"
                     >
                       {/* Avatar */}
                       <div className="relative flex-shrink-0">
                         <img
                           src={thread.user?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(thread.user?.name || 'User')}`}
                           alt={thread.user?.name}
-                          className="w-11 h-11 rounded-full object-cover border border-slate-700 bg-slate-800"
+                          className="w-11 h-11 rounded-full object-cover border border-slate-200 bg-slate-100 shadow-sm"
                         />
-                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 border-2 border-slate-900 rounded-full" />
+                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full" />
                       </div>
 
                       {/* Content */}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between">
-                          <h4 className="font-bold text-xs text-white group-hover:text-indigo-300 truncate transition-colors">
+                          <h4 className="font-bold text-xs text-slate-900 group-hover:text-indigo-600 truncate transition-colors">
                             {thread.user?.name || 'User'}
                           </h4>
-                          <span className="text-[10px] text-slate-500 flex-shrink-0">
+                          <span className="text-[10px] text-slate-400 flex-shrink-0">
                             {formatTime(thread.lastTimestamp)}
                           </span>
                         </div>
 
-                        <div className="text-[10px] text-slate-400 truncate mt-0.5">
+                        <div className="text-[10px] text-slate-500 truncate mt-0.5">
                           {thread.user?.companyName || thread.user?.title || (thread.user?.role === 'emp' ? 'Employer' : 'Candidate')}
                         </div>
 
                         <div className="flex items-center justify-between mt-1">
-                          <p className="text-[11px] text-slate-300 truncate max-w-[210px] leading-tight">
+                          <p className="text-[11px] text-slate-600 truncate max-w-[210px] leading-tight">
                             {thread.lastMessage}
                           </p>
                           {thread.unreadCount > 0 && (
@@ -609,14 +613,14 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
                         <button
                           onClick={(e) => { e.stopPropagation(); startCall(thread.user, false); }}
                           title="Quick Audio Call"
-                          className="p-1.5 rounded-lg bg-slate-800 hover:bg-emerald-600/30 text-emerald-400 transition-colors"
+                          className="p-1.5 rounded-lg bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-slate-200 transition-colors"
                         >
                           <Phone className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); startCall(thread.user, true); }}
                           title="Quick Video Call"
-                          className="p-1.5 rounded-lg bg-slate-800 hover:bg-indigo-600/30 text-indigo-400 transition-colors"
+                          className="p-1.5 rounded-lg bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-700 border border-slate-200 transition-colors"
                         >
                           <Video className="w-3.5 h-3.5" />
                         </button>
@@ -632,7 +636,7 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
             {activeTab === 'contacts' && (
               <>
                 {filteredContacts.length === 0 ? (
-                  <div className="p-6 text-center text-xs text-slate-500">
+                  <div className="p-6 text-center text-xs text-slate-400">
                     No contacts match "{searchQuery}"
                   </div>
                 ) : (
@@ -640,34 +644,34 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
                     <div
                       key={contact.id}
                       onClick={() => setActiveChatUser(contact)}
-                      className="p-3 flex items-center justify-between gap-3 hover:bg-slate-800/50 cursor-pointer transition-colors group"
+                      className="p-3 flex items-center justify-between gap-3 hover:bg-slate-50/90 cursor-pointer transition-colors group"
                     >
                       <div className="relative flex-shrink-0">
                         <img
                           src={contact.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(contact.name || 'User')}`}
                           alt={contact.name}
-                          className="w-10 h-10 rounded-full object-cover border border-slate-700 bg-slate-800"
+                          className="w-10 h-10 rounded-full object-cover border border-slate-200 bg-slate-100 shadow-sm"
                         />
-                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 border-2 border-slate-900 rounded-full" />
+                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full" />
                       </div>
 
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5">
-                          <h4 className="font-bold text-xs text-white group-hover:text-indigo-300 truncate">
+                          <h4 className="font-bold text-xs text-slate-900 group-hover:text-indigo-600 truncate">
                             {contact.name || 'User'}
                           </h4>
                           <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded uppercase ${
                             contact.role === 'emp'
-                              ? 'bg-indigo-500/20 text-indigo-300'
-                              : 'bg-emerald-500/20 text-emerald-300'
+                              ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                              : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                           }`}>
                             {contact.role === 'emp' ? 'Recruiter' : 'Seeker'}
                           </span>
                         </div>
-                        <p className="text-[10px] text-slate-400 truncate mt-0.5">
+                        <p className="text-[10px] text-slate-500 truncate mt-0.5">
                           {contact.companyName || contact.title || 'Tech Professional'}
                         </p>
-                        <p className="text-[10px] text-slate-500 truncate">
+                        <p className="text-[10px] text-slate-400 truncate">
                           {contact.address ? contact.address.split(',')[0] : 'Mumbai BKC'}
                         </p>
                       </div>
@@ -676,14 +680,14 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
                         <button
                           onClick={(e) => { e.stopPropagation(); startCall(contact, false); }}
                           title="Call"
-                          className="p-1.5 rounded-lg bg-slate-800 hover:bg-emerald-600/30 text-emerald-400 transition-colors"
+                          className="p-1.5 rounded-lg bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-slate-200 transition-colors"
                         >
                           <Phone className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); startCall(contact, true); }}
                           title="Video"
-                          className="p-1.5 rounded-lg bg-slate-800 hover:bg-indigo-600/30 text-indigo-400 transition-colors"
+                          className="p-1.5 rounded-lg bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-700 border border-slate-200 transition-colors"
                         >
                           <Video className="w-3.5 h-3.5" />
                         </button>
@@ -698,7 +702,7 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
           </div>
 
           {/* List Footer */}
-          <div className="p-2.5 bg-slate-900 border-t border-slate-800 text-center text-[10px] text-slate-500">
+          <div className="p-2.5 bg-slate-50 border-t border-slate-200/80 text-center text-[10px] text-slate-400">
             Realtime messaging powered by Socket.IO & WebSockets
           </div>
 

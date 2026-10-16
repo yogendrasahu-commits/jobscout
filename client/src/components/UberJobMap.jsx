@@ -834,8 +834,8 @@ export const UberJobMap = ({
           
           {/* Autocomplete Search Input */}
           <div ref={searchContainerRef} className="relative flex-1">
-            <div className="relative flex items-center bg-[#090d16]/90 backdrop-blur-2xl border border-white/[0.1] rounded-2xl shadow-[0_15px_35px_rgba(0,0,0,0.7)] focus-within:border-indigo-500/80 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
-              <Search className="w-4 h-4 text-indigo-400 absolute left-3.5 pointer-events-none" />
+            <div className="relative flex items-center bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-2xl shadow-lg focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
+              <Search className="w-4 h-4 text-indigo-600 absolute left-3.5 pointer-events-none" />
               
               <form onSubmit={handleSearchSubmit} className="w-full">
                 <input
@@ -847,21 +847,21 @@ export const UberJobMap = ({
                     setSearchQuery(e.target.value);
                     setIsSearchOpen(true);
                   }}
-                  className="w-full bg-transparent pl-10 pr-9 py-2.5 sm:py-2 text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none"
+                  className="w-full bg-transparent pl-10 pr-9 py-2.5 sm:py-2 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none"
                 />
               </form>
 
               {/* Clear button or Loader */}
               <div className="absolute right-3 flex items-center">
                 {isSearching ? (
-                  <Loader2 className="w-3.5 h-3.5 text-indigo-400 animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 text-indigo-600 animate-spin" />
                 ) : searchQuery ? (
                   <button
                     onClick={() => {
                       setSearchQuery('');
                       setLiveGeocodedResults([]);
                     }}
-                    className="p-1 rounded-full text-slate-400 hover:text-white"
+                    className="p-1 rounded-full text-slate-400 hover:text-slate-700"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -871,14 +871,14 @@ export const UberJobMap = ({
 
             {/* Autocomplete Dropdown */}
             {isSearchOpen && (
-              <div className="absolute top-full left-0 right-0 mt-1.5 bg-[#0c121e]/95 backdrop-blur-2xl border border-white/[0.12] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.85)] overflow-hidden z-[600] max-h-72 overflow-y-auto">
-                <div className="px-3 py-1.5 bg-black/40 border-b border-white/[0.08] text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+              <div className="absolute top-full left-0 right-0 mt-1.5 bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-2xl shadow-xl overflow-hidden z-[600] max-h-72 overflow-y-auto">
+                <div className="px-3 py-1.5 bg-slate-50 border-b border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between">
                   <span>{searchQuery ? 'Location Results' : 'Suggested Hubs'}</span>
-                  <span className="text-indigo-400 font-semibold">{combinedSearchResults.length} found</span>
+                  <span className="text-indigo-600 font-semibold">{combinedSearchResults.length} found</span>
                 </div>
 
                 {combinedSearchResults.length === 0 ? (
-                  <div className="p-4 text-center text-xs text-slate-400">
+                  <div className="p-4 text-center text-xs text-slate-500">
                     No matching location found. Try searching a major city or district.
                   </div>
                 ) : (
@@ -888,19 +888,19 @@ export const UberJobMap = ({
                       <div
                         key={idx}
                         onClick={() => handleSelectLocation(loc)}
-                        className="px-3.5 py-2.5 hover:bg-indigo-600/20 hover:border-l-4 hover:border-indigo-500 cursor-pointer transition-all border-b border-white/[0.05] flex items-center justify-between gap-2"
+                        className="px-3.5 py-2.5 hover:bg-slate-50 hover:border-l-4 hover:border-indigo-600 cursor-pointer transition-all border-b border-slate-100 flex items-center justify-between gap-2"
                       >
                         <div className="flex items-center gap-2.5 truncate">
-                          <div className="p-1.5 rounded-lg bg-white/[0.05] text-indigo-400 flex-shrink-0">
+                          <div className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600 flex-shrink-0">
                             <MapPin className="w-3.5 h-3.5" />
                           </div>
                           <div className="truncate">
-                            <p className="text-xs font-bold text-white truncate">{loc.name}</p>
-                            <p className="text-[10px] text-slate-400 truncate">{loc.city ? `${loc.city}, ` : ''}{loc.state || 'India'}</p>
+                            <p className="text-xs font-bold text-slate-900 truncate">{loc.name}</p>
+                            <p className="text-[10px] text-slate-500 truncate">{loc.city ? `${loc.city}, ` : ''}{loc.state || 'India'}</p>
                           </div>
                         </div>
 
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.06] text-indigo-300 font-semibold whitespace-nowrap flex-shrink-0 border border-white/[0.05]">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-semibold whitespace-nowrap flex-shrink-0 border border-indigo-200">
                           {distFromCurrent > 0 ? `${distFromCurrent} km` : 'Current'}
                         </span>
                       </div>
@@ -915,12 +915,12 @@ export const UberJobMap = ({
           <button
             onClick={locateMe}
             title="Recenter radar to my current GPS location"
-            className="flex-shrink-0 px-3 py-2.5 sm:py-2 bg-[#090d16]/90 backdrop-blur-2xl border border-white/[0.1] rounded-2xl shadow-[0_15px_35px_rgba(0,0,0,0.7)] hover:bg-[#0c121e] hover:border-indigo-400/50 text-indigo-400 hover:text-white transition-all flex items-center gap-1.5 active:scale-95"
+            className="flex-shrink-0 px-3 py-2.5 sm:py-2 bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-2xl shadow-lg hover:bg-slate-50 hover:border-indigo-500 text-indigo-600 hover:text-indigo-700 transition-all flex items-center gap-1.5 active:scale-95"
           >
             {gpsLoading ? (
-              <Loader2 className="w-4 h-4 text-indigo-400 animate-spin" />
+              <Loader2 className="w-4 h-4 text-indigo-600 animate-spin" />
             ) : (
-              <Crosshair className="w-4 h-4 text-indigo-400" />
+              <Crosshair className="w-4 h-4 text-indigo-600" />
             )}
             <span className="text-xs font-bold hidden sm:inline">Current Location</span>
           </button>
@@ -929,9 +929,9 @@ export const UberJobMap = ({
           <button
             onClick={() => setMapTheme(mapTheme === 'voyager' ? 'dark' : 'voyager')}
             title="Switch between Google Streets and Satellite Hybrid view"
-            className="flex-shrink-0 px-2.5 py-2.5 sm:py-2 bg-[#090d16]/90 backdrop-blur-2xl border border-white/[0.1] rounded-2xl shadow-[0_15px_35px_rgba(0,0,0,0.7)] hover:bg-[#0c121e] hover:border-white/[0.2] text-slate-200 transition-all flex items-center gap-1.5 active:scale-95"
+            className="flex-shrink-0 px-2.5 py-2.5 sm:py-2 bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-2xl shadow-lg hover:bg-slate-50 hover:border-slate-300 text-slate-700 transition-all flex items-center gap-1.5 active:scale-95"
           >
-            <Layers className="w-4 h-4 text-indigo-400" />
+            <Layers className="w-4 h-4 text-indigo-600" />
             <span className="text-xs font-bold hidden md:inline">{mapTheme === 'voyager' ? 'Satellite' : 'Streets'}</span>
           </button>
 
@@ -949,10 +949,10 @@ export const UberJobMap = ({
                 key={city.name}
                 type="button"
                 onClick={() => handleSelectCityPreset(city)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shadow-md transition-all active:scale-95 flex items-center gap-1.5 border ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shadow-xs transition-all active:scale-95 flex items-center gap-1.5 border ${
                   isCurrent
-                    ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-emerald-600 text-white border-amber-300/40 shadow-[0_0_15px_rgba(245,158,11,0.35)] ring-1 ring-amber-400/60'
-                    : 'bg-[#090d16]/80 hover:bg-[#0c121e]/90 backdrop-blur-xl text-slate-300 hover:text-white border-white/[0.08] hover:border-white/[0.18]'
+                    ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-emerald-600 text-white border-amber-400/40 shadow-sm ring-1 ring-amber-400/60'
+                    : 'bg-white/90 hover:bg-white backdrop-blur-xl text-slate-700 hover:text-slate-900 border-slate-200/90 hover:border-slate-300'
                 }`}
                 title={`Explore ${city.name}`}
               >
@@ -973,23 +973,23 @@ export const UberJobMap = ({
         <div className="md:hidden flex items-center justify-between gap-1 pointer-events-auto">
           <div 
             onClick={() => setIsFilterModalOpen(true)}
-            className="flex items-center gap-2 bg-[#090d16]/90 backdrop-blur-2xl px-3 py-1.5 rounded-xl border border-white/[0.1] text-xs shadow-xl cursor-pointer"
+            className="flex items-center gap-2 bg-white/95 backdrop-blur-2xl px-3 py-1.5 rounded-xl border border-slate-200/90 text-xs shadow-md cursor-pointer"
           >
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span className="text-[11px] font-bold text-white whitespace-nowrap">
+            <span className="text-[11px] font-bold text-slate-900 whitespace-nowrap">
               {radiusKm} km:
             </span>
-            <span className="text-[11px] text-indigo-300 font-bold whitespace-nowrap">
+            <span className="text-[11px] text-indigo-600 font-bold whitespace-nowrap">
               {visibleJobs.length} Jobs • {visibleSeekers.length} Seekers
             </span>
           </div>
 
           <button
             onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-            className="px-2.5 py-1.5 bg-[#090d16]/90 backdrop-blur-2xl border border-white/[0.1] rounded-xl text-[11px] font-bold text-emerald-400 flex items-center gap-1 shadow-xl"
+            className="px-2.5 py-1.5 bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-xl text-[11px] font-bold text-indigo-600 flex items-center gap-1 shadow-md"
           >
             <span>List</span>
             {isDrawerOpen ? <ChevronDown className="w-3 h-3" /> : <ChevronUp className="w-3 h-3" />}
@@ -1000,14 +1000,14 @@ export const UberJobMap = ({
         <div className="hidden md:flex flex-wrap items-center justify-between gap-2 pointer-events-auto">
           
           {/* Main Radar Slider & Stats Card */}
-          <div className="flex items-center gap-2.5 bg-[#090d16]/90 backdrop-blur-2xl px-3.5 py-1.5 rounded-2xl border border-white/[0.1] shadow-[0_15px_35px_rgba(0,0,0,0.7)]">
+          <div className="flex items-center gap-2.5 bg-white/95 backdrop-blur-2xl px-3.5 py-1.5 rounded-2xl border border-slate-200/90 shadow-lg text-slate-900">
             <div className="flex items-center gap-2">
               <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-xs"></span>
               </span>
-              <span className="text-xs font-bold text-white tracking-wide whitespace-nowrap">
-                Radar: <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-cyan-300 font-extrabold">{radiusKm} km</span>
+              <span className="text-xs font-bold text-slate-900 tracking-wide whitespace-nowrap">
+                Radar: <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-cyan-600 font-extrabold">{radiusKm} km</span>
               </span>
             </div>
 
@@ -1018,20 +1018,20 @@ export const UberJobMap = ({
               step="1"
               value={radiusKm}
               onChange={(e) => setRadiusKm(Number(e.target.value))}
-              className="w-24 accent-indigo-500 cursor-pointer"
+              className="w-24 accent-indigo-600 cursor-pointer"
               title="Drag to resize radar radius"
             />
 
             {/* Radius Quick Preset Buttons */}
-            <div className="flex items-center gap-1 border-l border-white/[0.08] pl-2">
+            <div className="flex items-center gap-1 border-l border-slate-200 pl-2">
               {[5, 10, 15, 25].map((km) => (
                 <button
                   key={km}
                   onClick={() => setRadiusKm(km)}
                   className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition-all ${
                     radiusKm === km
-                      ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-[0_0_10px_rgba(99,102,241,0.5)] border border-indigo-400/30'
-                      : 'bg-white/[0.04] text-slate-400 hover:text-white border border-transparent hover:border-white/10'
+                      ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-xs border border-indigo-500/30'
+                      : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200 border border-transparent'
                   }`}
                 >
                   {km}k
@@ -1039,14 +1039,14 @@ export const UberJobMap = ({
               ))}
             </div>
 
-            <div className="h-4 w-px bg-white/[0.08]" />
+            <div className="h-4 w-px bg-slate-200" />
 
             {/* Live Filter Count Display */}
             <div className="flex items-center gap-1.5 text-xs whitespace-nowrap">
-              <span className="px-2 py-0.5 bg-indigo-500/15 text-indigo-300 font-bold rounded-lg border border-indigo-500/30">
+              <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 font-bold rounded-lg border border-indigo-200">
                 {visibleJobs.length} Jobs
               </span>
-              <span className="px-2 py-0.5 bg-emerald-500/15 text-emerald-300 font-bold rounded-lg border border-emerald-500/30">
+              <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-bold rounded-lg border border-emerald-200">
                 {visibleSeekers.length} Seekers
               </span>
             </div>
@@ -1056,26 +1056,26 @@ export const UberJobMap = ({
               onClick={() => setStrictRadar(!strictRadar)}
               className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all flex items-center gap-1.5 ${
                 strictRadar
-                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-[0_0_10px_rgba(16,185,129,0.4)] border border-emerald-400/30'
-                  : 'bg-white/[0.04] text-slate-400 hover:text-white border border-white/[0.08]'
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-xs border border-emerald-500/30'
+                  : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
               }`}
               title="Toggle whether pins outside radar radius are hidden"
             >
-              {strictRadar ? <Eye className="w-3 h-3 text-emerald-200" /> : <EyeOff className="w-3 h-3 text-slate-400" />}
+              {strictRadar ? <Eye className="w-3 h-3 text-white" /> : <EyeOff className="w-3 h-3 text-slate-400" />}
               <span>{strictRadar ? 'Strict Radar ON' : 'Show All'}</span>
             </button>
           </div>
 
           {/* Categories Filter Pills */}
-          <div className="flex items-center gap-1 bg-[#090d16]/90 backdrop-blur-2xl p-1.5 rounded-2xl border border-white/[0.1] shadow-[0_15px_35px_rgba(0,0,0,0.7)]">
+          <div className="flex items-center gap-1 bg-white/95 backdrop-blur-2xl p-1.5 rounded-2xl border border-slate-200/90 shadow-lg text-slate-700">
             {['All', 'Technology', 'Design', 'Support', 'Logistics'].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-2.5 py-1 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
                   selectedCategory === cat
-                    ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-[0_0_12px_rgba(99,102,241,0.4)] border border-indigo-400/30'
-                    : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                    ? 'bg-indigo-600 text-white shadow-xs font-bold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
                 {cat}
@@ -1084,13 +1084,13 @@ export const UberJobMap = ({
           </div>
 
           {/* Layers Toggle (Show/Hide Jobs or Seekers) */}
-          <div className="flex items-center gap-1 bg-[#090d16]/90 backdrop-blur-2xl px-2 py-1.5 rounded-2xl border border-white/[0.1] shadow-[0_15px_35px_rgba(0,0,0,0.7)]">
+          <div className="flex items-center gap-1 bg-white/95 backdrop-blur-2xl px-2 py-1.5 rounded-2xl border border-slate-200/90 shadow-lg">
             <button
               onClick={() => setShowJobsLayer(!showJobsLayer)}
               className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1 transition-all ${
                 showJobsLayer 
-                  ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-[0_0_10px_rgba(99,102,241,0.4)] border border-indigo-400/30' 
-                  : 'text-slate-500 hover:text-slate-300'
+                  ? 'bg-indigo-600 text-white shadow-xs' 
+                  : 'text-slate-400 hover:text-slate-700'
               }`}
             >
               <Briefcase className="w-3 h-3" />
@@ -1100,8 +1100,8 @@ export const UberJobMap = ({
               onClick={() => setShowSeekersLayer(!showSeekersLayer)}
               className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1 transition-all ${
                 showSeekersLayer 
-                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-[0_0_10px_rgba(16,185,129,0.4)] border border-emerald-400/30' 
-                  : 'text-slate-500 hover:text-slate-300'
+                  ? 'bg-emerald-600 text-white shadow-xs' 
+                  : 'text-slate-400 hover:text-slate-700'
               }`}
             >
               <User className="w-3 h-3" />
@@ -1337,9 +1337,9 @@ export const UberJobMap = ({
       <div className="absolute bottom-4 right-3 sm:bottom-6 sm:right-6 z-[500] flex flex-col gap-2.5 items-end pointer-events-auto">
         
         {/* Google Maps Style Move & Zoom Navigation Controller (Transparent Glassmorphic) */}
-        <div className="flex flex-col items-center bg-[#090d16]/85 hover:bg-[#090d16]/95 backdrop-blur-2xl border border-white/[0.1] hover:border-white/[0.2] rounded-2xl shadow-[0_15px_35px_rgba(0,0,0,0.8)] p-1.5 gap-1 transition-all duration-200">
-          <div className="flex items-center gap-1 text-[9px] font-extrabold text-slate-300/80 uppercase tracking-wider px-1">
-            <Move className="w-2.5 h-2.5 text-indigo-400" />
+        <div className="flex flex-col items-center bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-2xl shadow-lg p-1.5 gap-1 transition-all duration-200">
+          <div className="flex items-center gap-1 text-[9px] font-extrabold text-slate-500 uppercase tracking-wider px-1">
+            <Move className="w-2.5 h-2.5 text-indigo-600" />
             <span>Move</span>
           </div>
 
@@ -1350,7 +1350,7 @@ export const UberJobMap = ({
               type="button"
               onClick={() => handlePan(0, -180)}
               title="Move Map North / Up"
-              className="p-1.5 bg-white/[0.04] hover:bg-gradient-to-r hover:from-indigo-600 hover:to-violet-600 hover:text-white text-slate-200 rounded-lg transition-all active:scale-90 border border-transparent hover:border-white/10"
+              className="p-1.5 bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-700 rounded-lg transition-all active:scale-90 border border-slate-200"
               aria-label="Move Up"
             >
               <ChevronUp className="w-3.5 h-3.5" />
@@ -1361,7 +1361,7 @@ export const UberJobMap = ({
               type="button"
               onClick={() => handlePan(-180, 0)}
               title="Move Map West / Left"
-              className="p-1.5 bg-white/[0.04] hover:bg-gradient-to-r hover:from-indigo-600 hover:to-violet-600 hover:text-white text-slate-200 rounded-lg transition-all active:scale-90 border border-transparent hover:border-white/10"
+              className="p-1.5 bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-700 rounded-lg transition-all active:scale-90 border border-slate-200"
               aria-label="Move Left"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
@@ -1370,7 +1370,7 @@ export const UberJobMap = ({
               type="button"
               onClick={handleMoveRadarToMapCenter}
               title="Center Radar at Current Map View (Search here)"
-              className="p-1.5 bg-indigo-500/20 hover:bg-gradient-to-r hover:from-indigo-600 hover:to-violet-600 hover:text-white text-indigo-300 rounded-lg transition-all active:scale-90 border border-indigo-500/30"
+              className="p-1.5 bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 rounded-lg transition-all active:scale-90 border border-indigo-200"
               aria-label="Center Radar at Current View"
             >
               <Crosshair className="w-3.5 h-3.5" />
@@ -1379,7 +1379,7 @@ export const UberJobMap = ({
               type="button"
               onClick={() => handlePan(180, 0)}
               title="Move Map East / Right"
-              className="p-1.5 bg-white/[0.04] hover:bg-gradient-to-r hover:from-indigo-600 hover:to-violet-600 hover:text-white text-slate-200 rounded-lg transition-all active:scale-90 border border-transparent hover:border-white/10"
+              className="p-1.5 bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-700 rounded-lg transition-all active:scale-90 border border-slate-200"
               aria-label="Move Right"
             >
               <ChevronRight className="w-3.5 h-3.5" />
@@ -1390,7 +1390,7 @@ export const UberJobMap = ({
               type="button"
               onClick={() => handlePan(0, 180)}
               title="Move Map South / Down"
-              className="p-1.5 bg-white/[0.04] hover:bg-gradient-to-r hover:from-indigo-600 hover:to-violet-600 hover:text-white text-slate-200 rounded-lg transition-all active:scale-90 border border-transparent hover:border-white/10"
+              className="p-1.5 bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-700 rounded-lg transition-all active:scale-90 border border-slate-200"
               aria-label="Move Down"
             >
               <ChevronDown className="w-3.5 h-3.5" />
@@ -1398,7 +1398,7 @@ export const UberJobMap = ({
             <div></div>
           </div>
           
-          <div className="w-full border-t border-white/[0.08] my-0.5" />
+          <div className="w-full border-t border-slate-200 my-0.5" />
 
           {/* Zoom Controls (+ / -) */}
           <div className="flex w-full justify-between gap-1">
@@ -1406,7 +1406,7 @@ export const UberJobMap = ({
               type="button"
               onClick={handleZoomIn}
               title="Zoom In (+)"
-              className="flex-1 py-1 bg-white/[0.04] hover:bg-gradient-to-r hover:from-indigo-600 hover:to-violet-600 hover:text-white text-slate-200 rounded-lg transition-all flex items-center justify-center active:scale-90 border border-transparent hover:border-white/10"
+              className="flex-1 py-1 bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-700 rounded-lg transition-all flex items-center justify-center active:scale-90 border border-slate-200"
               aria-label="Zoom In"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -1415,7 +1415,7 @@ export const UberJobMap = ({
               type="button"
               onClick={handleZoomOut}
               title="Zoom Out (-)"
-              className="flex-1 py-1 bg-white/[0.04] hover:bg-gradient-to-r hover:from-indigo-600 hover:to-violet-600 hover:text-white text-slate-200 rounded-lg transition-all flex items-center justify-center active:scale-90 border border-transparent hover:border-white/10"
+              className="flex-1 py-1 bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-700 rounded-lg transition-all flex items-center justify-center active:scale-90 border border-slate-200"
               aria-label="Zoom Out"
             >
               <Minus className="w-3.5 h-3.5" />
@@ -1427,18 +1427,18 @@ export const UberJobMap = ({
         <button
           onClick={() => setFitBoundsTrigger((prev) => prev + 1)}
           title="Fit all active jobs and candidates into view"
-          className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-[#090d16]/85 hover:bg-[#0c121e]/95 backdrop-blur-2xl text-indigo-300 hover:text-white border border-white/[0.1] hover:border-white/[0.2] shadow-xl text-xs font-bold transition-all active:scale-95"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-white/95 hover:bg-white backdrop-blur-2xl text-indigo-700 hover:text-indigo-900 border border-slate-200/90 shadow-lg text-xs font-bold transition-all active:scale-95"
         >
-          <Compass className="w-4 h-4 text-indigo-400" />
+          <Compass className="w-4 h-4 text-indigo-600" />
           <span>Fit All Pins</span>
         </button>
 
         {/* Toggle Results List Drawer */}
         <button
           onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-[#090d16]/85 hover:bg-[#0c121e]/95 backdrop-blur-2xl text-slate-100 border border-white/[0.1] hover:border-white/[0.2] shadow-xl text-xs font-bold transition-all active:scale-95"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-white/95 hover:bg-white backdrop-blur-2xl text-slate-900 border border-slate-200/90 shadow-lg text-xs font-bold transition-all active:scale-95"
         >
-          {isDrawerOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4 text-emerald-400" />}
+          {isDrawerOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4 text-emerald-600" />}
           <span>{isDrawerOpen ? 'Close List' : `Radar Matches (${visibleJobs.length + visibleSeekers.length})`}</span>
         </button>
 
@@ -1446,7 +1446,7 @@ export const UberJobMap = ({
         {isEmployer && (
           <button
             onClick={() => onPostJobAtCoords({ lat: safeCoords[0], lng: safeCoords[1] })}
-            className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs font-bold shadow-[0_0_20px_rgba(16,185,129,0.35)] border border-emerald-400/30 transition-transform active:scale-95"
+            className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 text-white text-xs font-bold shadow-md shadow-emerald-600/20 border border-emerald-500/30 transition-transform active:scale-95"
           >
             <Briefcase className="w-4 h-4" />
             <span className="hidden sm:inline">Post Job at Radar</span>
@@ -1458,9 +1458,9 @@ export const UberJobMap = ({
 
       {/* Map Guidance Tip (Desktop only) */}
       <div className="absolute bottom-4 left-4 z-[500] pointer-events-none hidden lg:block">
-        <div className="bg-[#090d16]/90 backdrop-blur-2xl px-3.5 py-1.5 rounded-xl border border-white/[0.1] text-[11px] text-slate-300 flex items-center gap-2 shadow-xl">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-          <span>Active Hub: <strong className="text-white">{activeLocationName}</strong> • {visibleJobs.length} jobs & {visibleSeekers.length} seekers in range</span>
+        <div className="bg-white/95 backdrop-blur-2xl px-3.5 py-1.5 rounded-xl border border-slate-200/90 text-[11px] text-slate-600 flex items-center gap-2 shadow-md">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
+          <span>Active Hub: <strong className="text-slate-900">{activeLocationName}</strong> • {visibleJobs.length} jobs & {visibleSeekers.length} seekers in range</span>
         </div>
       </div>
 
@@ -1468,12 +1468,12 @@ export const UberJobMap = ({
       {/* BOTTOM COLLAPSIBLE RADAR DISCOVERY DRAWER */}
       {/* ============================================================== */}
       {isDrawerOpen && (
-        <div className="absolute bottom-2 left-2 right-2 sm:bottom-6 sm:left-6 sm:right-auto sm:w-[480px] lg:w-[540px] max-w-[calc(100vw-1.5rem)] max-h-64 sm:max-h-72 z-[520] bg-[#090d16]/95 backdrop-blur-2xl border border-white/[0.1] rounded-3xl p-3 sm:p-4 shadow-[0_20px_50px_rgba(0,0,0,0.85)] flex flex-col gap-2.5 animate-in slide-in-from-bottom duration-200 pointer-events-auto">
+        <div className="absolute bottom-2 left-2 right-2 sm:bottom-6 sm:left-6 sm:right-auto sm:w-[480px] lg:w-[540px] max-w-[calc(100vw-1.5rem)] max-h-64 sm:max-h-72 z-[520] bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-3xl p-3 sm:p-4 shadow-2xl flex flex-col gap-2.5 animate-in slide-in-from-bottom duration-200 pointer-events-auto text-slate-900">
           
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-white/[0.08] pb-2">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
             <div className="flex items-center gap-2 sm:gap-3">
-              <span className="text-[11px] sm:text-xs font-bold text-white uppercase tracking-wider truncate">
+              <span className="text-[11px] sm:text-xs font-bold text-slate-900 uppercase tracking-wider truncate">
                 Radar Matches ({radiusKm} km)
               </span>
               <div className="flex gap-1">
@@ -1481,8 +1481,8 @@ export const UberJobMap = ({
                   onClick={() => setActiveTabDrawer('jobs')}
                   className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-xl text-xs font-bold transition-all ${
                     activeTabDrawer === 'jobs'
-                      ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-[0_0_10px_rgba(99,102,241,0.4)] border border-indigo-400/30'
-                      : 'bg-white/[0.04] text-slate-400 hover:text-white border border-transparent hover:border-white/10'
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200'
                   }`}
                 >
                   Jobs ({visibleJobs.length})
@@ -1491,8 +1491,8 @@ export const UberJobMap = ({
                   onClick={() => setActiveTabDrawer('seekers')}
                   className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-xl text-xs font-bold transition-all ${
                     activeTabDrawer === 'seekers'
-                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-[0_0_10px_rgba(16,185,129,0.4)] border border-emerald-400/30'
-                      : 'bg-white/[0.04] text-slate-400 hover:text-white border border-transparent hover:border-white/10'
+                      ? 'bg-emerald-600 text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200'
                   }`}
                 >
                   Seekers ({visibleSeekers.length})
@@ -1503,7 +1503,7 @@ export const UberJobMap = ({
             <button
               type="button"
               onClick={() => setIsDrawerOpen(false)}
-              className="text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-white/[0.06] transition-colors"
+              className="text-xs font-semibold text-slate-400 hover:text-slate-700 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-slate-100 transition-colors"
               title="Close drawer"
             >
               <span className="hidden sm:inline">Close</span>
@@ -1521,19 +1521,19 @@ export const UberJobMap = ({
               <div
                 key={job.id}
                 onClick={() => onSelectJob(job)}
-                className="min-w-[210px] sm:min-w-[230px] max-w-[230px] bg-white/[0.03] hover:bg-white/[0.06] p-3 rounded-2xl border border-white/[0.08] hover:border-indigo-400/50 cursor-pointer transition-all flex flex-col justify-between flex-shrink-0"
+                className="min-w-[210px] sm:min-w-[230px] max-w-[230px] bg-slate-50 hover:bg-slate-100/90 p-3 rounded-2xl border border-slate-200/90 hover:border-indigo-400 cursor-pointer transition-all flex flex-col justify-between flex-shrink-0 shadow-xs"
               >
                 <div>
-                  <div className="flex items-center justify-between text-[10px] text-indigo-400 font-bold mb-1">
+                  <div className="flex items-center justify-between text-[10px] text-indigo-600 font-bold mb-1">
                     <span>{job.jobType}</span>
-                    <span className="text-slate-400">{job.distanceKm} km away</span>
+                    <span className="text-slate-500">{job.distanceKm} km away</span>
                   </div>
-                  <h4 className="text-xs font-bold text-white truncate">{job.title}</h4>
-                  <p className="text-[11px] text-slate-400 truncate">{job.company}</p>
+                  <h4 className="text-xs font-bold text-slate-900 truncate">{job.title}</h4>
+                  <p className="text-[11px] text-slate-500 truncate">{job.company}</p>
                 </div>
-                <div className="mt-2 pt-2 border-t border-slate-900 flex items-center justify-between">
-                  <span className="text-xs font-bold text-emerald-400">{job.salary ? job.salary.split('-')[0].trim() : 'Active'}</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-600/30 text-indigo-300 font-bold">Apply</span>
+                <div className="mt-2 pt-2 border-t border-slate-200 flex items-center justify-between">
+                  <span className="text-xs font-bold text-emerald-700">{job.salary ? job.salary.split('-')[0].trim() : 'Active'}</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold">Apply</span>
                 </div>
               </div>
             ))}
@@ -1546,22 +1546,22 @@ export const UberJobMap = ({
               <div
                 key={seeker.id}
                 onClick={() => onSelectSeeker(seeker)}
-                className="min-w-[210px] sm:min-w-[230px] max-w-[230px] bg-slate-950 p-3 rounded-2xl border border-slate-800 hover:border-emerald-500/50 cursor-pointer transition-all flex flex-col justify-between flex-shrink-0"
+                className="min-w-[210px] sm:min-w-[230px] max-w-[230px] bg-slate-50 hover:bg-slate-100/90 p-3 rounded-2xl border border-slate-200/90 hover:border-emerald-400 cursor-pointer transition-all flex flex-col justify-between flex-shrink-0 shadow-xs"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <img
                     src={seeker.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${seeker.name}`}
                     alt={seeker.name}
-                    className="w-8 h-8 rounded-full border border-emerald-500/40 object-cover"
+                    className="w-8 h-8 rounded-full border border-emerald-400 object-cover"
                   />
                   <div className="truncate">
-                    <h4 className="text-xs font-bold text-white truncate">{seeker.name}</h4>
-                    <p className="text-[10px] text-emerald-400 truncate">{seeker.title || 'Job Seeker'}</p>
+                    <h4 className="text-xs font-bold text-slate-900 truncate">{seeker.name}</h4>
+                    <p className="text-[10px] text-emerald-700 truncate">{seeker.title || 'Job Seeker'}</p>
                   </div>
                 </div>
-                <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-900">
-                  <span className="text-slate-400 text-[10px]">{seeker.distanceKm} km away</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-600/30 text-emerald-300 font-bold">Connect</span>
+                <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-200">
+                  <span className="text-slate-500 text-[10px]">{seeker.distanceKm} km away</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">Connect</span>
                 </div>
               </div>
             ))}

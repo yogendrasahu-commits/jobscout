@@ -27,35 +27,34 @@ export const JobScoutLogo = ({
       className={`select-none flex-shrink-0 transition-all duration-300 ${className}`}
     >
       <defs>
-        {/* Luxury Obsidian Base with Optical Depth */}
+        {/* Luxury Crystal Platinum Base for Light Mode */}
         <linearGradient id="luxe_base" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#1e293b" />
-          <stop offset="35%" stopColor="#0b0f19" />
-          <stop offset="100%" stopColor="#04060a" />
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="45%" stopColor="#f8fafc" />
+          <stop offset="100%" stopColor="#eef2f6" />
         </linearGradient>
 
-        {/* Dual Specular Bevel Rim (Top-Left light reflection + Bottom-Right shadow) */}
+        {/* Dual Specular Bevel Rim (Crisp Indigo-Cyan Metallic Chrome) */}
         <linearGradient id="luxe_rim" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#67e8f9" stopOpacity="0.9" />
-          <stop offset="20%" stopColor="#818cf8" stopOpacity="0.75" />
-          <stop offset="50%" stopColor="#c084fc" stopOpacity="0.3" />
-          <stop offset="85%" stopColor="#1e1b4b" stopOpacity="0.5" />
-          <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.8" />
+          <stop offset="0%" stopColor="#cbd5e1" stopOpacity="0.9" />
+          <stop offset="30%" stopColor="#818cf8" stopOpacity="0.8" />
+          <stop offset="70%" stopColor="#38bdf8" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#e2e8f0" stopOpacity="0.9" />
         </linearGradient>
 
         {/* Inner Glass Specular Sheen */}
         <linearGradient id="luxe_sheen" x1="10" y1="10" x2="90" y2="50" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.25" />
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.7" />
           <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
         </linearGradient>
 
         {/* Primary Prismatic Ribbon (Electric Indigo to Vivid Violet) */}
         <linearGradient id="luxe_ribbon_primary" x1="15" y1="80" x2="55" y2="20" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#312e81" />
+          <stop offset="0%" stopColor="#3730a3" />
           <stop offset="25%" stopColor="#4f46e5" />
           <stop offset="60%" stopColor="#6366f1" />
-          <stop offset="85%" stopColor="#a855f7" />
-          <stop offset="100%" stopColor="#e879f9" />
+          <stop offset="85%" stopColor="#8b5cf6" />
+          <stop offset="100%" stopColor="#d946ef" />
         </linearGradient>
 
         {/* Secondary Discovery Ribbon (Cyan to Mint Ice) */}
@@ -64,14 +63,14 @@ export const JobScoutLogo = ({
           <stop offset="30%" stopColor="#0284c7" />
           <stop offset="65%" stopColor="#06b6d4" />
           <stop offset="90%" stopColor="#38bdf8" />
-          <stop offset="100%" stopColor="#a5f3fc" />
+          <stop offset="100%" stopColor="#7dd3fc" />
         </linearGradient>
 
         {/* Velocity Arrowhead Gradient */}
         <linearGradient id="luxe_arrow" x1="60" y1="35" x2="78" y2="15" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#38bdf8" />
-          <stop offset="50%" stopColor="#ffffff" />
-          <stop offset="100%" stopColor="#c084fc" />
+          <stop offset="0%" stopColor="#0284c7" />
+          <stop offset="50%" stopColor="#6366f1" />
+          <stop offset="100%" stopColor="#a855f7" />
         </linearGradient>
 
         {/* Diamond Core Crystal Gradient */}
@@ -84,15 +83,19 @@ export const JobScoutLogo = ({
 
         {/* Core Ambient Volumetric Glow */}
         <radialGradient id="luxe_ambient_glow" cx="50" cy="50" r="38" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.45" />
-          <stop offset="40%" stopColor="#6366f1" stopOpacity="0.2" />
-          <stop offset="75%" stopColor="#a855f7" stopOpacity="0.08" />
-          <stop offset="100%" stopColor="#000000" stopOpacity="0" />
+          <stop offset="0%" stopColor="#6366f1" stopOpacity="0.14" />
+          <stop offset="50%" stopColor="#0284c7" stopOpacity="0.08" />
+          <stop offset="100%" stopColor="#f8fafc" stopOpacity="0" />
         </radialGradient>
+
+        {/* Luxury Drop Shadow Filter */}
+        <filter id="luxe_shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="2" stdDeviation="3.5" floodColor="#4f46e5" floodOpacity="0.15" />
+        </filter>
 
         {/* Luminous Bloom Filter */}
         <filter id="luxe_bloom" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="2.2" result="glow" />
+          <feGaussianBlur stdDeviation="1.8" result="glow" />
           <feComposite in="SourceGraphic" in2="glow" operator="over" />
         </filter>
       </defs>
@@ -110,6 +113,7 @@ export const JobScoutLogo = ({
             fill="url(#luxe_base)" 
             stroke="url(#luxe_rim)" 
             strokeWidth="1.75" 
+            filter="url(#luxe_shadow)"
           />
 
           {/* Top Glass Refraction Arc */}
@@ -122,10 +126,10 @@ export const JobScoutLogo = ({
           <circle cx="50" cy="50" r="36" fill="url(#luxe_ambient_glow)" />
 
           {/* Precision Micro-Tick Reticle Calibrations */}
-          <line x1="50" y1="4" x2="50" y2="8" stroke="#38bdf8" strokeWidth="1.5" strokeOpacity="0.8" strokeLinecap="round" />
-          <line x1="50" y1="92" x2="50" y2="96" stroke="#818cf8" strokeWidth="1.5" strokeOpacity="0.6" strokeLinecap="round" />
-          <line x1="4" y1="50" x2="8" y2="50" stroke="#818cf8" strokeWidth="1.5" strokeOpacity="0.6" strokeLinecap="round" />
-          <line x1="92" y1="50" x2="96" y2="50" stroke="#38bdf8" strokeWidth="1.5" strokeOpacity="0.8" strokeLinecap="round" />
+          <line x1="50" y1="4" x2="50" y2="8" stroke="#0284c7" strokeWidth="1.75" strokeOpacity="0.9" strokeLinecap="round" />
+          <line x1="50" y1="92" x2="50" y2="96" stroke="#4f46e5" strokeWidth="1.75" strokeOpacity="0.9" strokeLinecap="round" />
+          <line x1="4" y1="50" x2="8" y2="50" stroke="#4f46e5" strokeWidth="1.75" strokeOpacity="0.9" strokeLinecap="round" />
+          <line x1="92" y1="50" x2="96" y2="50" stroke="#0284c7" strokeWidth="1.75" strokeOpacity="0.9" strokeLinecap="round" />
         </>
       )}
 
@@ -134,19 +138,19 @@ export const JobScoutLogo = ({
         cx="50" 
         cy="50" 
         r="30" 
-        stroke="#38bdf8" 
+        stroke="#0284c7" 
         strokeWidth="1" 
         strokeDasharray="2.5 4.5" 
-        strokeOpacity="0.3" 
+        strokeOpacity="0.35" 
       />
       <circle 
         cx="50" 
         cy="50" 
         r="20" 
-        stroke="#c084fc" 
+        stroke="#8b5cf6" 
         strokeWidth="0.8" 
         strokeDasharray="1.5 3.5" 
-        strokeOpacity="0.25" 
+        strokeOpacity="0.3" 
       />
 
       {/* 3. Left Continuous Velocity Ribbon (Electric Indigo / Violet) */}
@@ -211,7 +215,7 @@ export const JobScoutLogo = ({
         {/* Diamond High-Contrast Inner Facet */}
         <polygon 
           points="0,-7.5 7.5,0 0,7.5 -7.5,0" 
-          fill="#060911" 
+          fill="#1e1b4b" 
         />
         {/* Central Pure Radiant Star Point */}
         <circle 

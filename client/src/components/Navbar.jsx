@@ -31,6 +31,15 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { JobScoutLogo } from './JobScoutLogo';
+import { 
+  NavFeedIcon, 
+  NavNetworkIcon, 
+  NavRadarIcon, 
+  NavJobsIcon, 
+  NavConnectIcon, 
+  NavAnonIcon, 
+  NavMessagesIcon 
+} from './NavIcons';
 import { UpdateEmailModal } from './UpdateEmailModal';
 import { EmailSenderConfigModal } from './EmailSenderConfigModal';
 
@@ -237,7 +246,7 @@ export const Navbar = ({
   };
 
   return (
-    <header className="bg-[#07090e]/85 backdrop-blur-2xl border-b border-white/[0.08] sticky top-0 z-[800] select-none shadow-[0_4px_30px_rgba(0,0,0,0.6)] w-full max-w-full">
+    <header className="bg-white/90 backdrop-blur-2xl border-b border-slate-200/80 sticky top-0 z-[800] select-none shadow-sm w-full max-w-full">
       <div className="w-full max-w-[1700px] mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex md:grid md:grid-cols-[1fr_auto_1fr] items-center justify-between h-[56px] sm:h-[60px] md:h-[68px] gap-1 sm:gap-4">
           
@@ -251,30 +260,30 @@ export const Navbar = ({
               onClick={() => setCurrentTab('feed')}
               title="JobScout - Live Radar & Speed Connect"
             >
-              <div className="relative group-hover:scale-105 transition-all duration-300 flex-shrink-0 drop-shadow-[0_0_20px_rgba(56,189,248,0.45)]">
+              <div className="relative group-hover:scale-105 transition-all duration-300 flex-shrink-0 drop-shadow-[0_2px_10px_rgba(79,70,229,0.2)]">
                 <JobScoutLogo size={38} className="w-8 h-8 sm:w-10 sm:h-10" />
               </div>
 
               <div className="leading-none">
                 <div className="flex items-center gap-1.5 sm:gap-2">
-                  <span className="font-black text-base sm:text-lg lg:text-xl tracking-tight text-white flex items-center">
-                    Job<span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-indigo-400 to-violet-400 ml-0.5">Scout</span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 ml-1 shadow-[0_0_8px_rgba(56,189,248,0.9)] animate-pulse" />
+                  <span className="font-black text-base sm:text-lg lg:text-xl tracking-tight text-slate-900 flex items-center">
+                    Job<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-indigo-600 to-cyan-500 ml-0.5">Scout</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 ml-1 shadow-[0_0_8px_rgba(6,182,212,0.8)] animate-pulse" />
                   </span>
-                  <span className="hidden xl:inline-block text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-400/30 shadow-[0_0_12px_rgba(34,211,238,0.25)]">
+                  <span className="hidden xl:inline-block text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/80 shadow-xs">
                     RADAR
                   </span>
                 </div>
-                <div className="hidden 2xl:flex items-center gap-1.5 text-[10px] text-slate-400 mt-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-                  <span className="truncate max-w-[120px] font-medium text-slate-300">
+                <div className="hidden 2xl:flex items-center gap-1.5 text-[10px] text-slate-500 mt-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0 shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
+                  <span className="truncate max-w-[120px] font-medium text-slate-600">
                     {user?.address ? user.address.split(',')[0] : 'India • GPS Radar'}
                   </span>
                 </div>
               </div>
 
               {/* Hover Tooltip */}
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-white/10 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-900 border border-slate-800 text-white text-[10px] font-bold rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
                 JobScout Home
               </div>
             </div>
@@ -282,7 +291,7 @@ export const Navbar = ({
             {/* Quick Live Search Bar (Desktop / Laptop >= md) */}
             <div className="hidden md:block relative flex-shrink-0" ref={searchRef}>
               <form onSubmit={handleSearchSubmit} className="relative group">
-                <Search className="w-3.5 h-3.5 text-slate-400 group-focus-within:text-cyan-400 absolute left-3 top-2.5 transition-colors" />
+                <Search className="w-3.5 h-3.5 text-slate-400 group-focus-within:text-indigo-600 absolute left-3 top-2.5 transition-colors" />
                 <input
                   type="text"
                   placeholder="Search..."
@@ -292,7 +301,7 @@ export const Navbar = ({
                     setSearchFocused(true);
                   }}
                   onFocus={() => setSearchFocused(true)}
-                  className="w-24 md:w-28 lg:w-36 xl:w-48 2xl:w-60 bg-[#0c121e]/80 border border-white/[0.08] hover:border-white/[0.16] rounded-xl pl-8 pr-7 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/90 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                  className="w-24 md:w-28 lg:w-36 xl:w-48 2xl:w-60 bg-slate-100/90 hover:bg-slate-100 border border-slate-200/90 hover:border-slate-300 rounded-xl pl-8 pr-7 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 shadow-xs transition-all"
                   title="Search Jobs, Companies, Candidates"
                 />
                 {searchQuery && (
@@ -302,7 +311,7 @@ export const Navbar = ({
                       setSearchQuery('');
                       setSearchFocused(false);
                     }}
-                    className="absolute right-2 top-2 p-0.5 text-slate-400 hover:text-white rounded-full"
+                    className="absolute right-2 top-2 p-0.5 text-slate-400 hover:text-slate-700 rounded-full"
                     title="Clear search"
                   >
                     <X className="w-3 h-3" />
@@ -310,14 +319,14 @@ export const Navbar = ({
                 )}
 
                 {/* Search Bar Hover Tooltip */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-slate-700 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-900 border border-slate-800 text-white text-[10px] font-bold rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
                   Search Jobs & People
                 </div>
               </form>
 
               {/* Live Search Suggestions & Results Dropdown */}
               {searchFocused && (
-                <div className="absolute left-0 mt-2 w-80 lg:w-96 bg-slate-900 border border-slate-700/90 rounded-2xl p-3 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150 max-h-[460px] overflow-y-auto">
+                <div className="absolute left-0 mt-2 w-80 lg:w-96 bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-2xl p-3 shadow-xl z-50 animate-in fade-in zoom-in-95 duration-150 max-h-[460px] overflow-y-auto">
                   
                   {/* When no query is entered: Trending Suggestions */}
                   {!cleanQ ? (
@@ -327,45 +336,45 @@ export const Navbar = ({
                       </div>
                       <div 
                         onClick={() => { setSearchQuery('React Developer'); handleSearchSubmit(); }}
-                        className="flex items-center gap-2 px-2.5 py-1.5 text-xs text-slate-300 hover:bg-slate-800 rounded-xl cursor-pointer transition-colors"
+                        className="flex items-center gap-2 px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 hover:text-indigo-600 rounded-xl cursor-pointer transition-colors"
                       >
-                        <Briefcase className="w-3.5 h-3.5 text-indigo-400" />
+                        <Briefcase className="w-3.5 h-3.5 text-indigo-500" />
                         <span>React Developer Jobs ({jobsCount})</span>
                       </div>
                       <div 
                         onClick={() => { setSearchQuery('India'); setCurrentTab('map'); setSearchFocused(false); }}
-                        className="flex items-center gap-2 px-2.5 py-1.5 text-xs text-slate-300 hover:bg-slate-800 rounded-xl cursor-pointer transition-colors"
+                        className="flex items-center gap-2 px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 hover:text-emerald-600 rounded-xl cursor-pointer transition-colors"
                       >
-                        <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+                        <MapPin className="w-3.5 h-3.5 text-emerald-500" />
                         <span>Explore India Live Radar Map</span>
                       </div>
                       <div 
                         onClick={() => { setSearchQuery('Engineer'); setCurrentTab('network'); setSearchFocused(false); }}
-                        className="flex items-center gap-2 px-2.5 py-1.5 text-xs text-slate-300 hover:bg-slate-800 rounded-xl cursor-pointer transition-colors"
+                        className="flex items-center gap-2 px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 hover:text-amber-600 rounded-xl cursor-pointer transition-colors"
                       >
-                        <Users className="w-3.5 h-3.5 text-amber-400" />
+                        <Users className="w-3.5 h-3.5 text-amber-500" />
                         <span>Find Software Engineers ({seekersCount + employersCount})</span>
                       </div>
                       <div 
                         onClick={() => { setCurrentTab('anon'); setSearchFocused(false); }}
-                        className="flex items-center gap-2 px-2.5 py-1.5 text-xs text-slate-300 hover:bg-slate-800 rounded-xl cursor-pointer transition-colors"
+                        className="flex items-center gap-2 px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 hover:text-orange-600 rounded-xl cursor-pointer transition-colors"
                       >
-                        <Flame className="w-3.5 h-3.5 text-orange-400" />
+                        <Flame className="w-3.5 h-3.5 text-orange-500" />
                         <span>Anon Talk Salary & Culture Discussions</span>
                       </div>
                     </div>
                   ) : (
                     /* Live Matching Results */
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 px-1 border-b border-slate-800 pb-1.5">
+                      <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 px-1 border-b border-slate-100 pb-1.5">
                         <span>Search Results for "{searchQuery}"</span>
-                        <span className="text-indigo-400">{totalMatchesCount} matches</span>
+                        <span className="text-indigo-600">{totalMatchesCount} matches</span>
                       </div>
 
                       {/* Matching Jobs Section */}
                       {matchingJobs.length > 0 && (
                         <div>
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400 block mb-1">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 block mb-1">
                             Jobs ({matchingJobs.length})
                           </span>
                           <div className="space-y-1">
@@ -373,13 +382,13 @@ export const Navbar = ({
                               <div
                                 key={j.id}
                                 onClick={() => handleSelectJobResult(j)}
-                                className="p-2 rounded-xl hover:bg-slate-800/80 cursor-pointer border border-transparent hover:border-slate-700 transition-all flex items-start justify-between gap-2"
+                                className="p-2 rounded-xl hover:bg-slate-50 cursor-pointer border border-transparent hover:border-slate-200 transition-all flex items-start justify-between gap-2"
                               >
                                 <div className="truncate">
-                                  <div className="text-xs font-bold text-white truncate">{j.title}</div>
-                                  <div className="text-[11px] text-slate-400 truncate">{j.company} • {j.address}</div>
+                                  <div className="text-xs font-bold text-slate-900 truncate">{j.title}</div>
+                                  <div className="text-[11px] text-slate-500 truncate">{j.company} • {j.address}</div>
                                 </div>
-                                <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 whitespace-nowrap">
+                                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 whitespace-nowrap">
                                   {j.salary}
                                 </span>
                               </div>
@@ -391,7 +400,7 @@ export const Navbar = ({
                       {/* Matching Candidates Section */}
                       {matchingSeekers.length > 0 && (
                         <div>
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block mb-1">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 block mb-1">
                             Job Seekers ({matchingSeekers.length})
                           </span>
                           <div className="space-y-1">
@@ -399,14 +408,14 @@ export const Navbar = ({
                               <div
                                 key={s.id}
                                 onClick={() => handleSelectProfileResult(s)}
-                                className="p-2 rounded-xl hover:bg-slate-800/80 cursor-pointer border border-transparent hover:border-slate-700 transition-all flex items-center gap-2"
+                                className="p-2 rounded-xl hover:bg-slate-50 cursor-pointer border border-transparent hover:border-slate-200 transition-all flex items-center gap-2"
                               >
-                                <img src={s.avatar} alt={s.name} className="w-7 h-7 rounded-full object-cover border border-slate-700" />
+                                <img src={s.avatar} alt={s.name} className="w-7 h-7 rounded-full object-cover border border-slate-200" />
                                 <div className="truncate flex-1">
-                                  <div className="text-xs font-bold text-white truncate">{s.name}</div>
-                                  <div className="text-[11px] text-slate-400 truncate">{s.title || 'Candidate'}</div>
+                                  <div className="text-xs font-bold text-slate-900 truncate">{s.name}</div>
+                                  <div className="text-[11px] text-slate-500 truncate">{s.title || 'Candidate'}</div>
                                 </div>
-                                <span className="text-[9px] font-bold text-emerald-300 bg-emerald-500/15 px-1.5 py-0.5 rounded">
+                                <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
                                   Seeker
                                 </span>
                               </div>
@@ -418,7 +427,7 @@ export const Navbar = ({
                       {/* Matching Employers Section */}
                       {matchingEmployers.length > 0 && (
                         <div>
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400 block mb-1">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 block mb-1">
                             Companies & Employers ({matchingEmployers.length})
                           </span>
                           <div className="space-y-1">
@@ -426,14 +435,14 @@ export const Navbar = ({
                               <div
                                 key={e.id}
                                 onClick={() => handleSelectProfileResult(e)}
-                                className="p-2 rounded-xl hover:bg-slate-800/80 cursor-pointer border border-transparent hover:border-slate-700 transition-all flex items-center gap-2"
+                                className="p-2 rounded-xl hover:bg-slate-50 cursor-pointer border border-transparent hover:border-slate-200 transition-all flex items-center gap-2"
                               >
-                                <Building2 className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+                                <Building2 className="w-4 h-4 text-indigo-600 flex-shrink-0" />
                                 <div className="truncate flex-1">
-                                  <div className="text-xs font-bold text-white truncate">{e.companyName || e.name}</div>
-                                  <div className="text-[11px] text-slate-400 truncate">{e.industry || 'Hiring Company'}</div>
+                                  <div className="text-xs font-bold text-slate-900 truncate">{e.companyName || e.name}</div>
+                                  <div className="text-[11px] text-slate-500 truncate">{e.industry || 'Hiring Company'}</div>
                                 </div>
-                                <span className="text-[9px] font-bold text-indigo-300 bg-indigo-500/15 px-1.5 py-0.5 rounded">
+                                <span className="text-[9px] font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200">
                                   Employer
                                 </span>
                               </div>
@@ -443,7 +452,7 @@ export const Navbar = ({
                       )}
 
                       {totalMatchesCount === 0 && (
-                        <div className="p-4 text-center text-xs text-slate-400">
+                        <div className="p-4 text-center text-xs text-slate-500">
                           No direct matches found. Press Enter to search on Job Board.
                         </div>
                       )}
@@ -451,7 +460,7 @@ export const Navbar = ({
                       {/* Bottom view all in Job Board button */}
                       <button
                         onClick={handleSearchSubmit}
-                        className="w-full mt-2 py-2 px-3 rounded-xl bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
+                        className="w-full mt-2 py-2 px-3 rounded-xl bg-indigo-50 hover:bg-indigo-600 text-indigo-600 hover:text-white border border-indigo-200 hover:border-indigo-600 text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs"
                       >
                         <span>Filter Job Board for "{searchQuery}"</span>
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -468,23 +477,23 @@ export const Navbar = ({
           {/* 2. LAPTOP & DESKTOP NAVIGATION TABS (Centered in Header & Sized Up) */}
           {/* ========================================================== */}
           <div className="hidden md:flex justify-center items-center">
-            <nav className="flex items-center gap-1 lg:gap-1.5 bg-[#0b101d]/90 p-1 lg:p-1.5 rounded-2xl border border-white/[0.08] shadow-[0_8px_30px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.08)]">
+            <nav className="flex items-center gap-1 lg:gap-1.5 bg-slate-100/90 backdrop-blur-md p-1 lg:p-1.5 rounded-2xl border border-slate-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] ring-1 ring-slate-900/[0.02]">
               
               {/* 1. Feed (Home) */}
               <button
                 onClick={() => setCurrentTab('feed')}
-                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] font-bold transition-all ${
+                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] transition-all duration-200 ${
                   currentTab === 'feed'
-                    ? 'bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-600/35 ring-1 ring-white/20 font-extrabold'
-                    : 'text-slate-400 hover:text-white hover:bg-white/[0.06]'
+                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(99,102,241,0.08),0_1px_3px_rgba(0,0,0,0.05)] ring-1 ring-slate-200/90 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-bold'
                 }`}
                 title="Feed (Home)"
               >
-                <Home className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
+                <NavFeedIcon active={currentTab === 'feed'} className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
                 <span>Feed</span>
 
                 {/* Hover Tooltip */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-white/10 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-slate-900/95 backdrop-blur-md border border-slate-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
                   Feed (Home)
                 </div>
               </button>
@@ -492,18 +501,18 @@ export const Navbar = ({
               {/* 2. My Network */}
               <button
                 onClick={() => setCurrentTab('network')}
-                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] font-bold transition-all ${
+                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] transition-all duration-200 ${
                   currentTab === 'network'
-                    ? 'bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-600/35 ring-1 ring-white/20 font-extrabold'
-                    : 'text-slate-400 hover:text-white hover:bg-white/[0.06]'
+                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(79,70,229,0.08),0_1px_3px_rgba(0,0,0,0.05)] ring-1 ring-slate-200/90 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-bold'
                 }`}
                 title="My Professional Network"
               >
-                <Users className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
+                <NavNetworkIcon active={currentTab === 'network'} className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
                 <span>Network</span>
 
                 {/* Hover Tooltip */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-white/10 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-slate-900/95 backdrop-blur-md border border-slate-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
                   My Network ({seekersCount + employersCount})
                 </div>
               </button>
@@ -511,19 +520,19 @@ export const Navbar = ({
               {/* 3. Live Map Radar */}
               <button
                 onClick={() => setCurrentTab('map')}
-                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] font-bold transition-all ${
+                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] transition-all duration-200 ${
                   currentTab === 'map'
-                    ? 'bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-600/35 ring-1 ring-white/20 font-extrabold'
-                    : 'text-slate-400 hover:text-white hover:bg-white/[0.06]'
+                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(6,182,212,0.1),0_1px_3px_rgba(0,0,0,0.05)] ring-1 ring-slate-200/90 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-bold'
                 }`}
                 title="Live Radar Map"
               >
-                <MapPin className="w-4 h-4 lg:w-[18px] lg:h-[18px] text-cyan-300 flex-shrink-0" />
+                <NavRadarIcon active={currentTab === 'map'} className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
                 <span>Radar</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping ml-0.5 shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-ping ml-0.5 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
 
                 {/* Hover Tooltip */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-white/10 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-slate-900/95 backdrop-blur-md border border-slate-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
                   Live Radar Map
                 </div>
               </button>
@@ -531,23 +540,23 @@ export const Navbar = ({
               {/* 4. Jobs & Applied */}
               <button
                 onClick={() => setCurrentTab('jobs')}
-                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] font-bold transition-all ${
+                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] transition-all duration-200 ${
                   currentTab === 'jobs' || currentTab === 'applications'
-                    ? 'bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-600/35 ring-1 ring-white/20 font-extrabold'
-                    : 'text-slate-400 hover:text-white hover:bg-white/[0.06]'
+                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(124,58,237,0.08),0_1px_3px_rgba(0,0,0,0.05)] ring-1 ring-slate-200/90 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-bold'
                 }`}
                 title="Job Board & Applications"
               >
-                <Briefcase className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
+                <NavJobsIcon active={currentTab === 'jobs' || currentTab === 'applications'} className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
                 <span>Jobs</span>
                 {jobsCount > 0 && (
-                  <span className="text-[10px] lg:text-[11px] bg-white/10 px-1.5 py-0.2 rounded-full text-indigo-200 border border-white/20 font-extrabold">
+                  <span className="text-[10px] lg:text-[11px] bg-indigo-50 px-1.5 py-0.2 rounded-full text-indigo-700 border border-indigo-200 font-extrabold">
                     {jobsCount}
                   </span>
                 )}
 
                 {/* Hover Tooltip */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-white/10 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-slate-900/95 backdrop-blur-md border border-slate-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
                   Jobs & Applications ({jobsCount} openings)
                 </div>
               </button>
@@ -555,18 +564,18 @@ export const Navbar = ({
               {/* 5. Speed Connect Hub */}
               <button
                 onClick={() => setCurrentTab('connect')}
-                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] font-bold transition-all ${
+                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] transition-all duration-200 ${
                   currentTab === 'connect'
-                    ? 'bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-600/35 ring-1 ring-white/20 font-extrabold'
-                    : 'text-slate-400 hover:text-white hover:bg-white/[0.06]'
+                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(16,185,129,0.08),0_1px_3px_rgba(0,0,0,0.05)] ring-1 ring-slate-200/90 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-bold'
                 }`}
                 title="Speed Connect Hub (Audio & Video Calls)"
               >
-                <Radio className="w-4 h-4 lg:w-[18px] lg:h-[18px] text-emerald-400 animate-pulse flex-shrink-0" />
+                <NavConnectIcon active={currentTab === 'connect'} className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
                 <span>Connect</span>
 
                 {/* Hover Tooltip */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-white/10 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-slate-900/95 backdrop-blur-md border border-slate-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
                   Speed Connect (Calls & Chat)
                 </div>
               </button>
@@ -574,16 +583,16 @@ export const Navbar = ({
               {/* 6. Anonymous Discussions */}
               <button
                 onClick={() => setCurrentTab('anon')}
-                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] font-bold transition-all ${
+                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] transition-all duration-200 ${
                   currentTab === 'anon'
-                    ? 'bg-gradient-to-r from-orange-600 via-amber-600 to-orange-600 text-white shadow-lg shadow-orange-600/35 ring-1 ring-white/20 font-extrabold'
-                    : 'text-slate-400 hover:text-white hover:bg-white/[0.06]'
+                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(249,115,22,0.1),0_1px_3px_rgba(0,0,0,0.05)] ring-1 ring-slate-200/90 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-bold'
                 }`}
                 title="JobScout Anon Talk"
               >
                 <div className="relative">
-                  <Flame className={`w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0 ${currentTab === 'anon' ? 'text-white' : 'text-orange-400'}`} />
-                  <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-orange-400 rounded-full animate-ping" />
+                  <NavAnonIcon active={currentTab === 'anon'} className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
+                  <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-orange-500 rounded-full animate-ping" />
                 </div>
                 <span>
                   <span className="hidden xl:inline">Anon Talk</span>
@@ -591,7 +600,7 @@ export const Navbar = ({
                 </span>
 
                 {/* Hover Tooltip */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-white/10 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-slate-900/95 backdrop-blur-md border border-slate-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
                   JobScout Anon Talk
                 </div>
               </button>
@@ -599,21 +608,21 @@ export const Navbar = ({
               {/* 7. Full-Page Messaging */}
               <button
                 onClick={() => setCurrentTab('messages')}
-                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] font-bold transition-all ${
+                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] transition-all duration-200 ${
                   currentTab === 'messages'
-                    ? 'bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-600/35 ring-1 ring-white/20 font-extrabold'
-                    : 'text-slate-400 hover:text-white hover:bg-white/[0.06]'
+                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(79,70,229,0.08),0_1px_3px_rgba(0,0,0,0.05)] ring-1 ring-slate-200/90 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-bold'
                 }`}
                 title="Full-Page Messaging (चैट)"
               >
                 <div className="relative">
-                  <MessageSquare className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
-                  <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-emerald-400 rounded-full shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                  <NavMessagesIcon active={currentTab === 'messages'} className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
+                  <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
                 </div>
                 <span>Messages</span>
 
                 {/* Hover Tooltip */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-950 border border-white/10 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-slate-900/95 backdrop-blur-md border border-slate-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
                   Full-Page Messaging (चैट)
                 </div>
               </button>
@@ -632,7 +641,7 @@ export const Navbar = ({
                 className={`p-1.5 sm:p-2 rounded-xl border transition-colors ${
                   mobileSearchOpen 
                     ? 'bg-indigo-600 text-white border-indigo-500' 
-                    : 'bg-slate-800/80 hover:bg-slate-700/80 border-slate-700 text-slate-300'
+                    : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700'
                 }`}
                 title="Search Jobs & People"
               >
@@ -641,7 +650,7 @@ export const Navbar = ({
 
               {/* Mobile Search Dropdown Input */}
               {mobileSearchOpen && (
-                <div className="fixed left-2 right-2 top-16 bg-slate-900 border border-slate-700/90 rounded-2xl p-3 shadow-2xl z-[900] animate-in fade-in zoom-in-95 duration-150">
+                <div className="fixed left-2 right-2 top-16 bg-white border border-slate-200 rounded-2xl p-3 shadow-xl z-[900] animate-in fade-in zoom-in-95 duration-150">
                   <form onSubmit={handleSearchSubmit} className="relative">
                     <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                     <input
@@ -650,13 +659,13 @@ export const Navbar = ({
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       autoFocus
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-8 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-8 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500"
                     />
                     {searchQuery && (
                       <button
                         type="button"
                         onClick={() => setSearchQuery('')}
-                        className="absolute right-2.5 top-2.5 text-slate-400 hover:text-white"
+                        className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-700"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
@@ -665,16 +674,16 @@ export const Navbar = ({
 
                   {/* Matching quick previews */}
                   {matchingJobs.length > 0 && (
-                    <div className="mt-2 pt-2 border-t border-slate-800 space-y-1 max-h-48 overflow-y-auto">
-                      <span className="text-[10px] font-bold text-slate-400 block px-1">Top Matching Jobs:</span>
+                    <div className="mt-2 pt-2 border-t border-slate-100 space-y-1 max-h-48 overflow-y-auto">
+                      <span className="text-[10px] font-bold text-slate-500 block px-1">Top Matching Jobs:</span>
                       {matchingJobs.map(j => (
                         <div
                           key={j.id}
                           onClick={() => handleSelectJobResult(j)}
-                          className="p-2 rounded-lg bg-slate-950/60 hover:bg-slate-800 text-xs flex items-center justify-between"
+                          className="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-xs flex items-center justify-between"
                         >
-                          <span className="font-bold text-white truncate">{j.title}</span>
-                          <span className="text-[10px] text-emerald-400 font-bold">{j.salary}</span>
+                          <span className="font-bold text-slate-900 truncate">{j.title}</span>
+                          <span className="text-[10px] text-emerald-700 font-bold">{j.salary}</span>
                         </div>
                       ))}
                     </div>
@@ -682,7 +691,7 @@ export const Navbar = ({
 
                   <button
                     onClick={handleSearchSubmit}
-                    className="w-full mt-2.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md"
+                    className="w-full mt-2.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm"
                   >
                     View All Results in Job Board
                   </button>
@@ -695,7 +704,7 @@ export const Navbar = ({
               <div className="relative group">
                 <button
                   onClick={onOpenPostJob}
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] border border-emerald-400/30 transition-all active:scale-95"
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 text-white shadow-md shadow-emerald-600/20 border border-emerald-500/30 transition-all active:scale-95"
                   title="Post a New Job on Map"
                 >
                   <PlusCircle className="w-4 h-4" />
@@ -703,7 +712,7 @@ export const Navbar = ({
                 </button>
 
                 {/* Hover Tooltip */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-[#07090e]/95 border border-white/10 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-900 border border-slate-800 text-white text-[10px] font-bold rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
                   Post a Job on Live Map
                 </div>
               </div>
@@ -714,30 +723,30 @@ export const Navbar = ({
               <button
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
                 title="Notifications"
-                className="relative p-1.5 sm:p-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.18] text-slate-300 hover:text-white transition-all backdrop-blur-xl shadow-sm"
+                className="relative p-1.5 sm:p-2 rounded-xl bg-slate-100/90 hover:bg-slate-200/90 border border-slate-200/90 text-slate-700 hover:text-slate-900 transition-all shadow-xs"
               >
                 <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 {unreadNotifsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-[8px] font-black text-white flex items-center justify-center shadow-[0_0_10px_rgba(244,63,94,0.7)] animate-pulse">
+                  <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-[8px] font-black text-white flex items-center justify-center shadow-xs animate-pulse">
                     {unreadNotifsCount}
                   </span>
                 )}
               </button>
 
               {/* Hover Tooltip */}
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-[#07090e]/95 border border-white/10 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-900 border border-slate-800 text-white text-[10px] font-bold rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
                 Notifications ({unreadNotifsCount} unread)
               </div>
 
               {/* Notifications Dropdown */}
               {notificationsOpen && (
-                <div className="fixed left-2 right-2 top-16 sm:left-auto sm:right-0 sm:absolute sm:mt-2 sm:w-80 bg-[#0c121e]/95 backdrop-blur-2xl border border-white/[0.1] rounded-2xl p-3 shadow-[0_20px_50px_rgba(0,0,0,0.8)] z-[900] animate-in fade-in zoom-in-95 duration-150">
-                  <div className="flex items-center justify-between pb-2 border-b border-white/[0.08] mb-2">
+                <div className="fixed left-2 right-2 top-16 sm:left-auto sm:right-0 sm:absolute sm:mt-2 sm:w-80 bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-2xl p-3 shadow-xl z-[900] animate-in fade-in zoom-in-95 duration-150">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-100 mb-2">
                     <div className="flex items-center gap-1.5">
-                      <Bell className="w-4 h-4 text-indigo-400" />
-                      <span className="font-bold text-xs text-white">Notifications</span>
+                      <Bell className="w-4 h-4 text-indigo-600" />
+                      <span className="font-bold text-xs text-slate-900">Notifications</span>
                       {unreadNotifsCount > 0 && (
-                        <span className="text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30 px-1.5 py-0.2 rounded-full font-bold">
+                        <span className="text-[10px] bg-rose-50 text-rose-700 border border-rose-200 px-1.5 py-0.2 rounded-full font-bold">
                           {unreadNotifsCount} new
                         </span>
                       )}
@@ -745,7 +754,7 @@ export const Navbar = ({
                     {unreadNotifsCount > 0 && (
                       <button
                         onClick={markAllNotifsRead}
-                        className="text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold"
+                        className="text-[10px] text-indigo-600 hover:text-indigo-800 font-semibold"
                       >
                         Mark all read
                       </button>
@@ -759,25 +768,25 @@ export const Navbar = ({
                         onClick={() => handleNotificationClick(n)}
                         className={`p-2.5 rounded-xl text-left cursor-pointer transition-colors ${
                           n.read
-                            ? 'bg-white/[0.02] hover:bg-white/[0.06] text-slate-400'
-                            : 'bg-indigo-500/10 hover:bg-indigo-500/15 border border-indigo-500/30 text-white'
+                            ? 'bg-slate-50/70 hover:bg-slate-100/80 text-slate-600'
+                            : 'bg-indigo-50/70 hover:bg-indigo-50 border border-indigo-200/70 text-slate-900'
                         }`}
                       >
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-xs text-white leading-tight">
+                          <span className="font-bold text-xs text-slate-900 leading-tight">
                             {n.title}
                           </span>
                           <span className="text-[10px] text-slate-400">{n.time}</span>
                         </div>
-                        <p className="text-[11px] text-slate-300 mt-1 leading-snug">
+                        <p className="text-[11px] text-slate-600 mt-1 leading-snug">
                           {n.desc}
                         </p>
                       </div>
                     ))}
                   </div>
 
-                  <div className="pt-2 border-t border-white/[0.08] mt-2 text-center">
-                    <span className="text-[10px] text-slate-500">
+                  <div className="pt-2 border-t border-slate-100 mt-2 text-center">
+                    <span className="text-[10px] text-slate-400">
                       Live events synced with Socket.IO & WebRTC
                     </span>
                   </div>
@@ -790,56 +799,56 @@ export const Navbar = ({
               <div className="relative group flex-shrink-0" ref={profileRef}>
                 <button
                   onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                  className="flex items-center gap-1 sm:gap-2 px-1.5 py-1 sm:px-2.5 sm:py-1 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.18] transition-all text-left flex-shrink-0 cursor-pointer shadow-sm backdrop-blur-xl"
+                  className="flex items-center gap-1 sm:gap-2 px-1.5 py-1 sm:px-2.5 sm:py-1 rounded-xl bg-slate-100/90 hover:bg-slate-200/90 border border-slate-200/90 transition-all text-left flex-shrink-0 cursor-pointer shadow-xs"
                   title="Profile & Settings"
                 >
                   <div className="relative flex-shrink-0">
                     <img
                       src={user.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.name}`}
                       alt={user.name}
-                      className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-white/20 object-cover bg-slate-900 ring-2 ring-indigo-500/20"
+                      className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-slate-200 object-cover bg-slate-100 ring-2 ring-indigo-500/20"
                     />
-                    <span className={`absolute bottom-0 right-0 w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full border-2 border-[#07090e] ${
-                      isSeeker ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : 'bg-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.8)]'
+                    <span className={`absolute bottom-0 right-0 w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full border-2 border-white ${
+                      isSeeker ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.7)]' : 'bg-indigo-500 shadow-[0_0_6px_rgba(99,102,241,0.7)]'
                     }`} />
                   </div>
 
                   <div className="flex flex-col text-left min-w-0">
-                    <div className="text-[11px] sm:text-xs font-bold text-white truncate max-w-[42px] xs:max-w-[65px] sm:max-w-[95px] md:max-w-[110px] lg:max-w-[130px] xl:max-w-[150px] leading-tight">
+                    <div className="text-[11px] sm:text-xs font-bold text-slate-900 truncate max-w-[42px] xs:max-w-[65px] sm:max-w-[95px] md:max-w-[110px] lg:max-w-[130px] xl:max-w-[150px] leading-tight">
                       {user.name}
                     </div>
-                    <div className="hidden sm:flex text-[10px] text-slate-400 items-center gap-1 leading-tight mt-0.5">
-                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isEmployer ? 'bg-indigo-400' : 'bg-emerald-400'}`} />
+                    <div className="hidden sm:flex text-[10px] text-slate-500 items-center gap-1 leading-tight mt-0.5">
+                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isEmployer ? 'bg-indigo-500' : 'bg-emerald-500'}`} />
                       <span className="truncate">{isEmployer ? 'Recruiter' : 'Seeker'}</span>
                     </div>
                   </div>
 
-                  <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-400 flex-shrink-0 ml-0.5" />
+                  <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-500 flex-shrink-0 ml-0.5" />
                 </button>
 
                 {/* Hover Tooltip */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-[#07090e]/95 border border-white/10 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-900 border border-slate-800 text-white text-[10px] font-bold rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
                   {user.name} ({isEmployer ? 'Employer' : 'Seeker'})
                 </div>
 
                 {/* Profile Dropdown Menu */}
                 {profileMenuOpen && (
-                  <div className="fixed left-2 right-2 top-16 sm:left-auto sm:right-0 sm:absolute sm:mt-2 sm:w-72 bg-[#0c121e]/95 backdrop-blur-2xl border border-white/[0.1] rounded-2xl p-3 shadow-[0_20px_50px_rgba(0,0,0,0.8)] z-[900] animate-in fade-in zoom-in-95 duration-150">
+                  <div className="fixed left-2 right-2 top-16 sm:left-auto sm:right-0 sm:absolute sm:mt-2 sm:w-72 bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-2xl p-3 shadow-xl z-[900] animate-in fade-in zoom-in-95 duration-150">
                     
                     {/* Profile Header Details */}
-                    <div className="p-2 border-b border-white/[0.08] mb-2">
-                      <div className="font-bold text-sm text-white truncate">{user.name}</div>
-                      <div className="text-xs text-indigo-400 flex items-center gap-1 mt-0.5">
+                    <div className="p-2 border-b border-slate-100 mb-2">
+                      <div className="font-bold text-sm text-slate-900 truncate">{user.name}</div>
+                      <div className="text-xs text-indigo-600 flex items-center gap-1 mt-0.5 font-medium">
                         <Phone className="w-3 h-3" />
                         <span>{user.phone || '9876543210'}</span>
                       </div>
 
                       {/* Official Email with 1-click Update */}
-                      <div className="flex items-center justify-between gap-1 text-xs mt-1.5 pt-1.5 border-t border-white/[0.08]">
+                      <div className="flex items-center justify-between gap-1 text-xs mt-1.5 pt-1.5 border-t border-slate-100">
                         <div className="flex items-center gap-1.5 min-w-0" title={user.email || 'No email configured'}>
-                          <Mail className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" />
-                          <span className="truncate max-w-[145px] text-[11px] text-slate-300 font-medium">
-                            {user.email || <span className="text-amber-400 italic">No email linked</span>}
+                          <Mail className="w-3.5 h-3.5 text-indigo-600 flex-shrink-0" />
+                          <span className="truncate max-w-[145px] text-[11px] text-slate-600 font-medium">
+                            {user.email || <span className="text-amber-600 italic">No email linked</span>}
                           </span>
                         </div>
                         <button
@@ -848,7 +857,7 @@ export const Navbar = ({
                             setIsEmailModalOpen(true);
                             setProfileMenuOpen(false);
                           }}
-                          className="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold underline whitespace-nowrap ml-1 flex items-center gap-0.5"
+                          className="text-[10px] text-indigo-600 hover:text-indigo-800 font-bold underline whitespace-nowrap ml-1 flex items-center gap-0.5"
                           title="Update Email"
                         >
                           <Edit3 className="w-2.5 h-2.5" />
@@ -856,7 +865,7 @@ export const Navbar = ({
                         </button>
                       </div>
 
-                      <div className="mt-2 inline-block text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider bg-white/[0.05] text-slate-300 border border-white/10">
+                      <div className="mt-2 inline-block text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
                         {isEmployer ? '👔 Employer Account (#Hiring)' : '🔍 Seeker Account (#OpenToWork)'}
                       </div>
                     </div>
@@ -867,7 +876,7 @@ export const Navbar = ({
                         if (onOpenProfile) onOpenProfile(user);
                         setProfileMenuOpen(false);
                       }}
-                      className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 transition-all mb-2"
+                      className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold bg-indigo-50 hover:bg-indigo-100/80 text-indigo-700 border border-indigo-200/80 transition-all mb-2"
                     >
                       <span className="flex items-center gap-1.5">
                         <User className="w-3.5 h-3.5" />
@@ -882,13 +891,13 @@ export const Navbar = ({
                         setCurrentTab('applications');
                         setProfileMenuOpen(false);
                       }}
-                      className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/[0.06] transition-colors mb-2"
+                      className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100/80 transition-colors mb-2"
                     >
                       <span className="flex items-center gap-1.5">
-                        <FileText className="w-3.5 h-3.5 text-indigo-400" />
+                        <FileText className="w-3.5 h-3.5 text-indigo-600" />
                         <span>{isEmployer ? 'Candidate Applications' : 'My Job Applications'}</span>
                       </span>
-                      <ArrowRight className="w-3 h-3 text-slate-500" />
+                      <ArrowRight className="w-3 h-3 text-slate-400" />
                     </button>
 
                     {/* Email Sender Setup (for Real Gmail Delivery) */}
@@ -898,33 +907,33 @@ export const Navbar = ({
                           setIsSenderConfigOpen(true);
                           setProfileMenuOpen(false);
                         }}
-                        className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-amber-300 hover:text-white bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-colors mb-2"
+                        className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-amber-800 hover:text-amber-900 bg-amber-50 hover:bg-amber-100/80 border border-amber-200/80 transition-colors mb-2"
                         title="Configure Gmail App Password"
                       >
                         <span className="flex items-center gap-1.5">
-                          <Settings className="w-3.5 h-3.5 text-amber-400" />
+                          <Settings className="w-3.5 h-3.5 text-amber-600" />
                           <span>Email Sender Setup (Gmail)</span>
                         </span>
-                        <ArrowRight className="w-3 h-3 text-amber-400" />
+                        <ArrowRight className="w-3 h-3 text-amber-600" />
                       </button>
                     )}
 
                     {/* Location Info */}
-                    <div className="px-2 py-1 text-xs text-slate-400 flex items-center gap-1.5 mb-2">
-                      <MapPin className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                    <div className="px-2 py-1 text-xs text-slate-500 flex items-center gap-1.5 mb-2">
+                      <MapPin className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
                       <span className="truncate">{user.address || 'Active in India'}</span>
                     </div>
 
                     {/* Account Type Indicator */}
-                    <div className="p-2.5 bg-black/40 rounded-xl border border-white/[0.08] my-1.5 text-xs">
-                      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">
+                    <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200/90 my-1.5 text-xs">
+                      <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1">
                         Account Type (1 Number = 1 Role)
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className={`font-bold flex items-center gap-1.5 ${isEmployer ? 'text-indigo-400' : 'text-emerald-400'}`}>
+                        <span className={`font-bold flex items-center gap-1.5 ${isEmployer ? 'text-indigo-600' : 'text-emerald-600'}`}>
                           {isEmployer ? '👔 Registered Employer' : '🔍 Registered Job Seeker'}
                         </span>
-                        <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded font-bold">
+                        <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded font-bold">
                           Active
                         </span>
                       </div>
@@ -934,9 +943,9 @@ export const Navbar = ({
                     {onOpenSwitchAccount && (
                       <button
                         onClick={() => { onOpenSwitchAccount(); setProfileMenuOpen(false); }}
-                        className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-indigo-300 hover:bg-indigo-500/15 border border-indigo-500/30 transition-colors mb-2"
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-indigo-700 hover:bg-indigo-50 border border-indigo-200/80 transition-colors mb-2"
                       >
-                        <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                        <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
                         <span>Switch Account (14 Demo Users)</span>
                       </button>
                     )}
@@ -944,7 +953,7 @@ export const Navbar = ({
                     {/* Logout */}
                     <button
                       onClick={() => { logout(); setProfileMenuOpen(false); }}
-                      className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-500/15 transition-colors"
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors"
                     >
                       <LogOut className="w-4 h-4" />
                       <span>Sign Out (लॉग आउट)</span>
@@ -958,7 +967,7 @@ export const Navbar = ({
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={onOpenAuth}
-                  className="px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.35)] border border-indigo-400/30 transition-all active:scale-95"
+                  className="px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-md shadow-indigo-600/20 border border-indigo-400/30 transition-all active:scale-95"
                 >
                   Sign In
                 </button>
@@ -972,8 +981,8 @@ export const Navbar = ({
                 onClick={() => setMobileDrawerOpen(!mobileDrawerOpen)}
                 className={`p-1.5 sm:p-2 rounded-xl border transition-all active:scale-95 flex items-center justify-center ${
                   mobileDrawerOpen 
-                    ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white border-indigo-400/50 shadow-md shadow-indigo-600/30' 
-                    : 'bg-white/[0.04] text-slate-200 hover:text-white hover:bg-white/[0.08] border-white/[0.08] shadow-sm backdrop-blur-xl'
+                    ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white border-indigo-500 shadow-md shadow-indigo-600/30' 
+                    : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700 shadow-xs'
                 }`}
                 title="Navigation Menu & Options"
                 aria-label="Toggle navigation menu"
@@ -982,7 +991,7 @@ export const Navbar = ({
               </button>
 
               {/* Hover Tooltip */}
-              <div className="absolute -bottom-8 right-0 px-2 py-0.5 bg-[#07090e]/95 border border-white/10 text-white text-[10px] font-bold rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+              <div className="absolute -bottom-8 right-0 px-2 py-0.5 bg-slate-900 border border-slate-800 text-white text-[10px] font-bold rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
                 Menu & Options
               </div>
             </div>
@@ -997,39 +1006,39 @@ export const Navbar = ({
       {/* ========================================================== */}
       {mobileDrawerOpen && typeof document !== 'undefined' && createPortal(
         <div className="fixed inset-0 z-[99999] md:hidden flex justify-end animate-in fade-in duration-200">
-          {/* Dark Backdrop */}
+          {/* Backdrop */}
           <div 
-            className="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity"
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
             onClick={() => setMobileDrawerOpen(false)}
             aria-hidden="true"
           />
 
           {/* Drawer Panel */}
-          <div className="relative w-[90vw] max-w-sm h-full max-h-[100dvh] bg-slate-900 border-l border-slate-800 shadow-2xl flex flex-col p-4 sm:p-5 overflow-y-auto z-10 animate-in slide-in-from-right duration-250">
+          <div className="relative w-[90vw] max-w-sm h-full max-h-[100dvh] bg-white border-l border-slate-200 shadow-2xl flex flex-col p-4 sm:p-5 overflow-y-auto z-10 animate-in slide-in-from-right duration-250 text-slate-900">
             
             {/* Drawer Header */}
-            <div className="flex items-center justify-between pb-3.5 border-b border-slate-800 flex-shrink-0">
+            <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 flex-shrink-0">
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setMobileDrawerOpen(false)}
-                  className="p-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 transition-all flex items-center gap-1 text-xs font-bold active:scale-95"
+                  className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-all flex items-center gap-1 text-xs font-bold active:scale-95"
                   title="Back"
                 >
-                  <ArrowRight className="w-4 h-4 text-indigo-400 rotate-180" />
+                  <ArrowRight className="w-4 h-4 text-indigo-600 rotate-180" />
                   <span>Back</span>
                 </button>
                 <div className="flex items-center gap-2">
                   <JobScoutLogo size={28} />
                   <div className="leading-tight">
-                    <span className="font-extrabold text-white text-sm block">JobScout</span>
-                    <span className="text-[9px] text-slate-400 font-semibold">Navigation Menu</span>
+                    <span className="font-extrabold text-slate-900 text-sm block">JobScout</span>
+                    <span className="text-[9px] text-slate-500 font-semibold">Navigation Menu</span>
                   </div>
                 </div>
               </div>
               <button 
                 onClick={() => setMobileDrawerOpen(false)}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-800/90 text-slate-300 hover:text-white border border-slate-700 transition-colors active:scale-90"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 transition-colors active:scale-90"
                 title="Close Menu"
                 aria-label="Close navigation menu"
               >
@@ -1038,13 +1047,13 @@ export const Navbar = ({
               </button>
             </div>
 
-            {/* 1. PRIMARY NAVIGATION OPTIONS (Placed at the TOP so user sees all nav options immediately!) */}
+            {/* 1. PRIMARY NAVIGATION OPTIONS */}
             <div className="my-3 space-y-1.5 flex-shrink-0">
               <div className="flex items-center justify-between px-1 mb-1">
                 <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">
                   Pages & Navigation
                 </span>
-                <span className="text-[10px] text-indigo-400 font-bold">
+                <span className="text-[10px] text-indigo-600 font-bold">
                   Tap to open
                 </span>
               </div>
@@ -1055,14 +1064,14 @@ export const Navbar = ({
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
                   currentTab === 'feed'
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'text-slate-200 hover:bg-slate-800/90 hover:text-white'
+                    : 'text-slate-700 hover:bg-slate-100'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <Home className={`w-4 h-4 flex-shrink-0 ${currentTab === 'feed' ? 'text-white' : 'text-indigo-400'}`} />
+                  <NavFeedIcon active={currentTab === 'feed'} className="w-4 h-4 flex-shrink-0" />
                   <span>Feed (Home)</span>
                 </div>
-                <span className="text-[10px] text-slate-400 font-medium">Stories & Updates</span>
+                <span className={`text-[10px] font-medium ${currentTab === 'feed' ? 'text-indigo-100' : 'text-slate-400'}`}>Stories & Updates</span>
               </button>
 
               {/* Network */}
@@ -1071,14 +1080,14 @@ export const Navbar = ({
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
                   currentTab === 'network'
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'text-slate-200 hover:bg-slate-800/90 hover:text-white'
+                    : 'text-slate-700 hover:bg-slate-100'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <Users className={`w-4 h-4 flex-shrink-0 ${currentTab === 'network' ? 'text-white' : 'text-emerald-400'}`} />
+                  <NavNetworkIcon active={currentTab === 'network'} className="w-4 h-4 flex-shrink-0" />
                   <span>My Network</span>
                 </div>
-                <span className="bg-slate-800 px-2 py-0.5 rounded-full text-[10px] text-slate-300 font-bold">
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${currentTab === 'network' ? 'bg-white/20 border-white/30 text-white' : 'bg-slate-100 text-slate-600 border-slate-200'}`}>
                   {seekersCount + employersCount}
                 </span>
               </button>
@@ -1089,16 +1098,16 @@ export const Navbar = ({
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
                   currentTab === 'map'
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'text-slate-200 hover:bg-slate-800/90 hover:text-white'
+                    : 'text-slate-700 hover:bg-slate-100'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <MapPin className={`w-4 h-4 flex-shrink-0 ${currentTab === 'map' ? 'text-white' : 'text-emerald-400'}`} />
+                  <NavRadarIcon active={currentTab === 'map'} className="w-4 h-4 flex-shrink-0" />
                   <span>Live Radar Map</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                  <span className="text-[10px] text-emerald-400 font-extrabold uppercase">Live</span>
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                  <span className={`text-[10px] font-extrabold uppercase ${currentTab === 'map' ? 'text-cyan-200' : 'text-cyan-600'}`}>Live</span>
                 </div>
               </button>
 
@@ -1108,15 +1117,15 @@ export const Navbar = ({
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
                   currentTab === 'jobs'
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'text-slate-200 hover:bg-slate-800/90 hover:text-white'
+                    : 'text-slate-700 hover:bg-slate-100'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <Briefcase className={`w-4 h-4 flex-shrink-0 ${currentTab === 'jobs' ? 'text-white' : 'text-indigo-400'}`} />
+                  <NavJobsIcon active={currentTab === 'jobs'} className="w-4 h-4 flex-shrink-0" />
                   <span>Job Board (Openings)</span>
                 </div>
                 {jobsCount > 0 && (
-                  <span className="bg-indigo-500/20 border border-indigo-500/30 px-2 py-0.5 rounded-full text-[10px] text-indigo-300 font-bold">
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${currentTab === 'jobs' ? 'bg-white/20 border-white/30 text-white' : 'bg-indigo-50 border-indigo-200 text-indigo-700'}`}>
                     {jobsCount} jobs
                   </span>
                 )}
@@ -1128,14 +1137,14 @@ export const Navbar = ({
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
                   currentTab === 'applications'
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'text-slate-200 hover:bg-slate-800/90 hover:text-white'
+                    : 'text-slate-700 hover:bg-slate-100'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <FileText className={`w-4 h-4 flex-shrink-0 ${currentTab === 'applications' ? 'text-white' : 'text-indigo-400'}`} />
+                  <FileText className={`w-4 h-4 flex-shrink-0 ${currentTab === 'applications' ? 'text-white' : 'text-indigo-600'}`} />
                   <span>{isEmployer ? 'Candidate Applications' : 'Applied Jobs'}</span>
                 </div>
-                <span className="text-[10px] text-slate-400 font-semibold bg-slate-850 px-2 py-0.5 rounded-md">
+                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border ${currentTab === 'applications' ? 'bg-white/20 border-white/30 text-white' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
                   Status & Review
                 </span>
               </button>
@@ -1146,14 +1155,14 @@ export const Navbar = ({
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
                   currentTab === 'connect'
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'text-slate-200 hover:bg-slate-800/90 hover:text-white'
+                    : 'text-slate-700 hover:bg-slate-100'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <Radio className={`w-4 h-4 flex-shrink-0 ${currentTab === 'connect' ? 'text-white' : 'text-emerald-400 animate-pulse'}`} />
+                  <NavConnectIcon active={currentTab === 'connect'} className="w-4 h-4 flex-shrink-0" />
                   <span>Speed Connect</span>
                 </div>
-                <span className="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-bold uppercase">
+                <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase border ${currentTab === 'connect' ? 'bg-white/20 border-white/30 text-white' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
                   Calls
                 </span>
               </button>
@@ -1164,14 +1173,14 @@ export const Navbar = ({
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
                   currentTab === 'anon'
                     ? 'bg-orange-600 text-white shadow-md shadow-orange-600/30'
-                    : 'text-slate-200 hover:bg-slate-800/90 hover:text-white'
+                    : 'text-slate-700 hover:bg-slate-100'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <Flame className={`w-4 h-4 flex-shrink-0 ${currentTab === 'anon' ? 'text-white' : 'text-orange-400'}`} />
+                  <NavAnonIcon active={currentTab === 'anon'} className="w-4 h-4 flex-shrink-0" />
                   <span>Anon Talk (गुमनाम चर्चा)</span>
                 </div>
-                <span className="text-[10px] bg-orange-500/20 text-orange-300 border border-orange-500/30 px-2 py-0.5 rounded-full font-bold">
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${currentTab === 'anon' ? 'bg-white/20 border-white/30 text-white' : 'bg-orange-50 text-orange-700 border-orange-200'}`}>
                   Community
                 </span>
               </button>
@@ -1182,14 +1191,14 @@ export const Navbar = ({
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
                   currentTab === 'messages'
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'text-slate-200 hover:bg-slate-800/90 hover:text-white'
+                    : 'text-slate-700 hover:bg-slate-100'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <MessageSquare className={`w-4 h-4 flex-shrink-0 ${currentTab === 'messages' ? 'text-white' : 'text-emerald-400'}`} />
+                  <NavMessagesIcon active={currentTab === 'messages'} className="w-4 h-4 flex-shrink-0" />
                   <span>Full-Page Messaging</span>
                 </div>
-                <span className="text-[10px] bg-indigo-600/30 text-indigo-300 px-2 py-0.5 rounded-full font-bold">
+                <span className="text-[10px] bg-indigo-50 border border-indigo-200 text-indigo-700 px-2 py-0.5 rounded-full font-bold">
                   Chat
                 </span>
               </button>
@@ -1197,17 +1206,17 @@ export const Navbar = ({
 
             {/* 2. USER PROFILE & ROLE SWITCH SECTION */}
             {user ? (
-              <div className="my-2.5 p-3 rounded-2xl bg-slate-950 border border-slate-800 flex-shrink-0">
+              <div className="my-2.5 p-3 rounded-2xl bg-slate-50 border border-slate-200 flex-shrink-0">
                 <div className="flex items-center gap-3">
                   <img
                     src={user.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.name}`}
                     alt={user.name}
-                    className="w-10 h-10 rounded-full border border-slate-700 object-cover bg-slate-800 flex-shrink-0"
+                    className="w-10 h-10 rounded-full border border-slate-200 object-cover bg-slate-100 flex-shrink-0"
                   />
                   <div className="min-w-0 flex-1">
-                    <h4 className="font-bold text-xs text-white truncate">{user.name}</h4>
-                    <p className="text-[11px] text-indigo-400 truncate">{user.phone || '9876543210'}</p>
-                    <div className="flex items-center justify-between gap-1 text-[11px] text-slate-300 mt-0.5">
+                    <h4 className="font-bold text-xs text-slate-900 truncate">{user.name}</h4>
+                    <p className="text-[11px] text-indigo-600 font-medium truncate">{user.phone || '9876543210'}</p>
+                    <div className="flex items-center justify-between gap-1 text-[11px] text-slate-600 mt-0.5">
                       <span className="truncate max-w-[130px]">{user.email || 'No email set'}</span>
                       <button
                         type="button"
@@ -1215,27 +1224,27 @@ export const Navbar = ({
                           setIsEmailModalOpen(true);
                           setMobileDrawerOpen(false);
                         }}
-                        className="text-[10px] text-indigo-400 font-bold underline"
+                        className="text-[10px] text-indigo-600 font-bold underline"
                       >
                         Edit
                       </button>
                     </div>
-                    <span className="inline-block text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 mt-1">
+                    <span className="inline-block text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 mt-1">
                       {isEmployer ? '👔 Employer (#Hiring)' : '🔍 Seeker (#OpenToWork)'}
                     </span>
                   </div>
                 </div>
 
                 {/* 1-Tap Quick Role Switch */}
-                <div className="mt-2.5 pt-2 border-t border-slate-800/80">
+                <div className="mt-2.5 pt-2 border-t border-slate-200">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase">1-TAP ROLE SWITCH:</span>
+                    <span className="text-[10px] text-slate-500 font-bold uppercase">1-TAP ROLE SWITCH:</span>
                   </div>
                   <div className="grid grid-cols-2 gap-1.5">
                     <button
                       onClick={() => demoSwitch('emp')}
                       className={`py-1.5 px-2 rounded-xl text-xs font-bold transition-all ${
-                        isEmployer ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-800 text-slate-400 hover:text-white'
+                        isEmployer ? 'bg-indigo-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 border border-slate-200'
                       }`}
                     >
                       👔 Employer
@@ -1243,7 +1252,7 @@ export const Navbar = ({
                     <button
                       onClick={() => demoSwitch('seeker')}
                       className={`py-1.5 px-2 rounded-xl text-xs font-bold transition-all ${
-                        isSeeker ? 'bg-emerald-600 text-white shadow-md' : 'bg-slate-800 text-slate-400 hover:text-white'
+                        isSeeker ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 border border-slate-200'
                       }`}
                     >
                       🔍 Seeker
@@ -1257,21 +1266,21 @@ export const Navbar = ({
                     if (onOpenProfile) onOpenProfile(user);
                     setMobileDrawerOpen(false);
                   }}
-                  className="w-full mt-2 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 text-xs font-bold rounded-xl border border-indigo-500/30 flex items-center justify-center gap-1.5 transition-colors"
+                  className="w-full mt-2 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl border border-indigo-200 flex items-center justify-center gap-1.5 transition-colors"
                 >
                   <User className="w-3.5 h-3.5" />
                   <span>View Full Profile</span>
                 </button>
               </div>
             ) : (
-              <div className="my-2.5 p-3 rounded-2xl bg-slate-950 border border-slate-800 flex-shrink-0 text-center">
-                <p className="text-xs text-slate-400 mb-2">Sign in to apply for jobs and connect with candidates</p>
+              <div className="my-2.5 p-3 rounded-2xl bg-slate-50 border border-slate-200 flex-shrink-0 text-center">
+                <p className="text-xs text-slate-600 mb-2">Sign in to apply for jobs and connect with candidates</p>
                 <button
                   onClick={() => {
                     onOpenAuth();
                     setMobileDrawerOpen(false);
                   }}
-                  className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition-all"
+                  className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all"
                 >
                   Sign In to JobScout
                 </button>
@@ -1287,13 +1296,13 @@ export const Navbar = ({
                   placeholder="Search jobs, skills, candidates..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-8 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-8 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-all"
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-2.5 top-2.5 text-slate-400 hover:text-white"
+                    className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-700"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -1310,7 +1319,7 @@ export const Navbar = ({
                       setCurrentTab('jobs');
                       setMobileDrawerOpen(false);
                     }}
-                    className="px-2 py-0.5 bg-slate-950 border border-slate-800 hover:border-indigo-500/50 rounded-lg text-[10px] font-semibold text-slate-300 hover:text-white transition-colors"
+                    className="px-2 py-0.5 bg-slate-100 border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 rounded-lg text-[10px] font-semibold text-slate-700 hover:text-indigo-700 transition-colors"
                   >
                     {tag}
                   </button>
@@ -1319,7 +1328,7 @@ export const Navbar = ({
             </div>
 
             {/* 4. FOOTER ACTIONS */}
-            <div className="mt-auto pt-3 border-t border-slate-800 space-y-2 flex-shrink-0">
+            <div className="mt-auto pt-3 border-t border-slate-100 space-y-2 flex-shrink-0">
               {/* Employer Post Job */}
               {user && isEmployer && (
                 <button
@@ -1327,7 +1336,7 @@ export const Navbar = ({
                     onOpenPostJob();
                     setMobileDrawerOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-xs shadow-md"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-xs shadow-sm"
                 >
                   <PlusCircle className="w-4 h-4" />
                   <span>Post a New Job</span>
@@ -1341,9 +1350,9 @@ export const Navbar = ({
                     onOpenSwitchAccount();
                     setMobileDrawerOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-slate-850 hover:bg-slate-800 text-indigo-300 hover:text-white text-xs font-semibold border border-slate-700/80 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-indigo-700 text-xs font-semibold border border-slate-200 transition-colors"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
                   <span>Switch Demo Account (14 Profiles)</span>
                 </button>
               )}
@@ -1355,7 +1364,7 @@ export const Navbar = ({
                     logout();
                     setMobileDrawerOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-rose-400 hover:bg-rose-500/10 text-xs font-bold transition-colors"
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-rose-600 hover:bg-rose-50 text-xs font-bold transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Sign Out</span>
@@ -1366,9 +1375,9 @@ export const Navbar = ({
               <button
                 type="button"
                 onClick={() => setMobileDrawerOpen(false)}
-                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-white text-xs font-bold border border-slate-700/80 transition-colors active:scale-95"
+                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-200 transition-colors active:scale-95"
               >
-                <X className="w-4 h-4 text-slate-400" />
+                <X className="w-4 h-4 text-slate-500" />
                 <span>Close Menu (मेनू बंद करें)</span>
               </button>
             </div>
