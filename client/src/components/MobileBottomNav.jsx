@@ -84,7 +84,7 @@ export const MobileBottomNav = ({
             <span className={`text-[10px] font-black tracking-wider uppercase mt-1 ${
               currentTab === 'map' ? 'text-indigo-600' : 'text-slate-500'
             }`}>
-              Radar
+              Map
             </span>
           </button>
         </div>

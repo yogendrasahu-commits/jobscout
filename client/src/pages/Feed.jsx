@@ -294,7 +294,7 @@ export const Feed = ({
                 className="w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
               >
                 <Radio className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
-                <span>Open Live Radar Map</span>
+                <span>Open Live Map</span>
               </button>
             </div>
           </div>

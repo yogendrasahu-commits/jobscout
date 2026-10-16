@@ -3,11 +3,14 @@ import React from 'react';
 /**
  * Premium Luxury Navigation Icons for JobScout Flagship UI
  * Designed with duotone layered geometry, specular highlights, and fluid micro-gradients.
+ * Uses React.useId() for 100% collision-free SVG gradient IDs across Chrome/Chromium DOM trees.
  */
 
 // 1. Feed (Home) Icon
 export const NavFeedIcon = ({ active = false, className = "w-[18px] h-[18px]" }) => {
-  const uid = 'feed_grad';
+  const rawId = React.useId();
+  const uid = 'feed_' + rawId.replace(/[^a-zA-Z0-9]/g, '');
+
   return (
     <svg 
       className={`${className} transition-all duration-300 ${active ? 'scale-105 drop-shadow-[0_2px_8px_rgba(99,102,241,0.35)]' : 'group-hover:scale-105'}`}
@@ -60,7 +63,9 @@ export const NavFeedIcon = ({ active = false, className = "w-[18px] h-[18px]" })
 
 // 2. Network (Connections & People) Icon
 export const NavNetworkIcon = ({ active = false, className = "w-[18px] h-[18px]" }) => {
-  const uid = 'net_grad';
+  const rawId = React.useId();
+  const uid = 'net_' + rawId.replace(/[^a-zA-Z0-9]/g, '');
+
   return (
     <svg 
       className={`${className} transition-all duration-300 ${active ? 'scale-105 drop-shadow-[0_2px_8px_rgba(79,70,229,0.35)]' : 'group-hover:scale-105'}`}
@@ -122,7 +127,9 @@ export const NavNetworkIcon = ({ active = false, className = "w-[18px] h-[18px]"
 
 // 3. Radar (Geospatial Sonar Map) Icon
 export const NavRadarIcon = ({ active = false, className = "w-[18px] h-[18px]" }) => {
-  const uid = 'radar_grad';
+  const rawId = React.useId();
+  const uid = 'radar_' + rawId.replace(/[^a-zA-Z0-9]/g, '');
+
   return (
     <svg 
       className={`${className} transition-all duration-300 ${active ? 'scale-105 drop-shadow-[0_2px_8px_rgba(6,182,212,0.4)]' : 'group-hover:scale-105'}`}
@@ -168,13 +175,13 @@ export const NavRadarIcon = ({ active = false, className = "w-[18px] h-[18px]" }
         strokeWidth="2" 
         strokeLinecap="round" 
       />
-      {/* Radar Target Echo Ping */}
+      {/* Radar Target Echo Ping - uses animate-pulse for perfect Chrome SVG origin centering */}
       <circle 
         cx="17" 
         cy="8" 
-        r="1.8" 
+        r="2" 
         fill={active ? "#10B981" : "#0EA5E9"} 
-        className={active ? "animate-ping" : ""}
+        className={active ? "animate-pulse" : ""}
       />
     </svg>
   );
@@ -182,7 +189,9 @@ export const NavRadarIcon = ({ active = false, className = "w-[18px] h-[18px]" }
 
 // 4. Jobs (Executive Briefcase & Portfolio) Icon
 export const NavJobsIcon = ({ active = false, className = "w-[18px] h-[18px]" }) => {
-  const uid = 'jobs_grad';
+  const rawId = React.useId();
+  const uid = 'jobs_' + rawId.replace(/[^a-zA-Z0-9]/g, '');
+
   return (
     <svg 
       className={`${className} transition-all duration-300 ${active ? 'scale-105 drop-shadow-[0_2px_8px_rgba(124,58,237,0.35)]' : 'group-hover:scale-105'}`}
@@ -242,7 +251,9 @@ export const NavJobsIcon = ({ active = false, className = "w-[18px] h-[18px]" })
 
 // 5. Connect (Live Hub & Speed Signals) Icon
 export const NavConnectIcon = ({ active = false, className = "w-[18px] h-[18px]" }) => {
-  const uid = 'connect_grad';
+  const rawId = React.useId();
+  const uid = 'connect_' + rawId.replace(/[^a-zA-Z0-9]/g, '');
+
   return (
     <svg 
       className={`${className} transition-all duration-300 ${active ? 'scale-105 drop-shadow-[0_2px_8px_rgba(16,185,129,0.35)]' : 'group-hover:scale-105'}`}
@@ -297,7 +308,9 @@ export const NavConnectIcon = ({ active = false, className = "w-[18px] h-[18px]"
 
 // 6. Anon Talk (Incognito Ember Flame) Icon
 export const NavAnonIcon = ({ active = false, className = "w-[18px] h-[18px]" }) => {
-  const uid = 'anon_grad';
+  const rawId = React.useId();
+  const uid = 'anon_' + rawId.replace(/[^a-zA-Z0-9]/g, '');
+
   return (
     <svg 
       className={`${className} transition-all duration-300 ${active ? 'scale-105 drop-shadow-[0_2px_8px_rgba(249,115,22,0.4)]' : 'group-hover:scale-105'}`}
@@ -342,7 +355,9 @@ export const NavAnonIcon = ({ active = false, className = "w-[18px] h-[18px]" })
 
 // 7. Messages (Floating Dual Chat Bubbles) Icon
 export const NavMessagesIcon = ({ active = false, className = "w-[18px] h-[18px]" }) => {
-  const uid = 'msg_grad';
+  const rawId = React.useId();
+  const uid = 'msg_' + rawId.replace(/[^a-zA-Z0-9]/g, '');
+
   return (
     <svg 
       className={`${className} transition-all duration-300 ${active ? 'scale-105 drop-shadow-[0_2px_8px_rgba(79,70,229,0.35)]' : 'group-hover:scale-105'}`}

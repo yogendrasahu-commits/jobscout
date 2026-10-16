@@ -440,7 +440,7 @@ export const JobsList = ({
                           onClick={(e) => toggleSaveJob(e, job.id)}
                           className={`p-1.5 rounded-xl border transition-all ${
                             isSaved 
-                              ? 'bg-amber-50 border-amber-300 text-amber-600 shadow-2xs' 
+                              ? 'bg-amber-50 border-amber-300 text-amber-600 shadow-xs' 
                               : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-400 hover:text-slate-600'
                           }`}
                           title={isSaved ? 'Remove from Saved Jobs' : 'Save Job for Later'}

@@ -128,7 +128,7 @@
       "lat": 28.6304,
       "lng": 77.2177,
       "address": "Connaught Place (CP), New Delhi",
-      "isOnline": false,
+      "isOnline": true,
       "experience": "3+ Years",
       "expectedSalary": "₹14,00,000 / yr",
       "availability": "Immediate (Ready Today)",
@@ -2232,48 +2232,50 @@
   ],
   "posts": [
     {
-      "id": "post_15",
-      "authorId": "usr_seek_10",
-      "authorName": "Kavya Singhania",
-      "authorRole": "seeker",
-      "authorTitle": "Staff Product & Mobile UI/UX Designer • #OpenToWork",
-      "authorAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
-      "content": "✨ Excited to publish my open-source Design Tokens for Light & Dark luxury SaaS interfaces! Features WCAG AAA contrast ratios, optical kerning rules, and ready-to-use Tailwind CSS presets.\n\nOpen to strategic Lead / Staff Product Design roles across Bangalore or Remote.\n\n#ProductDesign #Figma #DesignTokens #DesignSystems #OpenToWork",
-      "image": "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=800",
-      "likes": 162,
-      "likedBy": [
-        "usr_emp_4",
-        "usr_emp_9"
-      ],
+      "id": "post_1792144548268_bq89",
+      "createdAt": "2026-10-16T09:55:48.268Z",
+      "likes": 0,
+      "likedBy": [],
       "comments": [],
-      "tags": [
-        "#ProductDesign",
-        "#DesignSystems",
-        "#OpenToWork"
-      ],
-      "createdAt": "2026-10-15T18:46:27.815Z"
+      "authorId": "guest",
+      "authorName": "Software Candidate",
+      "authorRole": "seeker",
+      "authorTitle": "Full-Stack Developer",
+      "authorAvatar": "https://api.dicebear.com/7.x/bottts/svg?seed=user",
+      "content": "jhh",
+      "image": null,
+      "tags": []
     },
     {
-      "id": "post_14",
-      "authorId": "usr_emp_9",
-      "authorName": "Cred Financial Technologies",
+      "id": "post_12",
+      "authorId": "usr_emp_7",
+      "authorName": "Razorpay Software",
       "authorRole": "emp",
-      "authorTitle": "Product Design & Engineering • Indiranagar",
-      "authorAvatar": "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150",
-      "content": "🎨 Why we obsess over micro-interactions:\n\nA button shouldn't just click. It should respond with mass, momentum, and tactile satisfaction. When design and engineering achieve parity, software feels like an instrument rather than a utility.\n\nWe are looking for UI Motion Designers and Frontend Crafters who care about 60fps spring transitions. Apply on our radar!\n\n#DesignSystems #CRED #UIUX #MicroInteractions",
-      "image": "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800",
-      "likes": 184,
+      "authorTitle": "Fintech & Payment Gateway Leader • Koramangala",
+      "authorAvatar": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=150",
+      "content": "⚡ We are scaling our core Payments Checkout team! We are looking for passionate Next.js, TypeScript, and Go developers who want to build payment pipelines supporting over $100 Billion in annual TPV.\n\nImmediate hiring, hybrid work model, top-tier compensation with generous ESOPs. Check our live radar pins or apply directly through JobScout!\n\n#Fintech #Razorpay #Hiring #NextJS #Golang #SoftwareEngineering",
+      "image": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800",
+      "likes": 148,
       "likedBy": [
-        "usr_seek_2",
+        "usr_seek_1",
+        "usr_seek_9",
         "usr_seek_10"
       ],
-      "comments": [],
-      "tags": [
-        "#DesignSystems",
-        "#CRED",
-        "#UIUX"
+      "comments": [
+        {
+          "id": "c_12_1",
+          "authorName": "Rahul Sharma",
+          "authorAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+          "text": "Just submitted my application! Excited about high-throughput checkout architecture.",
+          "createdAt": "2026-10-16T07:46:27.815Z"
+        }
       ],
-      "createdAt": "2026-10-15T21:46:27.815Z"
+      "tags": [
+        "#Fintech",
+        "#Razorpay",
+        "#Hiring"
+      ],
+      "createdAt": "2026-10-16T04:46:27.815Z"
     },
     {
       "id": "post_13",
@@ -2307,35 +2309,48 @@
       "createdAt": "2026-10-16T02:46:27.815Z"
     },
     {
-      "id": "post_12",
-      "authorId": "usr_emp_7",
-      "authorName": "Razorpay Software",
+      "id": "post_14",
+      "authorId": "usr_emp_9",
+      "authorName": "Cred Financial Technologies",
       "authorRole": "emp",
-      "authorTitle": "Fintech & Payment Gateway Leader • Koramangala",
-      "authorAvatar": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=150",
-      "content": "⚡ We are scaling our core Payments Checkout team! We are looking for passionate Next.js, TypeScript, and Go developers who want to build payment pipelines supporting over $100 Billion in annual TPV.\n\nImmediate hiring, hybrid work model, top-tier compensation with generous ESOPs. Check our live radar pins or apply directly through JobScout!\n\n#Fintech #Razorpay #Hiring #NextJS #Golang #SoftwareEngineering",
-      "image": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800",
-      "likes": 148,
+      "authorTitle": "Product Design & Engineering • Indiranagar",
+      "authorAvatar": "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150",
+      "content": "🎨 Why we obsess over micro-interactions:\n\nA button shouldn't just click. It should respond with mass, momentum, and tactile satisfaction. When design and engineering achieve parity, software feels like an instrument rather than a utility.\n\nWe are looking for UI Motion Designers and Frontend Crafters who care about 60fps spring transitions. Apply on our radar!\n\n#DesignSystems #CRED #UIUX #MicroInteractions",
+      "image": "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800",
+      "likes": 184,
       "likedBy": [
-        "usr_seek_1",
-        "usr_seek_9",
+        "usr_seek_2",
         "usr_seek_10"
       ],
-      "comments": [
-        {
-          "id": "c_12_1",
-          "authorName": "Rahul Sharma",
-          "authorAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
-          "text": "Just submitted my application! Excited about high-throughput checkout architecture.",
-          "createdAt": "2026-10-16T07:46:27.815Z"
-        }
-      ],
+      "comments": [],
       "tags": [
-        "#Fintech",
-        "#Razorpay",
-        "#Hiring"
+        "#DesignSystems",
+        "#CRED",
+        "#UIUX"
       ],
-      "createdAt": "2026-10-16T04:46:27.815Z"
+      "createdAt": "2026-10-15T21:46:27.815Z"
+    },
+    {
+      "id": "post_15",
+      "authorId": "usr_seek_10",
+      "authorName": "Kavya Singhania",
+      "authorRole": "seeker",
+      "authorTitle": "Staff Product & Mobile UI/UX Designer • #OpenToWork",
+      "authorAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "content": "✨ Excited to publish my open-source Design Tokens for Light & Dark luxury SaaS interfaces! Features WCAG AAA contrast ratios, optical kerning rules, and ready-to-use Tailwind CSS presets.\n\nOpen to strategic Lead / Staff Product Design roles across Bangalore or Remote.\n\n#ProductDesign #Figma #DesignTokens #DesignSystems #OpenToWork",
+      "image": "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=800",
+      "likes": 162,
+      "likedBy": [
+        "usr_emp_4",
+        "usr_emp_9"
+      ],
+      "comments": [],
+      "tags": [
+        "#ProductDesign",
+        "#DesignSystems",
+        "#OpenToWork"
+      ],
+      "createdAt": "2026-10-15T18:46:27.815Z"
     },
     {
       "id": "post_1791953803036_5i2t",

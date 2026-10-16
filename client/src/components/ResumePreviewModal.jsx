@@ -159,7 +159,7 @@ export const ResumePreviewModal = ({ candidate, isOpen, onClose }) => {
               {(candidate.skills || ['React', 'Node.js', 'TypeScript', 'WebSockets', 'Tailwind CSS', 'SQL']).map((skill, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1 rounded-xl bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200/90 shadow-2xs print:border-slate-300"
+                  className="px-3 py-1 rounded-xl bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200/90 shadow-xs print:border-slate-300"
                 >
                   {skill}
                 </span>

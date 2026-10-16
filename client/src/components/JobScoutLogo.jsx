@@ -4,12 +4,13 @@ import React from 'react';
  * JobScout Signature Luxury Emblem
  * 
  * Masterwork Design Architecture:
- * - Obsidian Crystal Squircle Foundation (#07090e -> #111827) with Dual Chamfer Specular Rim
+ * - Obsidian Crystal Squircle Foundation with Dual Chamfer Specular Rim
  * - Precision Orbital Reticle Ring with Micro-Degree Calibrations
  * - Continuous Prismatic Möbius Crest (Electric Indigo, Vivid Violet, Deep Sapphire, and Neon Cyan)
  * - 45° NE Velocity Discovery Arrowhead with Prismatic Specular Facet
  * - Diamond Core Quantum Beacon with 4-Point Star Flare and Crystalline Center
  * - Dynamic Ambient Pulsing Halo
+ * - Uses React.useId() to prevent Chromium SVG gradient/filter ID collisions across DOM trees
  */
 export const JobScoutLogo = ({ 
   size = 40, 
@@ -17,6 +18,9 @@ export const JobScoutLogo = ({
   withBadge = true, 
   animated = false 
 }) => {
+  const rawId = React.useId();
+  const uid = 'logo_' + rawId.replace(/[^a-zA-Z0-9]/g, '');
+
   return (
     <svg 
       width={size} 
@@ -28,14 +32,14 @@ export const JobScoutLogo = ({
     >
       <defs>
         {/* Luxury Crystal Platinum Base for Light Mode */}
-        <linearGradient id="luxe_base" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+        <linearGradient id={`${uid}_base`} x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#ffffff" />
           <stop offset="45%" stopColor="#f8fafc" />
           <stop offset="100%" stopColor="#eef2f6" />
         </linearGradient>
 
         {/* Dual Specular Bevel Rim (Crisp Indigo-Cyan Metallic Chrome) */}
-        <linearGradient id="luxe_rim" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+        <linearGradient id={`${uid}_rim`} x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#cbd5e1" stopOpacity="0.9" />
           <stop offset="30%" stopColor="#818cf8" stopOpacity="0.8" />
           <stop offset="70%" stopColor="#38bdf8" stopOpacity="0.8" />
@@ -43,13 +47,13 @@ export const JobScoutLogo = ({
         </linearGradient>
 
         {/* Inner Glass Specular Sheen */}
-        <linearGradient id="luxe_sheen" x1="10" y1="10" x2="90" y2="50" gradientUnits="userSpaceOnUse">
+        <linearGradient id={`${uid}_sheen`} x1="10" y1="10" x2="90" y2="50" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#ffffff" stopOpacity="0.7" />
           <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
         </linearGradient>
 
         {/* Primary Prismatic Ribbon (Electric Indigo to Vivid Violet) */}
-        <linearGradient id="luxe_ribbon_primary" x1="15" y1="80" x2="55" y2="20" gradientUnits="userSpaceOnUse">
+        <linearGradient id={`${uid}_ribbon_primary`} x1="15" y1="80" x2="55" y2="20" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#3730a3" />
           <stop offset="25%" stopColor="#4f46e5" />
           <stop offset="60%" stopColor="#6366f1" />
@@ -58,7 +62,7 @@ export const JobScoutLogo = ({
         </linearGradient>
 
         {/* Secondary Discovery Ribbon (Cyan to Mint Ice) */}
-        <linearGradient id="luxe_ribbon_cyan" x1="85" y1="80" x2="45" y2="15" gradientUnits="userSpaceOnUse">
+        <linearGradient id={`${uid}_ribbon_cyan`} x1="85" y1="80" x2="45" y2="15" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#0369a1" />
           <stop offset="30%" stopColor="#0284c7" />
           <stop offset="65%" stopColor="#06b6d4" />
@@ -67,14 +71,14 @@ export const JobScoutLogo = ({
         </linearGradient>
 
         {/* Velocity Arrowhead Gradient */}
-        <linearGradient id="luxe_arrow" x1="60" y1="35" x2="78" y2="15" gradientUnits="userSpaceOnUse">
+        <linearGradient id={`${uid}_arrow`} x1="60" y1="35" x2="78" y2="15" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#0284c7" />
           <stop offset="50%" stopColor="#6366f1" />
           <stop offset="100%" stopColor="#a855f7" />
         </linearGradient>
 
         {/* Diamond Core Crystal Gradient */}
-        <linearGradient id="luxe_crystal" x1="42" y1="42" x2="58" y2="58" gradientUnits="userSpaceOnUse">
+        <linearGradient id={`${uid}_crystal`} x1="42" y1="42" x2="58" y2="58" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#ffffff" />
           <stop offset="35%" stopColor="#e0f2fe" />
           <stop offset="70%" stopColor="#818cf8" />
@@ -82,19 +86,19 @@ export const JobScoutLogo = ({
         </linearGradient>
 
         {/* Core Ambient Volumetric Glow */}
-        <radialGradient id="luxe_ambient_glow" cx="50" cy="50" r="38" gradientUnits="userSpaceOnUse">
+        <radialGradient id={`${uid}_ambient_glow`} cx="50" cy="50" r="38" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#6366f1" stopOpacity="0.14" />
           <stop offset="50%" stopColor="#0284c7" stopOpacity="0.08" />
           <stop offset="100%" stopColor="#f8fafc" stopOpacity="0" />
         </radialGradient>
 
         {/* Luxury Drop Shadow Filter */}
-        <filter id="luxe_shadow" x="-20%" y="-20%" width="140%" height="140%">
+        <filter id={`${uid}_shadow`} x="-20%" y="-20%" width="140%" height="140%">
           <feDropShadow dx="0" dy="2" stdDeviation="3.5" floodColor="#4f46e5" floodOpacity="0.15" />
         </filter>
 
         {/* Luminous Bloom Filter */}
-        <filter id="luxe_bloom" x="-30%" y="-30%" width="160%" height="160%">
+        <filter id={`${uid}_bloom`} x="-30%" y="-30%" width="160%" height="160%">
           <feGaussianBlur stdDeviation="1.8" result="glow" />
           <feComposite in="SourceGraphic" in2="glow" operator="over" />
         </filter>
@@ -110,20 +114,20 @@ export const JobScoutLogo = ({
             width="94" 
             height="94" 
             rx="27" 
-            fill="url(#luxe_base)" 
-            stroke="url(#luxe_rim)" 
+            fill={`url(#${uid}_base)`} 
+            stroke={`url(#${uid}_rim)`} 
             strokeWidth="1.75" 
-            filter="url(#luxe_shadow)"
+            filter={`url(#${uid}_shadow)`}
           />
 
           {/* Top Glass Refraction Arc */}
           <path
             d="M 12 30 C 12 18 20 10 32 6 L 68 6 C 80 10 88 18 88 30 C 65 36 35 36 12 30 Z"
-            fill="url(#luxe_sheen)"
+            fill={`url(#${uid}_sheen)`}
           />
 
           {/* Core Radial Atmosphere */}
-          <circle cx="50" cy="50" r="36" fill="url(#luxe_ambient_glow)" />
+          <circle cx="50" cy="50" r="36" fill={`url(#${uid}_ambient_glow)`} />
 
           {/* Precision Micro-Tick Reticle Calibrations */}
           <line x1="50" y1="4" x2="50" y2="8" stroke="#0284c7" strokeWidth="1.75" strokeOpacity="0.9" strokeLinecap="round" />
@@ -156,7 +160,7 @@ export const JobScoutLogo = ({
       {/* 3. Left Continuous Velocity Ribbon (Electric Indigo / Violet) */}
       <path
         d="M 50 84 C 32 73 21 57 21 42 C 21 26 34 16 50 16"
-        stroke="url(#luxe_ribbon_primary)"
+        stroke={`url(#${uid}_ribbon_primary)`}
         strokeWidth="6"
         strokeLinecap="round"
       />
@@ -172,7 +176,7 @@ export const JobScoutLogo = ({
       {/* 4. Right Continuous Discovery Ribbon (Neon Cyan / Sky) */}
       <path
         d="M 50 84 C 68 73 79 57 79 42 C 79 28 68 17 54 16"
-        stroke="url(#luxe_ribbon_cyan)"
+        stroke={`url(#${uid}_ribbon_cyan)`}
         strokeWidth="6"
         strokeLinecap="round"
       />
@@ -188,15 +192,15 @@ export const JobScoutLogo = ({
       {/* 5. Geolocation Anchor Pin (Bottom Convergence) */}
       <polygon 
         points="50,88 42,77 58,77" 
-        fill="url(#luxe_ribbon_primary)" 
+        fill={`url(#${uid}_ribbon_primary)`} 
       />
 
       {/* 6. Precision 45° NE Discovery Arrowhead */}
       <g transform="translate(71, 23) rotate(28)">
         <polygon 
           points="0,-11 -6.5,6 0,2 6.5,6" 
-          fill="url(#luxe_arrow)" 
-          filter="url(#luxe_bloom)"
+          fill={`url(#${uid}_arrow)`} 
+          filter={`url(#${uid}_bloom)`}
         />
         <polygon 
           points="0,-8 -4,4 0,1.5 4,4" 
@@ -209,8 +213,8 @@ export const JobScoutLogo = ({
         {/* Diamond Outer Specular Frame */}
         <polygon 
           points="0,-11 11,0 0,11 -11,0" 
-          fill="url(#luxe_crystal)" 
-          filter="url(#luxe_bloom)"
+          fill={`url(#${uid}_crystal)`} 
+          filter={`url(#${uid}_bloom)`}
         />
         {/* Diamond High-Contrast Inner Facet */}
         <polygon 
@@ -231,7 +235,7 @@ export const JobScoutLogo = ({
         d="M 78 17 L 79.5 21 L 83.5 22.5 L 79.5 24 L 78 28 L 76.5 24 L 72.5 22.5 L 76.5 21 Z"
         fill="#ffffff"
         opacity="0.95"
-        filter="url(#luxe_bloom)"
+        filter={`url(#${uid}_bloom)`}
       />
 
       {/* 9. Live Radar Pulse Wave */}
@@ -243,8 +247,7 @@ export const JobScoutLogo = ({
           stroke="#38bdf8" 
           strokeWidth="1.5" 
           fill="none"
-          className="animate-ping"
-          style={{ transformOrigin: '50px 48px', animationDuration: '2.5s' }}
+          className="animate-pulse"
         />
       )}
     </svg>

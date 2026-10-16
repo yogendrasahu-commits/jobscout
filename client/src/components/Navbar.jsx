@@ -303,17 +303,17 @@ export const Navbar = ({
   };
 
   return (
-    <header className="bg-white/90 backdrop-blur-2xl border-b border-slate-200/80 sticky top-0 z-[800] select-none shadow-sm w-full max-w-full">
+    <header className="bg-white/90 backdrop-blur-2xl border-b border-slate-200/80 sticky top-0 z-[800] select-none shadow-sm w-full max-w-full overflow-x-clip">
       <div className="w-full max-w-[1700px] mx-auto px-2 sm:px-4 lg:px-6">
-        <div className="flex md:grid md:grid-cols-[1fr_auto_1fr] items-center justify-between h-[56px] sm:h-[60px] md:h-[68px] gap-1 sm:gap-4">
+        <div className="flex items-center justify-between h-[56px] sm:h-[60px] md:h-[68px] gap-2 lg:gap-4 w-full min-w-0">
           
           {/* ========================================================== */}
           {/* 1. BRAND LOGO & LOCATION PILL & SEARCH BAR */}
           {/* ========================================================== */}
-          <div className="flex items-center gap-1 sm:gap-2 lg:gap-2.5 xl:gap-3 justify-start flex-shrink-0">
-            {/* Logo with Hover Name Tooltip */}
+          <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 justify-start min-w-0 flex-shrink-0">
+            {/* Logo */}
             <div 
-              className="flex items-center gap-1.5 sm:gap-2.5 cursor-pointer group relative flex-shrink-0" 
+              className="flex items-center gap-1.5 sm:gap-2.5 cursor-pointer group flex-shrink-0" 
               onClick={() => setCurrentTab('feed')}
               title="JobScout - Live Radar & Speed Connect"
             >
@@ -327,21 +327,13 @@ export const Navbar = ({
                     Job<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-indigo-600 to-cyan-500 ml-0.5">Scout</span>
                     <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 ml-1 shadow-[0_0_8px_rgba(6,182,212,0.8)] animate-pulse" />
                   </span>
-                  <span className="hidden xl:inline-block text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/80 shadow-xs">
-                    RADAR
-                  </span>
                 </div>
                 <div className="hidden 2xl:flex items-center gap-1.5 text-[10px] text-slate-500 mt-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0 shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
                   <span className="truncate max-w-[120px] font-medium text-slate-600">
-                    {user?.address ? user.address.split(',')[0] : 'India • GPS Radar'}
+                    {user?.address ? user.address.split(',')[0] : 'India • GPS Live'}
                   </span>
                 </div>
-              </div>
-
-              {/* Hover Tooltip */}
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-900 border border-slate-800 text-white text-[10px] font-bold rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-                JobScout Home
               </div>
             </div>
 
@@ -358,7 +350,7 @@ export const Navbar = ({
                     setSearchFocused(true);
                   }}
                   onFocus={() => setSearchFocused(true)}
-                  className="w-24 md:w-28 lg:w-36 xl:w-48 2xl:w-60 bg-slate-100/90 hover:bg-slate-100 border border-slate-200/90 hover:border-slate-300 rounded-xl pl-8 pr-7 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 shadow-xs transition-all"
+                  className="w-20 md:w-24 lg:w-32 xl:w-44 2xl:w-60 bg-slate-100/90 hover:bg-slate-100 border border-slate-200/90 hover:border-slate-300 rounded-xl pl-8 pr-7 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 shadow-xs transition-all"
                   title="Search Jobs, Companies, Candidates"
                 />
                 {searchQuery && (
@@ -374,11 +366,6 @@ export const Navbar = ({
                     <X className="w-3 h-3" />
                   </button>
                 )}
-
-                {/* Search Bar Hover Tooltip */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-900 border border-slate-800 text-white text-[10px] font-bold rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-                  Search Jobs & People
-                </div>
               </form>
 
               {/* Live Search Suggestions & Results Dropdown */}
@@ -531,157 +518,120 @@ export const Navbar = ({
           </div>
 
           {/* ========================================================== */}
-          {/* 2. LAPTOP & DESKTOP NAVIGATION TABS (Centered in Header & Sized Up) */}
+          {/* 2. LAPTOP & DESKTOP NAVIGATION TABS (Centered in Header) */}
           {/* ========================================================== */}
-          <div className="hidden md:flex justify-center items-center">
-            <nav className="flex items-center gap-1 lg:gap-1.5 bg-slate-100/90 backdrop-blur-md p-1 lg:p-1.5 rounded-2xl border border-slate-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] ring-1 ring-slate-900/[0.02]">
+          <div className="hidden md:flex justify-center items-center flex-1 min-w-0 px-1">
+            <nav className="flex items-center gap-0.5 lg:gap-1 bg-slate-100/90 p-1 rounded-2xl border border-slate-200/90 shadow-xs max-w-full overflow-x-auto no-scrollbar">
               
               {/* 1. Feed (Home) */}
               <button
                 onClick={() => setCurrentTab('feed')}
-                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
                   currentTab === 'feed'
-                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(99,102,241,0.08),0_1px_3px_rgba(0,0,0,0.05)] ring-1 ring-slate-200/90 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-bold'
+                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
                 }`}
                 title="Feed (Home)"
               >
-                <NavFeedIcon active={currentTab === 'feed'} className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
+                <NavFeedIcon active={currentTab === 'feed'} className="w-4 h-4 flex-shrink-0" />
                 <span>Feed</span>
-
-                {/* Hover Tooltip */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-slate-900/95 backdrop-blur-md border border-slate-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-                  Feed (Home)
-                </div>
               </button>
 
               {/* 2. My Network */}
               <button
                 onClick={() => setCurrentTab('network')}
-                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
                   currentTab === 'network'
-                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(79,70,229,0.08),0_1px_3px_rgba(0,0,0,0.05)] ring-1 ring-slate-200/90 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-bold'
+                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
                 }`}
-                title="My Professional Network"
+                title={`My Professional Network (${seekersCount + employersCount})`}
               >
-                <NavNetworkIcon active={currentTab === 'network'} className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
+                <NavNetworkIcon active={currentTab === 'network'} className="w-4 h-4 flex-shrink-0" />
                 <span>Network</span>
-
-                {/* Hover Tooltip */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-slate-900/95 backdrop-blur-md border border-slate-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-                  My Network ({seekersCount + employersCount})
-                </div>
               </button>
 
-              {/* 3. Live Map Radar */}
+              {/* 3. Live Map */}
               <button
                 onClick={() => setCurrentTab('map')}
-                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
                   currentTab === 'map'
-                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(6,182,212,0.1),0_1px_3px_rgba(0,0,0,0.05)] ring-1 ring-slate-200/90 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-bold'
+                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
                 }`}
-                title="Live Radar Map"
+                title="Live Map"
               >
-                <NavRadarIcon active={currentTab === 'map'} className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
-                <span>Radar</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-ping ml-0.5 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-
-                {/* Hover Tooltip */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-slate-900/95 backdrop-blur-md border border-slate-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-                  Live Radar Map
-                </div>
+                <NavRadarIcon active={currentTab === 'map'} className="w-4 h-4 flex-shrink-0" />
+                <span>Map</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse ml-0.5 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
               </button>
 
               {/* 4. Jobs & Applied */}
               <button
                 onClick={() => setCurrentTab('jobs')}
-                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
                   currentTab === 'jobs' || currentTab === 'applications'
-                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(124,58,237,0.08),0_1px_3px_rgba(0,0,0,0.05)] ring-1 ring-slate-200/90 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-bold'
+                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
                 }`}
-                title="Job Board & Applications"
+                title={`Job Board & Applications (${jobsCount} openings)`}
               >
-                <NavJobsIcon active={currentTab === 'jobs' || currentTab === 'applications'} className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
+                <NavJobsIcon active={currentTab === 'jobs' || currentTab === 'applications'} className="w-4 h-4 flex-shrink-0" />
                 <span>Jobs</span>
                 {jobsCount > 0 && (
-                  <span className="text-[10px] lg:text-[11px] bg-indigo-50 px-1.5 py-0.2 rounded-full text-indigo-700 border border-indigo-200 font-extrabold">
+                  <span className="text-[10px] bg-indigo-50 px-1.5 py-0.2 rounded-full text-indigo-700 border border-indigo-200 font-extrabold">
                     {jobsCount}
                   </span>
                 )}
-
-                {/* Hover Tooltip */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-slate-900/95 backdrop-blur-md border border-slate-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-                  Jobs & Applications ({jobsCount} openings)
-                </div>
               </button>
 
               {/* 5. Speed Connect Hub */}
               <button
                 onClick={() => setCurrentTab('connect')}
-                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
                   currentTab === 'connect'
-                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(16,185,129,0.08),0_1px_3px_rgba(0,0,0,0.05)] ring-1 ring-slate-200/90 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-bold'
+                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
                 }`}
                 title="Speed Connect Hub (Audio & Video Calls)"
               >
-                <NavConnectIcon active={currentTab === 'connect'} className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
+                <NavConnectIcon active={currentTab === 'connect'} className="w-4 h-4 flex-shrink-0" />
                 <span>Connect</span>
-
-                {/* Hover Tooltip */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-slate-900/95 backdrop-blur-md border border-slate-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-                  Speed Connect (Calls & Chat)
-                </div>
               </button>
 
               {/* 6. Anonymous Discussions */}
               <button
                 onClick={() => setCurrentTab('anon')}
-                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
                   currentTab === 'anon'
-                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(249,115,22,0.1),0_1px_3px_rgba(0,0,0,0.05)] ring-1 ring-slate-200/90 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-bold'
+                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
                 }`}
                 title="JobScout Anon Talk"
               >
                 <div className="relative">
-                  <NavAnonIcon active={currentTab === 'anon'} className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
-                  <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-orange-500 rounded-full animate-ping" />
+                  <NavAnonIcon active={currentTab === 'anon'} className="w-4 h-4 flex-shrink-0" />
+                  <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" />
                 </div>
-                <span>
-                  <span className="hidden xl:inline">Anon Talk</span>
-                  <span className="xl:hidden">Anon</span>
-                </span>
-
-                {/* Hover Tooltip */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-slate-900/95 backdrop-blur-md border border-slate-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-                  JobScout Anon Talk
-                </div>
+                <span>Anon</span>
               </button>
 
               {/* 7. Full-Page Messaging */}
               <button
                 onClick={() => setCurrentTab('messages')}
-                className={`group relative flex items-center gap-1.5 lg:gap-2 px-2.5 md:px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-xs lg:text-[13px] transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
                   currentTab === 'messages'
-                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(79,70,229,0.08),0_1px_3px_rgba(0,0,0,0.05)] ring-1 ring-slate-200/90 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-bold'
+                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
                 }`}
                 title="Full-Page Messaging (चैट)"
               >
                 <div className="relative">
-                  <NavMessagesIcon active={currentTab === 'messages'} className="w-4 h-4 lg:w-[18px] lg:h-[18px] flex-shrink-0" />
+                  <NavMessagesIcon active={currentTab === 'messages'} className="w-4 h-4 flex-shrink-0" />
                   <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
                 </div>
-                <span>Messages</span>
-
-                {/* Hover Tooltip */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-slate-900/95 backdrop-blur-md border border-slate-800 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-                  Full-Page Messaging (चैट)
-                </div>
+                <span className="hidden xl:inline">Messages</span>
+                <span className="xl:hidden">Chat</span>
               </button>
             </nav>
           </div>
@@ -756,31 +706,24 @@ export const Navbar = ({
               )}
             </div>
 
-            {/* Post Job Button (if Employer) with Hover Tooltip */}
+            {/* Post Job Button (if Employer) */}
             {user && isEmployer && (
-              <div className="relative group">
-                <button
-                  onClick={onOpenPostJob}
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 text-white shadow-md shadow-emerald-600/20 border border-emerald-500/30 transition-all active:scale-95"
-                  title="Post a New Job on Map"
-                >
-                  <PlusCircle className="w-4 h-4" />
-                  <span className="hidden md:inline">Post Job</span>
-                </button>
-
-                {/* Hover Tooltip */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-900 border border-slate-800 text-white text-[10px] font-bold rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-                  Post a Job on Live Map
-                </div>
-              </div>
+              <button
+                onClick={onOpenPostJob}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 text-white shadow-md shadow-emerald-600/20 border border-emerald-500/30 transition-all active:scale-95 flex-shrink-0"
+                title="Post a New Job on Map"
+              >
+                <PlusCircle className="w-4 h-4" />
+                <span className="hidden md:inline">Post Job</span>
+              </button>
             )}
 
-            {/* Notifications Bell Dropdown with Hover Tooltip */}
-            <div className="relative group" ref={notifRef}>
+            {/* Notifications Bell Dropdown */}
+            <div className="relative" ref={notifRef}>
               <button
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
-                title="Notifications"
-                className="relative p-1.5 sm:p-2 rounded-xl bg-slate-100/90 hover:bg-slate-200/90 border border-slate-200/90 text-slate-700 hover:text-slate-900 transition-all shadow-xs"
+                title={`Notifications (${unreadNotifsCount} unread)`}
+                className="relative p-1.5 sm:p-2 rounded-xl bg-slate-100/90 hover:bg-slate-200/90 border border-slate-200/90 text-slate-700 hover:text-slate-900 transition-all shadow-xs flex-shrink-0"
               >
                 <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 {unreadNotifsCount > 0 && (
@@ -789,11 +732,6 @@ export const Navbar = ({
                   </span>
                 )}
               </button>
-
-              {/* Hover Tooltip */}
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-900 border border-slate-800 text-white text-[10px] font-bold rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-                Notifications ({unreadNotifsCount} unread)
-              </div>
 
               {/* Notifications Dropdown */}
               {notificationsOpen && (
@@ -898,11 +836,6 @@ export const Navbar = ({
 
                   <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-500 flex-shrink-0 ml-0.5" />
                 </button>
-
-                {/* Hover Tooltip */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-900 border border-slate-800 text-white text-[10px] font-bold rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-                  {user.name} ({isEmployer ? 'Employer' : 'Seeker'})
-                </div>
 
                 {/* Profile Dropdown Menu */}
                 {profileMenuOpen && (
@@ -1176,7 +1109,7 @@ export const Navbar = ({
               >
                 <div className="flex items-center gap-3">
                   <NavRadarIcon active={currentTab === 'map'} className="w-4 h-4 flex-shrink-0" />
-                  <span>Live Radar Map</span>
+                  <span>Live Map</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
