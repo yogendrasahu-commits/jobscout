@@ -232,6 +232,7 @@ function MainApp() {
             onSelectSeeker={(seeker) => setSelectedSeeker(seeker)}
             onSelectJob={(job) => setSelectedJob(job)}
             onNavigateToMap={() => setCurrentTab('map')}
+            onNavigateToJobs={() => setCurrentTab('jobs')}
             onOpenProfile={handleOpenProfile}
           />
         )}
