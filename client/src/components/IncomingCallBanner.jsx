@@ -1,14 +1,40 @@
 import React from 'react';
-import { Phone, PhoneCall, PhoneOff, Video, User } from 'lucide-react';
+import { Phone, PhoneCall, PhoneOff, Video, User, AlertCircle, X } from 'lucide-react';
 import { useSocket } from '../context/SocketContext';
 
 export const IncomingCallBanner = () => {
-  const { incomingCall, acceptCall, rejectCall } = useSocket();
-
-  if (!incomingCall) return null;
+  const { incomingCall, acceptCall, rejectCall, callNotice, dismissCallNotice } = useSocket();
 
   return (
-    <div className="fixed top-16 sm:top-20 left-3 right-3 sm:left-auto sm:right-8 z-[1000] animate-bounce duration-1000 max-w-sm sm:w-full">
+    <>
+      {/* Realtime Call Status & System Notice Toast */}
+      {callNotice && (
+        <div className="fixed top-16 sm:top-20 right-3 sm:right-6 z-[1100] animate-in fade-in slide-in-from-top-4 duration-300 max-w-sm sm:max-w-md w-[calc(100%-24px)] sm:w-auto">
+          <div className="bg-white/95 backdrop-blur-xl border border-slate-200/90 rounded-2xl p-3.5 shadow-2xl flex items-start gap-3 text-slate-900 ring-1 ring-slate-900/5">
+            <div className={`p-2 rounded-xl flex-shrink-0 ${
+              callNotice.type === 'error' ? 'bg-rose-50 text-rose-600 border border-rose-200' :
+              callNotice.type === 'warning' ? 'bg-amber-50 text-amber-600 border border-amber-200' :
+              'bg-indigo-50 text-indigo-600 border border-indigo-200'
+            }`}>
+              <AlertCircle className="w-4 h-4" />
+            </div>
+            <div className="flex-1 min-w-0 pt-0.5">
+              <p className="text-xs font-bold text-slate-800 leading-snug">{callNotice.message}</p>
+            </div>
+            <button
+              onClick={dismissCallNotice}
+              className="text-slate-400 hover:text-slate-700 p-1 rounded-lg transition-colors -mr-1 -mt-1"
+              title="Dismiss notification"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Ringing Incoming Call Overlay */}
+      {incomingCall && (
+        <div className="fixed top-16 sm:top-20 left-3 right-3 sm:left-auto sm:right-8 z-[1000] animate-bounce duration-1000 max-w-sm sm:w-full">
       <div className="bg-white/95 backdrop-blur-xl border border-slate-200/90 rounded-3xl p-4 shadow-2xl flex items-center justify-between gap-4 text-slate-900">
         
         {/* Caller Avatar & Ring Effect */}
@@ -54,7 +80,9 @@ export const IncomingCallBanner = () => {
           </button>
         </div>
 
+        </div>
       </div>
-    </div>
+      )}
+    </>
   );
 };

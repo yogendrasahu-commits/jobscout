@@ -99,6 +99,16 @@ export const SocketProvider = ({ children }) => {
   const [activeCall, setActiveCall] = useState(null); // { otherUser, isVideo, status, isMuted, isCamOff }
   const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
+  const [callNotice, setCallNotice] = useState(null); // { message: string, type: 'info' | 'warning' | 'error' }
+
+  const showCallNotice = (message, type = 'info') => {
+    setCallNotice({ message, type });
+    setTimeout(() => {
+      setCallNotice(prev => (prev?.message === message ? null : prev));
+    }, 4500);
+  };
+
+  const dismissCallNotice = () => setCallNotice(null);
 
   const pcRef = useRef(null);
   const localStreamRef = useRef(null);
@@ -167,13 +177,13 @@ export const SocketProvider = ({ children }) => {
 
     s.on('call:rejected', (data) => {
       ringtone.stop();
-      alert(`Call was declined: ${data.reason || 'User busy'}`);
+      showCallNotice(`Call was declined: ${data.reason || 'User busy'}`, 'warning');
       cleanupCall();
     });
 
     s.on('call:user_offline', () => {
       ringtone.stop();
-      alert('The user is currently offline. You can send them a chat message instead.');
+      showCallNotice('The user is currently offline. You can send them a direct message instead.', 'info');
       cleanupCall();
     });
 
@@ -347,7 +357,7 @@ export const SocketProvider = ({ children }) => {
       });
     } catch (err) {
       console.error('Cannot access camera/mic:', err);
-      alert('Could not access microphone or camera. Please verify device permissions in your browser.');
+      showCallNotice('Could not access microphone or camera. Please check device permissions in your browser.', 'error');
     }
   };
 
@@ -384,7 +394,7 @@ export const SocketProvider = ({ children }) => {
       setIncomingCall(null);
     } catch (err) {
       console.error('Cannot access media on accept:', err);
-      alert('Could not access microphone or camera to accept call.');
+      showCallNotice('Could not access microphone or camera to accept the call.', 'error');
       rejectCall();
     }
   };
@@ -478,6 +488,9 @@ export const SocketProvider = ({ children }) => {
         activeCall,
         localStream,
         remoteStream,
+        callNotice,
+        showCallNotice,
+        dismissCallNotice,
         startCall,
         acceptCall,
         rejectCall,

@@ -2232,6 +2232,23 @@
   ],
   "posts": [
     {
+      "id": "post_1792297812669_je8l",
+      "createdAt": "2026-10-18T04:30:12.671Z",
+      "likes": 0,
+      "likedBy": [],
+      "comments": [],
+      "authorId": "usr_seek_1",
+      "authorName": "Rahul Sharma",
+      "authorRole": "seeker",
+      "authorTitle": "Full Stack React & WebRTC Developer",
+      "authorAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "content": "#OpenToWork #ReactJS #UIUX",
+      "image": null,
+      "tags": [
+        "#OpenToWork"
+      ]
+    },
+    {
       "id": "post_1792144548268_bq89",
       "createdAt": "2026-10-16T09:55:48.268Z",
       "likes": 0,

@@ -251,6 +251,13 @@ const isWithinIndia = (lat, lng) => {
   return !isNaN(nLat) && !isNaN(nLng) && nLat >= 6.0 && nLat <= 38.0 && nLng >= 68.0 && nLng <= 98.0;
 };
 
+// Validate coordinates are valid numbers and within world boundaries
+const isValidCoord = (lat, lng) => {
+  const nLat = Number(lat);
+  const nLng = Number(lng);
+  return !isNaN(nLat) && !isNaN(nLng) && isFinite(nLat) && isFinite(nLng) && nLat >= -90.0 && nLat <= 90.0 && nLng >= -180.0 && nLng <= 180.0;
+};
+
 // Clamp coordinates to stay within Indian territory
 const clampToIndia = (lat, lng) => {
   const clampedLat = Math.min(Math.max(Number(lat), 7.0), 36.5);
@@ -722,14 +729,20 @@ export const UberJobMap = ({
 
   // Compute live distance for each job relative to centerCoords
   const processedJobs = useMemo(() => {
-    return jobs.map((job) => {
-      const dist = calculateDistance(safeCoords[0], safeCoords[1], job.lat, job.lng);
-      return {
-        ...job,
-        distanceKm: dist,
-        isInsideRadar: dist <= radiusKm
-      };
-    });
+    return (jobs || [])
+      .filter((job) => isValidCoord(job?.lat, job?.lng))
+      .map((job) => {
+        const lat = Number(job.lat);
+        const lng = Number(job.lng);
+        const dist = calculateDistance(safeCoords[0], safeCoords[1], lat, lng);
+        return {
+          ...job,
+          lat,
+          lng,
+          distanceKm: dist,
+          isInsideRadar: dist <= radiusKm
+        };
+      });
   }, [jobs, safeCoords, radiusKm]);
 
   // Filtered Jobs: according to category + strict radar setting
@@ -749,12 +762,15 @@ export const UberJobMap = ({
 
   // Compute live distance for each seeker relative to centerCoords
   const processedSeekers = useMemo(() => {
-    return seekers
-      .filter((s) => s.id !== user?.id) // Do not display oneself as a separate candidate marker
+    return (seekers || [])
+      .filter((s) => s && s.id !== user?.id) // Do not display oneself as a separate candidate marker
       .map((seeker) => {
         const livePos = otherUserLocations[seeker.id];
-        const lat = livePos?.lat ?? seeker.lat;
-        const lng = livePos?.lng ?? seeker.lng;
+        const rawLat = livePos?.lat ?? seeker.lat;
+        const rawLng = livePos?.lng ?? seeker.lng;
+        if (!isValidCoord(rawLat, rawLng)) return null;
+        const lat = Number(rawLat);
+        const lng = Number(rawLng);
         const dist = calculateDistance(safeCoords[0], safeCoords[1], lat, lng);
         return {
           ...seeker,
@@ -763,7 +779,8 @@ export const UberJobMap = ({
           distanceKm: dist,
           isInsideRadar: dist <= radiusKm
         };
-      });
+      })
+      .filter(Boolean);
   }, [seekers, user?.id, otherUserLocations, safeCoords, radiusKm]);
 
   // Filtered Seekers: according to strict radar setting

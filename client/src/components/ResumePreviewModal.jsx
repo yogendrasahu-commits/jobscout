@@ -20,6 +20,8 @@ import {
 export const ResumePreviewModal = ({ candidate, isOpen, onClose }) => {
   if (!isOpen || !candidate) return null;
 
+  const [copied, setCopied] = React.useState(false);
+
   const handlePrint = () => {
     window.print();
   };
@@ -27,7 +29,8 @@ export const ResumePreviewModal = ({ candidate, isOpen, onClose }) => {
   const handleShare = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(window.location.href);
-      alert('Candidate profile link copied to clipboard!');
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
     }
   };
 
@@ -49,11 +52,15 @@ export const ResumePreviewModal = ({ candidate, isOpen, onClose }) => {
             <button
               type="button"
               onClick={handleShare}
-              className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 shadow-xs"
+              className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 shadow-xs ${
+                copied 
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-300' 
+                  : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
+              }`}
               title="Share Profile Link"
             >
-              <Share2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Share</span>
+              {copied ? <CheckCircle className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5" />}
+              <span className="hidden sm:inline">{copied ? 'Link Copied!' : 'Share'}</span>
             </button>
 
             <button

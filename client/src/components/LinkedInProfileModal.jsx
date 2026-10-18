@@ -18,11 +18,13 @@ import {
   ThumbsUp,
   ArrowLeft,
   Mail,
-  Edit3
+  Edit3,
+  FileText
 } from 'lucide-react';
 import { useSocket } from '../context/SocketContext';
 import { useAuth } from '../context/AuthContext';
 import { UpdateEmailModal } from './UpdateEmailModal';
+import { ResumePreviewModal } from './ResumePreviewModal';
 
 export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
   const { user } = useAuth();
@@ -31,6 +33,7 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [endorsedSkills, setEndorsedSkills] = useState({});
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
 
   if (!isOpen || !profileUser) return null;
 
@@ -208,7 +211,7 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
 
           {/* Open To Work Card (If Seeker) */}
           {isSeeker && (
-            <div className="p-4 bg-emerald-50/70 border border-emerald-200/90 rounded-2xl mb-5 flex items-start justify-between gap-3">
+            <div className="p-4 bg-emerald-50/70 border border-emerald-200/90 rounded-2xl mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <span className="text-[10px] font-extrabold text-emerald-800 uppercase tracking-wider block mb-1">
                   Open to Work Preferences
@@ -220,9 +223,20 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
                   Availability: <strong className="text-emerald-700">{profileUser.availability || 'Immediate (Ready Today)'}</strong> • Expected: <strong className="text-slate-800">{profileUser.expectedSalary || '₹18,00,000 / yr'}</strong>
                 </p>
               </div>
-              <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-lg border border-emerald-200">
-                Active Candidate
-              </span>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsResumeModalOpen(true)}
+                  className="px-3 py-1.5 bg-white hover:bg-emerald-100 text-emerald-800 text-xs font-bold rounded-xl border border-emerald-300 transition-all shadow-xs flex items-center gap-1.5 active:scale-95"
+                  title="View & Print Verified CV"
+                >
+                  <FileText className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>View CV (बायोडाटा)</span>
+                </button>
+                <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-lg border border-emerald-200">
+                  Active Candidate
+                </span>
+              </div>
             </div>
           )}
 
@@ -345,6 +359,14 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
           onUpdated={(newEmail) => {
             if (profileUser) profileUser.email = newEmail;
           }}
+        />
+      )}
+
+      {isResumeModalOpen && (
+        <ResumePreviewModal
+          candidate={profileUser}
+          isOpen={isResumeModalOpen}
+          onClose={() => setIsResumeModalOpen(false)}
         />
       )}
     </div>

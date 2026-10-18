@@ -33,6 +33,7 @@ export const Feed = ({
   onNavigateToMap, 
   onNavigateToAnon,
   onNavigateToApplications,
+  onNavigateToSavedJobs,
   onOpenProfile 
 }) => {
   const { user, isEmployer, isSeeker } = useAuth();
@@ -46,6 +47,7 @@ export const Feed = ({
   const [selectedTag, setSelectedTag] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [postError, setPostError] = useState('');
+  const [copiedPostId, setCopiedPostId] = useState(null);
   
   // Active comments drawer per post
   const [activeCommentsPostId, setActiveCommentsPostId] = useState(null);
@@ -302,7 +304,10 @@ export const Feed = ({
           {/* Quick Shortcuts */}
           <div className="bg-white border border-slate-200/90 rounded-3xl p-4 shadow-sm text-xs space-y-2.5">
             <h4 className="font-bold text-slate-400 text-[11px] uppercase tracking-wider mb-2">My Shortcuts</h4>
-            <div className="flex items-center gap-2 text-slate-600 hover:text-indigo-600 cursor-pointer transition-colors">
+            <div 
+              onClick={() => onNavigateToSavedJobs && onNavigateToSavedJobs()}
+              className="flex items-center gap-2 text-slate-600 hover:text-indigo-600 cursor-pointer transition-colors"
+            >
               <Bookmark className="w-4 h-4 text-indigo-600" />
               <span>Saved Jobs & Opportunities</span>
             </div>
@@ -560,13 +565,25 @@ export const Feed = ({
 
                     <button
                       onClick={() => {
-                        navigator.clipboard?.writeText(window.location.href);
-                        alert('Post link copied to clipboard!');
+                        if (navigator.clipboard) {
+                          navigator.clipboard.writeText(window.location.href);
+                          setCopiedPostId(post.id);
+                          setTimeout(() => setCopiedPostId(null), 2500);
+                        }
                       }}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all"
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                        copiedPostId === post.id
+                          ? 'text-emerald-700 bg-emerald-50'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                      }`}
+                      title="Share Post Link"
                     >
-                      <Share2 className="w-4 h-4" />
-                      <span>Share</span>
+                      {copiedPostId === post.id ? (
+                        <Check className="w-4 h-4 text-emerald-600" />
+                      ) : (
+                        <Share2 className="w-4 h-4" />
+                      )}
+                      <span>{copiedPostId === post.id ? 'Copied Link!' : 'Share'}</span>
                     </button>
                   </div>
 

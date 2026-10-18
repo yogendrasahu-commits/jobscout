@@ -41,6 +41,7 @@ function MainApp() {
   const [selectedSeeker, setSelectedSeeker] = useState(null);
   const [selectedProfileUser, setSelectedProfileUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [jobsQuickFilter, setJobsQuickFilter] = useState('all');
 
   // Live Socket.IO listeners for real-time synchronization across dual windows/devices
   useEffect(() => {
@@ -215,6 +216,11 @@ function MainApp() {
               setCurrentTab('jobs');
               setJobsSubTab('applied');
             }}
+            onNavigateToSavedJobs={() => {
+              setCurrentTab('jobs');
+              setJobsSubTab('browse');
+              setJobsQuickFilter('saved');
+            }}
             onOpenProfile={handleOpenProfile}
           />
         )}
@@ -256,6 +262,8 @@ function MainApp() {
                 setCurrentTab('jobs');
               }
             }}
+            initialQuickFilter={jobsQuickFilter}
+            onQuickFilterChange={(filter) => setJobsQuickFilter(filter)}
           />
         )}
 

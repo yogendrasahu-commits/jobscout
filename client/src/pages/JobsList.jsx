@@ -31,7 +31,9 @@ export const JobsList = ({
   onOpenAuth,
   activeSubTab: externalActiveSubTab,
   setActiveSubTab: externalSetActiveSubTab,
-  defaultSubTab = 'browse'
+  defaultSubTab = 'browse',
+  initialQuickFilter = 'all',
+  onQuickFilterChange
 }) => {
   const { user, token, isEmployer } = useAuth();
   const [internalSearchTerm, setInternalSearchTerm] = useState('');
@@ -95,7 +97,18 @@ export const JobsList = ({
   const [selectedWorkMode, setSelectedWorkMode] = useState('All');
   const [selectedExperience, setSelectedExperience] = useState('All');
   const [sortBy, setSortBy] = useState('newest');
-  const [quickFilter, setQuickFilter] = useState('all'); // 'all', 'saved', 'urgent', 'remote', 'easy_apply'
+  const [quickFilter, setQuickFilter] = useState(initialQuickFilter || 'all'); // 'all', 'saved', 'urgent', 'remote', 'easy_apply'
+
+  useEffect(() => {
+    if (initialQuickFilter) {
+      setQuickFilter(initialQuickFilter);
+    }
+  }, [initialQuickFilter]);
+
+  const handleQuickFilterChange = (filter) => {
+    setQuickFilter(filter);
+    if (onQuickFilterChange) onQuickFilterChange(filter);
+  };
 
   // Filter & Sort Logic
   const filteredJobs = jobs
@@ -231,7 +244,7 @@ export const JobsList = ({
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none mb-4">
             <button
               type="button"
-              onClick={() => setQuickFilter('all')}
+              onClick={() => handleQuickFilterChange('all')}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
                 quickFilter === 'all'
                   ? 'bg-slate-900 text-white shadow-xs'
@@ -246,7 +259,7 @@ export const JobsList = ({
 
             <button
               type="button"
-              onClick={() => setQuickFilter('saved')}
+              onClick={() => handleQuickFilterChange('saved')}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
                 quickFilter === 'saved'
                   ? 'bg-amber-600 text-white shadow-xs'
@@ -264,7 +277,7 @@ export const JobsList = ({
 
             <button
               type="button"
-              onClick={() => setQuickFilter('urgent')}
+              onClick={() => handleQuickFilterChange('urgent')}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
                 quickFilter === 'urgent'
                   ? 'bg-orange-600 text-white shadow-xs'
@@ -277,7 +290,7 @@ export const JobsList = ({
 
             <button
               type="button"
-              onClick={() => setQuickFilter('remote')}
+              onClick={() => handleQuickFilterChange('remote')}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
                 quickFilter === 'remote'
                   ? 'bg-cyan-600 text-white shadow-xs'
