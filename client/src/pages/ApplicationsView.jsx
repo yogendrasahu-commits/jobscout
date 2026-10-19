@@ -25,7 +25,6 @@ import { useSocket } from '../context/SocketContext';
 import { IssueOfferModal } from '../components/IssueOfferModal';
 import { ViewOfferLetterModal } from '../components/ViewOfferLetterModal';
 import { ProfileEditModal } from '../components/ProfileEditModal';
-import { EmailSenderConfigModal } from '../components/EmailSenderConfigModal';
 import { ResumePreviewModal } from '../components/ResumePreviewModal';
 
 export const ApplicationsView = ({ 
@@ -45,7 +44,6 @@ export const ApplicationsView = ({
   const [selectedAppForView, setSelectedAppForView] = useState(null);
   const [selectedCandidateForCV, setSelectedCandidateForCV] = useState(null);
   const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
-  const [isSenderConfigOpen, setIsSenderConfigOpen] = useState(false);
 
   const fetchApplications = async () => {
     if (!token) {
@@ -255,19 +253,6 @@ export const ApplicationsView = ({
               <span>Edit Profile (प्रोफाइल एडिट करें)</span>
             </button>
           </div>
-
-          {/* Employer Email Sender Setup Button */}
-          {isEmployer && (
-            <button
-              type="button"
-              onClick={() => setIsSenderConfigOpen(true)}
-              className="px-3 py-2 rounded-2xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 shadow-xs whitespace-nowrap"
-              title="Configure Gmail App Password or SMTP to send real emails to candidates"
-            >
-              <Settings className="w-4 h-4 text-amber-600" />
-              <span>Email Sender Setup (Gmail)</span>
-            </button>
-          )}
         </div>
       </div>
 
@@ -592,14 +577,6 @@ export const ApplicationsView = ({
         isOpen={isProfileEditOpen}
         onClose={() => setIsProfileEditOpen(false)}
       />
-
-      {/* 4. Modal to Configure Real Gmail / SMTP Sender */}
-      {isSenderConfigOpen && (
-        <EmailSenderConfigModal
-          isOpen={isSenderConfigOpen}
-          onClose={() => setIsSenderConfigOpen(false)}
-        />
-      )}
 
       {/* 5. Modal to Preview Candidate CV */}
       {selectedCandidateForCV && (
