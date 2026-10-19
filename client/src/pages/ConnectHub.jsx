@@ -25,13 +25,30 @@ export const ConnectHub = ({ seekers = [], employers = [], jobs = [], onSelectSe
   const { user, isEmployer } = useAuth();
   const { setActiveChatUser, startCall, otherUserLocations } = useSocket();
 
-  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'online' | 'verified' | 'nearby'
+  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'candidates' | 'employers' | 'online' | 'nearby'
   const [searchTerm, setSearchTerm] = useState('');
 
-  // If Employer: connect targets are Job Seekers (filtered out self)
-  // If Seeker: connect targets are Employers/Recruiters (filtered out self)
-  const rawList = isEmployer ? seekers : employers;
-  const connectList = rawList.filter(item => item.id !== user?.id);
+  // Combine both candidates and employers into a unified ready-to-call pool
+  const allAvailableUsers = React.useMemo(() => {
+    let pool = [];
+    if (activeFilter === 'candidates') {
+      pool = seekers;
+    } else if (activeFilter === 'employers') {
+      pool = employers;
+    } else {
+      // By default, prioritize the complementary role, followed by peers
+      const primary = isEmployer ? seekers : employers;
+      const secondary = isEmployer ? employers : seekers;
+      pool = [...primary, ...secondary];
+    }
+    const seen = new Set();
+    return pool.filter(item => {
+      if (!item || String(item.id) === String(user?.id)) return false;
+      if (seen.has(item.id)) return false;
+      seen.add(item.id);
+      return true;
+    });
+  }, [seekers, employers, isEmployer, user?.id, activeFilter]);
 
   const parseSkills = (skills) => {
     if (Array.isArray(skills)) return skills;
@@ -42,22 +59,23 @@ export const ConnectHub = ({ seekers = [], employers = [], jobs = [], onSelectSe
   };
 
   // Filter & Search
-  const filteredList = connectList.filter((item) => {
-    const q = searchTerm.toLowerCase();
-    const parsedSkills = parseSkills(item.skills);
-    const matchesSearch = 
-      item.name.toLowerCase().includes(q) ||
-      (item.title && item.title.toLowerCase().includes(q)) ||
-      (item.companyName && item.companyName.toLowerCase().includes(q)) ||
-      parsedSkills.some(s => s.toLowerCase().includes(q));
+  const filteredList = React.useMemo(() => {
+    const q = searchTerm.trim().toLowerCase();
+    return allAvailableUsers.filter((item) => {
+      const parsedSkills = parseSkills(item.skills);
+      const matchesSearch = !q ||
+        item.name?.toLowerCase().includes(q) ||
+        (item.title && item.title.toLowerCase().includes(q)) ||
+        (item.companyName && item.companyName.toLowerCase().includes(q)) ||
+        parsedSkills.some(s => s.toLowerCase().includes(q));
 
-    if (!matchesSearch) return false;
+      if (!matchesSearch) return false;
 
-    if (activeFilter === 'online') return item.isOnline !== false;
-    if (activeFilter === 'nearby') return item.distanceKm ? item.distanceKm <= 5 : true;
+      if (activeFilter === 'online') return item.isOnline !== false;
 
-    return true;
-  });
+      return true;
+    });
+  }, [allAvailableUsers, searchTerm, activeFilter]);
 
   return (
     <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
@@ -123,9 +141,10 @@ export const ConnectHub = ({ seekers = [], employers = [], jobs = [], onSelectSe
         {/* Filter Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
           {[
-            { id: 'all', label: 'All Profiles' },
-            { id: 'online', label: '🟢 Online Now' },
-            { id: 'nearby', label: '📍 Within 5 km' }
+            { id: 'all', label: `All Profiles (${seekers.length + employers.length - (user ? 1 : 0)})` },
+            { id: 'candidates', label: `Candidates (${seekers.filter(s => s.id !== user?.id).length})` },
+            { id: 'employers', label: `Recruiters (${employers.filter(e => e.id !== user?.id).length})` },
+            { id: 'online', label: '🟢 Online Now' }
           ].map((f) => (
             <button
               key={f.id}

@@ -484,6 +484,9 @@ router.put('/location', authenticateToken, (req, res) => {
   }
 
   const { password: _, ...safeUser } = updated;
+  if (req.io) {
+    req.io.emit('user:updated', safeUser);
+  }
   res.json({ user: safeUser });
 });
 
@@ -545,6 +548,10 @@ router.put('/profile', authenticateToken, (req, res) => {
   }
 
   const { password: _, ...safeUser } = updated;
+
+  if (req.io) {
+    req.io.emit('user:updated', safeUser);
+  }
 
   // Generate refreshed token with updated email/name
   const token = jwt.sign(

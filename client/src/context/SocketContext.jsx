@@ -202,38 +202,62 @@ export const SocketProvider = ({ children }) => {
     });
 
     s.on('call:signal', async ({ fromUserId, signal }) => {
-      if (!pcRef.current) return;
+      if (!signal) return;
 
       try {
+        // ICE Candidate handling
+        if (signal.candidate) {
+          if (pcRef.current && pcRef.current.remoteDescription && pcRef.current.remoteDescription.type) {
+            try {
+              await pcRef.current.addIceCandidate(new RTCIceCandidate(signal.candidate));
+            } catch (candErr) {
+              console.warn('[WebRTC] addIceCandidate non-fatal warning:', candErr);
+            }
+          } else {
+            // Queue candidate until peer connection and remote description are set
+            candidateQueueRef.current.push(signal.candidate);
+          }
+          return;
+        }
+
+        // WebRTC Offer received
         if (signal.type === 'offer') {
+          if (!pcRef.current) {
+            setupPeerConnection(fromUserId);
+          }
+
           await pcRef.current.setRemoteDescription(new RTCSessionDescription(signal.sdp));
-          
-          // Drain queued candidates if any
+
+          // Drain any early queued candidates
           while (candidateQueueRef.current.length > 0) {
             const cand = candidateQueueRef.current.shift();
-            await pcRef.current.addIceCandidate(new RTCIceCandidate(cand)).catch(() => {});
+            try {
+              await pcRef.current.addIceCandidate(new RTCIceCandidate(cand));
+            } catch (e) {
+              console.warn('[WebRTC] Drained addIceCandidate warning:', e);
+            }
           }
 
           const answer = await pcRef.current.createAnswer();
           await pcRef.current.setLocalDescription(answer);
           s.emit('call:signal', {
-            toUserId: fromUserId,
-            fromUserId: userRef.current?.id,
+            toUserId: String(fromUserId),
+            fromUserId: String(userRef.current?.id),
             signal: { type: 'answer', sdp: answer }
           });
         } else if (signal.type === 'answer') {
-          await pcRef.current.setRemoteDescription(new RTCSessionDescription(signal.sdp));
-          
-          // Drain queued candidates if any
-          while (candidateQueueRef.current.length > 0) {
-            const cand = candidateQueueRef.current.shift();
-            await pcRef.current.addIceCandidate(new RTCIceCandidate(cand)).catch(() => {});
-          }
-        } else if (signal.candidate) {
-          if (pcRef.current.remoteDescription && pcRef.current.remoteDescription.type) {
-            await pcRef.current.addIceCandidate(new RTCIceCandidate(signal.candidate)).catch(() => {});
-          } else {
-            candidateQueueRef.current.push(signal.candidate);
+          if (pcRef.current) {
+            await pcRef.current.setRemoteDescription(new RTCSessionDescription(signal.sdp));
+
+            // Drain any queued candidates
+            while (candidateQueueRef.current.length > 0) {
+              const cand = candidateQueueRef.current.shift();
+              try {
+                await pcRef.current.addIceCandidate(new RTCIceCandidate(cand));
+              } catch (e) {
+                console.warn('[WebRTC] Drained addIceCandidate warning:', e);
+              }
+            }
           }
         }
       } catch (err) {
@@ -260,13 +284,16 @@ export const SocketProvider = ({ children }) => {
   const cleanupCall = () => {
     ringtone.stop();
     if (pcRef.current) {
-      pcRef.current.close();
+      try { pcRef.current.close(); } catch(e) {}
       pcRef.current = null;
     }
     if (localStreamRef.current) {
-      localStreamRef.current.getTracks().forEach(t => t.stop());
+      try {
+        localStreamRef.current.getTracks().forEach(t => t.stop());
+      } catch(e) {}
       localStreamRef.current = null;
     }
+    candidateQueueRef.current = [];
     setLocalStream(null);
     setRemoteStream(null);
     remoteStreamRef.current = null;
@@ -276,35 +303,83 @@ export const SocketProvider = ({ children }) => {
 
   // Setup Peer Connection
   const setupPeerConnection = (targetUserId) => {
+    if (pcRef.current) {
+      try { pcRef.current.close(); } catch(e) {}
+      pcRef.current = null;
+    }
+
     const pc = new RTCPeerConnection(ICE_SERVERS);
     pcRef.current = pc;
 
     pc.onicecandidate = (event) => {
       if (event.candidate && socket && userRef.current) {
         socket.emit('call:signal', {
-          toUserId: targetUserId,
-          fromUserId: userRef.current.id,
+          toUserId: String(targetUserId),
+          fromUserId: String(userRef.current.id),
           signal: { candidate: event.candidate }
         });
       }
     };
 
     pc.ontrack = (event) => {
-      console.log('Received remote track:', event.streams);
+      console.log('[WebRTC] Received remote track:', event.track?.kind, event.streams);
+      let stream = null;
       if (event.streams && event.streams[0]) {
-        remoteStreamRef.current = event.streams[0];
-        setRemoteStream(event.streams[0]);
+        stream = event.streams[0];
+      } else if (event.track) {
+        stream = new MediaStream([event.track]);
+      }
+      if (stream) {
+        remoteStreamRef.current = stream;
+        setRemoteStream(stream);
+      }
+    };
+
+    pc.onconnectionstatechange = () => {
+      console.log('[WebRTC] Connection state:', pc.connectionState);
+      if (pc.connectionState === 'connected') {
+        setActiveCall(prev => prev ? { ...prev, status: 'connected' } : null);
+      }
+    };
+
+    pc.oniceconnectionstatechange = () => {
+      console.log('[WebRTC] ICE Connection state:', pc.iceConnectionState);
+      if (pc.iceConnectionState === 'connected' || pc.iceConnectionState === 'completed') {
+        setActiveCall(prev => prev ? { ...prev, status: 'connected' } : null);
       }
     };
 
     // Add local tracks to peer connection
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach(track => {
-        pc.addTrack(track, localStreamRef.current);
+        try {
+          pc.addTrack(track, localStreamRef.current);
+        } catch (e) {
+          console.warn('Track add warning:', e);
+        }
       });
     }
 
     return pc;
+  };
+
+  // Synthetic silent audio stream generator in case physical microphone is missing or blocked during local testing
+  const createSyntheticAudioStream = () => {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return null;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const dst = ctx.createMediaStreamDestination();
+      const gain = ctx.createGain();
+      gain.gain.value = 0.0001;
+      osc.connect(gain);
+      gain.connect(dst);
+      osc.start();
+      return dst.stream;
+    } catch {
+      return null;
+    }
   };
 
   // Robust media acquisition with video -> audio fallback
@@ -319,27 +394,55 @@ export const SocketProvider = ({ children }) => {
           const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
           return { stream: audioStream, videoActive: false };
         } catch (audioErr) {
+          console.warn('Physical mic denied or missing, using synthetic fallback:', audioErr);
+          const synth = createSyntheticAudioStream();
+          if (synth) return { stream: synth, videoActive: false };
           throw audioErr;
         }
       }
     } else {
-      const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      return { stream: audioStream, videoActive: false };
+      try {
+        const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        return { stream: audioStream, videoActive: false };
+      } catch (audioErr) {
+        console.warn('Physical mic denied or missing, using synthetic fallback:', audioErr);
+        const synth = createSyntheticAudioStream();
+        if (synth) return { stream: synth, videoActive: false };
+        throw audioErr;
+      }
     }
   };
 
   // Start outgoing call
   const startCall = async (targetUser, isVideo = true) => {
-    if (!socket || !user) return;
+    if (!socket || !user) {
+      showCallNotice('Please sign in to make voice and video calls.', 'warning');
+      return;
+    }
+
+    const target = typeof targetUser === 'string'
+      ? { id: targetUser, name: 'User' }
+      : targetUser;
+
+    const targetId = target?.id || target?.userId || target?._id;
+    if (!targetId) {
+      showCallNotice('Invalid contact selected.', 'error');
+      return;
+    }
+
     try {
       const { stream, videoActive } = await getMediaStream(isVideo);
       localStreamRef.current = stream;
       setLocalStream(stream);
 
-      setupPeerConnection(targetUser.id);
+      setupPeerConnection(targetId);
 
       setActiveCall({
-        otherUser: targetUser,
+        otherUser: {
+          id: String(targetId),
+          name: target.name || target.employerName || 'User',
+          avatar: target.avatar || ''
+        },
         isVideo: videoActive,
         status: 'calling', // 'calling' | 'connected'
         isMuted: false,
@@ -349,10 +452,10 @@ export const SocketProvider = ({ children }) => {
       ringtone.playRing();
 
       socket.emit('call:initiate', {
-        toUserId: targetUser.id,
-        fromUserId: user.id,
-        fromName: user.name,
-        fromAvatar: user.avatar,
+        toUserId: String(targetId),
+        fromUserId: String(user.id),
+        fromName: user.name || 'User',
+        fromAvatar: user.avatar || '',
         isVideo: videoActive
       });
     } catch (err) {
@@ -375,7 +478,7 @@ export const SocketProvider = ({ children }) => {
 
       setActiveCall({
         otherUser: {
-          id: incomingCall.callerId,
+          id: String(incomingCall.callerId),
           name: incomingCall.callerName,
           avatar: incomingCall.callerAvatar
         },
@@ -386,8 +489,8 @@ export const SocketProvider = ({ children }) => {
       });
 
       socket.emit('call:accept', {
-        callerId: incomingCall.callerId,
-        receiverId: user.id,
+        callerId: String(incomingCall.callerId),
+        receiverId: String(user.id),
         receiverName: user.name
       });
 
@@ -404,7 +507,7 @@ export const SocketProvider = ({ children }) => {
     ringtone.stop();
     if (incomingCall && socket) {
       socket.emit('call:reject', {
-        callerId: incomingCall.callerId,
+        callerId: String(incomingCall.callerId),
         reason: 'Call declined by user'
       });
     }

@@ -456,6 +456,7 @@ const createUserLocationIcon = (isDragging = false) => {
 export const UberJobMap = ({ 
   jobs = [], 
   seekers = [], 
+  employers = [],
   onSelectJob, 
   onSelectSeeker, 
   onPostJobAtCoords 
@@ -768,10 +769,17 @@ export const UberJobMap = ({
       .sort((a, b) => a.distanceKm - b.distanceKm);
   }, [processedJobs, selectedCategory, strictRadar, showJobsLayer]);
 
-  // Compute live distance for each seeker relative to centerCoords
+  // Compute live distance for each candidate/employer relative to centerCoords
   const processedSeekers = useMemo(() => {
-    return (seekers || [])
-      .filter((s) => s && s.id !== user?.id) // Do not display oneself as a separate candidate marker
+    const peoplePool = [...(seekers || []), ...(employers || [])];
+    const seen = new Set();
+    return peoplePool
+      .filter((s) => {
+        if (!s || String(s.id) === String(user?.id)) return false;
+        if (seen.has(s.id)) return false;
+        seen.add(s.id);
+        return true;
+      })
       .map((seeker) => {
         const livePos = otherUserLocations[seeker.id];
         const rawLat = livePos?.lat ?? seeker.lat;
@@ -789,7 +797,7 @@ export const UberJobMap = ({
         };
       })
       .filter(Boolean);
-  }, [seekers, user?.id, otherUserLocations, safeCoords, radiusKm]);
+  }, [seekers, employers, user?.id, otherUserLocations, safeCoords, radiusKm]);
 
   // Filtered Seekers: according to strict radar setting
   const visibleSeekers = useMemo(() => {

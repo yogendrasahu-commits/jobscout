@@ -69,27 +69,25 @@ function MainApp() {
     };
 
     const handleUserRegisteredEvent = (newUser) => {
-      if (newUser.role === 'seeker') {
-        setSeekers(prev => {
-          if (prev.some(s => s.id === newUser.id)) return prev;
-          return [newUser, ...prev];
-        });
-      } else if (newUser.role === 'emp') {
-        setEmployers(prev => {
-          if (prev.some(e => e.id === newUser.id)) return prev;
-          return [newUser, ...prev];
-        });
-      }
+      fetchSeekers();
+      fetchEmployers();
+    };
+
+    const handleUserUpdatedEvent = (updatedUser) => {
+      fetchSeekers();
+      fetchEmployers();
     };
 
     socket.on('job:created', handleJobCreatedEvent);
     socket.on('job:deleted', handleJobDeletedEvent);
     socket.on('user:registered', handleUserRegisteredEvent);
+    socket.on('user:updated', handleUserUpdatedEvent);
 
     return () => {
       socket.off('job:created', handleJobCreatedEvent);
       socket.off('job:deleted', handleJobDeletedEvent);
       socket.off('user:registered', handleUserRegisteredEvent);
+      socket.off('user:updated', handleUserUpdatedEvent);
     };
   }, [socket]);
 
@@ -169,6 +167,23 @@ function MainApp() {
     fetchEmployers();
     setLoading(false);
   }, [user]);
+
+  // Synchronize seekers & employers whenever user switches to relevant tabs
+  useEffect(() => {
+    if (['network', 'connect', 'map', 'feed'].includes(currentTab)) {
+      fetchSeekers();
+      fetchEmployers();
+    }
+  }, [currentTab]);
+
+  // Background polling to ensure live updates across multiple windows/browsers
+  useEffect(() => {
+    const timer = setInterval(() => {
+      fetchSeekers();
+      fetchEmployers();
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Handle posting job from map pin
   const handlePostJobAtCoords = (coords) => {
@@ -331,6 +346,7 @@ function MainApp() {
           <UberJobMap
             jobs={jobs}
             seekers={seekers}
+            employers={employers}
             onSelectJob={(job) => setSelectedJob(job)}
             onSelectSeeker={(seeker) => handleOpenProfile(seeker)}
             onPostJobAtCoords={handlePostJobAtCoords}

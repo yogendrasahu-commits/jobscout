@@ -87,16 +87,19 @@ export function setupSocket(io) {
     // 1. Initiate Call
     socket.on('call:initiate', (payload) => {
       const { toUserId, fromUserId, fromName, fromAvatar, isVideo } = payload;
-      const receiverSockets = userSockets.get(toUserId);
+      const targetId = String(toUserId);
+      const receiverSockets = userSockets.get(targetId);
 
       if (!receiverSockets || receiverSockets.size === 0) {
-        socket.emit('call:user_offline', { toUserId });
+        console.log(`[WebRTC] Call initiate failed: target user ${targetId} is offline. Active users:`, Array.from(userSockets.keys()));
+        socket.emit('call:user_offline', { toUserId: targetId });
         return;
       }
 
+      console.log(`[WebRTC] Ringing target user ${targetId} on ${receiverSockets.size} socket(s) from caller ${fromUserId} (${fromName})`);
       receiverSockets.forEach(socketId => {
         io.to(socketId).emit('call:incoming', {
-          callerId: fromUserId,
+          callerId: String(fromUserId),
           callerName: fromName,
           callerAvatar: fromAvatar,
           isVideo: Boolean(isVideo)
@@ -107,12 +110,14 @@ export function setupSocket(io) {
     // 2. Accept Call
     socket.on('call:accept', (payload) => {
       const { callerId, receiverId, receiverName } = payload;
-      const callerSockets = userSockets.get(callerId);
+      const targetCallerId = String(callerId);
+      const callerSockets = userSockets.get(targetCallerId);
 
+      console.log(`[WebRTC] Call accepted by receiver ${receiverId} (${receiverName}) for caller ${targetCallerId}`);
       if (callerSockets) {
         callerSockets.forEach(socketId => {
           io.to(socketId).emit('call:accepted', {
-            receiverId,
+            receiverId: String(receiverId),
             receiverName
           });
         });
@@ -122,8 +127,10 @@ export function setupSocket(io) {
     // 3. Reject Call
     socket.on('call:reject', (payload) => {
       const { callerId, reason } = payload;
-      const callerSockets = userSockets.get(callerId);
+      const targetCallerId = String(callerId);
+      const callerSockets = userSockets.get(targetCallerId);
 
+      console.log(`[WebRTC] Call declined by peer for caller ${targetCallerId}: ${reason}`);
       if (callerSockets) {
         callerSockets.forEach(socketId => {
           io.to(socketId).emit('call:rejected', {
@@ -136,12 +143,13 @@ export function setupSocket(io) {
     // 4. WebRTC Signaling Data (Offer, Answer, ICE Candidates)
     socket.on('call:signal', (payload) => {
       const { toUserId, signal, fromUserId } = payload;
-      const receiverSockets = userSockets.get(toUserId);
+      const targetId = String(toUserId);
+      const receiverSockets = userSockets.get(targetId);
 
       if (receiverSockets) {
         receiverSockets.forEach(socketId => {
           io.to(socketId).emit('call:signal', {
-            fromUserId,
+            fromUserId: String(fromUserId),
             signal
           });
         });
@@ -151,8 +159,10 @@ export function setupSocket(io) {
     // 5. End Call
     socket.on('call:end', (payload) => {
       const { toUserId } = payload;
-      const receiverSockets = userSockets.get(toUserId);
+      const targetId = String(toUserId);
+      const receiverSockets = userSockets.get(targetId);
 
+      console.log(`[WebRTC] Call ended for target user ${targetId}`);
       if (receiverSockets) {
         receiverSockets.forEach(socketId => {
           io.to(socketId).emit('call:ended');
