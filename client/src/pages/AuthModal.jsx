@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { JobScoutLogo } from '../components/JobScoutLogo';
+import { LocationPickerInput } from '../components/LocationPickerInput';
 
 export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole = 'seeker', onSuccess }) => {
   const { 
@@ -65,7 +66,9 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
   const [industry, setIndustry] = useState('Technology & IT');
   const [companySize, setCompanySize] = useState('1-10 Employees');
   const [hiringType, setHiringType] = useState('Full-time');
-  const [officeAddress, setOfficeAddress] = useState('Mumbai, Maharashtra');
+  const [officeAddress, setOfficeAddress] = useState('Bandra Kurla Complex (BKC), Mumbai');
+  const [locationLat, setLocationLat] = useState(19.0760);
+  const [locationLng, setLocationLng] = useState(72.8777);
   const [website, setWebsite] = useState('');
 
   // -------------------------------------------------------------
@@ -256,6 +259,11 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
       return;
     }
 
+    if (!officeAddress || !officeAddress.trim()) {
+      setError('Please select or enter your city / location (स्थान / शहर)');
+      return;
+    }
+
     setLoading(true);
     try {
       const payload = {
@@ -264,7 +272,9 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
         password,
         name: name.trim(),
         role,
-        address: officeAddress.trim() || 'Mumbai, India',
+        address: officeAddress.trim(),
+        lat: locationLat || 19.0760,
+        lng: locationLng || 72.8777,
         // Role-specific payload fields
         ...(role === 'emp' ? {
           companyName: companyName.trim(),
@@ -894,34 +904,19 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                      Hiring Model
-                    </label>
-                    <select
-                      value={hiringType}
-                      onChange={(e) => setHiringType(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
-                    >
-                      <option value="Immediate Spot Hiring">Immediate Spot Hiring</option>
-                      <option value="Full-time Permanent">Full-time Permanent</option>
-                      <option value="Part-time / Gigs">Part-time / Gigs</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                      Office Area
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. BKC, Mumbai"
-                      value={officeAddress}
-                      onChange={(e) => setOfficeAddress(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                    Hiring Model
+                  </label>
+                  <select
+                    value={hiringType}
+                    onChange={(e) => setHiringType(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+                  >
+                    <option value="Immediate Spot Hiring">Immediate Spot Hiring</option>
+                    <option value="Full-time Permanent">Full-time Permanent</option>
+                    <option value="Part-time / Gigs">Part-time / Gigs</option>
+                  </select>
                 </div>
               </div>
             )}
@@ -1015,6 +1010,23 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
                 </div>
               </div>
             )}
+
+            {/* Location Field with GPS detection & Indian Hubs */}
+            <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl">
+              <LocationPickerInput
+                value={officeAddress}
+                onChange={(addr, lat, lng) => {
+                  setOfficeAddress(addr);
+                  if (lat && lng) {
+                    setLocationLat(lat);
+                    setLocationLng(lng);
+                  }
+                }}
+                theme={role === 'seeker' ? 'emerald' : 'indigo'}
+                label={role === 'seeker' ? 'Preferred Job Location / City (स्थान / शहर)' : 'Company / Office Location (कंपनी का स्थान / शहर)'}
+                placeholder="e.g. Bandra Kurla Complex (BKC), Mumbai or Koramangala, Bengaluru"
+              />
+            </div>
 
             {/* Create Password */}
             <div>

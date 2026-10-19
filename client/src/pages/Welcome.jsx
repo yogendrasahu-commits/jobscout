@@ -36,6 +36,7 @@ import {
 } from 'lucide-react';
 import { JobScoutLogo } from '../components/JobScoutLogo';
 import { useAuth } from '../context/AuthContext';
+import { LocationPickerInput } from '../components/LocationPickerInput';
 
 export const Welcome = ({
   onNavigateToMap,
@@ -77,6 +78,9 @@ export const Welcome = ({
   const [skills, setSkills] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [industry, setIndustry] = useState('Technology & IT');
+  const [locationAddress, setLocationAddress] = useState('Bandra Kurla Complex (BKC), Mumbai');
+  const [locationLat, setLocationLat] = useState(19.0760);
+  const [locationLng, setLocationLng] = useState(72.8777);
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   
@@ -199,13 +203,21 @@ export const Welcome = ({
           }
         }
 
+        if (!locationAddress.trim()) {
+          setError('कृपया अपना शहर या इलाका (Location) चुनें या दर्ज करें');
+          setLoading(false);
+          return;
+        }
+
         const payload = {
           phone: cleanPhone,
           otp: '123456',
           password,
           name: name.trim(),
           role,
-          address: 'India',
+          address: locationAddress.trim(),
+          lat: locationLat || 19.0760,
+          lng: locationLng || 72.8777,
           ...(role === 'emp' ? {
             companyName: companyName.trim(),
             industry: industry || 'Technology & IT',
@@ -705,6 +717,21 @@ export const Welcome = ({
                       />
                     </div>
                   )}
+
+                  {/* Location Field with GPS detection & Indian Hubs */}
+                  <LocationPickerInput
+                    value={locationAddress}
+                    onChange={(addr, lat, lng) => {
+                      setLocationAddress(addr);
+                      if (lat && lng) {
+                        setLocationLat(lat);
+                        setLocationLng(lng);
+                      }
+                    }}
+                    theme={role === 'seeker' ? 'indigo' : 'emerald'}
+                    label={role === 'seeker' ? 'Preferred Job Location / City (स्थान / शहर)' : 'Office / Hiring Location (कंपनी का स्थान / शहर)'}
+                    placeholder="उदा. BKC, Mumbai या Koramangala, Bengaluru"
+                  />
 
                   {/* Submit Register Button */}
                   <button

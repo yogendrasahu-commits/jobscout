@@ -28,7 +28,55 @@ function sanitizeCoords(lat, lng) {
   if (Number.isFinite(nLat) && Number.isFinite(nLng) && nLat >= 6 && nLat <= 38 && nLng >= 68 && nLng <= 98) {
     return { lat: nLat, lng: nLng };
   }
-  return { lat: 19.0760, lng: 72.8777 };
+  return null;
+}
+
+// Helper to lookup coordinates from city/address name if lat/lng missing
+function resolveCoordsFromAddress(address, lat, lng) {
+  const sanitized = sanitizeCoords(lat, lng);
+  if (sanitized) return sanitized;
+  
+  if (!address) {
+    return { lat: 19.0760, lng: 72.8777 }; // Default Mumbai BKC
+  }
+  const low = String(address).toLowerCase();
+  if (low.includes('delhi') || low.includes('noida') || low.includes('gurgaon') || low.includes('gurugram') || low.includes('ncr')) {
+    return { lat: 28.6139, lng: 77.2090 };
+  }
+  if (low.includes('bengaluru') || low.includes('bangalore') || low.includes('koramangala') || low.includes('whitefield') || low.includes('hsr')) {
+    return { lat: 12.9716, lng: 77.5946 };
+  }
+  if (low.includes('hyderabad') || low.includes('hitech') || low.includes('gachibowli')) {
+    return { lat: 17.3850, lng: 78.4867 };
+  }
+  if (low.includes('pune') || low.includes('hinjawadi') || low.includes('viman')) {
+    return { lat: 18.5204, lng: 73.8567 };
+  }
+  if (low.includes('chennai') || low.includes('omr')) {
+    return { lat: 13.0827, lng: 80.2707 };
+  }
+  if (low.includes('kolkata') || low.includes('salt lake')) {
+    return { lat: 22.5726, lng: 88.3639 };
+  }
+  if (low.includes('ahmedabad')) {
+    return { lat: 23.0225, lng: 72.5714 };
+  }
+  if (low.includes('jaipur')) {
+    return { lat: 26.9124, lng: 75.7873 };
+  }
+  if (low.includes('chandigarh')) {
+    return { lat: 30.7333, lng: 76.7794 };
+  }
+  if (low.includes('indore')) {
+    return { lat: 22.7196, lng: 75.8577 };
+  }
+  if (low.includes('kochi') || low.includes('cochin')) {
+    return { lat: 9.9312, lng: 76.2673 };
+  }
+  if (low.includes('lucknow')) {
+    return { lat: 26.8467, lng: 80.9462 };
+  }
+  return { lat: 19.0760, lng: 72.8777 }; // Default Mumbai
 }
 
 // Middleware to authenticate JWT
@@ -252,7 +300,7 @@ router.post('/register-phone', async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
     const trimmedName = String(name).trim();
-    const coords = sanitizeCoords(lat, lng);
+    const coords = resolveCoordsFromAddress(address, lat, lng);
 
     const newUser = db.createUser({
       name: trimmedName,
@@ -340,7 +388,7 @@ router.post('/register', async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
     const trimmedName = String(name).trim();
-    const coords = sanitizeCoords(lat, lng);
+    const coords = resolveCoordsFromAddress(address, lat, lng);
 
     const newUser = db.createUser({
       name: trimmedName,

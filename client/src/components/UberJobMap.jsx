@@ -486,7 +486,7 @@ export const UberJobMap = ({
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
   // Search Functionality States
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(user?.address || '');
   const [isSearching, setIsSearching] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [liveGeocodedResults, setLiveGeocodedResults] = useState([]);
@@ -537,10 +537,18 @@ export const UberJobMap = ({
   // Sync center when user profile coordinates change
   useEffect(() => {
     if (user?.lat && user?.lng && isWithinIndia(user.lat, user.lng)) {
-      setCenterCoords([Number(user.lat), Number(user.lng)]);
-      if (user.address) setActiveLocationName(user.address);
+      const uLat = Number(user.lat);
+      const uLng = Number(user.lng);
+      setCenterCoords([uLat, uLng]);
+      if (user.address) {
+        setActiveLocationName(user.address);
+        setSearchQuery(user.address);
+      }
+      if (mapInstance) {
+        mapInstance.flyTo([uLat, uLng], 13, { animate: true, duration: 1.0 });
+      }
     }
-  }, [user?.lat, user?.lng, user?.address]);
+  }, [user?.lat, user?.lng, user?.address, mapInstance]);
 
   // Guaranteed safe finite coordinates within India for MapContainer & Leaflet layers
   const safeCoords = useMemo(() => {
@@ -1605,7 +1613,7 @@ export const UberJobMap = ({
       {/* ============================================================== */}
       <MapContainer
         center={safeCoords}
-        zoom={user?.lat && isWithinIndia(user.lat, user.lng) ? 12 : 5}
+        zoom={user?.lat && isWithinIndia(user.lat, user.lng) ? 13 : 5}
         minZoom={4}
         maxZoom={19}
         maxBounds={INDIA_BOUNDS}
