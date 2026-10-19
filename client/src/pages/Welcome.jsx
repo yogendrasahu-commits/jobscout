@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   MapPin, 
   Sparkles, 
@@ -29,7 +29,10 @@ import {
   UserPlus,
   ArrowUpRight,
   LogOut,
-  Smartphone
+  Smartphone,
+  KeyRound,
+  AlertCircle,
+  Loader2
 } from 'lucide-react';
 import { JobScoutLogo } from '../components/JobScoutLogo';
 import { useAuth } from '../context/AuthContext';
@@ -40,8 +43,6 @@ export const Welcome = ({
   onNavigateToNetwork,
   onNavigateToFeed,
   onNavigateToAnon,
-  onOpenLogin,
-  onOpenSignup,
   onOpenSwitchAccount,
   onSelectJob,
   onSelectSeeker,
@@ -49,38 +50,187 @@ export const Welcome = ({
   seekers = [],
   employers = []
 }) => {
-  const { user, logout, demoSwitch } = useAuth();
+  const { 
+    user, 
+    logout, 
+    demoSwitch, 
+    loginWithPhonePassword, 
+    loginWithPhoneOtp, 
+    sendOtp, 
+    registerWithPhone 
+  } = useAuth();
+
   const [activeFaq, setActiveFaq] = useState(null);
+  const authCardRef = useRef(null);
+
+  // Unified Auth State
+  const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
+  const [loginMethod, setLoginMethod] = useState('password'); // 'password' | 'otp'
+  const [role, setRole] = useState('seeker'); // 'seeker' | 'emp'
   
-  // Hero Auth Card mode: 'login' | 'register'
-  const [authCardTab, setAuthCardTab] = useState('login');
-  const [signupRole, setSignupRole] = useState('seeker'); // 'seeker' | 'emp'
-  const [quickPhone, setQuickPhone] = useState('');
+  // Fields
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [title, setTitle] = useState('');
+  const [skills, setSkills] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [industry, setIndustry] = useState('Technology & IT');
+  const [otp, setOtp] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  
+  // Status
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
 
   const toggleFaq = (idx) => {
     setActiveFaq(prev => prev === idx ? null : idx);
   };
 
-  const featuredJobs = jobs.slice(0, 3);
-  const featuredSeekers = seekers.slice(0, 3);
-
-  const handleQuickAuthSubmit = (e) => {
-    e.preventDefault();
-    if (authCardTab === 'login') {
-      onOpenLogin(quickPhone);
-    } else {
-      onOpenSignup(signupRole, quickPhone);
+  const scrollToAuth = (mode = 'login', chosenRole = 'seeker') => {
+    setAuthMode(mode);
+    if (chosenRole) setRole(chosenRole);
+    setError('');
+    setSuccessMsg('');
+    if (authCardRef.current) {
+      authCardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const input = authCardRef.current.querySelector('input[type="tel"]');
+      if (input) input.focus();
     }
   };
 
+  // 1-Tap Demo Switch
   const handle1TapDemo = async (roleType) => {
-    if (demoSwitch) {
-      await demoSwitch(roleType);
-      onNavigateToFeed();
-    } else {
-      onOpenSwitchAccount();
+    setLoading(true);
+    setError('');
+    try {
+      if (demoSwitch) {
+        await demoSwitch(roleType);
+        onNavigateToFeed();
+      } else if (onOpenSwitchAccount) {
+        onOpenSwitchAccount();
+      }
+    } catch (err) {
+      setError(err.message || 'Demo switch failed');
+    } finally {
+      setLoading(false);
     }
   };
+
+  // Send OTP
+  const handleSendOtp = async () => {
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+      setError('कृपया एक मान्य 10-अंकों का भारतीय मोबाइल नंबर दर्ज करें (6-9 से शुरू)');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    setSuccessMsg('');
+    try {
+      await sendOtp(phone);
+      setOtpSent(true);
+      setSuccessMsg('OTP भेज दिया गया है! टेस्टिंग के लिए 123456 दर्ज करें।');
+    } catch (err) {
+      setError(err.message || 'OTP भेजने में विफल');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Submit Unified Auth Form
+  const handleAuthSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccessMsg('');
+
+    const cleanPhone = phone.replace(/[^0-9]/g, '').slice(-10);
+    if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+      setError('कृपया एक मान्य 10-अंकों का भारतीय मोबाइल नंबर दर्ज करें (6-9 से शुरू)');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (authMode === 'login') {
+        // LOGIN FLOW
+        if (loginMethod === 'otp') {
+          if (!otp || otp.length < 6) {
+            setError('कृपया 6-अंकों का OTP दर्ज करें (डिफ़ॉल्ट: 123456)');
+            setLoading(false);
+            return;
+          }
+          await loginWithPhoneOtp(cleanPhone, otp);
+        } else {
+          if (!password) {
+            setError('कृपया अपना पासवर्ड दर्ज करें');
+            setLoading(false);
+            return;
+          }
+          await loginWithPhonePassword(cleanPhone, password);
+        }
+        // Success -> Enter Dashboard
+        onNavigateToFeed();
+      } else {
+        // REGISTRATION FLOW
+        if (!name.trim() || name.trim().length < 2) {
+          setError('कृपया अपना पूरा नाम दर्ज करें (कम से कम 2 अक्षर)');
+          setLoading(false);
+          return;
+        }
+        if (!password || password.length < 6) {
+          setError('पासवर्ड कम से कम 6 अक्षरों का होना चाहिए');
+          setLoading(false);
+          return;
+        }
+
+        if (role === 'seeker') {
+          if (!title.trim()) {
+            setError('कृपया अपनी जॉब प्रोफाइल / पद दर्ज करें (उदा. React Developer)');
+            setLoading(false);
+            return;
+          }
+        } else {
+          if (!companyName.trim()) {
+            setError('कृपया अपनी कंपनी या संस्थान का नाम दर्ज करें');
+            setLoading(false);
+            return;
+          }
+        }
+
+        const payload = {
+          phone: cleanPhone,
+          otp: '123456',
+          password,
+          name: name.trim(),
+          role,
+          address: 'India',
+          ...(role === 'emp' ? {
+            companyName: companyName.trim(),
+            industry: industry || 'Technology & IT',
+            companySize: '1-10 Employees',
+            hiringType: 'Full-time'
+          } : {
+            title: title.trim(),
+            experience: '1 - 3 Years',
+            skills: skills ? skills.split(',').map(s => s.trim()).filter(Boolean) : ['JavaScript', 'React'],
+            expectedSalary: 'Competitive',
+            availability: 'Immediate (Ready Today)'
+          })
+        };
+
+        await registerWithPhone(payload);
+        // Success -> Enter Dashboard
+        onNavigateToFeed();
+      }
+    } catch (err) {
+      setError(err.message || 'प्रमाणीकरण विफल। कृपया पुनः प्रयास करें।');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const featuredJobs = jobs.slice(0, 3);
 
   const faqs = [
     {
@@ -93,7 +243,7 @@ export const Welcome = ({
     },
     {
       q: "Can I try JobScout without creating a new account?",
-      a: "Yes! JobScout comes with 14 pre-configured demo profiles including 7 Job Seekers (React, Python, DevOps, Cloud Architects) and 7 Top Employers (Nexus Cloud, Fintech Labs, etc.). Use the 'Switch Demo Account' button to experience both roles instantly."
+      a: "Yes! JobScout comes with 14 pre-configured demo profiles including 7 Job Seekers (React, Python, DevOps, Cloud Architects) and 7 Top Employers (Nexus Cloud, Fintech Labs, etc.). Use the 1-Tap Demo buttons to experience both roles instantly."
     },
     {
       q: "How does the professional resume and offer letter generator work?",
@@ -109,9 +259,9 @@ export const Welcome = ({
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-indigo-600/20 selection:text-indigo-900">
       
       {/* ========================================================== */}
-      {/* STANDALONE WELCOME HEADER BAR */}
+      {/* 1. STANDALONE HEADER */}
       {/* ========================================================== */}
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-slate-200/90 shadow-xs">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200/90 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
           
           {/* Brand Logo & Tag */}
@@ -130,7 +280,7 @@ export const Welcome = ({
             </div>
           </div>
 
-          {/* Center Quick Jump Links */}
+          {/* Center Quick Navigation Links */}
           <nav className="hidden lg:flex items-center gap-6 text-xs font-bold text-slate-600">
             <button onClick={onNavigateToMap} className="hover:text-indigo-600 transition-colors flex items-center gap-1">
               <MapPin className="w-3.5 h-3.5 text-cyan-600" />
@@ -150,7 +300,7 @@ export const Welcome = ({
             </button>
           </nav>
 
-          {/* Right Action Buttons */}
+          {/* Right Action Header Buttons */}
           <div className="flex items-center gap-2">
             {user ? (
               <div className="flex items-center gap-2">
@@ -180,7 +330,7 @@ export const Welcome = ({
                 </button>
 
                 <button
-                  onClick={() => onOpenLogin()}
+                  onClick={() => scrollToAuth('login')}
                   className="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200 shadow-xs transition-all flex items-center gap-1.5 active:scale-95"
                 >
                   <LogIn className="w-3.5 h-3.5 text-indigo-600" />
@@ -188,7 +338,7 @@ export const Welcome = ({
                 </button>
 
                 <button
-                  onClick={() => onOpenSignup('seeker')}
+                  onClick={() => scrollToAuth('register', 'seeker')}
                   className="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold shadow-md shadow-indigo-600/20 border border-indigo-400/30 transition-all flex items-center gap-1.5 active:scale-95"
                 >
                   <UserPlus className="w-3.5 h-3.5" />
@@ -202,19 +352,18 @@ export const Welcome = ({
       </header>
 
       {/* ========================================================== */}
-      {/* 1. HERO WITH DIRECT LOGIN & SIGNUP CARD */}
+      {/* 2. HERO: VALUE NARRATIVE (LEFT) + UNIFIED AUTH CARD (RIGHT) */}
       {/* ========================================================== */}
       <section className="relative pt-6 pb-16 md:pt-12 md:pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex-1">
-        {/* Glow Effects */}
+        {/* Ambient Glows */}
         <div className="absolute top-10 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl -z-10 pointer-events-none" />
         <div className="absolute top-20 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl -z-10 pointer-events-none" />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
-          {/* Left Column: Hero Narrative */}
+          {/* Left Column: Narrative */}
           <div className="lg:col-span-7 space-y-5 text-center lg:text-left">
             
-            {/* Live Indicator Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-200 shadow-xs text-xs font-bold text-indigo-700">
               <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
               <span>India's 1st Live Geospatial Hiring Platform</span>
@@ -223,7 +372,6 @@ export const Welcome = ({
               </span>
             </div>
 
-            {/* Main Title */}
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-[1.12]">
               Find Local Jobs & Hire Tech Talent on a{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-indigo-600 to-cyan-500">
@@ -231,12 +379,11 @@ export const Welcome = ({
               </span>
             </h1>
 
-            {/* Subhead */}
             <p className="text-sm sm:text-base lg:text-lg text-slate-600 leading-relaxed font-medium max-w-2xl mx-auto lg:mx-0">
               Skip the resume blackhole. Connect in real time with nearby tech employers and candidates through visual GPS discovery, 1-tap WebRTC audio/video speed calling, and verified digital CVs.
             </p>
 
-            {/* Action Buttons for Quick Browsing */}
+            {/* Quick Action Navigation Buttons */}
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
               <button
                 onClick={onNavigateToMap}
@@ -263,7 +410,7 @@ export const Welcome = ({
               </button>
             </div>
 
-            {/* Quick Metrics Cards */}
+            {/* Quick Stats Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4">
               <div className="p-3 bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xs text-center lg:text-left">
                 <div className="text-xl sm:text-2xl font-black text-indigo-600">{jobs.length > 0 ? jobs.length : '35'}+</div>
@@ -285,138 +432,319 @@ export const Welcome = ({
 
           </div>
 
-          {/* Right Column: Integrated Auth & Quick Start Card */}
-          <div className="lg:col-span-5">
-            <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-7 shadow-xl relative overflow-hidden">
+          {/* Right Column: THE ONE UNIFIED AUTHENTICATION CARD */}
+          <div className="lg:col-span-5" ref={authCardRef} id="auth-card">
+            <div className="bg-white border-2 border-indigo-100 rounded-3xl p-6 sm:p-7 shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-indigo-500/10 to-transparent pointer-events-none rounded-bl-full" />
               
-              {/* Card Header & Tabs */}
-              <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
-                <div>
-                  <h2 className="text-lg font-extrabold text-slate-900">
-                    {authCardTab === 'login' ? 'Welcome Back!' : 'Join JobScout Today'}
-                  </h2>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    {authCardTab === 'login' ? 'Sign in to access your dashboard' : 'Create your free candidate or recruiter profile'}
-                  </p>
-                </div>
-                <div className="flex bg-slate-100 p-1 rounded-xl">
+              {/* Tabs: Log In vs Sign Up */}
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                <div className="flex bg-slate-100 p-1 rounded-2xl w-full">
                   <button
-                    onClick={() => setAuthCardTab('login')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                      authCardTab === 'login' ? 'bg-white text-indigo-700 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                    type="button"
+                    onClick={() => { setAuthMode('login'); setError(''); setSuccessMsg(''); }}
+                    className={`flex-1 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
+                      authMode === 'login'
+                        ? 'bg-white text-indigo-700 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-900'
                     }`}
                   >
-                    Log In
+                    <LogIn className="w-3.5 h-3.5" />
+                    <span>Log In (लॉगिन)</span>
                   </button>
+
                   <button
-                    onClick={() => setAuthCardTab('register')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                      authCardTab === 'register' ? 'bg-white text-indigo-700 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                    type="button"
+                    onClick={() => { setAuthMode('register'); setError(''); setSuccessMsg(''); }}
+                    className={`flex-1 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
+                      authMode === 'register'
+                        ? 'bg-white text-indigo-700 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-900'
                     }`}
                   >
-                    Sign Up
+                    <UserPlus className="w-3.5 h-3.5" />
+                    <span>Sign Up (नया खाता)</span>
                   </button>
                 </div>
               </div>
 
-              {/* Form / Quick Start Action */}
-              <form onSubmit={handleQuickAuthSubmit} className="space-y-4">
-                
-                {/* Role Toggle when signing up */}
-                {authCardTab === 'register' && (
+              {/* Feedback Alerts */}
+              {error && (
+                <div className="mb-3.5 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-600" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              {successMsg && (
+                <div className="mb-3.5 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
+                  <Check className="w-4 h-4 flex-shrink-0 text-emerald-600" />
+                  <span>{successMsg}</span>
+                </div>
+              )}
+
+              {/* ============================================== */}
+              {/* TAB 1: UNIFIED LOGIN FORM */}
+              {/* ============================================== */}
+              {authMode === 'login' && (
+                <form onSubmit={handleAuthSubmit} className="space-y-3.5">
+                  
+                  {/* Phone Input */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                      I am signing up as:
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Mobile Number (मोबाइल नंबर) <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
+                        +91
+                      </span>
+                      <input
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, '').slice(0, 10))}
+                        placeholder="98765 43210"
+                        required
+                        className="w-full pl-12 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm font-semibold focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Login Method Toggle: Password vs OTP */}
+                  <div className="flex items-center justify-between text-xs pt-0.5">
+                    <span className="text-slate-500 font-medium">लॉगिन विधि (Method):</span>
+                    <button
+                      type="button"
+                      onClick={() => setLoginMethod(prev => prev === 'password' ? 'otp' : 'password')}
+                      className="text-indigo-600 font-bold hover:underline"
+                    >
+                      {loginMethod === 'password' ? 'Log in with OTP instead' : 'Log in with Password instead'}
+                    </button>
+                  </div>
+
+                  {/* Password Field */}
+                  {loginMethod === 'password' ? (
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Password (पासवर्ड) <span className="text-rose-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="••••••••"
+                          required
+                          className="w-full pl-3 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-xs font-bold text-slate-700">
+                          Enter 6-Digit OTP <span className="text-rose-500">*</span>
+                        </label>
+                        <button
+                          type="button"
+                          onClick={handleSendOtp}
+                          disabled={loading}
+                          className="text-xs font-bold text-indigo-600 hover:underline"
+                        >
+                          {otpSent ? 'Resend OTP' : 'Get OTP'}
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
+                        placeholder="123456"
+                        required
+                        className="w-full px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm tracking-widest font-mono font-bold focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                      />
+                    </div>
+                  )}
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-sm shadow-md shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                  >
+                    {loading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <>
+                        <LogIn className="w-4 h-4" />
+                        <span>Log In to JobScout (लॉगिन करें)</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              )}
+
+              {/* ============================================== */}
+              {/* TAB 2: UNIFIED SIGN UP FORM */}
+              {/* ============================================== */}
+              {authMode === 'register' && (
+                <form onSubmit={handleAuthSubmit} className="space-y-3">
+                  
+                  {/* Role Selector */}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Select Your Profile Type (खाता प्रकार) <span className="text-rose-500">*</span>
                     </label>
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         type="button"
-                        onClick={() => setSignupRole('seeker')}
-                        className={`p-2.5 rounded-xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
-                          signupRole === 'seeker'
-                            ? 'bg-indigo-50 border-indigo-500 text-indigo-700 shadow-xs'
+                        onClick={() => setRole('seeker')}
+                        className={`p-2.5 rounded-xl border text-xs font-bold flex flex-col items-center gap-0.5 transition-all ${
+                          role === 'seeker'
+                            ? 'bg-indigo-50 border-indigo-500 text-indigo-700 shadow-xs ring-1 ring-indigo-500/20'
                             : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                         }`}
                       >
                         <UserCheck className="w-4 h-4 text-indigo-600" />
                         <span>Job Seeker</span>
-                        <span className="text-[10px] font-normal text-slate-400">(#OpenToWork)</span>
+                        <span className="text-[9px] font-normal text-slate-500">(#OpenToWork)</span>
                       </button>
 
                       <button
                         type="button"
-                        onClick={() => setSignupRole('emp')}
-                        className={`p-2.5 rounded-xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
-                          signupRole === 'emp'
-                            ? 'bg-emerald-50 border-emerald-500 text-emerald-800 shadow-xs'
+                        onClick={() => setRole('emp')}
+                        className={`p-2.5 rounded-xl border text-xs font-bold flex flex-col items-center gap-0.5 transition-all ${
+                          role === 'emp'
+                            ? 'bg-emerald-50 border-emerald-500 text-emerald-800 shadow-xs ring-1 ring-emerald-500/20'
                             : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                         }`}
                       >
                         <Building2 className="w-4 h-4 text-emerald-600" />
                         <span>Employer</span>
-                        <span className="text-[10px] font-normal text-slate-400">(#Hiring Talent)</span>
+                        <span className="text-[9px] font-normal text-slate-500">(#Hiring Talent)</span>
                       </button>
                     </div>
                   </div>
-                )}
 
-                {/* Mobile Number Input */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                    Mobile Number (मोबाइल नंबर)
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
-                      +91
-                    </span>
+                  {/* Name Input */}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Full Name (आपका पूरा नाम) <span className="text-rose-500">*</span>
+                    </label>
                     <input
-                      type="tel"
-                      value={quickPhone}
-                      onChange={(e) => setQuickPhone(e.target.value.replace(/[^0-9]/g, '').slice(0, 10))}
-                      placeholder="98765 43210"
-                      className="w-full pl-12 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm font-semibold focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="उदा. अमित कुमार / Priya Sharma"
+                      required
+                      className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm font-semibold focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                     />
                   </div>
-                </div>
 
-                {/* Primary Action Button */}
-                <button
-                  type="submit"
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 active:scale-95"
-                >
-                  {authCardTab === 'login' ? (
-                    <>
-                      <LogIn className="w-4 h-4" />
-                      <span>Continue to Log In (लॉगिन करें)</span>
-                    </>
+                  {/* Phone Input */}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Mobile Number (मोबाइल नंबर) <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
+                        +91
+                      </span>
+                      <input
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, '').slice(0, 10))}
+                        placeholder="98765 43210"
+                        required
+                        className="w-full pl-12 pr-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm font-semibold focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Password Input */}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Create Password (पासवर्ड) <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="कम से कम 6 अक्षर"
+                      required
+                      className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                    />
+                  </div>
+
+                  {/* Role Specific Fields */}
+                  {role === 'seeker' ? (
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Job Role / Profession (पद) <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="उदा. Senior React Developer / UI Designer"
+                        required
+                        className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                      />
+                    </div>
                   ) : (
-                    <>
-                      <UserPlus className="w-4 h-4" />
-                      <span>Continue to Register as {signupRole === 'seeker' ? 'Candidate' : 'Employer'}</span>
-                    </>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Company Name (कंपनी का नाम) <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
+                        placeholder="उदा. TechPulse India / Apex Cloud Labs"
+                        required
+                        className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                      />
+                    </div>
                   )}
-                </button>
-              </form>
 
-              {/* 1-Tap Instant Demo Access Section */}
-              <div className="mt-5 pt-4 border-t border-slate-100">
+                  {/* Submit Register Button */}
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-md shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 mt-1"
+                  >
+                    {loading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <>
+                        <UserPlus className="w-4 h-4" />
+                        <span>Create {role === 'seeker' ? 'Candidate' : 'Employer'} Account (रजिस्टर करें)</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              )}
+
+              {/* Instant 1-Tap Demo Logins */}
+              <div className="mt-4 pt-3.5 border-t border-slate-100">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-                    Instant Demo Login (No Setup Required)
+                    Instant 1-Click Demo Login:
                   </span>
-                  <button
-                    onClick={onOpenSwitchAccount}
-                    className="text-[10px] font-bold text-indigo-600 hover:underline"
-                  >
-                    View All 14
-                  </button>
+                  {onOpenSwitchAccount && (
+                    <button
+                      type="button"
+                      onClick={onOpenSwitchAccount}
+                      className="text-[10px] font-bold text-indigo-600 hover:underline"
+                    >
+                      All 14 Demo Profiles →
+                    </button>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => handle1TapDemo('seeker')}
+                    disabled={loading}
                     className="p-2 rounded-xl bg-slate-50 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 text-left transition-all group"
                   >
                     <div className="text-[11px] font-bold text-slate-800 group-hover:text-indigo-600 flex items-center gap-1">
@@ -429,6 +757,7 @@ export const Welcome = ({
                   <button
                     type="button"
                     onClick={() => handle1TapDemo('emp')}
+                    disabled={loading}
                     className="p-2 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 text-left transition-all group"
                   >
                     <div className="text-[11px] font-bold text-slate-800 group-hover:text-emerald-700 flex items-center gap-1">
@@ -447,7 +776,7 @@ export const Welcome = ({
       </section>
 
       {/* ========================================================== */}
-      {/* 2. THE 4 PILLARS OF JOBSCOUT */}
+      {/* 3. THE 4 PILLARS */}
       {/* ========================================================== */}
       <section className="py-14 bg-white border-y border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -552,7 +881,7 @@ export const Welcome = ({
       </section>
 
       {/* ========================================================== */}
-      {/* 3. DUAL PERSPECTIVE: CANDIDATES VS RECRUITERS */}
+      {/* 4. DUAL PERSPECTIVE */}
       {/* ========================================================== */}
       <section className="py-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
@@ -593,7 +922,7 @@ export const Welcome = ({
 
             <div className="pt-6 mt-6 border-t border-indigo-100 flex items-center justify-between">
               <button
-                onClick={() => onOpenSignup('seeker')}
+                onClick={() => scrollToAuth('register', 'seeker')}
                 className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5 active:scale-95"
               >
                 <span>Register as Candidate</span>
@@ -639,7 +968,7 @@ export const Welcome = ({
 
             <div className="pt-6 mt-6 border-t border-emerald-100 flex items-center justify-between">
               <button
-                onClick={() => onOpenSignup('emp')}
+                onClick={() => scrollToAuth('register', 'emp')}
                 className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5 active:scale-95"
               >
                 <span>Register as Employer</span>
@@ -653,9 +982,9 @@ export const Welcome = ({
       </section>
 
       {/* ========================================================== */}
-      {/* 4. LIVE FEATURED PREVIEWS */}
+      {/* 5. LIVE PREVIEW */}
       {/* ========================================================== */}
-      {(featuredJobs.length > 0 || featuredSeekers.length > 0) && (
+      {featuredJobs.length > 0 && (
         <section className="py-12 bg-white border-y border-slate-200/80">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
@@ -665,7 +994,7 @@ export const Welcome = ({
                   Live Platform Activity
                 </span>
                 <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 mt-2">
-                  Hot Tech Openings & Verified Talent
+                  Hot Tech Openings Ready for Spot Calling
                 </h2>
               </div>
               <button
@@ -714,7 +1043,7 @@ export const Welcome = ({
       )}
 
       {/* ========================================================== */}
-      {/* 5. FREQUENTLY ASKED QUESTIONS */}
+      {/* 6. FREQUENTLY ASKED QUESTIONS */}
       {/* ========================================================== */}
       <section className="py-14 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
         <div className="text-center mb-8">
@@ -751,7 +1080,7 @@ export const Welcome = ({
       </section>
 
       {/* ========================================================== */}
-      {/* 6. BOTTOM CALL TO ACTION */}
+      {/* 7. BOTTOM CTA */}
       {/* ========================================================== */}
       <section className="py-14 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto mb-10">
         <div className="relative rounded-3xl bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white p-8 sm:p-12 shadow-2xl overflow-hidden text-center">
@@ -772,7 +1101,7 @@ export const Welcome = ({
 
             <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
               <button
-                onClick={() => onOpenSignup('seeker')}
+                onClick={() => scrollToAuth('register', 'seeker')}
                 className="px-6 py-3 rounded-2xl bg-cyan-400 hover:bg-cyan-300 text-slate-900 font-extrabold text-sm shadow-md transition-all flex items-center gap-2 active:scale-95"
               >
                 <UserPlus className="w-4 h-4" />
@@ -788,11 +1117,11 @@ export const Welcome = ({
               </button>
 
               <button
-                onClick={onOpenSwitchAccount}
+                onClick={() => scrollToAuth('login')}
                 className="px-5 py-3 rounded-2xl bg-indigo-500/30 hover:bg-indigo-500/40 text-cyan-200 font-bold text-xs sm:text-sm border border-cyan-400/30 transition-all flex items-center gap-1.5 active:scale-95"
               >
-                <Sparkles className="w-4 h-4 text-amber-400" />
-                <span>Try 14 Demo Profiles</span>
+                <LogIn className="w-4 h-4 text-amber-400" />
+                <span>Log In Directly</span>
               </button>
             </div>
           </div>
@@ -801,7 +1130,7 @@ export const Welcome = ({
       </section>
 
       {/* ========================================================== */}
-      {/* 7. STANDALONE FOOTER */}
+      {/* 8. STANDALONE FOOTER */}
       {/* ========================================================== */}
       <footer className="py-8 bg-white border-t border-slate-200/80 text-center text-xs text-slate-500 mt-auto">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -815,8 +1144,8 @@ export const Welcome = ({
             <button onClick={onNavigateToJobs} className="hover:text-indigo-600 transition-colors">Jobs</button>
             <button onClick={onNavigateToFeed} className="hover:text-indigo-600 transition-colors">Feed</button>
             <button onClick={onNavigateToAnon} className="hover:text-indigo-600 transition-colors">Anon Salon</button>
-            <button onClick={() => onOpenLogin()} className="hover:text-indigo-600 transition-colors">Log In</button>
-            <button onClick={() => onOpenSignup('seeker')} className="hover:text-indigo-600 transition-colors">Sign Up</button>
+            <button onClick={() => scrollToAuth('login')} className="hover:text-indigo-600 transition-colors">Log In</button>
+            <button onClick={() => scrollToAuth('register', 'seeker')} className="hover:text-indigo-600 transition-colors">Sign Up</button>
           </div>
           <p className="text-slate-400 text-[11px]">
             © {new Date().getFullYear()} JobScout Platform. All rights reserved.
