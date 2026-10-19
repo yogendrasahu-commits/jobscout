@@ -293,23 +293,19 @@ export const Welcome = ({
             </div>
           </div>
 
-          {/* Center Quick Navigation Links */}
+          {/* Center Quick Navigation Links (Feed, Emp & Seeker, Jobs) */}
           <nav className="hidden lg:flex items-center gap-6 text-xs font-bold text-slate-600">
-            <button onClick={onNavigateToMap} className="hover:text-indigo-600 transition-colors flex items-center gap-1">
-              <MapPin className="w-3.5 h-3.5 text-cyan-600" />
-              <span>Live Map</span>
+            <button onClick={onNavigateToFeed} className="hover:text-indigo-600 transition-colors flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+              <span>Feed</span>
             </button>
-            <button onClick={onNavigateToJobs} className="hover:text-indigo-600 transition-colors flex items-center gap-1">
-              <Briefcase className="w-3.5 h-3.5 text-indigo-600" />
-              <span>Job Board ({jobs.length > 0 ? jobs.length : '35+'})</span>
-            </button>
-            <button onClick={onNavigateToNetwork} className="hover:text-indigo-600 transition-colors flex items-center gap-1">
+            <button onClick={onNavigateToNetwork} className="hover:text-indigo-600 transition-colors flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Network</span>
+              <span>Emp & Seeker</span>
             </button>
-            <button onClick={onNavigateToAnon} className="hover:text-indigo-600 transition-colors flex items-center gap-1">
-              <MessageSquare className="w-3.5 h-3.5 text-amber-600" />
-              <span>Anon Salon</span>
+            <button onClick={onNavigateToJobs} className="hover:text-indigo-600 transition-colors flex items-center gap-1.5">
+              <Briefcase className="w-3.5 h-3.5 text-indigo-600" />
+              <span>Jobs ({jobs.length > 0 ? jobs.length : '35+'})</span>
             </button>
           </nav>
 

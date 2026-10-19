@@ -209,17 +209,28 @@ function MainApp() {
     }
   }, [user, isGuestMode, currentTab]);
 
+  // Route guard: without login only allow 'welcome', 'feed', 'network', 'jobs'
+  useEffect(() => {
+    if (!user && !['welcome', 'feed', 'network', 'jobs'].includes(currentTab)) {
+      setCurrentTab('feed');
+      setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' });
+    }
+  }, [user, currentTab]);
+
   // STANDALONE WELCOME / ONBOARDING LANDING VIEW (Unauthenticated / Non-guest only)
   if (currentTab === 'welcome' && !user && !isGuestMode) {
     return (
       <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 text-slate-900 flex flex-col font-sans antialiased">
         <Welcome
-          onNavigateToMap={() => handleExploreAsGuest('map')}
+          onNavigateToMap={() => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
           onNavigateToJobs={() => handleExploreAsGuest('jobs')}
           onNavigateToNetwork={() => handleExploreAsGuest('network')}
           onNavigateToFeed={() => handleExploreAsGuest('feed')}
-          onNavigateToAnon={() => handleExploreAsGuest('anon')}
-          onExploreAsGuest={(tab) => handleExploreAsGuest(tab || 'feed')}
+          onNavigateToAnon={() => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
+          onExploreAsGuest={(tab) => {
+            const allowed = ['feed', 'network', 'jobs'];
+            handleExploreAsGuest(allowed.includes(tab) ? tab : 'feed');
+          }}
           onOpenLogin={(phone) => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
           onOpenSignup={(role, phone) => setAuthConfig({ isOpen: true, mode: 'register', role: role || 'seeker' })}
           onOpenSwitchAccount={() => setIsSwitchAccountOpen(true)}
