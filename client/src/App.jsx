@@ -25,8 +25,13 @@ import { Welcome } from './pages/Welcome';
 function MainApp() {
   const { user, isEmployer } = useAuth();
   const { socket } = useSocket();
+  const [isGuestMode, setIsGuestMode] = useState(() => {
+    return localStorage.getItem('jobradar_guest_mode') === 'true';
+  });
   const [currentTab, setCurrentTab] = useState(() => {
-    return localStorage.getItem('jobradar_token') ? 'feed' : 'welcome';
+    if (localStorage.getItem('jobradar_token')) return 'feed';
+    if (localStorage.getItem('jobradar_guest_mode') === 'true') return 'feed';
+    return 'welcome';
   }); // 'welcome' | 'feed' | 'network' | 'map' | 'jobs' | 'connect' | 'anon' | 'applications' | 'messages'
   const [jobsSubTab, setJobsSubTab] = useState('browse'); // 'browse' | 'applied'
 
@@ -185,28 +190,41 @@ function MainApp() {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [currentTab]);
 
-  // Once logged in, completely bypass and remove the welcome page, directing user to feed
+  const handleExploreAsGuest = (targetTab = 'feed') => {
+    localStorage.setItem('jobradar_guest_mode', 'true');
+    setIsGuestMode(true);
+    setCurrentTab(targetTab);
+  };
+
+  const handleExitGuest = () => {
+    localStorage.removeItem('jobradar_guest_mode');
+    setIsGuestMode(false);
+    setCurrentTab('welcome');
+  };
+
+  // Once logged in or exploring as guest, completely bypass and remove the welcome page
   useEffect(() => {
-    if (user && currentTab === 'welcome') {
+    if ((user || isGuestMode) && currentTab === 'welcome') {
       setCurrentTab('feed');
     }
-  }, [user, currentTab]);
+  }, [user, isGuestMode, currentTab]);
 
-  // STANDALONE WELCOME / ONBOARDING LANDING VIEW (Unauthenticated / Guest only)
-  if (currentTab === 'welcome' && !user) {
+  // STANDALONE WELCOME / ONBOARDING LANDING VIEW (Unauthenticated / Non-guest only)
+  if (currentTab === 'welcome' && !user && !isGuestMode) {
     return (
       <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 text-slate-900 flex flex-col font-sans antialiased">
         <Welcome
-          onNavigateToMap={() => setCurrentTab('map')}
-          onNavigateToJobs={() => setCurrentTab('jobs')}
-          onNavigateToNetwork={() => setCurrentTab('network')}
-          onNavigateToFeed={() => setCurrentTab('feed')}
-          onNavigateToAnon={() => setCurrentTab('anon')}
+          onNavigateToMap={() => handleExploreAsGuest('map')}
+          onNavigateToJobs={() => handleExploreAsGuest('jobs')}
+          onNavigateToNetwork={() => handleExploreAsGuest('network')}
+          onNavigateToFeed={() => handleExploreAsGuest('feed')}
+          onNavigateToAnon={() => handleExploreAsGuest('anon')}
+          onExploreAsGuest={(tab) => handleExploreAsGuest(tab || 'feed')}
           onOpenLogin={(phone) => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
           onOpenSignup={(role, phone) => setAuthConfig({ isOpen: true, mode: 'register', role: role || 'seeker' })}
           onOpenSwitchAccount={() => setIsSwitchAccountOpen(true)}
-          onSelectJob={(job) => { setSelectedJob(job); setCurrentTab('jobs'); }}
-          onSelectSeeker={(seeker) => { handleOpenProfile(seeker); }}
+          onSelectJob={(job) => { setSelectedJob(job); handleExploreAsGuest('jobs'); }}
+          onSelectSeeker={(seeker) => { handleOpenProfile(seeker); handleExploreAsGuest('feed'); }}
           jobs={jobs}
           seekers={seekers}
           employers={employers}
@@ -254,6 +272,8 @@ function MainApp() {
         onOpenAuth={() => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
         onOpenSwitchAccount={() => setIsSwitchAccountOpen(true)}
         onOpenProfile={handleOpenProfile}
+        isGuestMode={isGuestMode}
+        onExitGuest={handleExitGuest}
         jobsCount={jobs.length}
         seekersCount={seekers.length}
         employersCount={employers.length}

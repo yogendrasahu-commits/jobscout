@@ -46,6 +46,7 @@ export const Welcome = ({
   onOpenSwitchAccount,
   onSelectJob,
   onSelectSeeker,
+  onExploreAsGuest,
   jobs = [],
   seekers = [],
   employers = []
@@ -322,8 +323,8 @@ export const Welcome = ({
             ) : (
               <div className="flex items-center gap-2">
                 <button
-                  onClick={onNavigateToFeed}
-                  className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all"
+                  onClick={() => onExploreAsGuest ? onExploreAsGuest('feed') : onNavigateToFeed()}
+                  className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all active:scale-95"
                   title="Browse without logging in"
                 >
                   <span>Explore as Guest</span>
@@ -403,8 +404,8 @@ export const Welcome = ({
               </button>
 
               <button
-                onClick={onNavigateToFeed}
-                className="px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs sm:text-sm transition-all flex items-center gap-1.5"
+                onClick={() => onExploreAsGuest ? onExploreAsGuest('feed') : onNavigateToFeed()}
+                className="px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs sm:text-sm transition-all flex items-center gap-1.5 active:scale-95"
               >
                 <span>Guest Preview (बिना लॉगिन देखें)</span>
               </button>
@@ -767,6 +768,15 @@ export const Welcome = ({
                     <div className="text-[10px] text-slate-500 font-medium">Tech Lead (Employer)</div>
                   </button>
                 </div>
+
+                {/* Continue as Guest Button */}
+                <button
+                  type="button"
+                  onClick={() => onExploreAsGuest ? onExploreAsGuest('feed') : onNavigateToFeed()}
+                  className="w-full mt-3 py-2 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 hover:text-indigo-600 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors active:scale-98"
+                >
+                  <span>Continue without account: <strong>Explore as Guest →</strong></span>
+                </button>
               </div>
 
             </div>
@@ -1122,6 +1132,13 @@ export const Welcome = ({
               >
                 <LogIn className="w-4 h-4 text-amber-400" />
                 <span>Log In Directly</span>
+              </button>
+
+              <button
+                onClick={() => onExploreAsGuest ? onExploreAsGuest('feed') : onNavigateToFeed()}
+                className="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm border border-white/20 transition-all flex items-center gap-1.5 active:scale-95"
+              >
+                <span>Explore as Guest</span>
               </button>
             </div>
           </div>

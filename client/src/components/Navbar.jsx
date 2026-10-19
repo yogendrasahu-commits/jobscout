@@ -49,6 +49,8 @@ export const Navbar = ({
   onOpenAuth, 
   onOpenSwitchAccount, 
   onOpenProfile,
+  isGuestMode,
+  onExitGuest,
   jobs = [],
   seekers = [],
   employers = [],
@@ -312,8 +314,8 @@ export const Navbar = ({
             {/* Logo */}
             <div 
               className="flex items-center gap-1.5 sm:gap-2.5 cursor-pointer group flex-shrink-0" 
-              onClick={() => setCurrentTab(user ? 'feed' : 'welcome')}
-              title={user ? "JobScout - Live Feed" : "JobScout - Welcome"}
+              onClick={() => setCurrentTab('feed')}
+              title="JobScout - Live Feed"
             >
               <div className="relative group-hover:scale-105 transition-all duration-300 flex-shrink-0 drop-shadow-[0_2px_10px_rgba(79,70,229,0.2)]">
                 <JobScoutLogo size={38} className="w-8 h-8 sm:w-10 sm:h-10" />
@@ -521,22 +523,6 @@ export const Navbar = ({
           <div className="hidden md:flex justify-center items-center flex-1 min-w-0 px-1">
             <nav className="flex items-center gap-0.5 lg:gap-1 bg-slate-100/90 p-1 rounded-2xl border border-slate-200/90 shadow-xs max-w-full overflow-x-auto no-scrollbar">
               
-              {/* 0. Welcome (Only shown for guest/unauthenticated users) */}
-              {!user && (
-                <button
-                  onClick={() => setCurrentTab('welcome')}
-                  className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
-                    currentTab === 'welcome'
-                      ? 'bg-white text-indigo-700 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
-                  }`}
-                  title="Welcome & Platform Overview"
-                >
-                  <Sparkles className={`w-3.5 h-3.5 flex-shrink-0 ${currentTab === 'welcome' ? 'text-indigo-600' : 'text-slate-400'}`} />
-                  <span>Welcome</span>
-                </button>
-              )}
-
               {/* 1. Feed (Home) */}
               <button
                 onClick={() => setCurrentTab('feed')}
@@ -958,7 +944,12 @@ export const Navbar = ({
 
                     {/* Logout */}
                     <button
-                      onClick={() => { logout(); setProfileMenuOpen(false); setCurrentTab('welcome'); }}
+                      onClick={() => {
+                        logout();
+                        if (onExitGuest) onExitGuest();
+                        setProfileMenuOpen(false);
+                        setCurrentTab('welcome');
+                      }}
                       className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors"
                     >
                       <LogOut className="w-4 h-4" />
@@ -969,8 +960,18 @@ export const Navbar = ({
                 )}
               </div>
             ) : (
-              /* Guest Sign In Button */
+              /* Guest Actions (Sign In + Demo Users) */
               <div className="flex items-center gap-1.5">
+                {onOpenSwitchAccount && (
+                  <button
+                    onClick={onOpenSwitchAccount}
+                    className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 sm:py-2 text-xs font-bold rounded-xl bg-slate-100 hover:bg-indigo-50 text-indigo-700 border border-slate-200 hover:border-indigo-200 transition-all active:scale-95"
+                    title="Switch Demo Profiles"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Demo Users</span>
+                  </button>
+                )}
                 <button
                   onClick={onOpenAuth}
                   className="px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-md shadow-indigo-600/20 border border-indigo-400/30 transition-all active:scale-95"
@@ -1063,26 +1064,6 @@ export const Navbar = ({
                   Tap to open
                 </span>
               </div>
-
-              {/* Welcome Page (Only for guests/unauthenticated) */}
-              {!user && (
-                <button
-                  onClick={() => { setCurrentTab('welcome'); setMobileDrawerOpen(false); }}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
-                    currentTab === 'welcome'
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                      : 'text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Sparkles className={`w-4 h-4 flex-shrink-0 ${currentTab === 'welcome' ? 'text-white' : 'text-amber-500'}`} />
-                    <span>Welcome & Platform Tour</span>
-                  </div>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${currentTab === 'welcome' ? 'bg-white/20 border-white/30 text-white' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
-                    Overview
-                  </span>
-                </button>
-              )}
 
               {/* Feed (Home) */}
               <button
@@ -1373,11 +1354,40 @@ export const Navbar = ({
                 </button>
               )}
 
+              {/* Guest Sign In */}
+              {!user && (
+                <button
+                  onClick={() => {
+                    onOpenAuth();
+                    setMobileDrawerOpen(false);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-xs font-bold shadow-sm"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Sign In / Create Account</span>
+                </button>
+              )}
+
+              {/* Exit Guest Mode / Back to Welcome */}
+              {!user && isGuestMode && (
+                <button
+                  onClick={() => {
+                    if (onExitGuest) onExitGuest();
+                    setMobileDrawerOpen(false);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-semibold border border-slate-200 transition-colors"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Exit Guest (Back to Welcome Screen)</span>
+                </button>
+              )}
+
               {/* Sign Out */}
               {user && (
                 <button
                   onClick={() => {
                     logout();
+                    if (onExitGuest) onExitGuest();
                     setMobileDrawerOpen(false);
                     setCurrentTab('welcome');
                   }}
