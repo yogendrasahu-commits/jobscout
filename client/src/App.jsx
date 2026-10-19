@@ -209,9 +209,20 @@ function MainApp() {
     }
   }, [user, isGuestMode, currentTab]);
 
+  // Centralized tab navigation: public tabs accessible to guests, protected tabs require login
+  const handleNavigateTab = (tab) => {
+    const publicTabs = ['welcome', 'feed', 'network', 'jobs'];
+    if (!user && !publicTabs.includes(tab)) {
+      setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' });
+      return;
+    }
+    setCurrentTab(tab);
+  };
+
   // Route guard: without login only allow 'welcome', 'feed', 'network', 'jobs'
   useEffect(() => {
-    if (!user && !['welcome', 'feed', 'network', 'jobs'].includes(currentTab)) {
+    const publicTabs = ['welcome', 'feed', 'network', 'jobs'];
+    if (!user && !publicTabs.includes(currentTab)) {
       setCurrentTab('feed');
       setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' });
     }
@@ -268,7 +279,7 @@ function MainApp() {
       {/* Top Desktop/Tablet Navbar */}
       <Navbar
         currentTab={currentTab}
-        setCurrentTab={setCurrentTab}
+        setCurrentTab={handleNavigateTab}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         jobs={jobs}
@@ -297,18 +308,19 @@ function MainApp() {
           <Feed
             onSelectSeeker={(seeker) => setSelectedSeeker(seeker)}
             onSelectJob={(job) => setSelectedJob(job)}
-            onNavigateToMap={() => setCurrentTab('map')}
-            onNavigateToAnon={() => setCurrentTab('anon')}
+            onNavigateToMap={() => handleNavigateTab('map')}
+            onNavigateToAnon={() => handleNavigateTab('anon')}
             onNavigateToApplications={() => {
-              setCurrentTab('jobs');
+              handleNavigateTab('applications');
               setJobsSubTab('applied');
             }}
             onNavigateToSavedJobs={() => {
-              setCurrentTab('jobs');
+              handleNavigateTab('jobs');
               setJobsSubTab('browse');
               setJobsQuickFilter('saved');
             }}
             onOpenProfile={handleOpenProfile}
+            onOpenAuth={() => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
           />
         )}
 
@@ -318,8 +330,8 @@ function MainApp() {
             employers={employers}
             onSelectSeeker={(seeker) => setSelectedSeeker(seeker)}
             onSelectJob={(job) => setSelectedJob(job)}
-            onNavigateToMap={() => setCurrentTab('map')}
-            onNavigateToJobs={() => setCurrentTab('jobs')}
+            onNavigateToMap={() => handleNavigateTab('map')}
+            onNavigateToJobs={() => handleNavigateTab('jobs')}
             onOpenProfile={handleOpenProfile}
           />
         )}
@@ -378,7 +390,7 @@ function MainApp() {
       {/* Native App-Style Mobile Bottom Navigation Bar */}
       <MobileBottomNav
         currentTab={currentTab}
-        setCurrentTab={setCurrentTab}
+        setCurrentTab={handleNavigateTab}
         onOpenPostJob={() => {
           setPostJobCoords(null);
           setIsPostJobOpen(true);
@@ -392,7 +404,7 @@ function MainApp() {
       <IncomingCallBanner />
       <VideoCallModal />
       <ChatDrawer 
-        onOpenFullPageChat={() => setCurrentTab('messages')}
+        onOpenFullPageChat={() => handleNavigateTab('messages')}
         currentTab={currentTab}
       />
 

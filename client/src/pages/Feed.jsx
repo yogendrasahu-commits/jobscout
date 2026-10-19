@@ -34,7 +34,8 @@ export const Feed = ({
   onNavigateToAnon,
   onNavigateToApplications,
   onNavigateToSavedJobs,
-  onOpenProfile 
+  onOpenProfile,
+  onOpenAuth
 }) => {
   const { user, isEmployer, isSeeker } = useAuth();
   const { startCall, setActiveChatUser } = useSocket();
@@ -316,18 +317,27 @@ export const Feed = ({
               </div>
             </div>
 
-            {/* Quick Map Jump (Logged in only) */}
-            {user && (
-              <div className="p-3 bg-slate-50 border-t border-slate-100">
-                <button
-                  onClick={onNavigateToMap}
-                  className="w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
-                >
-                  <Radio className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
-                  <span>Open Live Map</span>
-                </button>
-              </div>
-            )}
+            {/* Quick Map Jump */}
+            <div className="p-3 bg-slate-50 border-t border-slate-100">
+              <button
+                onClick={() => {
+                  if (!user) {
+                    onOpenAuth ? onOpenAuth() : onNavigateToMap && onNavigateToMap();
+                  } else {
+                    onNavigateToMap && onNavigateToMap();
+                  }
+                }}
+                className="w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+              >
+                <Radio className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
+                <span>Open Live Map</span>
+                {!user && (
+                  <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 leading-none ml-1">
+                    Login
+                  </span>
+                )}
+              </button>
+            </div>
           </div>
 
           {/* Quick Shortcuts */}
@@ -340,15 +350,26 @@ export const Feed = ({
               <Bookmark className="w-4 h-4 text-indigo-600" />
               <span>Saved Jobs & Opportunities</span>
             </div>
-            {user && (
-              <div 
-                onClick={() => onNavigateToApplications && onNavigateToApplications()}
-                className="flex items-center gap-2 text-slate-600 hover:text-emerald-600 cursor-pointer transition-colors"
-              >
+            <div 
+              onClick={() => {
+                if (!user) {
+                  onOpenAuth ? onOpenAuth() : onNavigateToApplications && onNavigateToApplications();
+                } else {
+                  onNavigateToApplications && onNavigateToApplications();
+                }
+              }}
+              className="flex items-center justify-between text-slate-600 hover:text-emerald-600 cursor-pointer transition-colors"
+            >
+              <div className="flex items-center gap-2">
                 <Briefcase className="w-4 h-4 text-emerald-600" />
                 <span>Submitted Applications</span>
               </div>
-            )}
+              {!user && (
+                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 leading-none">
+                  Login
+                </span>
+              )}
+            </div>
           </div>
 
         </div>

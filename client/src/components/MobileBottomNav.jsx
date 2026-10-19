@@ -11,78 +11,11 @@ import {
 export const MobileBottomNav = ({ 
   currentTab, 
   setCurrentTab, 
-  jobsCount = 0 
+  jobsCount = 0,
+  onOpenAuth
 }) => {
   const { user } = useAuth();
   const { incomingMessage } = useSocket();
-
-  // If user is not logged in, only show Feed, Emp & Seeker, and Jobs
-  if (!user) {
-    return (
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[800] bg-white/95 backdrop-blur-2xl border-t border-slate-200/90 py-1.5 pb-[max(0.35rem,env(safe-area-inset-bottom,0px))] px-3 shadow-[0_-4px_25px_rgba(0,0,0,0.06)] select-none">
-        <div className="grid grid-cols-3 items-center w-full max-w-md mx-auto">
-          {/* 1. Feed */}
-          <button
-            onClick={() => setCurrentTab('feed')}
-            className={`col-span-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all ${
-              currentTab === 'feed'
-                ? 'text-indigo-600 font-extrabold scale-105'
-                : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            <div className="relative">
-              <NavFeedIcon active={currentTab === 'feed'} className="w-5 h-5 flex-shrink-0" />
-            </div>
-            <span className={`text-[11px] mt-0.5 tracking-tight truncate max-w-full text-center ${currentTab === 'feed' ? 'text-indigo-600 font-bold' : ''}`}>Feed</span>
-            {currentTab === 'feed' && (
-              <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
-            )}
-          </button>
-
-          {/* 2. Emp & Seeker */}
-          <button
-            onClick={() => setCurrentTab('network')}
-            className={`col-span-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all ${
-              currentTab === 'network'
-                ? 'text-indigo-600 font-extrabold scale-105'
-                : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            <div className="relative">
-              <NavNetworkIcon active={currentTab === 'network'} className="w-5 h-5 flex-shrink-0" />
-            </div>
-            <span className={`text-[11px] mt-0.5 tracking-tight truncate max-w-full text-center ${currentTab === 'network' ? 'text-indigo-600 font-bold' : ''}`}>Emp & Seeker</span>
-            {currentTab === 'network' && (
-              <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
-            )}
-          </button>
-
-          {/* 3. Jobs */}
-          <button
-            onClick={() => setCurrentTab('jobs')}
-            className={`col-span-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all relative ${
-              currentTab === 'jobs'
-                ? 'text-indigo-600 font-extrabold scale-105'
-                : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            <div className="relative">
-              <NavJobsIcon active={currentTab === 'jobs'} className="w-5 h-5 flex-shrink-0" />
-              {jobsCount > 0 && (
-                <span className="absolute -top-1 -right-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-[8px] text-white font-extrabold px-1.5 py-0.2 rounded-full border border-white shadow-xs">
-                  {jobsCount}
-                </span>
-              )}
-            </div>
-            <span className={`text-[11px] mt-0.5 tracking-tight truncate max-w-full text-center ${currentTab === 'jobs' ? 'text-indigo-600 font-bold' : ''}`}>Jobs</span>
-            {currentTab === 'jobs' && (
-              <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
-            )}
-          </button>
-        </div>
-      </nav>
-    );
-  }
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[800] bg-white/90 backdrop-blur-2xl border-t border-slate-200/90 py-1.5 pb-[max(0.35rem,env(safe-area-inset-bottom,0px))] px-2 shadow-[0_-4px_25px_rgba(0,0,0,0.06)] select-none">
@@ -106,7 +39,7 @@ export const MobileBottomNav = ({
           )}
         </button>
 
-        {/* 2. My Network */}
+        {/* 2. Network / Emp & Seeker */}
         <button
           onClick={() => setCurrentTab('network')}
           className={`col-span-1 flex flex-col items-center justify-center py-1 px-0.5 rounded-xl transition-all ${
@@ -118,16 +51,24 @@ export const MobileBottomNav = ({
           <div className="relative">
             <NavNetworkIcon active={currentTab === 'network'} className="w-5 h-5 flex-shrink-0" />
           </div>
-          <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center ${currentTab === 'network' ? 'text-indigo-600 font-bold' : ''}`}>Network</span>
+          <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center ${currentTab === 'network' ? 'text-indigo-600 font-bold' : ''}`}>
+            {user ? 'Network' : 'Seeker/Emp'}
+          </span>
           {currentTab === 'network' && (
             <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
           )}
         </button>
 
-        {/* 3. Center Elevated JobScout Radar Button */}
+        {/* 3. Center Elevated JobScout Radar Button (Map) */}
         <div className="col-span-1 flex flex-col items-center justify-center relative">
           <button
-            onClick={() => setCurrentTab('map')}
+            onClick={() => {
+              if (!user) {
+                onOpenAuth ? onOpenAuth() : setCurrentTab('map');
+              } else {
+                setCurrentTab('map');
+              }
+            }}
             className="relative -top-3.5 flex flex-col items-center group active:scale-95 transition-transform"
           >
             {/* Ambient Aura Halo */}
@@ -149,11 +90,18 @@ export const MobileBottomNav = ({
               </span>
             </div>
 
-            <span className={`text-[10px] font-black tracking-wider uppercase mt-1 ${
-              currentTab === 'map' ? 'text-indigo-600' : 'text-slate-500'
-            }`}>
-              Map
-            </span>
+            <div className="flex items-center gap-0.5 mt-1">
+              <span className={`text-[10px] font-black tracking-wider uppercase ${
+                currentTab === 'map' ? 'text-indigo-600' : 'text-slate-500'
+              }`}>
+                Map
+              </span>
+              {!user && (
+                <span className="text-[8px] font-extrabold px-1 rounded bg-amber-100 text-amber-800 leading-none">
+                  Login
+                </span>
+              )}
+            </div>
           </button>
         </div>
 
@@ -182,7 +130,13 @@ export const MobileBottomNav = ({
 
         {/* 5. Messages (Full-Page Chat) */}
         <button
-          onClick={() => setCurrentTab('messages')}
+          onClick={() => {
+            if (!user) {
+              onOpenAuth ? onOpenAuth() : setCurrentTab('messages');
+            } else {
+              setCurrentTab('messages');
+            }
+          }}
           className={`col-span-1 flex flex-col items-center justify-center py-1 px-0.5 rounded-xl transition-all relative ${
             currentTab === 'messages'
               ? 'text-indigo-600 font-extrabold scale-105'
@@ -193,7 +147,14 @@ export const MobileBottomNav = ({
             <NavMessagesIcon active={currentTab === 'messages'} className="w-5 h-5 flex-shrink-0" />
             <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-500 rounded-full shadow-xs border border-white" />
           </div>
-          <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center ${currentTab === 'messages' ? 'text-indigo-600 font-bold' : ''}`}>Chat</span>
+          <div className="flex items-center gap-0.5 mt-0.5">
+            <span className={`text-[10px] tracking-tight truncate max-w-full text-center ${currentTab === 'messages' ? 'text-indigo-600 font-bold' : ''}`}>Chat</span>
+            {!user && (
+              <span className="text-[8px] font-extrabold px-1 rounded bg-amber-100 text-amber-800 leading-none">
+                Login
+              </span>
+            )}
+          </div>
           {currentTab === 'messages' && (
             <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
           )}

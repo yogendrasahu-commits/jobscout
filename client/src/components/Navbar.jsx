@@ -549,22 +549,32 @@ export const Navbar = ({
                 <span>{user ? 'Network' : 'Emp & Seeker'}</span>
               </button>
 
-              {/* 3. Live Map (Logged in only) */}
-              {user && (
-                <button
-                  onClick={() => setCurrentTab('map')}
-                  className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
-                    currentTab === 'map'
-                      ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
-                  }`}
-                  title="Live Map"
-                >
-                  <NavRadarIcon active={currentTab === 'map'} className="w-4 h-4 flex-shrink-0" />
-                  <span>Map</span>
+              {/* 3. Live Map */}
+              <button
+                onClick={() => {
+                  if (!user) {
+                    onOpenAuth ? onOpenAuth() : setCurrentTab('map');
+                  } else {
+                    setCurrentTab('map');
+                  }
+                }}
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
+                  currentTab === 'map'
+                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
+                }`}
+                title={user ? 'Live Map' : 'Live Map (Login Required)'}
+              >
+                <NavRadarIcon active={currentTab === 'map'} className="w-4 h-4 flex-shrink-0" />
+                <span>Map</span>
+                {user ? (
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse ml-0.5 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-                </button>
-              )}
+                ) : (
+                  <span className="text-[9px] font-bold px-1 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-200 leading-none">
+                    Login
+                  </span>
+                )}
+              </button>
 
               {/* 4. Jobs & Applied */}
               <button
@@ -585,60 +595,87 @@ export const Navbar = ({
                 )}
               </button>
 
-              {/* 5. Speed Connect Hub (Logged in only) */}
-              {user && (
-                <button
-                  onClick={() => setCurrentTab('connect')}
-                  className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
-                    currentTab === 'connect'
-                      ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
-                  }`}
-                  title="Speed Connect Hub (Audio & Video Calls)"
-                >
-                  <NavConnectIcon active={currentTab === 'connect'} className="w-4 h-4 flex-shrink-0" />
-                  <span>Connect</span>
-                </button>
-              )}
+              {/* 5. Speed Connect Hub */}
+              <button
+                onClick={() => {
+                  if (!user) {
+                    onOpenAuth ? onOpenAuth() : setCurrentTab('connect');
+                  } else {
+                    setCurrentTab('connect');
+                  }
+                }}
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
+                  currentTab === 'connect'
+                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
+                }`}
+                title={user ? 'Speed Connect Hub (Audio & Video Calls)' : 'Speed Connect (Login Required)'}
+              >
+                <NavConnectIcon active={currentTab === 'connect'} className="w-4 h-4 flex-shrink-0" />
+                <span>Connect</span>
+                {!user && (
+                  <span className="text-[9px] font-bold px-1 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-200 leading-none">
+                    Login
+                  </span>
+                )}
+              </button>
 
-              {/* 6. Anonymous Discussions (Logged in only) */}
-              {user && (
-                <button
-                  onClick={() => setCurrentTab('anon')}
-                  className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
-                    currentTab === 'anon'
-                      ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
-                  }`}
-                  title="JobScout Anon Talk"
-                >
-                  <div className="relative">
-                    <NavAnonIcon active={currentTab === 'anon'} className="w-4 h-4 flex-shrink-0" />
-                    <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" />
-                  </div>
-                  <span>Anon</span>
-                </button>
-              )}
+              {/* 6. Anonymous Discussions */}
+              <button
+                onClick={() => {
+                  if (!user) {
+                    onOpenAuth ? onOpenAuth() : setCurrentTab('anon');
+                  } else {
+                    setCurrentTab('anon');
+                  }
+                }}
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
+                  currentTab === 'anon'
+                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
+                }`}
+                title={user ? 'JobScout Anon Talk' : 'Anon Talk (Login Required)'}
+              >
+                <div className="relative">
+                  <NavAnonIcon active={currentTab === 'anon'} className="w-4 h-4 flex-shrink-0" />
+                  <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" />
+                </div>
+                <span>Anon</span>
+                {!user && (
+                  <span className="text-[9px] font-bold px-1 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-200 leading-none">
+                    Login
+                  </span>
+                )}
+              </button>
 
-              {/* 7. Full-Page Messaging (Logged in only) */}
-              {user && (
-                <button
-                  onClick={() => setCurrentTab('messages')}
-                  className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
-                    currentTab === 'messages'
-                      ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
-                  }`}
-                  title="Full-Page Messaging (चैट)"
-                >
-                  <div className="relative">
-                    <NavMessagesIcon active={currentTab === 'messages'} className="w-4 h-4 flex-shrink-0" />
-                    <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
-                  </div>
-                  <span className="hidden xl:inline">Messages</span>
-                  <span className="xl:hidden">Chat</span>
-                </button>
-              )}
+              {/* 7. Full-Page Messaging */}
+              <button
+                onClick={() => {
+                  if (!user) {
+                    onOpenAuth ? onOpenAuth() : setCurrentTab('messages');
+                  } else {
+                    setCurrentTab('messages');
+                  }
+                }}
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
+                  currentTab === 'messages'
+                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
+                }`}
+                title={user ? 'Full-Page Messaging (चैट)' : 'Messages (Login Required)'}
+              >
+                <div className="relative">
+                  <NavMessagesIcon active={currentTab === 'messages'} className="w-4 h-4 flex-shrink-0" />
+                  <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
+                </div>
+                <span className="hidden xl:inline">Messages</span>
+                <span className="xl:hidden">Chat</span>
+                {!user && (
+                  <span className="text-[9px] font-bold px-1 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-200 leading-none">
+                    Login
+                  </span>
+                )}
+              </button>
             </nav>
           </div>
 
@@ -1087,26 +1124,39 @@ export const Navbar = ({
                 </span>
               </button>
 
-              {/* Live Map (Logged in only) */}
-              {user && (
-                <button
-                  onClick={() => { setCurrentTab('map'); setMobileDrawerOpen(false); }}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
-                    currentTab === 'map'
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                      : 'text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <NavRadarIcon active={currentTab === 'map'} className="w-4 h-4 flex-shrink-0" />
-                    <span>Live Map</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                    <span className={`text-[10px] font-extrabold uppercase ${currentTab === 'map' ? 'text-cyan-200' : 'text-cyan-600'}`}>Live</span>
-                  </div>
-                </button>
-              )}
+              {/* Live Map */}
+              <button
+                onClick={() => {
+                  setMobileDrawerOpen(false);
+                  if (!user) {
+                    onOpenAuth ? onOpenAuth() : setCurrentTab('map');
+                  } else {
+                    setCurrentTab('map');
+                  }
+                }}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
+                  currentTab === 'map'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                    : 'text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <NavRadarIcon active={currentTab === 'map'} className="w-4 h-4 flex-shrink-0" />
+                  <span>Live Map</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  {user ? (
+                    <>
+                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                      <span className={`text-[10px] font-extrabold uppercase ${currentTab === 'map' ? 'text-cyan-200' : 'text-cyan-600'}`}>Live</span>
+                    </>
+                  ) : (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                      Login
+                    </span>
+                  )}
+                </div>
+              </button>
 
               {/* Job Board */}
               <button
@@ -1128,85 +1178,129 @@ export const Navbar = ({
                 )}
               </button>
 
-              {/* Applied Jobs / Candidate Applications (Logged in only) */}
-              {user && (
-                <button
-                  onClick={() => { setCurrentTab('applications'); setMobileDrawerOpen(false); }}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
-                    currentTab === 'applications'
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                      : 'text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <FileText className={`w-4 h-4 flex-shrink-0 ${currentTab === 'applications' ? 'text-white' : 'text-indigo-600'}`} />
-                    <span>{isEmployer ? 'Candidate Applications' : 'Applied Jobs'}</span>
-                  </div>
+              {/* Applied Jobs / Candidate Applications */}
+              <button
+                onClick={() => {
+                  setMobileDrawerOpen(false);
+                  if (!user) {
+                    onOpenAuth ? onOpenAuth() : setCurrentTab('applications');
+                  } else {
+                    setCurrentTab('applications');
+                  }
+                }}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
+                  currentTab === 'applications'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                    : 'text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <FileText className={`w-4 h-4 flex-shrink-0 ${currentTab === 'applications' ? 'text-white' : 'text-indigo-600'}`} />
+                  <span>{isEmployer ? 'Candidate Applications' : 'Applied Jobs'}</span>
+                </div>
+                {user ? (
                   <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border ${currentTab === 'applications' ? 'bg-white/20 border-white/30 text-white' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
                     Status & Review
                   </span>
-                </button>
-              )}
+                ) : (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                    Login
+                  </span>
+                )}
+              </button>
 
-              {/* Speed Connect Hub (Logged in only) */}
-              {user && (
-                <button
-                  onClick={() => { setCurrentTab('connect'); setMobileDrawerOpen(false); }}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
-                    currentTab === 'connect'
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                      : 'text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <NavConnectIcon active={currentTab === 'connect'} className="w-4 h-4 flex-shrink-0" />
-                    <span>Speed Connect</span>
-                  </div>
+              {/* Speed Connect Hub */}
+              <button
+                onClick={() => {
+                  setMobileDrawerOpen(false);
+                  if (!user) {
+                    onOpenAuth ? onOpenAuth() : setCurrentTab('connect');
+                  } else {
+                    setCurrentTab('connect');
+                  }
+                }}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
+                  currentTab === 'connect'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                    : 'text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <NavConnectIcon active={currentTab === 'connect'} className="w-4 h-4 flex-shrink-0" />
+                  <span>Speed Connect</span>
+                </div>
+                {user ? (
                   <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase border ${currentTab === 'connect' ? 'bg-white/20 border-white/30 text-white' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
                     Calls
                   </span>
-                </button>
-              )}
+                ) : (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                    Login
+                  </span>
+                )}
+              </button>
 
-              {/* Anon Talk (Logged in only) */}
-              {user && (
-                <button
-                  onClick={() => { setCurrentTab('anon'); setMobileDrawerOpen(false); }}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
-                    currentTab === 'anon'
-                      ? 'bg-orange-600 text-white shadow-md shadow-orange-600/30'
-                      : 'text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <NavAnonIcon active={currentTab === 'anon'} className="w-4 h-4 flex-shrink-0" />
-                    <span>Anon Talk (गुमनाम चर्चा)</span>
-                  </div>
+              {/* Anon Talk */}
+              <button
+                onClick={() => {
+                  setMobileDrawerOpen(false);
+                  if (!user) {
+                    onOpenAuth ? onOpenAuth() : setCurrentTab('anon');
+                  } else {
+                    setCurrentTab('anon');
+                  }
+                }}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
+                  currentTab === 'anon'
+                    ? 'bg-orange-600 text-white shadow-md shadow-orange-600/30'
+                    : 'text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <NavAnonIcon active={currentTab === 'anon'} className="w-4 h-4 flex-shrink-0" />
+                  <span>Anon Talk (गुमनाम चर्चा)</span>
+                </div>
+                {user ? (
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${currentTab === 'anon' ? 'bg-white/20 border-white/30 text-white' : 'bg-orange-50 text-orange-700 border-orange-200'}`}>
                     Community
                   </span>
-                </button>
-              )}
+                ) : (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                    Login
+                  </span>
+                )}
+              </button>
 
-              {/* Full-Page Messaging (Logged in only) */}
-              {user && (
-                <button
-                  onClick={() => { setCurrentTab('messages'); setMobileDrawerOpen(false); }}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
-                    currentTab === 'messages'
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                      : 'text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <NavMessagesIcon active={currentTab === 'messages'} className="w-4 h-4 flex-shrink-0" />
-                    <span>Full-Page Messaging</span>
-                  </div>
+              {/* Full-Page Messaging */}
+              <button
+                onClick={() => {
+                  setMobileDrawerOpen(false);
+                  if (!user) {
+                    onOpenAuth ? onOpenAuth() : setCurrentTab('messages');
+                  } else {
+                    setCurrentTab('messages');
+                  }
+                }}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
+                  currentTab === 'messages'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                    : 'text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <NavMessagesIcon active={currentTab === 'messages'} className="w-4 h-4 flex-shrink-0" />
+                  <span>Full-Page Messaging</span>
+                </div>
+                {user ? (
                   <span className="text-[10px] bg-indigo-50 border border-indigo-200 text-indigo-700 px-2 py-0.5 rounded-full font-bold">
                     Chat
                   </span>
-                </button>
-              )}
+                ) : (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                    Login
+                  </span>
+                )}
+              </button>
             </div>
 
             {/* 2. USER PROFILE & ROLE SWITCH SECTION */}
