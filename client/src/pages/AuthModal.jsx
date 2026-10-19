@@ -31,8 +31,7 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
     loginWithPhoneOtp, 
     loginWithPhonePassword, 
     registerWithPhone, 
-    checkPhone,
-    demoSwitch 
+    checkPhone
   } = useAuth();
 
   // Mode: 'login' | 'register'
@@ -303,14 +302,6 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
     }
   };
 
-  const handleDemo = async (demoRole) => {
-    setLoading(true);
-    await demoSwitch(demoRole);
-    setLoading(false);
-    if (onSuccess) onSuccess();
-    onClose();
-  };
-
   return (
     <div className="fixed inset-0 z-[950] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
       <div className="relative w-full max-w-lg bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-7 shadow-2xl animate-in zoom-in-95 duration-200 max-h-[92dvh] overflow-y-auto my-auto text-slate-900">
@@ -362,29 +353,6 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
               ? 'Sign in via Mobile OTP or Password'
               : 'Sign up with distinct Employer or Job Seeker options'}
           </p>
-        </div>
-
-        {/* Fast Demo Bar */}
-        <div className="p-2.5 bg-slate-50 rounded-2xl border border-slate-200 mb-4">
-          <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider block text-center mb-1.5">
-            ⚡ 1-Click Demo Login
-          </span>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => handleDemo('emp')}
-              className="py-1.5 px-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold text-xs transition-colors shadow-sm"
-            >
-              👔 Recruiter Demo
-            </button>
-            <button
-              type="button"
-              onClick={() => handleDemo('seeker')}
-              className="py-1.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold text-xs transition-colors shadow-sm"
-            >
-              🔍 Seeker Demo
-            </button>
-          </div>
         </div>
 
         {/* Tab Toggle: Login vs Sign Up */}
@@ -530,7 +498,7 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
                       >
                         <span className="flex items-center gap-1.5">
                           <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                          Demo OTP: <strong className="text-slate-900 tracking-widest">{simulatedOtp}</strong>
+                          Test OTP: <strong className="text-slate-900 tracking-widest">{simulatedOtp}</strong>
                         </span>
                         <span className="text-[10px] bg-indigo-600 px-2 py-0.5 rounded text-white font-bold shadow-sm">
                           Click to Fill
@@ -806,7 +774,7 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
                     onClick={() => setOtp(simulatedOtp)}
                     className="cursor-pointer mb-2 p-1.5 bg-indigo-50 border border-indigo-200 rounded-lg flex items-center justify-between text-[11px] text-indigo-700 shadow-sm"
                   >
-                    <span>Demo OTP: <strong className="text-slate-900">{simulatedOtp}</strong></span>
+                    <span>Test OTP: <strong className="text-slate-900">{simulatedOtp}</strong></span>
                     <span className="text-[9px] bg-indigo-600 px-1.5 py-0.5 rounded text-white font-bold">Auto-Fill</span>
                   </div>
                 )}

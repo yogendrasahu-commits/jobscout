@@ -46,7 +46,6 @@ export const Navbar = ({
   setCurrentTab, 
   onOpenPostJob, 
   onOpenAuth, 
-  onOpenSwitchAccount, 
   onOpenProfile,
   isGuestMode,
   onExitGuest,
@@ -61,7 +60,7 @@ export const Navbar = ({
   seekersCount = 0,
   employersCount = 0
 }) => {
-  const { user, isEmployer, isSeeker, demoSwitch, logout } = useAuth();
+  const { user, isEmployer, isSeeker, logout } = useAuth();
   const { setActiveChatUser, socket } = useSocket();
 
   // Dropdown & Drawer states
@@ -956,17 +955,6 @@ export const Navbar = ({
                       </div>
                     </div>
 
-                    {/* Switch Account (14 Demo Users) */}
-                    {onOpenSwitchAccount && (
-                      <button
-                        onClick={() => { onOpenSwitchAccount(); setProfileMenuOpen(false); }}
-                        className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-indigo-700 hover:bg-indigo-50 border border-indigo-200/80 transition-colors mb-2"
-                      >
-                        <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                        <span>Switch Account (14 Demo Users)</span>
-                      </button>
-                    )}
-
                     {/* Logout */}
                     <button
                       onClick={() => {
@@ -985,18 +973,8 @@ export const Navbar = ({
                 )}
               </div>
             ) : (
-              /* Guest Actions (Sign In + Demo Users) */
+              /* Guest Actions (Sign In) */
               <div className="flex items-center gap-1.5">
-                {onOpenSwitchAccount && (
-                  <button
-                    onClick={onOpenSwitchAccount}
-                    className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 sm:py-2 text-xs font-bold rounded-xl bg-slate-100 hover:bg-indigo-50 text-indigo-700 border border-slate-200 hover:border-indigo-200 transition-all active:scale-95"
-                    title="Switch Demo Profiles"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                    <span>Demo Users</span>
-                  </button>
-                )}
                 <button
                   onClick={onOpenAuth}
                   className="px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-md shadow-indigo-600/20 border border-indigo-400/30 transition-all active:scale-95"
@@ -1324,38 +1302,13 @@ export const Navbar = ({
                   </div>
                 </div>
 
-                {/* 1-Tap Quick Role Switch */}
-                <div className="mt-2.5 pt-2 border-t border-slate-200">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase">1-TAP ROLE SWITCH:</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    <button
-                      onClick={() => demoSwitch('emp')}
-                      className={`py-1.5 px-2 rounded-xl text-xs font-bold transition-all ${
-                        isEmployer ? 'bg-indigo-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 border border-slate-200'
-                      }`}
-                    >
-                      👔 Employer
-                    </button>
-                    <button
-                      onClick={() => demoSwitch('seeker')}
-                      className={`py-1.5 px-2 rounded-xl text-xs font-bold transition-all ${
-                        isSeeker ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 border border-slate-200'
-                      }`}
-                    >
-                      🔍 Seeker
-                    </button>
-                  </div>
-                </div>
-
                 {/* View Full Profile */}
                 <button
                   onClick={() => {
                     if (onOpenProfile) onOpenProfile(user);
                     setMobileDrawerOpen(false);
                   }}
-                  className="w-full mt-2 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl border border-indigo-200 flex items-center justify-center gap-1.5 transition-colors"
+                  className="w-full mt-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl border border-indigo-200 flex items-center justify-center gap-1.5 transition-colors"
                 >
                   <User className="w-3.5 h-3.5" />
                   <span>View Full Profile</span>
@@ -1429,20 +1382,6 @@ export const Navbar = ({
                 >
                   <PlusCircle className="w-4 h-4" />
                   <span>Post a New Job</span>
-                </button>
-              )}
-
-              {/* Switch Demo Account */}
-              {onOpenSwitchAccount && (
-                <button
-                  onClick={() => {
-                    onOpenSwitchAccount();
-                    setMobileDrawerOpen(false);
-                  }}
-                  className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-indigo-700 text-xs font-semibold border border-slate-200 transition-colors"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                  <span>Switch Demo Account (14 Profiles)</span>
                 </button>
               )}
 

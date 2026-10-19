@@ -13,7 +13,6 @@ import { LinkedInProfileModal } from './components/LinkedInProfileModal';
 import { PostJobModal } from './components/PostJobModal';
 import { JobApplyModal } from './components/JobApplyModal';
 import { SeekerProfileModal } from './components/SeekerProfileModal';
-import { SwitchAccountModal } from './components/SwitchAccountModal';
 import { ChatDrawer } from './components/ChatDrawer';
 import { VideoCallModal } from './components/VideoCallModal';
 import { IncomingCallBanner } from './components/IncomingCallBanner';
@@ -48,7 +47,6 @@ function MainApp() {
     mode: 'login',
     role: 'seeker'
   });
-  const [isSwitchAccountOpen, setIsSwitchAccountOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
   const [selectedSeeker, setSelectedSeeker] = useState(null);
   const [selectedProfileUser, setSelectedProfileUser] = useState(null);
@@ -244,7 +242,6 @@ function MainApp() {
           }}
           onOpenLogin={(phone) => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
           onOpenSignup={(role, phone) => setAuthConfig({ isOpen: true, mode: 'register', role: role || 'seeker' })}
-          onOpenSwitchAccount={() => setIsSwitchAccountOpen(true)}
           onSelectJob={(job) => { setSelectedJob(job); handleExploreAsGuest('jobs'); }}
           onSelectSeeker={(seeker) => { handleOpenProfile(seeker); handleExploreAsGuest('feed'); }}
           jobs={jobs}
@@ -262,12 +259,6 @@ function MainApp() {
             setAuthConfig(prev => ({ ...prev, isOpen: false }));
             setCurrentTab('feed');
           }}
-        />
-
-        {/* Switch Account Modal */}
-        <SwitchAccountModal
-          isOpen={isSwitchAccountOpen}
-          onClose={() => setIsSwitchAccountOpen(false)}
         />
       </div>
     );
@@ -292,7 +283,6 @@ function MainApp() {
           setIsPostJobOpen(true);
         }}
         onOpenAuth={() => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
-        onOpenSwitchAccount={() => setIsSwitchAccountOpen(true)}
         onOpenProfile={handleOpenProfile}
         isGuestMode={isGuestMode}
         onExitGuest={handleExitGuest}
@@ -396,7 +386,6 @@ function MainApp() {
           setIsPostJobOpen(true);
         }}
         onOpenAuth={() => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
-        onOpenSwitchAccount={() => setIsSwitchAccountOpen(true)}
         jobsCount={jobs.length}
       />
 
@@ -435,11 +424,6 @@ function MainApp() {
         seeker={selectedSeeker}
         isOpen={Boolean(selectedSeeker)}
         onClose={() => setSelectedSeeker(null)}
-      />
-
-      <SwitchAccountModal
-        isOpen={isSwitchAccountOpen}
-        onClose={() => setIsSwitchAccountOpen(false)}
       />
 
       <AuthModal

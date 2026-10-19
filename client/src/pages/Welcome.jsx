@@ -44,7 +44,6 @@ export const Welcome = ({
   onNavigateToNetwork,
   onNavigateToFeed,
   onNavigateToAnon,
-  onOpenSwitchAccount,
   onSelectJob,
   onSelectSeeker,
   onExploreAsGuest,
@@ -55,7 +54,6 @@ export const Welcome = ({
   const { 
     user, 
     logout, 
-    demoSwitch, 
     loginWithPhonePassword, 
     loginWithPhoneOtp, 
     sendOtp, 
@@ -105,23 +103,6 @@ export const Welcome = ({
     }
   };
 
-  // 1-Tap Demo Switch
-  const handle1TapDemo = async (roleType) => {
-    setLoading(true);
-    setError('');
-    try {
-      if (demoSwitch) {
-        await demoSwitch(roleType);
-        onNavigateToFeed();
-      } else if (onOpenSwitchAccount) {
-        onOpenSwitchAccount();
-      }
-    } catch (err) {
-      setError(err.message || 'Demo switch failed');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Send OTP
   const handleSendOtp = async () => {
@@ -255,8 +236,8 @@ export const Welcome = ({
       a: "Speed Connect is built on WebRTC peer-to-peer technology. Recruiters and job candidates can start instant high-definition video or voice screening calls directly inside the browser without downloading extra software or exchanging personal phone numbers."
     },
     {
-      q: "Can I try JobScout without creating a new account?",
-      a: "Yes! JobScout comes with 14 pre-configured demo profiles including 7 Job Seekers (React, Python, DevOps, Cloud Architects) and 7 Top Employers (Nexus Cloud, Fintech Labs, etc.). Use the 1-Tap Demo buttons to experience both roles instantly."
+      q: "Can I explore JobScout without creating a new account?",
+      a: "Yes! You can explore the live Feed, Job Board, Employers, and Candidate profiles freely in Guest Mode without logging in. You only need to sign in when you want to apply or post jobs."
     },
     {
       q: "How does the professional resume and offer letter generator work?",
@@ -765,56 +746,12 @@ export const Welcome = ({
                 </form>
               )}
 
-              {/* Instant 1-Tap Demo Logins */}
+              {/* Continue as Guest Button */}
               <div className="mt-4 pt-3.5 border-t border-slate-100">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-                    Instant 1-Click Demo Login:
-                  </span>
-                  {onOpenSwitchAccount && (
-                    <button
-                      type="button"
-                      onClick={onOpenSwitchAccount}
-                      className="text-[10px] font-bold text-indigo-600 hover:underline"
-                    >
-                      All 14 Demo Profiles →
-                    </button>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handle1TapDemo('seeker')}
-                    disabled={loading}
-                    className="p-2 rounded-xl bg-slate-50 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 text-left transition-all group"
-                  >
-                    <div className="text-[11px] font-bold text-slate-800 group-hover:text-indigo-600 flex items-center gap-1">
-                      <span>Rahul Sharma</span>
-                      <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-indigo-600" />
-                    </div>
-                    <div className="text-[10px] text-slate-500 font-medium">React Dev (Seeker)</div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handle1TapDemo('emp')}
-                    disabled={loading}
-                    className="p-2 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 text-left transition-all group"
-                  >
-                    <div className="text-[11px] font-bold text-slate-800 group-hover:text-emerald-700 flex items-center gap-1">
-                      <span>Nexus Cloud</span>
-                      <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-emerald-600" />
-                    </div>
-                    <div className="text-[10px] text-slate-500 font-medium">Tech Lead (Employer)</div>
-                  </button>
-                </div>
-
-                {/* Continue as Guest Button */}
                 <button
                   type="button"
                   onClick={() => onExploreAsGuest ? onExploreAsGuest('feed') : onNavigateToFeed()}
-                  className="w-full mt-3 py-2 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 hover:text-indigo-600 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors active:scale-98"
+                  className="w-full py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 hover:text-indigo-600 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors active:scale-98 shadow-xs"
                 >
                   <span>Continue without account: <strong>Explore as Guest →</strong></span>
                 </button>
