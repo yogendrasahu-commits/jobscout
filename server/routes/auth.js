@@ -456,21 +456,6 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Fast Demo Login
-router.post('/demo-login', (req, res) => {
-  const { role } = req.body; // 'emp' or 'seeker'
-  const user = db.getAllUsers().find(u => u.role === (role || 'seeker'));
-  if (!user) return res.status(404).json({ error: 'Demo user not found' });
-
-  const token = jwt.sign(
-    { id: user.id, email: user.email, role: user.role, name: user.name },
-    JWT_SECRET,
-    { expiresIn: '7d' }
-  );
-  const { password: _, ...safeUser } = user;
-  res.json({ token, user: safeUser });
-});
-
 // Get Current User Profile
 router.get('/me', authenticateToken, (req, res) => {
   const user = db.findUserById(req.user.id);
@@ -589,32 +574,6 @@ router.get('/seekers', (req, res) => {
   res.json({ seekers });
 });
 
-// Get all categorized demo users for multi-account testing
-router.get('/demo-users', (req, res) => {
-  const employers = db.getEmployers().map(u => {
-    const { password, ...safe } = u;
-    return safe;
-  });
-  const seekers = db.getSeekers().map(u => {
-    const { password, ...safe } = u;
-    return safe;
-  });
-  res.json({ employers, seekers });
-});
-
-// Switch login directly to any specific user ID (for multi-user testing)
-router.post('/switch-user/:id', (req, res) => {
-  const user = db.findUserById(req.params.id);
-  if (!user) return res.status(404).json({ error: 'User not found' });
-
-  const token = jwt.sign(
-    { id: user.id, email: user.email, role: user.role, name: user.name, phone: user.phone },
-    JWT_SECRET,
-    { expiresIn: '7d' }
-  );
-  const { password: _, ...safeUser } = user;
-  res.json({ token, user: safeUser });
-});
 
 // Get current email sender configuration status
 router.get('/settings/email', (req, res) => {

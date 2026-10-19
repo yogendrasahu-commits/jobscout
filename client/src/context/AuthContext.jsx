@@ -155,22 +155,6 @@ export const AuthProvider = ({ children }) => {
     return data.user;
   };
 
-  const demoSwitch = async (role) => {
-    try {
-      const res = await fetch('/api/auth/demo-login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        saveAuthSession(data.token, data.user);
-        return data.user;
-      }
-    } catch (err) {
-      console.error('Demo switch error:', err);
-    }
-  };
 
   const updateLocation = async (lat, lng, address) => {
     if (!token) return;
@@ -242,7 +226,6 @@ export const AuthProvider = ({ children }) => {
         loginWithPhonePassword,
         registerWithPhone,
         checkPhone,
-        demoSwitch,
         updateLocation,
         updateProfile,
         logout,
