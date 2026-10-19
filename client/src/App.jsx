@@ -20,11 +20,14 @@ import { IncomingCallBanner } from './components/IncomingCallBanner';
 import { AuthModal } from './pages/AuthModal';
 import { FullPageChat } from './pages/FullPageChat';
 import { AnonDiscuss } from './pages/AnonDiscuss';
+import { Welcome } from './pages/Welcome';
 
 function MainApp() {
   const { user, isEmployer } = useAuth();
   const { socket } = useSocket();
-  const [currentTab, setCurrentTab] = useState('feed'); // 'feed' | 'network' | 'map' | 'jobs' | 'connect' | 'anon' | 'applications' | 'messages'
+  const [currentTab, setCurrentTab] = useState(() => {
+    return localStorage.getItem('jobradar_token') ? 'feed' : 'welcome';
+  }); // 'welcome' | 'feed' | 'network' | 'map' | 'jobs' | 'connect' | 'anon' | 'applications' | 'messages'
   const [jobsSubTab, setJobsSubTab] = useState('browse'); // 'browse' | 'applied'
 
   const [jobs, setJobs] = useState([]);
@@ -206,6 +209,23 @@ function MainApp() {
 
       {/* Main Content Area */}
       <main className={`flex-1 w-full max-w-full relative ${currentTab === 'map' ? 'overflow-hidden' : 'pb-20 md:pb-0 overflow-x-hidden'}`}>
+        {currentTab === 'welcome' && (
+          <Welcome
+            onNavigateToMap={() => setCurrentTab('map')}
+            onNavigateToJobs={() => setCurrentTab('jobs')}
+            onNavigateToNetwork={() => setCurrentTab('network')}
+            onNavigateToFeed={() => setCurrentTab('feed')}
+            onNavigateToAnon={() => setCurrentTab('anon')}
+            onOpenAuth={() => setIsAuthOpen(true)}
+            onOpenSwitchAccount={() => setIsSwitchAccountOpen(true)}
+            onSelectJob={(job) => setSelectedJob(job)}
+            onSelectSeeker={(seeker) => handleOpenProfile(seeker)}
+            jobs={jobs}
+            seekers={seekers}
+            employers={employers}
+          />
+        )}
+
         {currentTab === 'feed' && (
           <Feed
             onSelectSeeker={(seeker) => setSelectedSeeker(seeker)}
