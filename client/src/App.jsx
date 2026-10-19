@@ -323,6 +323,7 @@ function MainApp() {
             onNavigateToMap={() => handleNavigateTab('map')}
             onNavigateToJobs={() => handleNavigateTab('jobs')}
             onOpenProfile={handleOpenProfile}
+            onOpenAuth={() => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
           />
         )}
 

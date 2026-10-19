@@ -25,6 +25,35 @@
       "lng": 72.8777,
       "address": "Mumbai Central",
       "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Real%20Candidate"
+    },
+    {
+      "id": "usr_1792404668987_g6bf",
+      "createdAt": "2026-10-19T10:11:08.987Z",
+      "isOnline": true,
+      "name": "abc",
+      "phone": "+91 9111111111",
+      "email": "9111111111@user.jobradar.io",
+      "password": "$2a$10$V5fkLs1cBMUfRuQ9N2k6Mu1O1fZmBxtipk88lhCly7q/W33t0kwbO",
+      "role": "seeker",
+      "companyName": "",
+      "industry": "",
+      "companySize": "",
+      "website": "",
+      "hiringType": "",
+      "title": "test",
+      "skills": [
+        "JavaScript",
+        "React"
+      ],
+      "experience": "1 - 3 Years",
+      "expectedSalary": "Competitive",
+      "availability": "Immediate (Ready Today)",
+      "vehicle": false,
+      "bio": "",
+      "lat": 19.076,
+      "lng": 72.8777,
+      "address": "Bandra Kurla Complex (BKC), Mumbai",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=abc"
     }
   ],
   "jobs": [

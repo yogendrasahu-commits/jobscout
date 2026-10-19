@@ -88,8 +88,8 @@ export const Navbar = ({
     },
     {
       id: 'notif_2',
-      title: 'New Hot Job Posted in BKC',
-      desc: 'TechPulse posted "Senior React Lead" within 5 km.',
+      title: 'Real-Time Radar Ready',
+      desc: 'Explore jobs and talent in your local area on the interactive map.',
       time: '12m ago',
       read: false,
       tab: 'jobs',
@@ -97,17 +97,8 @@ export const Navbar = ({
     },
     {
       id: 'notif_3',
-      title: 'New Connection Request',
-      desc: 'Rahul Sharma sent you an invitation to connect.',
-      time: '45m ago',
-      read: false,
-      tab: 'network',
-      icon: 'user'
-    },
-    {
-      id: 'notif_4',
       title: 'Location Distance Calibrated',
-      desc: 'GPS lock updated to Mumbai BKC tech corridor.',
+      desc: 'GPS lock updated to your current local area.',
       time: '2h ago',
       read: true,
       tab: 'map',

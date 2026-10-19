@@ -31,7 +31,8 @@ export const Network = ({
   onSelectJob, 
   onNavigateToMap,
   onNavigateToJobs,
-  onOpenProfile
+  onOpenProfile,
+  onOpenAuth
 }) => {
   const { user, token, isEmployer } = useAuth();
   const { startCall, setActiveChatUser } = useSocket();
@@ -54,64 +55,42 @@ export const Network = ({
   const [connectedUserIds, setConnectedUserIds] = useState(() => {
     try {
       const stored = localStorage.getItem('jobscout_connections');
-      if (stored) return JSON.parse(stored);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) return parsed.filter(id => !String(id).startsWith('usr_seek_') && !String(id).startsWith('usr_emp_'));
+      }
     } catch {
       // fallback
     }
-    return ['usr_seek_2', 'usr_emp_1'];
+    return [];
   });
 
   // Followed companies state (persisted locally)
   const [followingCompanyIds, setFollowingCompanyIds] = useState(() => {
     try {
       const stored = localStorage.getItem('jobscout_followed_companies');
-      if (stored) return JSON.parse(stored);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) return parsed.filter(id => !String(id).startsWith('usr_seek_') && !String(id).startsWith('usr_emp_'));
+      }
     } catch {
       // fallback
     }
-    return ['usr_emp_1', 'usr_emp_2'];
+    return [];
   });
 
-  // Pending Invitations Simulation (persisted across accept/ignore)
+  // Pending Invitations (Only for logged-in users who received actual connection invitations)
   const [invitations, setInvitations] = useState(() => {
     try {
       const stored = localStorage.getItem('jobscout_invitations');
-      if (stored) return JSON.parse(stored);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) return parsed.filter(i => !String(i.userId || i.id).startsWith('usr_seek_') && !String(i.userId || i.id).startsWith('usr_emp_'));
+      }
     } catch {
       // fallback
     }
-    return [
-      {
-        id: 'inv_1',
-        userId: 'usr_seek_2',
-        name: 'Priya Sharma',
-        title: 'Lead Product UI/UX Designer • BKC Design Systems',
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
-        role: 'seeker',
-        mutual: 14,
-        address: 'Bandra Kurla Complex (BKC), Mumbai'
-      },
-      {
-        id: 'inv_2',
-        userId: 'usr_emp_3',
-        name: 'Nexus Cloud India',
-        title: 'Enterprise Cloud & DevOps Recruitment Lead',
-        avatar: 'https://images.unsplash.com/photo-1549923746-c502d488b3ea?w=150',
-        role: 'emp',
-        mutual: 8,
-        address: 'Powai Hiranandani Tech Park, Mumbai'
-      },
-      {
-        id: 'inv_3',
-        userId: 'usr_seek_3',
-        name: 'Vikram Joshi',
-        title: 'High-Concurrency Golang & Backend Architect',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
-        role: 'seeker',
-        mutual: 21,
-        address: 'Andheri East MIDC, Mumbai'
-      }
-    ];
+    return [];
   });
 
   // Fetch verified network connections from backend API
@@ -186,6 +165,10 @@ export const Network = ({
 
   // Toggle Connect with a user
   const toggleConnect = (targetUserId, targetName = 'Professional') => {
+    if (!user) {
+      if (onOpenAuth) onOpenAuth();
+      return;
+    }
     setConnectedUserIds(prev => {
       const isCurrentlyConnected = prev.includes(targetUserId);
       const next = isCurrentlyConnected 
@@ -217,6 +200,10 @@ export const Network = ({
 
   // Toggle Follow Company
   const toggleFollow = (companyId, companyName = 'Company') => {
+    if (!user) {
+      if (onOpenAuth) onOpenAuth();
+      return;
+    }
     setFollowingCompanyIds(prev => {
       const isCurrentlyFollowing = prev.includes(companyId);
       const next = isCurrentlyFollowing
@@ -338,7 +325,7 @@ export const Network = ({
                   <Users className="w-4 h-4 text-indigo-600" /> Connections
                 </span>
                 <span className="font-extrabold text-slate-900 bg-white px-2 py-0.5 rounded-md border border-slate-200 shadow-xs">
-                  {500 + connectedUserIds.length}
+                  {user ? connectedUserIds.length : 0}
                 </span>
               </button>
 
@@ -410,8 +397,8 @@ export const Network = ({
         {/* ========================================================== */}
         <div className="lg:col-span-9 space-y-6">
           
-          {/* Pending Invitations Box */}
-          {invitations.length > 0 && (
+          {/* Pending Invitations Box (Only visible for authenticated users who have pending invitations) */}
+          {Boolean(user && invitations.length > 0) && (
             <div className="bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-3xl p-5 shadow-sm">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
                 <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
@@ -695,7 +682,13 @@ export const Network = ({
                           <div className="grid grid-cols-4 gap-1 pt-0.5">
                             <button
                               type="button"
-                              onClick={() => startCall(person, false)}
+                              onClick={() => {
+                                if (!user) {
+                                  if (onOpenAuth) onOpenAuth();
+                                  return;
+                                }
+                                startCall(person, false);
+                              }}
                               title="Voice Call"
                               className="py-1.5 bg-white hover:bg-emerald-50 text-emerald-700 rounded-lg text-xs font-bold border border-slate-200 shadow-xs flex items-center justify-center transition-colors active:scale-95"
                             >
@@ -703,7 +696,13 @@ export const Network = ({
                             </button>
                             <button
                               type="button"
-                              onClick={() => startCall(person, true)}
+                              onClick={() => {
+                                if (!user) {
+                                  if (onOpenAuth) onOpenAuth();
+                                  return;
+                                }
+                                startCall(person, true);
+                              }}
                               title="HD Video Call"
                               className="py-1.5 bg-white hover:bg-indigo-50 text-indigo-700 rounded-lg text-xs font-bold border border-slate-200 shadow-xs flex items-center justify-center transition-colors active:scale-95"
                             >
@@ -711,7 +710,13 @@ export const Network = ({
                             </button>
                             <button
                               type="button"
-                              onClick={() => setActiveChatUser(person)}
+                              onClick={() => {
+                                if (!user) {
+                                  if (onOpenAuth) onOpenAuth();
+                                  return;
+                                }
+                                setActiveChatUser(person);
+                              }}
                               title="Direct Message"
                               className="py-1.5 bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold border border-slate-200 shadow-xs flex items-center justify-center transition-colors active:scale-95"
                             >
