@@ -40,7 +40,6 @@ import {
   NavAnonIcon, 
   NavMessagesIcon 
 } from './NavIcons';
-import { UpdateEmailModal } from './UpdateEmailModal';
 import { EmailSenderConfigModal } from './EmailSenderConfigModal';
 
 export const Navbar = ({ 
@@ -70,7 +69,6 @@ export const Navbar = ({
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
-  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [isSenderConfigOpen, setIsSenderConfigOpen] = useState(false);
   
   // Search state (synced with App.jsx if provided)
@@ -390,7 +388,7 @@ export const Navbar = ({
                         className="flex items-center gap-2 px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50 hover:text-emerald-600 rounded-xl cursor-pointer transition-colors"
                       >
                         <MapPin className="w-3.5 h-3.5 text-emerald-500" />
-                        <span>Explore India Live Radar Map</span>
+                        <span>Explore India Live Map</span>
                       </div>
                       <div 
                         onClick={() => { setSearchQuery('Engineer'); setCurrentTab('network'); setSearchFocused(false); }}
@@ -849,26 +847,12 @@ export const Navbar = ({
                         <span>{user.phone || '9876543210'}</span>
                       </div>
 
-                      {/* Official Email with 1-click Update */}
-                      <div className="flex items-center justify-between gap-1 text-xs mt-1.5 pt-1.5 border-t border-slate-100">
-                        <div className="flex items-center gap-1.5 min-w-0" title={user.email || 'No email configured'}>
-                          <Mail className="w-3.5 h-3.5 text-indigo-600 flex-shrink-0" />
-                          <span className="truncate max-w-[145px] text-[11px] text-slate-600 font-medium">
-                            {user.email || <span className="text-amber-600 italic">No email linked</span>}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsEmailModalOpen(true);
-                            setProfileMenuOpen(false);
-                          }}
-                          className="text-[10px] text-indigo-600 hover:text-indigo-800 font-bold underline whitespace-nowrap ml-1 flex items-center gap-0.5"
-                          title="Update Email"
-                        >
-                          <Edit3 className="w-2.5 h-2.5" />
-                          <span>{user.email ? 'Edit' : 'Add Email'}</span>
-                        </button>
+                      {/* Official Email */}
+                      <div className="flex items-center gap-1.5 text-xs mt-1.5 pt-1.5 border-t border-slate-100 min-w-0" title={user.email || 'No email configured'}>
+                        <Mail className="w-3.5 h-3.5 text-indigo-600 flex-shrink-0" />
+                        <span className="truncate text-[11px] text-slate-600 font-medium">
+                          {user.email || <span className="text-amber-600 italic">No email linked</span>}
+                        </span>
                       </div>
 
                       <div className="mt-2 inline-block text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
@@ -1222,18 +1206,8 @@ export const Navbar = ({
                   <div className="min-w-0 flex-1">
                     <h4 className="font-bold text-xs text-slate-900 truncate">{user.name}</h4>
                     <p className="text-[11px] text-indigo-600 font-medium truncate">{user.phone || '9876543210'}</p>
-                    <div className="flex items-center justify-between gap-1 text-[11px] text-slate-600 mt-0.5">
-                      <span className="truncate max-w-[130px]">{user.email || 'No email set'}</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsEmailModalOpen(true);
-                          setMobileDrawerOpen(false);
-                        }}
-                        className="text-[10px] text-indigo-600 font-bold underline"
-                      >
-                        Edit
-                      </button>
+                    <div className="text-[11px] text-slate-600 mt-0.5">
+                      <span className="truncate block max-w-[170px]">{user.email || 'No email set'}</span>
                     </div>
                     <span className="inline-block text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 mt-1">
                       {isEmployer ? '👔 Employer (#Hiring)' : '🔍 Seeker (#OpenToWork)'}
@@ -1393,13 +1367,7 @@ export const Navbar = ({
         document.body
       )}
 
-      {/* Update Email Modal */}
-      {isEmailModalOpen && (
-        <UpdateEmailModal
-          isOpen={isEmailModalOpen}
-          onClose={() => setIsEmailModalOpen(false)}
-        />
-      )}
+
 
       {/* Email Sender Configuration Modal */}
       {isSenderConfigOpen && (

@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { X, Phone, Video, MessageSquare, MapPin, Briefcase, Award, Sparkles, User, ArrowLeft, Mail, Edit3, FileText } from 'lucide-react';
 import { useSocket } from '../context/SocketContext';
 import { useAuth } from '../context/AuthContext';
-import { UpdateEmailModal } from './UpdateEmailModal';
 import { ResumePreviewModal } from './ResumePreviewModal';
+import { ProfileEditModal } from './ProfileEditModal';
 
 export const SeekerProfileModal = ({ seeker, isOpen, onClose }) => {
   const { user } = useAuth();
   const { setActiveChatUser, startCall } = useSocket();
-  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
+  const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
 
   if (!isOpen || !seeker) return null;
 
@@ -77,12 +77,12 @@ export const SeekerProfileModal = ({ seeker, isOpen, onClose }) => {
             {user?.id === seeker.id && (
               <button
                 type="button"
-                onClick={() => setIsEmailModalOpen(true)}
-                className="px-2 py-0.5 rounded-lg bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white text-[11px] font-bold border border-indigo-200 transition-all flex items-center gap-1 active:scale-95 shadow-xs"
-                title="Update Email"
+                onClick={() => setIsProfileEditOpen(true)}
+                className="px-2 py-0.5 rounded-lg bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white text-[11px] font-bold border border-emerald-200 transition-all flex items-center gap-1 active:scale-95 shadow-xs"
+                title="Edit Profile"
               >
                 <Edit3 className="w-3 h-3" />
-                <span>{seeker.email ? 'Edit' : 'Add Email'}</span>
+                <span>Edit Profile</span>
               </button>
             )}
             {seeker.phone && (
@@ -181,12 +181,12 @@ export const SeekerProfileModal = ({ seeker, isOpen, onClose }) => {
           </button>
         </div>
 
-        {/* Update Email Modal */}
-        <UpdateEmailModal
-          isOpen={isEmailModalOpen}
-          onClose={() => setIsEmailModalOpen(false)}
-          onUpdated={(newEmail) => {
-            if (seeker) seeker.email = newEmail;
+
+        <ProfileEditModal
+          isOpen={isProfileEditOpen}
+          onClose={() => setIsProfileEditOpen(false)}
+          onUpdated={(updatedUser) => {
+            if (seeker) Object.assign(seeker, updatedUser);
           }}
         />
 

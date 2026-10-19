@@ -2623,12 +2623,6 @@
       "user1": "usr_emp_1",
       "user2": "usr_seek_2",
       "connectedAt": "2026-10-10T11:00:00.000Z"
-    },
-    {
-      "id": "conn_3",
-      "user1": "usr_seek_1",
-      "user2": "usr_seek_2",
-      "connectedAt": "2026-10-11T12:00:00.000Z"
     }
   ],
   "anonDiscussions": [
