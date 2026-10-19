@@ -282,7 +282,7 @@ export const ApplicationsView = ({
           <p className="text-xs text-slate-500 max-w-md mx-auto">
             {isEmployer
               ? 'When candidates apply to your job postings on the map, their profiles will appear here for review and offer letter issuance.'
-              : 'Explore the live radar map to discover nearby opportunities, submit applications, and receive direct offer letters!'}
+              : 'Explore the live map to discover nearby opportunities, submit applications, and receive direct offer letters!'}
           </p>
         </div>
       ) : (

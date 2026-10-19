@@ -53,8 +53,19 @@ export const Feed = ({
   const [activeCommentsPostId, setActiveCommentsPostId] = useState(null);
   const [commentInputs, setCommentInputs] = useState({});
 
-  // Connected state simulation
-  const [connectedUsers, setConnectedUsers] = useState({});
+  // Connected state synchronized with localStorage and backend network
+  const [connectedUsers, setConnectedUsers] = useState(() => {
+    try {
+      const stored = localStorage.getItem('jobscout_connections');
+      if (stored) {
+        const arr = JSON.parse(stored);
+        if (Array.isArray(arr)) {
+          return arr.reduce((acc, id) => ({ ...acc, [id]: true }), {});
+        }
+      }
+    } catch {}
+    return { usr_seek_2: true, usr_emp_1: true };
+  });
 
   // Fetch feed posts
   const fetchPosts = async () => {
@@ -199,10 +210,26 @@ export const Feed = ({
   };
 
   const toggleConnectUser = (targetId) => {
-    setConnectedUsers(prev => ({
-      ...prev,
-      [targetId]: !prev[targetId]
-    }));
+    setConnectedUsers(prev => {
+      const nextState = !prev[targetId];
+      const updated = {
+        ...prev,
+        [targetId]: nextState
+      };
+      try {
+        const activeIds = Object.keys(updated).filter(id => updated[id]);
+        localStorage.setItem('jobscout_connections', JSON.stringify(activeIds));
+      } catch {}
+      return updated;
+    });
+
+    if (user?.id) {
+      fetch('/api/network/connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, targetId })
+      }).catch(() => {});
+    }
   };
 
   return (
@@ -289,7 +316,7 @@ export const Feed = ({
               </div>
             </div>
 
-            {/* Quick Map Radar Jump */}
+            {/* Quick Map Jump */}
             <div className="p-3 bg-slate-50 border-t border-slate-100">
               <button
                 onClick={onNavigateToMap}
@@ -424,11 +451,15 @@ export const Feed = ({
                   {/* Post Author Header */}
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="relative">
+                      <div 
+                        onClick={() => onOpenProfile && onOpenProfile(post.authorId)}
+                        className="relative cursor-pointer group"
+                        title={`View ${post.authorName}'s Profile`}
+                      >
                         <img
                           src={post.authorAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${post.authorName}`}
                           alt={post.authorName}
-                          className="w-12 h-12 rounded-full border border-slate-200 object-cover"
+                          className="w-12 h-12 rounded-full border border-slate-200 group-hover:border-indigo-500 object-cover transition-colors"
                         />
                         {post.authorRole === 'seeker' && (
                           <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full" title="Open to Work" />
@@ -645,7 +676,7 @@ export const Feed = ({
         </div>
 
         {/* ========================================================== */}
-        {/* RIGHT COLUMN: INDUSTRY NEWS & RADAR */}
+        {/* RIGHT COLUMN: INDUSTRY NEWS & HIGHLIGHTS */}
         {/* ========================================================== */}
         <div className="hidden lg:block lg:col-span-3 space-y-4">
           
@@ -683,7 +714,7 @@ export const Feed = ({
 
               <div className="cursor-pointer group">
                 <p className="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">
-                  Leaflet location radars become industry standard
+                  Interactive geospatial maps become industry standard
                 </p>
                 <p className="text-[10px] text-slate-400 mt-0.5">6h ago • 3,490 readers</p>
               </div>
@@ -703,10 +734,14 @@ export const Feed = ({
                 { name: 'Sneha Rao', title: 'Backend Python Engineer', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150', id: 'usr_seek_4' }
               ].map((p) => (
                 <div key={p.id} className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 truncate">
-                    <img src={p.avatar} alt={p.name} className="w-8 h-8 rounded-full object-cover border border-slate-200" />
+                  <div 
+                    onClick={() => onOpenProfile && onOpenProfile(p.id)}
+                    className="flex items-center gap-2 truncate cursor-pointer group/prof"
+                    title={`View ${p.name}'s Profile`}
+                  >
+                    <img src={p.avatar} alt={p.name} className="w-8 h-8 rounded-full object-cover border border-slate-200 group-hover/prof:border-indigo-500 transition-colors" />
                     <div className="truncate">
-                      <p className="text-xs font-bold text-slate-900 truncate">{p.name}</p>
+                      <p className="text-xs font-bold text-slate-900 truncate group-hover/prof:text-indigo-600 transition-colors">{p.name}</p>
                       <p className="text-[10px] text-emerald-600 font-medium truncate">{p.title}</p>
                     </div>
                   </div>

@@ -75,7 +75,7 @@ export const ConnectHub = ({ seekers = [], employers = [], jobs = [], onSelectSe
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl leading-relaxed">
               {isEmployer
-                ? 'Spot-call candidates on radar. Zero waiting time — connect via 1-click HD Video Call, Voice, or Live Chat.'
+                ? 'Spot-call candidates nearby. Zero waiting time — connect via 1-click HD Video Call, Voice, or Live Chat.'
                 : 'Browse verified hiring companies nearby. Call HR directly and fast-track your spot interview.'}
             </p>
           </div>
@@ -178,7 +178,7 @@ export const ConnectHub = ({ seekers = [], employers = [], jobs = [], onSelectSe
                   </div>
                 </div>
 
-                {/* Radar distance tag */}
+                {/* Proximity distance tag */}
                 <div className="text-right">
                   <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 shadow-xs">
                     {target.distanceKm ? `${target.distanceKm} km away` : 'Active Nearby'}

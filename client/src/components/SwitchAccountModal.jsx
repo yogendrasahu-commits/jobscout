@@ -212,7 +212,7 @@ export const SwitchAccountModal = ({ isOpen, onClose }) => {
         {/* Bottom Close Button */}
         <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between gap-3">
           <span className="text-[11px] text-slate-500">
-            Switching updates live sockets, radar position & chat persona.
+            Switching updates live sockets, map location & chat persona.
           </span>
           <button
             type="button"

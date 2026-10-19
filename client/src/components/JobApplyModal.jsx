@@ -30,6 +30,10 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
       setError('Please sign in as a Job Seeker to apply for jobs');
       return;
     }
+    if (user.role === 'emp') {
+      setError('You are currently signed in as an Employer. Application submissions are reserved for Job Seekers. Please switch to a Job Seeker account.');
+      return;
+    }
     if (coverNote.trim().length > 1000) {
       setError('Cover note cannot exceed 1000 characters');
       return;
@@ -129,7 +133,7 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
             <span className="text-sm font-bold text-emerald-700">{job.salary}</span>
           </div>
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-            <span className="text-[10px] text-slate-400 font-semibold block uppercase">Radar Distance</span>
+            <span className="text-[10px] text-slate-400 font-semibold block uppercase">Map Distance</span>
             <span className="text-sm font-bold text-indigo-700">
               {job.distanceKm ? `${job.distanceKm} km away` : 'Nearby in city'}
             </span>
@@ -187,6 +191,16 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
           </div>
         </div>
 
+        {user?.role === 'emp' && (
+          <div className="mb-3 p-3 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2">
+            <span className="text-base leading-none">⚠️</span>
+            <div>
+              <span className="font-bold block">Employer Account Notice</span>
+              <span>You are signed in as an Employer. Application submissions are reserved for Job Seekers. You can switch to a Job Seeker account from the profile menu, or use the direct recruiter contact buttons above.</span>
+            </div>
+          </div>
+        )}
+
         {error && (
           <div className="mb-3 p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs">
             {error}
@@ -210,7 +224,8 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
               placeholder="Hi, I am ready for this role and available nearby for an immediate discussion..."
               value={coverNote}
               onChange={(e) => setCoverNote(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 resize-none"
+              disabled={user?.role === 'emp'}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 resize-none disabled:opacity-60"
             />
           </div>
 
@@ -230,11 +245,17 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
               </button>
               <button
                 type="submit"
-                disabled={loading || success}
+                disabled={loading || success || user?.role === 'emp'}
                 className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 text-white text-xs font-extrabold shadow-md shadow-emerald-600/20 flex items-center justify-center gap-1.5 transition-all active:scale-95 whitespace-nowrap"
               >
                 <span>⚡</span>
-                <span>{loading ? 'Submitting...' : '1-Click Easy Apply'}</span>
+                <span>
+                  {loading
+                    ? 'Submitting...'
+                    : user?.role === 'emp'
+                    ? 'Employer Account (Seekers Only)'
+                    : '1-Click Easy Apply'}
+                </span>
               </button>
             </div>
           </div>

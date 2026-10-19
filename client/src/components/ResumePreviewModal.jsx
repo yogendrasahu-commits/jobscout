@@ -208,7 +208,7 @@ export const ResumePreviewModal = ({ candidate, isOpen, onClose }) => {
           <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
             <div className="flex items-center gap-2">
               <Award className="w-5 h-5 text-indigo-600 flex-shrink-0" />
-              <span>Verified candidate record generated via <strong>JobScout Geospatial Radar Platform</strong>.</span>
+              <span>Verified candidate record generated via <strong>JobScout Geospatial Platform</strong>.</span>
             </div>
             <div className="text-[11px] font-mono text-slate-400">
               ID: {candidate.id || 'usr_verified'} • {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}

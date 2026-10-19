@@ -83,7 +83,7 @@ export const Navbar = ({
     {
       id: 'notif_1',
       title: 'WebRTC Speed Call Ready',
-      desc: 'Instant audio and video calling is live in your radar.',
+      desc: 'Instant audio and video calling is live in your area.',
       time: 'Just now',
       read: false,
       tab: 'connect',
@@ -109,12 +109,12 @@ export const Navbar = ({
     },
     {
       id: 'notif_4',
-      title: 'Radar Distance Calibrated',
+      title: 'Location Distance Calibrated',
       desc: 'GPS lock updated to Mumbai BKC tech corridor.',
       time: '2h ago',
       read: true,
       tab: 'map',
-      icon: 'radar'
+      icon: 'map'
     }
   ]);
 
@@ -315,7 +315,7 @@ export const Navbar = ({
             <div 
               className="flex items-center gap-1.5 sm:gap-2.5 cursor-pointer group flex-shrink-0" 
               onClick={() => setCurrentTab('feed')}
-              title="JobScout - Live Radar & Speed Connect"
+              title="JobScout - Live Map & Speed Connect"
             >
               <div className="relative group-hover:scale-105 transition-all duration-300 flex-shrink-0 drop-shadow-[0_2px_10px_rgba(79,70,229,0.2)]">
                 <JobScoutLogo size={38} className="w-8 h-8 sm:w-10 sm:h-10" />
@@ -1098,7 +1098,7 @@ export const Navbar = ({
                 </span>
               </button>
 
-              {/* Live Radar Map */}
+              {/* Live Map */}
               <button
                 onClick={() => { setCurrentTab('map'); setMobileDrawerOpen(false); }}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${

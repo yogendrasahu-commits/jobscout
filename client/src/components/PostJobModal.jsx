@@ -218,7 +218,7 @@ export const PostJobModal = ({ isOpen, onClose, onJobCreated, defaultCoords }) =
               <span>Map Pin GPS: <strong className="text-slate-800">{Number(lat).toFixed(4)}, {Number(lng).toFixed(4)}</strong></span>
             </div>
             <span className="text-[10px] text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200 shadow-xs">
-              Live Radar Active
+              Live Map Active
             </span>
           </div>
 
