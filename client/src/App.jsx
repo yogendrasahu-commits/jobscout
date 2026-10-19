@@ -38,7 +38,11 @@ function MainApp() {
   // Modals state
   const [isPostJobOpen, setIsPostJobOpen] = useState(false);
   const [postJobCoords, setPostJobCoords] = useState(null);
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [authConfig, setAuthConfig] = useState({
+    isOpen: false,
+    mode: 'login',
+    role: 'seeker'
+  });
   const [isSwitchAccountOpen, setIsSwitchAccountOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
   const [selectedSeeker, setSelectedSeeker] = useState(null);
@@ -181,6 +185,47 @@ function MainApp() {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [currentTab]);
 
+  // STANDALONE WELCOME / ONBOARDING LANDING VIEW
+  if (currentTab === 'welcome') {
+    return (
+      <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 text-slate-900 flex flex-col font-sans antialiased">
+        <Welcome
+          onNavigateToMap={() => setCurrentTab('map')}
+          onNavigateToJobs={() => setCurrentTab('jobs')}
+          onNavigateToNetwork={() => setCurrentTab('network')}
+          onNavigateToFeed={() => setCurrentTab('feed')}
+          onNavigateToAnon={() => setCurrentTab('anon')}
+          onOpenLogin={(phone) => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
+          onOpenSignup={(role, phone) => setAuthConfig({ isOpen: true, mode: 'register', role: role || 'seeker' })}
+          onOpenSwitchAccount={() => setIsSwitchAccountOpen(true)}
+          onSelectJob={(job) => { setSelectedJob(job); setCurrentTab('jobs'); }}
+          onSelectSeeker={(seeker) => { handleOpenProfile(seeker); }}
+          jobs={jobs}
+          seekers={seekers}
+          employers={employers}
+        />
+
+        {/* Global Auth Modal for Welcome Page Login / Register */}
+        <AuthModal
+          isOpen={authConfig.isOpen}
+          initialMode={authConfig.mode}
+          initialRole={authConfig.role}
+          onClose={() => setAuthConfig(prev => ({ ...prev, isOpen: false }))}
+          onSuccess={() => {
+            setAuthConfig(prev => ({ ...prev, isOpen: false }));
+            setCurrentTab('feed');
+          }}
+        />
+
+        {/* Switch Account Modal */}
+        <SwitchAccountModal
+          isOpen={isSwitchAccountOpen}
+          onClose={() => setIsSwitchAccountOpen(false)}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 text-slate-900 flex flex-col font-sans antialiased">
       
@@ -199,7 +244,7 @@ function MainApp() {
           setPostJobCoords(null);
           setIsPostJobOpen(true);
         }}
-        onOpenAuth={() => setIsAuthOpen(true)}
+        onOpenAuth={() => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
         onOpenSwitchAccount={() => setIsSwitchAccountOpen(true)}
         onOpenProfile={handleOpenProfile}
         jobsCount={jobs.length}
@@ -209,22 +254,6 @@ function MainApp() {
 
       {/* Main Content Area */}
       <main className={`flex-1 w-full max-w-full relative ${currentTab === 'map' ? 'overflow-hidden' : 'pb-20 md:pb-0 overflow-x-hidden'}`}>
-        {currentTab === 'welcome' && (
-          <Welcome
-            onNavigateToMap={() => setCurrentTab('map')}
-            onNavigateToJobs={() => setCurrentTab('jobs')}
-            onNavigateToNetwork={() => setCurrentTab('network')}
-            onNavigateToFeed={() => setCurrentTab('feed')}
-            onNavigateToAnon={() => setCurrentTab('anon')}
-            onOpenAuth={() => setIsAuthOpen(true)}
-            onOpenSwitchAccount={() => setIsSwitchAccountOpen(true)}
-            onSelectJob={(job) => setSelectedJob(job)}
-            onSelectSeeker={(seeker) => handleOpenProfile(seeker)}
-            jobs={jobs}
-            seekers={seekers}
-            employers={employers}
-          />
-        )}
 
         {currentTab === 'feed' && (
           <Feed
@@ -275,7 +304,7 @@ function MainApp() {
             onSelectJob={(job) => setSelectedJob(job)}
             onOpenPostJob={() => setIsPostJobOpen(true)}
             onOpenProfile={handleOpenProfile}
-            onOpenAuth={() => setIsAuthOpen(true)}
+            onOpenAuth={() => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
             activeSubTab={currentTab === 'applications' ? 'applied' : jobsSubTab}
             setActiveSubTab={(subTab) => {
               setJobsSubTab(subTab);
@@ -316,7 +345,7 @@ function MainApp() {
           setPostJobCoords(null);
           setIsPostJobOpen(true);
         }}
-        onOpenAuth={() => setIsAuthOpen(true)}
+        onOpenAuth={() => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
         onOpenSwitchAccount={() => setIsSwitchAccountOpen(true)}
         jobsCount={jobs.length}
       />
@@ -364,8 +393,14 @@ function MainApp() {
       />
 
       <AuthModal
-        isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
+        isOpen={authConfig.isOpen}
+        initialMode={authConfig.mode}
+        initialRole={authConfig.role}
+        onClose={() => setAuthConfig(prev => ({ ...prev, isOpen: false }))}
+        onSuccess={() => {
+          setAuthConfig(prev => ({ ...prev, isOpen: false }));
+          setCurrentTab('feed');
+        }}
       />
 
     </div>

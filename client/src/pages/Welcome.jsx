@@ -24,7 +24,12 @@ import {
   Check,
   Flame,
   Search,
-  Lock
+  Lock,
+  LogIn,
+  UserPlus,
+  ArrowUpRight,
+  LogOut,
+  Smartphone
 } from 'lucide-react';
 import { JobScoutLogo } from '../components/JobScoutLogo';
 import { useAuth } from '../context/AuthContext';
@@ -35,7 +40,8 @@ export const Welcome = ({
   onNavigateToNetwork,
   onNavigateToFeed,
   onNavigateToAnon,
-  onOpenAuth,
+  onOpenLogin,
+  onOpenSignup,
   onOpenSwitchAccount,
   onSelectJob,
   onSelectSeeker,
@@ -43,17 +49,38 @@ export const Welcome = ({
   seekers = [],
   employers = []
 }) => {
-  const { user } = useAuth();
+  const { user, logout, demoSwitch } = useAuth();
   const [activeFaq, setActiveFaq] = useState(null);
+  
+  // Hero Auth Card mode: 'login' | 'register'
+  const [authCardTab, setAuthCardTab] = useState('login');
+  const [signupRole, setSignupRole] = useState('seeker'); // 'seeker' | 'emp'
+  const [quickPhone, setQuickPhone] = useState('');
 
   const toggleFaq = (idx) => {
     setActiveFaq(prev => prev === idx ? null : idx);
   };
 
-  // Preview featured jobs
   const featuredJobs = jobs.slice(0, 3);
-  // Preview top candidates
   const featuredSeekers = seekers.slice(0, 3);
+
+  const handleQuickAuthSubmit = (e) => {
+    e.preventDefault();
+    if (authCardTab === 'login') {
+      onOpenLogin(quickPhone);
+    } else {
+      onOpenSignup(signupRole, quickPhone);
+    }
+  };
+
+  const handle1TapDemo = async (roleType) => {
+    if (demoSwitch) {
+      await demoSwitch(roleType);
+      onNavigateToFeed();
+    } else {
+      onOpenSwitchAccount();
+    }
+  };
 
   const faqs = [
     {
@@ -79,96 +106,340 @@ export const Welcome = ({
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-indigo-600/20 selection:text-indigo-900">
       
       {/* ========================================================== */}
-      {/* 1. HERO SECTION */}
+      {/* STANDALONE WELCOME HEADER BAR */}
       {/* ========================================================== */}
-      <section className="relative pt-8 pb-16 md:pt-14 md:pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
-        {/* Ambient background glows */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-96 bg-gradient-to-tr from-indigo-500/10 via-cyan-500/10 to-teal-400/5 blur-3xl -z-10 pointer-events-none rounded-full" />
-        
-        <div className="text-center max-w-3xl mx-auto space-y-5">
-          {/* Top Live Pill */}
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50/90 border border-indigo-200/80 shadow-xs text-xs font-bold text-indigo-700 animate-in fade-in slide-in-from-top-4 duration-500">
-            <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-            <span>India's 1st Live Geospatial Job & Talent Discovery Platform</span>
-            <span className="hidden sm:inline bg-white px-2 py-0.5 rounded-full text-[10px] text-slate-600 border border-indigo-100">
-              Live GPS
-            </span>
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-slate-200/90 shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+          
+          {/* Brand Logo & Tag */}
+          <div className="flex items-center gap-3 cursor-pointer select-none" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <div className="drop-shadow-[0_2px_10px_rgba(79,70,229,0.2)]">
+              <JobScoutLogo size={36} />
+            </div>
+            <div>
+              <span className="font-black text-lg sm:text-xl tracking-tight text-slate-900 flex items-center">
+                Job<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-indigo-600 to-cyan-500 ml-0.5">Scout</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 ml-1 shadow-[0_0_8px_rgba(6,182,212,0.8)] animate-pulse" />
+              </span>
+              <span className="text-[10px] text-slate-400 font-semibold hidden sm:block -mt-0.5">
+                Real-time Map & Speed Connect
+              </span>
+            </div>
           </div>
 
-          {/* Main Headline */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-[1.12]">
-            Find Local Jobs & Hire Talent on a{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-indigo-600 to-cyan-500">
-              Live Interactive Map
-            </span>
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-sm sm:text-base lg:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed font-medium">
-            Skip the endless resume blackhole. Connect in real time with nearby tech employers and candidates through visual GPS discovery, 1-tap WebRTC audio/video speed calling, and verified professional profiles.
-          </p>
-
-          {/* Hero CTAs */}
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-3">
-            <button
-              onClick={onNavigateToMap}
-              className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-extrabold text-sm shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/35 transition-all flex items-center gap-2 active:scale-95"
-            >
-              <Compass className="w-4 h-4 text-cyan-300 animate-spin-slow" />
-              <span>Explore Live Job Map</span>
-              <ArrowRight className="w-4 h-4" />
+          {/* Center Quick Jump Links */}
+          <nav className="hidden lg:flex items-center gap-6 text-xs font-bold text-slate-600">
+            <button onClick={onNavigateToMap} className="hover:text-indigo-600 transition-colors flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5 text-cyan-600" />
+              <span>Live Map</span>
             </button>
-
-            <button
-              onClick={onNavigateToJobs}
-              className="px-5 py-3.5 rounded-2xl bg-white hover:bg-slate-100 text-slate-800 font-bold text-sm border border-slate-200 shadow-sm hover:border-slate-300 transition-all flex items-center gap-2 active:scale-95"
-            >
-              <Briefcase className="w-4 h-4 text-indigo-600" />
-              <span>Browse {jobs.length > 0 ? `${jobs.length}+ Openings` : 'Hot Jobs'}</span>
+            <button onClick={onNavigateToJobs} className="hover:text-indigo-600 transition-colors flex items-center gap-1">
+              <Briefcase className="w-3.5 h-3.5 text-indigo-600" />
+              <span>Job Board ({jobs.length > 0 ? jobs.length : '35+'})</span>
             </button>
+            <button onClick={onNavigateToNetwork} className="hover:text-indigo-600 transition-colors flex items-center gap-1">
+              <Users className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Network</span>
+            </button>
+            <button onClick={onNavigateToAnon} className="hover:text-indigo-600 transition-colors flex items-center gap-1">
+              <MessageSquare className="w-3.5 h-3.5 text-amber-600" />
+              <span>Anon Salon</span>
+            </button>
+          </nav>
 
-            {onOpenSwitchAccount && (
-              <button
-                onClick={onOpenSwitchAccount}
-                className="px-4 py-3.5 rounded-2xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs sm:text-sm border border-amber-200 transition-all flex items-center gap-1.5 active:scale-95 shadow-xs"
-                title="Switch between 14 demo accounts"
-              >
-                <Sparkles className="w-4 h-4 text-amber-600" />
-                <span>Try Demo (14 Profiles)</span>
-              </button>
-            )}
+          {/* Right Action Buttons */}
+          <div className="flex items-center gap-2">
+            {user ? (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={onNavigateToFeed}
+                  className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5 active:scale-95"
+                >
+                  <span>Go to App Dashboard</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={logout}
+                  className="p-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 transition-colors"
+                  title="Sign Out"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={onNavigateToFeed}
+                  className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all"
+                  title="Browse without logging in"
+                >
+                  <span>Explore as Guest</span>
+                </button>
 
-            {!user && onOpenAuth && (
-              <button
-                onClick={onOpenAuth}
-                className="px-4 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm shadow-sm transition-all flex items-center gap-1.5 active:scale-95"
-              >
-                <Lock className="w-3.5 h-3.5 text-slate-300" />
-                <span>Log In / Register</span>
-              </button>
+                <button
+                  onClick={() => onOpenLogin()}
+                  className="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200 shadow-xs transition-all flex items-center gap-1.5 active:scale-95"
+                >
+                  <LogIn className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Log In (लॉगिन)</span>
+                </button>
+
+                <button
+                  onClick={() => onOpenSignup('seeker')}
+                  className="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold shadow-md shadow-indigo-600/20 border border-indigo-400/30 transition-all flex items-center gap-1.5 active:scale-95"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>Sign Up Free</span>
+                </button>
+              </div>
             )}
           </div>
 
-          {/* Quick Metrics */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 max-w-3xl mx-auto">
-            <div className="p-3.5 bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200/90 shadow-xs text-center">
-              <div className="text-xl sm:text-2xl font-black text-indigo-600">{jobs.length > 0 ? jobs.length : '35'}+</div>
-              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">Active Tech Jobs</div>
+        </div>
+      </header>
+
+      {/* ========================================================== */}
+      {/* 1. HERO WITH DIRECT LOGIN & SIGNUP CARD */}
+      {/* ========================================================== */}
+      <section className="relative pt-6 pb-16 md:pt-12 md:pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex-1">
+        {/* Glow Effects */}
+        <div className="absolute top-10 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl -z-10 pointer-events-none" />
+        <div className="absolute top-20 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl -z-10 pointer-events-none" />
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          
+          {/* Left Column: Hero Narrative */}
+          <div className="lg:col-span-7 space-y-5 text-center lg:text-left">
+            
+            {/* Live Indicator Badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-200 shadow-xs text-xs font-bold text-indigo-700">
+              <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+              <span>India's 1st Live Geospatial Hiring Platform</span>
+              <span className="bg-white px-2 py-0.5 rounded-full text-[10px] text-slate-600 border border-indigo-100">
+                GPS Verified
+              </span>
             </div>
-            <div className="p-3.5 bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200/90 shadow-xs text-center">
-              <div className="text-xl sm:text-2xl font-black text-emerald-600">{seekers.length > 0 ? `${seekers.length * 25}+` : '500+'}</div>
-              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">Verified Talent</div>
+
+            {/* Main Title */}
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-[1.12]">
+              Find Local Jobs & Hire Tech Talent on a{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-indigo-600 to-cyan-500">
+                Live Interactive Map
+              </span>
+            </h1>
+
+            {/* Subhead */}
+            <p className="text-sm sm:text-base lg:text-lg text-slate-600 leading-relaxed font-medium max-w-2xl mx-auto lg:mx-0">
+              Skip the resume blackhole. Connect in real time with nearby tech employers and candidates through visual GPS discovery, 1-tap WebRTC audio/video speed calling, and verified digital CVs.
+            </p>
+
+            {/* Action Buttons for Quick Browsing */}
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
+              <button
+                onClick={onNavigateToMap}
+                className="px-5 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-indigo-600/25 transition-all flex items-center gap-2 active:scale-95"
+              >
+                <Compass className="w-4 h-4 text-cyan-200" />
+                <span>Explore Live Job Map</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={onNavigateToJobs}
+                className="px-4 py-3 rounded-2xl bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs sm:text-sm border border-slate-200 shadow-sm transition-all flex items-center gap-2 active:scale-95"
+              >
+                <Briefcase className="w-4 h-4 text-indigo-600" />
+                <span>Browse {jobs.length > 0 ? `${jobs.length}+ Jobs` : 'Hot Jobs'}</span>
+              </button>
+
+              <button
+                onClick={onNavigateToFeed}
+                className="px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs sm:text-sm transition-all flex items-center gap-1.5"
+              >
+                <span>Guest Preview (बिना लॉगिन देखें)</span>
+              </button>
             </div>
-            <div className="p-3.5 bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200/90 shadow-xs text-center">
-              <div className="text-xl sm:text-2xl font-black text-cyan-600">{employers.length > 0 ? employers.length : '18'}+</div>
-              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">Tech Companies</div>
+
+            {/* Quick Metrics Cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4">
+              <div className="p-3 bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xs text-center lg:text-left">
+                <div className="text-xl sm:text-2xl font-black text-indigo-600">{jobs.length > 0 ? jobs.length : '35'}+</div>
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Live Tech Jobs</div>
+              </div>
+              <div className="p-3 bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xs text-center lg:text-left">
+                <div className="text-xl sm:text-2xl font-black text-emerald-600">{seekers.length > 0 ? `${seekers.length * 25}+` : '500+'}</div>
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Verified Talent</div>
+              </div>
+              <div className="p-3 bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xs text-center lg:text-left">
+                <div className="text-xl sm:text-2xl font-black text-cyan-600">{employers.length > 0 ? employers.length : '18'}+</div>
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Companies & Hubs</div>
+              </div>
+              <div className="p-3 bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xs text-center lg:text-left">
+                <div className="text-xl sm:text-2xl font-black text-amber-600">&lt; 60s</div>
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Screening Call</div>
+              </div>
             </div>
-            <div className="p-3.5 bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200/90 shadow-xs text-center">
-              <div className="text-xl sm:text-2xl font-black text-amber-600">&lt; 60s</div>
-              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">Speed Call Connect</div>
+
+          </div>
+
+          {/* Right Column: Integrated Auth & Quick Start Card */}
+          <div className="lg:col-span-5">
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-7 shadow-xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-indigo-500/10 to-transparent pointer-events-none rounded-bl-full" />
+              
+              {/* Card Header & Tabs */}
+              <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
+                <div>
+                  <h2 className="text-lg font-extrabold text-slate-900">
+                    {authCardTab === 'login' ? 'Welcome Back!' : 'Join JobScout Today'}
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {authCardTab === 'login' ? 'Sign in to access your dashboard' : 'Create your free candidate or recruiter profile'}
+                  </p>
+                </div>
+                <div className="flex bg-slate-100 p-1 rounded-xl">
+                  <button
+                    onClick={() => setAuthCardTab('login')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      authCardTab === 'login' ? 'bg-white text-indigo-700 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    Log In
+                  </button>
+                  <button
+                    onClick={() => setAuthCardTab('register')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      authCardTab === 'register' ? 'bg-white text-indigo-700 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    Sign Up
+                  </button>
+                </div>
+              </div>
+
+              {/* Form / Quick Start Action */}
+              <form onSubmit={handleQuickAuthSubmit} className="space-y-4">
+                
+                {/* Role Toggle when signing up */}
+                {authCardTab === 'register' && (
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                      I am signing up as:
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setSignupRole('seeker')}
+                        className={`p-2.5 rounded-xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
+                          signupRole === 'seeker'
+                            ? 'bg-indigo-50 border-indigo-500 text-indigo-700 shadow-xs'
+                            : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                        }`}
+                      >
+                        <UserCheck className="w-4 h-4 text-indigo-600" />
+                        <span>Job Seeker</span>
+                        <span className="text-[10px] font-normal text-slate-400">(#OpenToWork)</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setSignupRole('emp')}
+                        className={`p-2.5 rounded-xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
+                          signupRole === 'emp'
+                            ? 'bg-emerald-50 border-emerald-500 text-emerald-800 shadow-xs'
+                            : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                        }`}
+                      >
+                        <Building2 className="w-4 h-4 text-emerald-600" />
+                        <span>Employer</span>
+                        <span className="text-[10px] font-normal text-slate-400">(#Hiring Talent)</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Mobile Number Input */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Mobile Number (मोबाइल नंबर)
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
+                      +91
+                    </span>
+                    <input
+                      type="tel"
+                      value={quickPhone}
+                      onChange={(e) => setQuickPhone(e.target.value.replace(/[^0-9]/g, '').slice(0, 10))}
+                      placeholder="98765 43210"
+                      className="w-full pl-12 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm font-semibold focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Primary Action Button */}
+                <button
+                  type="submit"
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 active:scale-95"
+                >
+                  {authCardTab === 'login' ? (
+                    <>
+                      <LogIn className="w-4 h-4" />
+                      <span>Continue to Log In (लॉगिन करें)</span>
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus className="w-4 h-4" />
+                      <span>Continue to Register as {signupRole === 'seeker' ? 'Candidate' : 'Employer'}</span>
+                    </>
+                  )}
+                </button>
+              </form>
+
+              {/* 1-Tap Instant Demo Access Section */}
+              <div className="mt-5 pt-4 border-t border-slate-100">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                    Instant Demo Login (No Setup Required)
+                  </span>
+                  <button
+                    onClick={onOpenSwitchAccount}
+                    className="text-[10px] font-bold text-indigo-600 hover:underline"
+                  >
+                    View All 14
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handle1TapDemo('seeker')}
+                    className="p-2 rounded-xl bg-slate-50 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 text-left transition-all group"
+                  >
+                    <div className="text-[11px] font-bold text-slate-800 group-hover:text-indigo-600 flex items-center gap-1">
+                      <span>Rahul Sharma</span>
+                      <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-indigo-600" />
+                    </div>
+                    <div className="text-[10px] text-slate-500 font-medium">React Dev (Seeker)</div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handle1TapDemo('emp')}
+                    className="p-2 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 text-left transition-all group"
+                  >
+                    <div className="text-[11px] font-bold text-slate-800 group-hover:text-emerald-700 flex items-center gap-1">
+                      <span>Nexus Cloud</span>
+                      <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-emerald-600" />
+                    </div>
+                    <div className="text-[10px] text-slate-500 font-medium">Tech Lead (Employer)</div>
+                  </button>
+                </div>
+              </div>
+
             </div>
           </div>
 
@@ -178,7 +449,7 @@ export const Welcome = ({
       {/* ========================================================== */}
       {/* 2. THE 4 PILLARS OF JOBSCOUT */}
       {/* ========================================================== */}
-      <section className="py-12 bg-white border-y border-slate-200/80">
+      <section className="py-14 bg-white border-y border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-2xl mx-auto mb-10">
@@ -322,10 +593,10 @@ export const Welcome = ({
 
             <div className="pt-6 mt-6 border-t border-indigo-100 flex items-center justify-between">
               <button
-                onClick={onNavigateToJobs}
+                onClick={() => onOpenSignup('seeker')}
                 className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5 active:scale-95"
               >
-                <span>Find Jobs Near Me</span>
+                <span>Register as Candidate</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
               <span className="text-[11px] text-slate-500 font-semibold">100% Free for Candidates</span>
@@ -368,10 +639,10 @@ export const Welcome = ({
 
             <div className="pt-6 mt-6 border-t border-emerald-100 flex items-center justify-between">
               <button
-                onClick={onNavigateToMap}
+                onClick={() => onOpenSignup('emp')}
                 className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5 active:scale-95"
               >
-                <span>Discover Candidates on Map</span>
+                <span>Register as Employer</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
               <span className="text-[11px] text-slate-500 font-semibold">Zero Commission Fees</span>
@@ -382,7 +653,7 @@ export const Welcome = ({
       </section>
 
       {/* ========================================================== */}
-      {/* 4. LIVE FEATURED SNEAK PEEK */}
+      {/* 4. LIVE FEATURED PREVIEWS */}
       {/* ========================================================== */}
       {(featuredJobs.length > 0 || featuredSeekers.length > 0) && (
         <section className="py-12 bg-white border-y border-slate-200/80">
@@ -501,30 +772,28 @@ export const Welcome = ({
 
             <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
               <button
-                onClick={onNavigateToMap}
+                onClick={() => onOpenSignup('seeker')}
                 className="px-6 py-3 rounded-2xl bg-cyan-400 hover:bg-cyan-300 text-slate-900 font-extrabold text-sm shadow-md transition-all flex items-center gap-2 active:scale-95"
               >
-                <Compass className="w-4 h-4" />
+                <UserPlus className="w-4 h-4" />
+                <span>Create Free Account</span>
+              </button>
+
+              <button
+                onClick={onNavigateToMap}
+                className="px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm border border-white/20 transition-all flex items-center gap-2 active:scale-95"
+              >
+                <Compass className="w-4 h-4 text-cyan-300" />
                 <span>Launch Live Map</span>
               </button>
 
               <button
-                onClick={onNavigateToJobs}
-                className="px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm border border-white/20 transition-all flex items-center gap-2 active:scale-95"
+                onClick={onOpenSwitchAccount}
+                className="px-5 py-3 rounded-2xl bg-indigo-500/30 hover:bg-indigo-500/40 text-cyan-200 font-bold text-xs sm:text-sm border border-cyan-400/30 transition-all flex items-center gap-1.5 active:scale-95"
               >
-                <Briefcase className="w-4 h-4 text-cyan-300" />
-                <span>Explore All Jobs</span>
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span>Try 14 Demo Profiles</span>
               </button>
-
-              {onOpenSwitchAccount && (
-                <button
-                  onClick={onOpenSwitchAccount}
-                  className="px-5 py-3 rounded-2xl bg-indigo-500/30 hover:bg-indigo-500/40 text-cyan-200 font-bold text-xs sm:text-sm border border-cyan-400/30 transition-all flex items-center gap-1.5 active:scale-95"
-                >
-                  <Sparkles className="w-4 h-4 text-amber-400" />
-                  <span>Try 14 Demo Profiles</span>
-                </button>
-              )}
             </div>
           </div>
 
@@ -532,9 +801,9 @@ export const Welcome = ({
       </section>
 
       {/* ========================================================== */}
-      {/* 7. FOOTER */}
+      {/* 7. STANDALONE FOOTER */}
       {/* ========================================================== */}
-      <footer className="py-8 bg-white border-t border-slate-200/80 text-center text-xs text-slate-500">
+      <footer className="py-8 bg-white border-t border-slate-200/80 text-center text-xs text-slate-500 mt-auto">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <JobScoutLogo size={24} />
@@ -546,7 +815,8 @@ export const Welcome = ({
             <button onClick={onNavigateToJobs} className="hover:text-indigo-600 transition-colors">Jobs</button>
             <button onClick={onNavigateToFeed} className="hover:text-indigo-600 transition-colors">Feed</button>
             <button onClick={onNavigateToAnon} className="hover:text-indigo-600 transition-colors">Anon Salon</button>
-            {onOpenAuth && <button onClick={onOpenAuth} className="hover:text-indigo-600 transition-colors">Sign In</button>}
+            <button onClick={() => onOpenLogin()} className="hover:text-indigo-600 transition-colors">Log In</button>
+            <button onClick={() => onOpenSignup('seeker')} className="hover:text-indigo-600 transition-colors">Sign Up</button>
           </div>
           <p className="text-slate-400 text-[11px]">
             © {new Date().getFullYear()} JobScout Platform. All rights reserved.

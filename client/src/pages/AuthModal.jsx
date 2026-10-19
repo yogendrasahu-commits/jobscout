@@ -24,7 +24,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { JobScoutLogo } from '../components/JobScoutLogo';
 
-export const AuthModal = ({ isOpen, onClose }) => {
+export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole = 'seeker', onSuccess }) => {
   const { 
     sendOtp, 
     loginWithPhoneOtp, 
@@ -35,13 +35,20 @@ export const AuthModal = ({ isOpen, onClose }) => {
   } = useAuth();
 
   // Mode: 'login' | 'register'
-  const [mode, setMode] = useState('login');
+  const [mode, setMode] = useState(initialMode || 'login');
   
   // Login Sub-mode: 'otp' | 'password'
   const [loginMethod, setLoginMethod] = useState('otp');
 
   // Active Role for Registration: 'emp' | 'seeker'
-  const [role, setRole] = useState('seeker');
+  const [role, setRole] = useState(initialRole || 'seeker');
+
+  useEffect(() => {
+    if (isOpen) {
+      if (initialMode) setMode(initialMode);
+      if (initialRole) setRole(initialRole);
+    }
+  }, [isOpen, initialMode, initialRole]);
 
   // Common User fields
   const [name, setName] = useState('');
@@ -172,6 +179,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
         setOtpVerified(true);
         setSuccessMsg('Phone verified! Please select your profile type and complete sign up.');
       } else {
+        if (onSuccess) onSuccess();
         onClose();
       }
     } catch (err) {
@@ -197,6 +205,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
     setLoading(true);
     try {
       await loginWithPhonePassword(phone, password);
+      if (onSuccess) onSuccess();
       onClose();
     } catch (err) {
       setError(err.message || 'Invalid credentials');
@@ -275,6 +284,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
       };
 
       await registerWithPhone(payload);
+      if (onSuccess) onSuccess();
       onClose();
     } catch (err) {
       setError(err.message || 'Registration failed');
@@ -287,6 +297,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
     setLoading(true);
     await demoSwitch(demoRole);
     setLoading(false);
+    if (onSuccess) onSuccess();
     onClose();
   };
 

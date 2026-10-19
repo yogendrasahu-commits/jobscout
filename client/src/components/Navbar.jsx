@@ -956,7 +956,7 @@ export const Navbar = ({
 
                     {/* Logout */}
                     <button
-                      onClick={() => { logout(); setProfileMenuOpen(false); }}
+                      onClick={() => { logout(); setProfileMenuOpen(false); setCurrentTab('welcome'); }}
                       className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors"
                     >
                       <LogOut className="w-4 h-4" />
@@ -1375,6 +1375,7 @@ export const Navbar = ({
                   onClick={() => {
                     logout();
                     setMobileDrawerOpen(false);
+                    setCurrentTab('welcome');
                   }}
                   className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-rose-600 hover:bg-rose-50 text-xs font-bold transition-colors"
                 >
