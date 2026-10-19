@@ -185,8 +185,15 @@ function MainApp() {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [currentTab]);
 
-  // STANDALONE WELCOME / ONBOARDING LANDING VIEW
-  if (currentTab === 'welcome') {
+  // Once logged in, completely bypass and remove the welcome page, directing user to feed
+  useEffect(() => {
+    if (user && currentTab === 'welcome') {
+      setCurrentTab('feed');
+    }
+  }, [user, currentTab]);
+
+  // STANDALONE WELCOME / ONBOARDING LANDING VIEW (Unauthenticated / Guest only)
+  if (currentTab === 'welcome' && !user) {
     return (
       <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 text-slate-900 flex flex-col font-sans antialiased">
         <Welcome
