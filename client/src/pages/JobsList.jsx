@@ -22,6 +22,9 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { ApplicationsView } from './ApplicationsView';
+import { calculateAIMatch } from '../utils/aiMatchEngine';
+import { AIMatchBadge } from '../components/AIMatchBadge';
+import { AIMatchModal } from '../components/AIMatchModal';
 
 export const JobsList = ({ 
   jobs = [], 
@@ -40,6 +43,7 @@ export const JobsList = ({
   const { user, token, isEmployer } = useAuth();
   const [internalSearchTerm, setInternalSearchTerm] = useState('');
   const [internalActiveSubTab, setInternalActiveSubTab] = useState(defaultSubTab);
+  const [selectedMatchJob, setSelectedMatchJob] = useState(null);
 
   const activeSubTab = externalActiveSubTab !== undefined ? externalActiveSubTab : internalActiveSubTab;
   const setActiveSubTab = externalSetActiveSubTab || setInternalActiveSubTab;
@@ -175,6 +179,11 @@ export const JobsList = ({
       return matchesSearch && matchesType && matchesCategory && matchesWorkMode && matchesExperience;
     })
     .sort((a, b) => {
+      if (sortBy === 'ai_match') {
+        const scoreA = calculateAIMatch(user, a).score;
+        const scoreB = calculateAIMatch(user, b).score;
+        return scoreB - scoreA;
+      }
       if (sortBy === 'salary_high') {
         const salA = a.minSalary || (parseInt((a.salary || '').replace(/[^0-9]/g, '')) || 0);
         const salB = b.minSalary || (parseInt((b.salary || '').replace(/[^0-9]/g, '')) || 0);
@@ -422,6 +431,7 @@ export const JobsList = ({
                     className="bg-transparent text-xs text-slate-700 focus:outline-none font-semibold cursor-pointer"
                   >
                     <option value="newest">Newest</option>
+                    <option value="ai_match">✨ Best AI Fit</option>
                     <option value="salary_high">Highest Salary</option>
                     <option value="urgent">Urgent First</option>
                   </select>
@@ -475,14 +485,8 @@ export const JobsList = ({
               {filteredJobs.map((job) => {
                 const isSaved = savedJobIds.includes(job.id);
                 
-                // Compute smart skill match percentage if user has skills defined
-                const userSkills = (user?.skills || []).map(s => String(s).toLowerCase().trim());
-                const jobSkills = (job.skills || []).map(s => String(s).toLowerCase().trim());
-                let matchPercentage = null;
-                if (userSkills.length > 0 && jobSkills.length > 0) {
-                  const matched = jobSkills.filter(s => userSkills.includes(s));
-                  matchPercentage = Math.min(98, Math.max(55, Math.round((matched.length / jobSkills.length) * 100)));
-                }
+                // Compute smart AI skill match
+                const matchResult = user?.role !== 'emp' ? calculateAIMatch(user, job) : null;
 
                 return (
                   <div
@@ -510,10 +514,12 @@ export const JobsList = ({
                               <Flame className="w-3 h-3 text-rose-500 fill-rose-500 animate-pulse" /> Urgent
                             </span>
                           )}
-                          {matchPercentage && (
-                            <span className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-black text-indigo-800 bg-indigo-50/90 border border-indigo-200 rounded-lg shadow-2xs">
-                              <Sparkles className="w-2.5 h-2.5 text-indigo-600 animate-pulse" /> {matchPercentage}% Match
-                            </span>
+                          {matchResult && (
+                            <AIMatchBadge
+                              matchResult={matchResult}
+                              compact={true}
+                              onClick={() => setSelectedMatchJob(job)}
+                            />
                           )}
                         </div>
 
@@ -613,6 +619,16 @@ export const JobsList = ({
             </div>
           )}
         </>
+      )}
+
+      {/* Interactive AI Skill Match Modal */}
+      {selectedMatchJob && (
+        <AIMatchModal
+          isOpen={Boolean(selectedMatchJob)}
+          onClose={() => setSelectedMatchJob(null)}
+          job={selectedMatchJob}
+          matchResult={calculateAIMatch(user, selectedMatchJob)}
+        />
       )}
 
     </div>

@@ -51,6 +51,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
+import { calculateAIMatch } from '../utils/aiMatchEngine';
+import { AIMatchBadge } from './AIMatchBadge';
 
 // Fix Leaflet's default marker icons in case standard markers are used
 delete L.Icon.Default.prototype._getIconUrl;
@@ -1767,6 +1769,13 @@ export const UberJobMap = ({
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-200 flex items-center gap-0.5">
                         <Zap className="w-2.5 h-2.5 text-rose-600 fill-rose-600" /> Urgent
                       </span>
+                    )}
+                    {user && !isEmployer && (
+                      <AIMatchBadge
+                        matchResult={calculateAIMatch(user, selectedPin.data)}
+                        compact={true}
+                        onClick={() => onSelectJob(selectedPin.data)}
+                      />
                     )}
                   </div>
                   <h3 className="font-extrabold text-slate-900 text-base leading-snug truncate mt-1">

@@ -25,6 +25,7 @@ import { useSocket } from '../context/SocketContext';
 import { useAuth } from '../context/AuthContext';
 import { ResumePreviewModal } from './ResumePreviewModal';
 import { ProfileEditModal } from './ProfileEditModal';
+import { AIMatchModal } from './AIMatchModal';
 
 export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
   const { user } = useAuth();
@@ -34,11 +35,13 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
   const [endorsedSkills, setEndorsedSkills] = useState({});
   const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
   const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
+  const [isAiResumeScanOpen, setIsAiResumeScanOpen] = useState(false);
 
   if (!isOpen || !profileUser) return null;
 
   const isSeeker = profileUser.role === 'seeker';
   const isEmployer = profileUser.role === 'emp';
+  const isOwnProfile = user?.id === profileUser.id;
 
   const handleVoiceCall = () => {
     startCall(profileUser, false);
@@ -276,7 +279,20 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
               <h3 className="font-extrabold text-xs text-slate-500 uppercase tracking-wider">
                 Skills & Endorsements
               </h3>
-              <span className="text-[11px] text-slate-500">1-click to endorse</span>
+              <div className="flex items-center gap-2">
+                {isOwnProfile && (
+                  <button
+                    type="button"
+                    onClick={() => setIsAiResumeScanOpen(true)}
+                    className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer transition-colors px-2 py-0.5 rounded-lg bg-indigo-50 border border-indigo-200"
+                    title="Paste resume to auto-detect and sync skills"
+                  >
+                    <Sparkles className="w-3 h-3 text-indigo-600" />
+                    <span>AI Resume Scanner</span>
+                  </button>
+                )}
+                <span className="text-[11px] text-slate-500">1-click to endorse</span>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -367,6 +383,16 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
           onClose={() => setIsResumeModalOpen(false)}
         />
       )}
+
+      {/* AI Resume Skills Scanner Modal */}
+      <AIMatchModal
+        isOpen={isAiResumeScanOpen}
+        onClose={() => setIsAiResumeScanOpen(false)}
+        defaultTab="resume"
+        onProfileUpdated={(updated) => {
+          if (profileUser) Object.assign(profileUser, updated);
+        }}
+      />
     </div>
   );
 };

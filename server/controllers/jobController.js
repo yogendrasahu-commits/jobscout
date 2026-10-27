@@ -1,5 +1,6 @@
 import { db } from '../db.js';
 import { AppError } from '../utils/AppError.js';
+import { calculateAIMatch } from '../utils/aiMatchEngine.js';
 
 // Haversine distance in kilometers
 function getDistanceKm(lat1, lon1, lat2, lon2) {
@@ -147,6 +148,52 @@ export const jobController = {
         req.io.emit('job:deleted', { id: req.params.id });
       }
       res.json({ success: true, message: 'Job deleted successfully' });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // Get AI Recommended jobs for current candidate
+  getRecommendedJobs: (req, res, next) => {
+    try {
+      const user = db.findUserById(req.user.id);
+      if (!user) {
+        throw AppError.notFound('User not found');
+      }
+
+      const jobs = db.getAllJobs();
+      const scoredJobs = jobs.map(job => {
+        const matchResult = calculateAIMatch(user, job);
+        return {
+          ...job,
+          aiMatch: matchResult
+        };
+      });
+
+      // Sort by highest match score first
+      scoredJobs.sort((a, b) => b.aiMatch.score - a.aiMatch.score);
+
+      res.json({ jobs: scoredJobs });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // Calculate AI Match for single job
+  getJobAIMatch: (req, res, next) => {
+    try {
+      const user = db.findUserById(req.user.id);
+      if (!user) {
+        throw AppError.notFound('User not found');
+      }
+
+      const job = db.findJobById(req.params.id);
+      if (!job) {
+        throw AppError.notFound('Job not found');
+      }
+
+      const matchResult = calculateAIMatch(user, job);
+      res.json({ job, matchResult });
     } catch (err) {
       next(err);
     }

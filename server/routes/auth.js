@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { db } from '../db.js';
 import { verifyEmailConfig, sendTestEmail } from '../email.js';
 import { rateLimiter } from '../middleware/security.js';
+import { extractSkillsFromResume } from '../utils/aiMatchEngine.js';
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'jobradar_secret_jwt_key_2026';
@@ -708,6 +709,16 @@ router.post('/settings/email/test', async (req, res) => {
       error: `Failed to send test email: ${err.message}. Please verify your Gmail address and 16-character App Password.`
     });
   }
+});
+
+// AI Resume / Text Skill Extraction
+router.post('/extract-skills', (req, res) => {
+  const { resumeText } = req.body || {};
+  if (!resumeText || !String(resumeText).trim()) {
+    return res.status(400).json({ error: 'Resume text is required' });
+  }
+  const skills = extractSkillsFromResume(String(resumeText));
+  res.json({ skills, count: skills.length });
 });
 
 export default router;

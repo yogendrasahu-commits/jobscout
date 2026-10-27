@@ -540,6 +540,43 @@ async function runTestSuite() {
   }
 
   // ----------------------------------------------------
+  // SUITE 12: AI Match Engine & Resume Skill Extractor
+  // ----------------------------------------------------
+  console.log('\n--- SUITE 12: AI Match Engine & Resume Skill Extractor ---');
+  try {
+    // 12.1 Extract Skills from Raw Resume Text
+    const resumeText = 'Senior React & Node.js Developer with 4 years building WebRTC video apps, Docker containers, Tailwind CSS, PostgreSQL databases, and Jest unit tests on AWS.';
+    const extractRes = await api('/api/auth/extract-skills', {
+      method: 'POST',
+      body: JSON.stringify({ resumeText })
+    });
+    assert(extractRes.status === 200, 'Resume skill extraction endpoint returns HTTP 200');
+    assert(Array.isArray(extractRes.data.skills), 'Extracted skills returned as array');
+    assert(extractRes.data.skills.includes('React'), 'Detected "React" in resume');
+    assert(extractRes.data.skills.includes('WebRTC'), 'Detected "WebRTC" in resume');
+    assert(extractRes.data.skills.includes('Docker'), 'Detected "Docker" in resume');
+
+    // 12.2 Single Job AI Fit Match
+    const matchRes = await api(`/api/jobs/${createdJobId}/match`, {
+      headers: { Authorization: `Bearer ${seekerToken}` }
+    });
+    assert(matchRes.status === 200, 'Get single job AI match returns HTTP 200');
+    assert(typeof matchRes.data.matchResult?.score === 'number', 'AI Fit Score calculated as numeric value');
+    assert(matchRes.data.matchResult.score >= 0 && matchRes.data.matchResult.score <= 100, 'AI Fit score bounded between 0-100');
+    assert(Array.isArray(matchRes.data.matchResult.matchedSkills), 'Matching skills returned as array');
+
+    // 12.3 AI Recommended Jobs Feed
+    const recJobs = await api('/api/jobs/recommended', {
+      headers: { Authorization: `Bearer ${seekerToken}` }
+    });
+    assert(recJobs.status === 200, 'AI recommended jobs returns HTTP 200');
+    assert(Array.isArray(recJobs.data.jobs), 'Recommended jobs returned as an array');
+    assert(Boolean(recJobs.data.jobs[0]?.aiMatch), 'Jobs enriched with aiMatch score objects');
+  } catch (err) {
+    console.error('Suite 12 halted:', err.message);
+  }
+
+  // ----------------------------------------------------
   // FINAL SUMMARY
   // ----------------------------------------------------
   console.log('\n======================================================');

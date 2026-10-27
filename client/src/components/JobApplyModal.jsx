@@ -23,6 +23,8 @@ import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { triggerConfetti } from '../utils/confetti';
 import { playSuccessChime } from '../utils/soundEffects';
+import { calculateAIMatch } from '../utils/aiMatchEngine';
+import { AIMatchModal } from './AIMatchModal';
 
 export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
   const { user, token } = useAuth();
@@ -32,6 +34,7 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [showMatchModal, setShowMatchModal] = useState(false);
 
   // Reset form state whenever modal opens or selected job changes
   useEffect(() => {
@@ -45,14 +48,15 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
 
   if (!isOpen || !job) return null;
 
-  // Compute skill match score
+  // Compute comprehensive AI skill and role match score
+  const matchResult = calculateAIMatch(user, job);
   const userSkills = (user?.skills || []).map(s => String(s).toLowerCase().trim());
-  const jobSkills = (job.skills || []).map(s => String(s).toLowerCase().trim());
-  let matchPercentage = null;
-  if (userSkills.length > 0 && jobSkills.length > 0) {
-    const matched = jobSkills.filter(s => userSkills.includes(s));
-    matchPercentage = Math.min(99, Math.max(60, Math.round((matched.length / jobSkills.length) * 100)));
-  }
+
+  const handleGenerateAIPitch = () => {
+    const matched = matchResult.matchedSkills.slice(0, 3).join(', ');
+    const note = `Hi, I am excited about the ${job.title} opportunity at ${job.company || 'your team'}! With hands-on experience in ${matched || 'modern engineering and problem solving'}, I can add immediate value from Day 1. Available for an immediate discussion!`;
+    setCoverNote(note);
+  };
 
   const handleApply = async (e) => {
     e.preventDefault();
@@ -317,6 +321,39 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
           </div>
         )}
 
+        {/* AI Resume & Skill Fit Meter */}
+        {user?.role !== 'emp' && (
+          <div className="mb-4 p-3 rounded-2xl bg-gradient-to-r from-indigo-50/90 via-slate-50 to-indigo-50/70 border border-indigo-200/80 flex items-center justify-between gap-3 shadow-2xs">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-black text-xs shadow-sm flex-shrink-0">
+                {matchResult.score}%
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-extrabold text-xs text-slate-900 truncate">
+                    {matchResult.label}
+                  </span>
+                  <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-indigo-100 text-indigo-700 flex-shrink-0">
+                    AI Match
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-600 truncate mt-0.5">
+                  {matchResult.matchedSkills.length} of {job.skills?.length || 0} skills matched • {matchResult.summary}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowMatchModal(true)}
+              className="px-3 py-1.5 rounded-xl bg-white hover:bg-indigo-600 text-indigo-700 hover:text-white border border-indigo-200 hover:border-indigo-600 text-xs font-bold transition-all shadow-xs flex-shrink-0 flex items-center gap-1 active:scale-95 cursor-pointer"
+            >
+              <Sparkles className="w-3 h-3" />
+              <span>Skill Gap</span>
+            </button>
+          </div>
+        )}
+
         {error && (
           <div className="mb-4 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold">
             {error}
@@ -333,9 +370,21 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
         {/* Application Submission Form */}
         <form onSubmit={handleApply} className="space-y-3.5 pt-2 border-t border-slate-100">
           <div>
-            <label className="block text-xs font-extrabold text-slate-800 mb-1">
-              Quick Pitch / Candidate Note (Optional)
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-extrabold text-slate-800">
+                Quick Pitch / Candidate Note (Optional)
+              </label>
+              {user?.role !== 'emp' && (
+                <button
+                  type="button"
+                  onClick={handleGenerateAIPitch}
+                  className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer transition-colors"
+                >
+                  <Sparkles className="w-3 h-3" />
+                  <span>Auto-Generate AI Pitch</span>
+                </button>
+              )}
+            </div>
             <textarea
               rows={2}
               placeholder="Hi, I am ready for this role and available nearby for an immediate discussion..."
@@ -378,6 +427,14 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
             </div>
           </div>
         </form>
+
+        {/* AI Skill Breakdown Modal */}
+        <AIMatchModal
+          isOpen={showMatchModal}
+          onClose={() => setShowMatchModal(false)}
+          job={job}
+          matchResult={matchResult}
+        />
 
       </div>
     </div>

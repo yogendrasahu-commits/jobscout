@@ -33,6 +33,9 @@ import { ProfileEditModal } from '../components/ProfileEditModal';
 import { ResumePreviewModal } from '../components/ResumePreviewModal';
 import { EmailSettingsModal } from '../components/EmailSettingsModal';
 import { playMessageChime, playSuccessChime } from '../utils/soundEffects';
+import { calculateAIMatch } from '../utils/aiMatchEngine';
+import { AIMatchBadge } from '../components/AIMatchBadge';
+import { AIMatchModal } from '../components/AIMatchModal';
 
 export const ApplicationsView = ({ 
   onOpenProfile, 
@@ -42,6 +45,7 @@ export const ApplicationsView = ({
 }) => {
   const { user, token, isEmployer } = useAuth();
   const { setActiveChatUser, startCall, socket } = useSocket();
+  const [selectedMatchApp, setSelectedMatchApp] = useState(null);
 
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(Boolean(token));
@@ -438,11 +442,46 @@ export const ApplicationsView = ({
                           <div className="mb-2">
                             <div className="flex items-start justify-between gap-1.5 mb-1">
                               <span className="text-xs font-bold text-indigo-600 line-clamp-1">{app.jobTitle}</span>
-                              {app.jobSalary && (
-                                <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 whitespace-nowrap">
-                                  {app.jobSalary}
-                                </span>
-                              )}
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                {isEmployer && (
+                                  <AIMatchBadge
+                                    matchResult={calculateAIMatch(
+                                      {
+                                        skills: app.seekerSkills || ['React', 'JavaScript', 'Node.js', 'Tailwind CSS'],
+                                        title: app.seekerTitle || app.jobTitle,
+                                        bio: app.coverNote || ''
+                                      },
+                                      {
+                                        title: app.jobTitle,
+                                        skills: app.jobSkills || ['React', 'WebSockets', 'Node.js']
+                                      }
+                                    )}
+                                    compact={true}
+                                    onClick={() => {
+                                      const jobObj = {
+                                        title: app.jobTitle,
+                                        skills: app.jobSkills || ['React', 'WebSockets', 'Node.js'],
+                                        company: user?.companyName || user?.name || 'Your Company'
+                                      };
+                                      const candObj = {
+                                        name: app.seekerName,
+                                        skills: app.seekerSkills || ['React', 'JavaScript', 'Node.js', 'Tailwind CSS'],
+                                        title: app.seekerTitle || app.jobTitle,
+                                        bio: app.coverNote || ''
+                                      };
+                                      setSelectedMatchApp({
+                                        job: jobObj,
+                                        matchResult: calculateAIMatch(candObj, jobObj)
+                                      });
+                                    }}
+                                  />
+                                )}
+                                {app.jobSalary && (
+                                  <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 whitespace-nowrap">
+                                    {app.jobSalary}
+                                  </span>
+                                )}
+                              </div>
                             </div>
 
                             <div
@@ -951,6 +990,16 @@ export const ApplicationsView = ({
         isOpen={isEmailSettingsOpen}
         onClose={() => setIsEmailSettingsOpen(false)}
       />
+
+      {/* 7. Modal for AI Candidate Skill Gap Breakdown */}
+      {selectedMatchApp && (
+        <AIMatchModal
+          isOpen={Boolean(selectedMatchApp)}
+          onClose={() => setSelectedMatchApp(null)}
+          job={selectedMatchApp.job}
+          matchResult={selectedMatchApp.matchResult}
+        />
+      )}
 
     </div>
   );
