@@ -14,6 +14,7 @@ import messagesRoutes from './routes/messages.js';
 import postsRoutes from './routes/posts.js';
 import networkRoutes from './routes/network.js';
 import anonRoutes from './routes/anon.js';
+import alertsRoutes from './routes/alerts.js';
 import { setupSocket } from './socket.js';
 import { db } from './db.js';
 import { verifyEmailConfig } from './email.js';
@@ -98,6 +99,7 @@ app.use('/api/messages', messagesRoutes);
 app.use('/api/posts', postsRoutes);
 app.use('/api/network', networkRoutes);
 app.use('/api/anon', anonRoutes);
+app.use('/api/alerts', alertsRoutes);
 
 // Email Sender Settings Endpoints
 app.get('/api/settings/email', (req, res) => {

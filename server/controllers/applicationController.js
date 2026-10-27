@@ -1,6 +1,7 @@
 import { db } from '../db.js';
 import { AppError } from '../utils/AppError.js';
 import { sendOfferLetterEmail, sendOfferAcceptedEmail } from '../email.js';
+import { dispatchCandidateAlert } from '../alerts.js';
 
 export const applicationController = {
   // Apply for a job (Seeker only)
@@ -106,6 +107,19 @@ export const applicationController = {
         req.io.emit('application:updated', updated);
       }
 
+      // Background instant mobile alert (WhatsApp & Telegram)
+      if (['reviewed', 'interview', 'accepted', 'hired'].includes(status)) {
+        dispatchCandidateAlert({
+          candidatePhone: existingApp.seekerPhone,
+          candidateName: existingApp.seekerName,
+          employerName: req.user.companyName || req.user.name,
+          jobTitle: existingApp.jobTitle,
+          type: 'status_update',
+          details: { status },
+          io: req.io
+        }).catch(e => console.warn('[AlertService] Status alert error:', e.message));
+      }
+
       res.json({ application: updated });
     } catch (err) {
       next(err);
@@ -207,9 +221,29 @@ export const applicationController = {
         req.io.emit('message:received', chatMsg);
       }
 
+      // Generate & dispatch Instant WhatsApp / Telegram alert
+      const alertResult = await dispatchCandidateAlert({
+        candidatePhone: app.seekerPhone || (seeker && seeker.phone),
+        candidateName: app.seekerName,
+        employerName: req.user.companyName || req.user.name,
+        jobTitle: offerDetails.designation,
+        type: 'offer_issued',
+        details: {
+          salary: offerDetails.salary,
+          refNo,
+          joiningDate: offerDetails.joiningDate
+        },
+        io: req.io
+      }).catch(e => {
+        console.warn('[AlertService] Offer alert dispatch error:', e.message);
+        return null;
+      });
+
       res.json({
         application: app,
         emailResult,
+        whatsappUrl: alertResult?.whatsappUrl,
+        telegramUrl: alertResult?.telegramUrl,
         message: `Offer letter successfully dispatched to ${targetEmail}!`
       });
     } catch (err) {

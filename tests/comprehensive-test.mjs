@@ -577,6 +577,87 @@ async function runTestSuite() {
   }
 
   // ----------------------------------------------------
+  // SUITE 13: Instant WhatsApp & Telegram Alert System
+  // ----------------------------------------------------
+  console.log('\n--- SUITE 13: Instant WhatsApp & Telegram Alert System ---');
+  try {
+    // 13.1 WhatsApp URL Generation Endpoint
+    const waRes = await api('/api/alerts/whatsapp', {
+      method: 'POST',
+      body: JSON.stringify({
+        phone: '+91 98765 43210',
+        text: 'Congratulations! You have received a verified Job Offer on JobScout.'
+      })
+    });
+    assert(waRes.status === 200, 'POST /api/alerts/whatsapp returns HTTP 200');
+    assert(waRes.data.success === true, 'WhatsApp payload formatted successfully');
+    assert(waRes.data.phone === '919876543210', 'Phone sanitized to E.164 digits without plus or spaces');
+    assert(waRes.data.whatsappUrl.startsWith('https://wa.me/919876543210'), 'Generates valid wa.me direct link');
+
+    // 13.2 Telegram Alert Endpoint
+    const tgRes = await api('/api/alerts/telegram', {
+      method: 'POST',
+      body: JSON.stringify({
+        text: 'Interview Scheduled for React Engineer at 4:00 PM via JobScout Video Call.'
+      })
+    });
+    assert(tgRes.status === 200, 'POST /api/alerts/telegram returns HTTP 200');
+    assert(tgRes.data.success === true, 'Telegram alert handled');
+    assert(tgRes.data.telegramUrl.includes('https://t.me/share/url'), 'Generates valid Telegram share/deep-link fallback');
+
+    // 13.3 Test Alert Endpoint
+    const testWaRes = await api('/api/alerts/test', {
+      method: 'POST',
+      body: JSON.stringify({ channel: 'whatsapp', target: '9876543210' })
+    });
+    assert(testWaRes.status === 200, 'POST /api/alerts/test (whatsapp) returns HTTP 200');
+    assert(testWaRes.data.success === true, 'Test alert dispatched');
+    assert(Boolean(testWaRes.data.previewUrl), 'Returns preview URL for testing');
+
+    // 13.4 Alerts Settings Retrieval & Update
+    const getSettingsRes = await api('/api/alerts/settings');
+    assert(getSettingsRes.status === 200, 'GET /api/alerts/settings returns HTTP 200');
+    assert(typeof getSettingsRes.data.settings?.whatsappEnabled === 'boolean', 'Contains whatsappEnabled boolean flag');
+
+    const updateSettingsRes = await api('/api/alerts/settings', {
+      method: 'PUT',
+      body: JSON.stringify({
+        whatsappEnabled: true,
+        telegramEnabled: true,
+        phone: '9988776655',
+        telegramChatId: '@jobscout_channel'
+      })
+    });
+    assert(updateSettingsRes.status === 200, 'PUT /api/alerts/settings returns HTTP 200');
+    assert(updateSettingsRes.data.settings.phone === '9988776655', 'Settings updated with new target phone');
+    assert(updateSettingsRes.data.settings.telegramChatId === '@jobscout_channel', 'Settings updated with telegramChatId');
+
+    // 13.5 Candidate Lifecycle Alert Dispatch (Offer Issued Alert)
+    const dispatchRes = await api('/api/alerts/send', {
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'offer_issued',
+        recipient: {
+          phone: '9876543210',
+          name: 'Rohit Sharma'
+        },
+        data: {
+          candidateName: 'Rohit Sharma',
+          jobTitle: 'Senior Frontend Architect',
+          companyName: 'Tech Innovators India',
+          salary: '₹28,00,000 / year',
+          offerId: 'OFF-123456'
+        }
+      })
+    });
+    assert(dispatchRes.status === 200, 'POST /api/alerts/send (offer_issued) returns HTTP 200');
+    assert(dispatchRes.data.success === true, 'Lifecycle alert dispatched');
+    assert(Boolean(dispatchRes.data.whatsappUrl), 'WhatsApp direct URL generated for candidate offer');
+  } catch (err) {
+    console.error('Suite 13 halted:', err.message);
+  }
+
+  // ----------------------------------------------------
   // FINAL SUMMARY
   // ----------------------------------------------------
   console.log('\n======================================================');

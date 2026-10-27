@@ -35,6 +35,7 @@ export const IssueOfferModal = ({ application, isOpen, onClose, onSuccess }) => 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [dispatchedWhatsAppUrl, setDispatchedWhatsAppUrl] = useState(null);
 
   useEffect(() => {
     if (application) {
@@ -88,10 +89,14 @@ export const IssueOfferModal = ({ application, isOpen, onClose, onSuccess }) => 
         throw new Error(data.error || 'Failed to dispatch offer letter');
       }
 
+      if (data.whatsappUrl) {
+        setDispatchedWhatsAppUrl(data.whatsappUrl);
+      }
+
       if (data.emailResult?.sentReal) {
         setSuccess(`🎉 आधिकारिक ऑफर लेटर उम्मीदवार के Gmail (${cleanEmail}) इनबॉक्स में सफलतापूर्वक डिलीवर कर दिया गया है!`);
       } else if (data.emailResult?.error) {
-        setSuccess(`🎉 ऑफर लेटर पोर्टल में जारी हो गया है। ध्यान दें: ${data.emailResult.error} (Email Settings में Gmail App Password अपडेट करें)।`);
+        setSuccess(`🎉 ऑफर लेटर पोर्टल में जारी हो गया है।`);
       } else {
         setSuccess(`🎉 आधिकारिक ऑफर लेटर पोर्टल में उम्मीदवार के प्रोफाइल पर सफलतापूर्वक जारी कर दिया गया है!`);
       }
@@ -99,9 +104,11 @@ export const IssueOfferModal = ({ application, isOpen, onClose, onSuccess }) => 
       if (onSuccess) {
         onSuccess(data.application);
       }
-      setTimeout(() => {
-        onClose();
-      }, 2600);
+      if (!data.whatsappUrl) {
+        setTimeout(() => {
+          onClose();
+        }, 2600);
+      }
     } catch (err) {
       setError(err.message || 'ऑफर लेटर भेजने में त्रुटि हुई।');
     } finally {
@@ -183,9 +190,27 @@ export const IssueOfferModal = ({ application, isOpen, onClose, onSuccess }) => 
           )}
 
           {success && (
-            <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 flex-shrink-0 text-emerald-600" />
-              <span>{success}</span>
+            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs space-y-2">
+              <div className="flex items-center gap-2 font-bold">
+                <CheckCircle className="w-4 h-4 flex-shrink-0 text-emerald-600" />
+                <span>{success}</span>
+              </div>
+              {dispatchedWhatsAppUrl && (
+                <div className="pt-2 border-t border-emerald-200/80 flex items-center justify-between gap-3">
+                  <span className="text-[11px] text-emerald-800 font-medium">
+                    Send immediate mobile notification to candidate:
+                  </span>
+                  <a
+                    href={dispatchedWhatsAppUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs shadow-sm transition-all active:scale-95"
+                  >
+                    <span>💬 Open WhatsApp Alert</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              )}
             </div>
           )}
 

@@ -32,6 +32,8 @@ import { ViewOfferLetterModal } from '../components/ViewOfferLetterModal';
 import { ProfileEditModal } from '../components/ProfileEditModal';
 import { ResumePreviewModal } from '../components/ResumePreviewModal';
 import { EmailSettingsModal } from '../components/EmailSettingsModal';
+import { AlertSettingsModal } from '../components/AlertSettingsModal';
+import { generateWhatsAppUrl } from '../utils/alertService';
 import { playMessageChime, playSuccessChime } from '../utils/soundEffects';
 import { calculateAIMatch } from '../utils/aiMatchEngine';
 import { AIMatchBadge } from '../components/AIMatchBadge';
@@ -56,6 +58,7 @@ export const ApplicationsView = ({
   const [selectedCandidateForCV, setSelectedCandidateForCV] = useState(null);
   const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
   const [isEmailSettingsOpen, setIsEmailSettingsOpen] = useState(false);
+  const [isAlertSettingsOpen, setIsAlertSettingsOpen] = useState(false);
   const [viewMode, setViewMode] = useState(isEmployer ? 'kanban' : 'list');
 
   const KANBAN_STAGES = [
@@ -363,6 +366,15 @@ export const ApplicationsView = ({
               </button>
               <button
                 type="button"
+                onClick={() => setIsAlertSettingsOpen(true)}
+                className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white text-[11px] font-bold border border-emerald-200 transition-all flex items-center gap-1 active:scale-95 whitespace-nowrap shadow-xs"
+                title="Configure WhatsApp & Telegram Instant Alerts"
+              >
+                <span>💬</span>
+                <span>WhatsApp / Telegram Alerts</span>
+              </button>
+              <button
+                type="button"
                 onClick={() => setIsProfileEditOpen(true)}
                 className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white text-[11px] font-bold border border-emerald-200 transition-all flex items-center gap-1 active:scale-95 whitespace-nowrap shadow-xs"
                 title="Edit Profile"
@@ -562,6 +574,20 @@ export const ApplicationsView = ({
                                 className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors"
                               >
                                 <MessageSquare className="w-3 h-3" />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  const targetPhone = isEmployer ? (app.seekerPhone || '9876543210') : (app.employerPhone || '9876543210');
+                                  const greeting = isEmployer
+                                    ? `Hi ${app.seekerName}, regarding your application for ${app.jobTitle} on JobScout:`
+                                    : `Hi ${app.employerName}, inquiring about my JobScout application for ${app.jobTitle}.`;
+                                  const waUrl = generateWhatsAppUrl(targetPhone, greeting);
+                                  window.open(waUrl, '_blank');
+                                }}
+                                title="Chat on WhatsApp"
+                                className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition-colors"
+                              >
+                                <span className="text-[11px] font-bold">💬</span>
                               </button>
                               <button
                                 onClick={() =>
@@ -798,6 +824,22 @@ export const ApplicationsView = ({
                         <MessageSquare className="w-4 h-4" />
                       </button>
 
+                      {/* WhatsApp Direct Chat */}
+                      <button
+                        onClick={() => {
+                          const targetPhone = isEmployer ? (app.seekerPhone || '9876543210') : (app.employerPhone || '9876543210');
+                          const greeting = isEmployer
+                            ? `Hi ${app.seekerName}, regarding your application for ${app.jobTitle} on JobScout:`
+                            : `Hi ${app.employerName}, inquiring about my JobScout application for ${app.jobTitle}.`;
+                          const waUrl = generateWhatsAppUrl(targetPhone, greeting);
+                          window.open(waUrl, '_blank');
+                        }}
+                        title="Chat on WhatsApp"
+                        className="p-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition-colors shadow-xs flex items-center justify-center font-bold"
+                      >
+                        <span className="text-sm">💬</span>
+                      </button>
+
                       {/* View & Print Candidate CV Button */}
                       <button
                         onClick={() =>
@@ -989,6 +1031,12 @@ export const ApplicationsView = ({
       <EmailSettingsModal
         isOpen={isEmailSettingsOpen}
         onClose={() => setIsEmailSettingsOpen(false)}
+      />
+
+      {/* 6b. Modal for Instant WhatsApp & Telegram Mobile Alerts */}
+      <AlertSettingsModal
+        isOpen={isAlertSettingsOpen}
+        onClose={() => setIsAlertSettingsOpen(false)}
       />
 
       {/* 7. Modal for AI Candidate Skill Gap Breakdown */}
