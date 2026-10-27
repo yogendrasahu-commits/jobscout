@@ -33,6 +33,7 @@ import { ProfileEditModal } from '../components/ProfileEditModal';
 import { ResumePreviewModal } from '../components/ResumePreviewModal';
 import { EmailSettingsModal } from '../components/EmailSettingsModal';
 import { AlertSettingsModal } from '../components/AlertSettingsModal';
+import { ResumeBuilderModal } from '../components/ResumeBuilderModal';
 import { generateWhatsAppUrl } from '../utils/alertService';
 import { playMessageChime, playSuccessChime } from '../utils/soundEffects';
 import { calculateAIMatch } from '../utils/aiMatchEngine';
@@ -59,6 +60,7 @@ export const ApplicationsView = ({
   const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
   const [isEmailSettingsOpen, setIsEmailSettingsOpen] = useState(false);
   const [isAlertSettingsOpen, setIsAlertSettingsOpen] = useState(false);
+  const [isResumeBuilderOpen, setIsResumeBuilderOpen] = useState(false);
   const [viewMode, setViewMode] = useState(isEmployer ? 'kanban' : 'list');
 
   const KANBAN_STAGES = [
@@ -372,6 +374,15 @@ export const ApplicationsView = ({
               >
                 <span>💬</span>
                 <span>WhatsApp / Telegram Alerts</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsResumeBuilderOpen(true)}
+                className="px-2.5 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white text-[11px] font-bold border border-purple-200 transition-all flex items-center gap-1 active:scale-95 whitespace-nowrap shadow-xs"
+                title="1-Click ATS Harvard Resume Builder"
+              >
+                <FileText className="w-3 h-3" />
+                <span>ATS Resume Builder</span>
               </button>
               <button
                 type="button"
@@ -1037,6 +1048,12 @@ export const ApplicationsView = ({
       <AlertSettingsModal
         isOpen={isAlertSettingsOpen}
         onClose={() => setIsAlertSettingsOpen(false)}
+      />
+
+      {/* 6c. Modal for 1-Click ATS Harvard Resume Builder */}
+      <ResumeBuilderModal
+        isOpen={isResumeBuilderOpen}
+        onClose={() => setIsResumeBuilderOpen(false)}
       />
 
       {/* 7. Modal for AI Candidate Skill Gap Breakdown */}

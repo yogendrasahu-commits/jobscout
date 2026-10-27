@@ -53,6 +53,7 @@ import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { calculateAIMatch } from '../utils/aiMatchEngine';
 import { AIMatchBadge } from './AIMatchBadge';
+import { SmartCommuteModal } from './SmartCommuteModal';
 
 // Fix Leaflet's default marker icons in case standard markers are used
 delete L.Icon.Default.prototype._getIconUrl;
@@ -561,6 +562,7 @@ export const UberJobMap = ({
   const [activeTabDrawer, setActiveTabDrawer] = useState('jobs'); // 'jobs' | 'seekers'
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [selectedPin, setSelectedPin] = useState(null); // { type: 'job' | 'seeker', data: Object }
+  const [commuteModalJob, setCommuteModalJob] = useState(null);
 
   // Search Functionality States
   const [searchQuery, setSearchQuery] = useState(user?.address || '');
@@ -1817,16 +1819,25 @@ export const UberJobMap = ({
                   onClick={() => {
                     onSelectJob(selectedPin.data);
                   }}
-                  className="flex-1 py-2.5 px-4 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white rounded-2xl text-xs font-extrabold transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5"
+                  className="flex-1 py-2.5 px-3 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white rounded-2xl text-xs font-extrabold transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5"
                 >
-                  <span>View Details & Apply</span>
+                  <span>Apply</span>
                   <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCommuteModalJob(selectedPin.data)}
+                  className="py-2.5 px-3 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-all flex items-center justify-center gap-1 text-xs font-bold active:scale-95 shadow-xs"
+                  title="Calculate travel time via Metro, Bike, Cab & Walking"
+                >
+                  <span>🚇</span>
+                  <span>Commute</span>
                 </button>
                 <a
                   href={`https://www.google.com/maps/dir/?api=1&destination=${selectedPin.data.lat},${selectedPin.data.lng}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="py-2.5 px-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 transition-all flex items-center justify-center gap-1.5 text-xs font-bold active:scale-95"
+                  className="py-2.5 px-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 transition-all flex items-center justify-center gap-1 text-xs font-bold active:scale-95"
                   title="Turn-by-turn Navigation in Google Maps"
                 >
                   <Navigation className="w-3.5 h-3.5 text-indigo-600" />
@@ -2155,6 +2166,17 @@ export const UberJobMap = ({
         })}
 
       </MapContainer>
+
+      {/* Smart Commute Radar Modal */}
+      {commuteModalJob && (
+        <SmartCommuteModal
+          isOpen={Boolean(commuteModalJob)}
+          onClose={() => setCommuteModalJob(null)}
+          job={commuteModalJob}
+          userCoords={{ lat: centerCoords[0], lng: centerCoords[1] }}
+          userAddress={activeLocationName}
+        />
+      )}
 
     </div>
   );

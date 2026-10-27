@@ -26,12 +26,18 @@ import {
   ArrowRight,
   Mail,
   Edit3,
-  Settings
+  Settings,
+  Mic,
+  MicOff,
+  Globe
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
+import { useTranslation } from '../context/LanguageContext';
+import { startVoiceRecognition, isVoiceRecognitionSupported } from '../utils/voiceSearch';
 import { JobScoutLogo } from './JobScoutLogo';
 import { AlertSettingsModal } from './AlertSettingsModal';
+import { ResumeBuilderModal } from './ResumeBuilderModal';
 import { 
   NavFeedIcon, 
   NavNetworkIcon, 
@@ -64,6 +70,7 @@ export const Navbar = ({
 }) => {
   const { user, isEmployer, isSeeker, logout } = useAuth();
   const { setActiveChatUser, socket } = useSocket();
+  const { t, language, setLanguage, languages } = useTranslation();
 
   // Dropdown & Drawer states
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -72,6 +79,31 @@ export const Navbar = ({
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
   const [isAlertSettingsOpen, setIsAlertSettingsOpen] = useState(false);
+  const [isResumeBuilderOpen, setIsResumeBuilderOpen] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+
+  // Trigger voice recognition
+  const handleVoiceSearch = () => {
+    if (isListening) return;
+    startVoiceRecognition({
+      language,
+      onStart: () => setIsListening(true),
+      onEnd: () => setIsListening(false),
+      onError: (err) => {
+        console.warn('Voice search error:', err);
+        setIsListening(false);
+      },
+      onResult: (transcript) => {
+        setIsListening(false);
+        if (transcript) {
+          setSearchQuery(transcript);
+          setCurrentTab('jobs');
+          setSearchFocused(false);
+          setMobileSearchOpen(false);
+        }
+      }
+    });
+  };
   
   // Search state (synced with App.jsx if provided)
   const [internalSearchQuery, setInternalSearchQuery] = useState('');
@@ -366,6 +398,20 @@ export const Navbar = ({
                   </kbd>
                 )}
               </form>
+
+              {/* Instant Voice Search Button (Desktop) */}
+              <button
+                type="button"
+                onClick={handleVoiceSearch}
+                className={`p-1.5 rounded-full border transition-all ${
+                  isListening
+                    ? 'bg-rose-500 text-white border-rose-400 ring-2 ring-rose-400/30 animate-pulse'
+                    : 'bg-slate-100/80 hover:bg-indigo-50 border-slate-200/80 text-slate-500 hover:text-indigo-600'
+                }`}
+                title={isListening ? 'Listening... Speak now' : 'Voice Search (बोलकर खोजें)'}
+              >
+                <Mic className="w-3.5 h-3.5" />
+              </button>
 
               {/* Live Search Suggestions & Results Dropdown */}
               {searchFocused && (
@@ -698,11 +744,23 @@ export const Navbar = ({
                       <button
                         type="button"
                         onClick={() => setSearchQuery('')}
-                        className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-700"
+                        className="absolute right-9 top-2.5 text-slate-400 hover:text-slate-700"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
                     )}
+                    <button
+                      type="button"
+                      onClick={handleVoiceSearch}
+                      className={`absolute right-2 top-2 p-1 rounded-lg border transition-all ${
+                        isListening
+                          ? 'bg-rose-500 text-white border-rose-400 animate-pulse'
+                          : 'bg-slate-100 hover:bg-indigo-50 border-slate-200 text-slate-500 hover:text-indigo-600'
+                      }`}
+                      title="Voice Search"
+                    >
+                      <Mic className="w-3.5 h-3.5" />
+                    </button>
                   </form>
 
                   {/* Matching quick previews */}
@@ -743,6 +801,25 @@ export const Navbar = ({
                 <span className="hidden xl:inline whitespace-nowrap">Post Job</span>
               </button>
             )}
+
+            {/* Language Switcher Pill (EN | हिं | मरा) */}
+            <div className="flex items-center p-0.5 rounded-full bg-slate-100/90 border border-slate-200/80 text-[10px] font-bold flex-shrink-0 shadow-2xs">
+              {languages.map((l) => (
+                <button
+                  key={l.code}
+                  type="button"
+                  onClick={() => setLanguage(l.code)}
+                  className={`px-2 py-0.5 rounded-full transition-all ${
+                    language === l.code
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                  }`}
+                  title={`Switch language to ${l.label}`}
+                >
+                  {l.short}
+                </button>
+              ))}
+            </div>
 
             {/* Notifications Bell Dropdown */}
             <div className="relative" ref={notifRef}>
@@ -935,6 +1012,23 @@ export const Navbar = ({
                       </span>
                       <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-600 text-white shadow-xs">
                         Config
+                      </span>
+                    </button>
+
+                    {/* 1-Click ATS Harvard Resume Builder */}
+                    <button
+                      onClick={() => {
+                        setIsResumeBuilderOpen(true);
+                        setProfileMenuOpen(false);
+                      }}
+                      className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-indigo-700 bg-indigo-50/70 hover:bg-indigo-100/80 border border-indigo-200/80 transition-all mb-2"
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5 text-indigo-600" />
+                        <span>ATS Harvard Resume Builder</span>
+                      </span>
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-600 text-white shadow-xs">
+                        PDF
                       </span>
                     </button>
 
@@ -1471,6 +1565,12 @@ export const Navbar = ({
       <AlertSettingsModal
         isOpen={isAlertSettingsOpen}
         onClose={() => setIsAlertSettingsOpen(false)}
+      />
+
+      {/* 1-Click ATS Harvard Resume Builder Modal */}
+      <ResumeBuilderModal
+        isOpen={isResumeBuilderOpen}
+        onClose={() => setIsResumeBuilderOpen(false)}
       />
 
     </header>
