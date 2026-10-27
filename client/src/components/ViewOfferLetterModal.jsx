@@ -16,6 +16,8 @@ import {
   UserCheck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { triggerConfetti } from '../utils/confetti';
+import { playSuccessChime } from '../utils/soundEffects';
 
 export const ViewOfferLetterModal = ({ 
   application, 
@@ -61,6 +63,8 @@ export const ViewOfferLetterModal = ({
       });
       const data = await res.json();
       if (res.ok) {
+        triggerConfetti();
+        playSuccessChime();
         setFeedback({ type: 'success', text: '🎉 बधाई हो! आपने आधिकारिक ऑफर लेटर स्वीकार कर लिया है और आप आधिकारिक तौर पर नियुक्त हो चुके हैं!' });
         if (onAccepted) onAccepted(data.application || { ...application, status: 'hired' });
       } else {

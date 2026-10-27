@@ -8,9 +8,21 @@
     "build:client": "npm --prefix client install --include=dev && npm --prefix client run build",
     "install:all": "npm --prefix server install && npm --prefix client install --include=dev",
     "server": "npm --prefix server start",
-    "client": "npm --prefix client run dev"
+    "client": "npm --prefix client run dev",
+    "test": "node tests/comprehensive-test.mjs"
   },
-  "keywords": ["react", "express", "webrtc", "socketio", "leaflet", "jobs", "map"],
+  "keywords": [
+    "react",
+    "express",
+    "webrtc",
+    "socketio",
+    "leaflet",
+    "jobs",
+    "map"
+  ],
   "author": "Antigravity",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "socket.io-client": "^4.8.4"
+  }
 }

@@ -26,25 +26,27 @@ export async function getTransporter() {
       host,
       port,
       secure: port === 465,
-      family: 4,
-      auth: { user: smtpUser, pass: smtpPass }
+      auth: { user: smtpUser, pass: smtpPass },
+      connectionTimeout: 5000,
+      greetingTimeout: 5000,
+      socketTimeout: 5000
     });
   }
 
-  // Gmail App Password
+  // Gmail App Password (uses service: 'gmail' for automatic TLS/STARTTLS support without port 465 timeouts)
   const rawGmailUser = (dbConfig.gmailUser || process.env.GMAIL_USER || '').trim();
   const rawGmailPass = (dbConfig.gmailPass || process.env.GMAIL_PASS || '').replace(/\s+/g, '');
 
   if (rawGmailUser && rawGmailPass) {
     return nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
-      family: 4,
+      service: 'gmail',
       auth: {
         user: rawGmailUser,
         pass: rawGmailPass
-      }
+      },
+      connectionTimeout: 5000,
+      greetingTimeout: 5000,
+      socketTimeout: 5000
     });
   }
 
@@ -70,15 +72,11 @@ export async function verifyEmailConfig(config) {
       host,
       port,
       secure: port === 465,
-      family: 4,
       auth: { user: smtpUser, pass: smtpPass }
     });
   } else if (gmailUser && gmailPass) {
     transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
-      family: 4,
+      service: 'gmail',
       auth: { user: gmailUser, pass: gmailPass }
     });
   } else {
@@ -88,6 +86,39 @@ export async function verifyEmailConfig(config) {
   // Test connection
   await transporter.verify();
   return true;
+}
+
+/**
+ * Sends an immediate test email to verify end-to-end inbox delivery
+ */
+export async function sendTestEmail(targetEmail) {
+  const transporter = await getTransporter();
+  if (!transporter) {
+    throw new Error('Email service is not configured. Please enter your Gmail Address & 16-character App Password.');
+  }
+
+  const dbConfig = db.getEmailConfig ? db.getEmailConfig() : {};
+  const senderEmail = (dbConfig.emailFrom || dbConfig.gmailUser || 'noreply@jobscout.io').trim();
+
+  const info = await transporter.sendMail({
+    from: senderEmail.includes('<') ? senderEmail : `"JobScout Live" <${senderEmail}>`,
+    to: targetEmail,
+    subject: '✅ JobScout Live: Email Delivery Test Successful!',
+    html: `
+      <div style="font-family: sans-serif; max-width: 500px; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff;">
+        <h2 style="color: #4f46e5; margin-top: 0;">🎉 Email Delivery Verified!</h2>
+        <p style="color: #334155; font-size: 14px; line-height: 1.6;">
+          Your Gmail SMTP connection is working perfectly. Job offer letters and candidate notifications will now be delivered directly to real inboxes.
+        </p>
+        <div style="margin-top: 16px; padding: 12px; background: #f8fafc; border-radius: 8px; font-size: 12px; color: #64748b;">
+          <strong>Dispatched from:</strong> ${senderEmail}<br/>
+          <strong>Timestamp:</strong> ${new Date().toLocaleString()}
+        </div>
+      </div>
+    `
+  });
+
+  return { success: true, messageId: info.messageId };
 }
 
 /**

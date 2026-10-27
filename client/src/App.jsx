@@ -20,6 +20,10 @@ import { AuthModal } from './pages/AuthModal';
 import { FullPageChat } from './pages/FullPageChat';
 import { AnonDiscuss } from './pages/AnonDiscuss';
 import { Welcome } from './pages/Welcome';
+import { CommandPalette } from './components/CommandPalette';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { jobService } from './services/jobService';
+import { userService } from './services/userService';
 
 function MainApp() {
   const { user, isEmployer } = useAuth();
@@ -52,6 +56,40 @@ function MainApp() {
   const [selectedProfileUser, setSelectedProfileUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [jobsQuickFilter, setJobsQuickFilter] = useState('all');
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
+  const [showReconnectedToast, setShowReconnectedToast] = useState(false);
+
+  // Network connection listener (Uber/Slack style offline notice)
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      setShowReconnectedToast(true);
+      setTimeout(() => setShowReconnectedToast(false), 3500);
+    };
+    const handleOffline = () => {
+      setIsOnline(false);
+      setShowReconnectedToast(false);
+    };
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Global Spotlight Keyboard Shortcut: Ctrl + K or Cmd + K
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Live Socket.IO listeners for real-time synchronization across dual windows/devices
   useEffect(() => {
@@ -113,49 +151,48 @@ function MainApp() {
       setSelectedProfileUser(found);
       return;
     }
-    // Fallback: if user is logged in
-    if (user) {
-      setSelectedProfileUser(user);
-    }
+    // Fetch profile dynamically from API if not loaded in local cache
+    fetch(`/api/auth/user/${targetId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data?.user) {
+          setSelectedProfileUser(data.user);
+        } else if (user) {
+          setSelectedProfileUser(user);
+        }
+      })
+      .catch(() => {
+        if (user) setSelectedProfileUser(user);
+      });
   };
 
-  // Fetch jobs
+  // Fetch jobs via JobService
   const fetchJobs = async () => {
     try {
-      const url = user?.lat && user?.lng
-        ? `/api/jobs?userLat=${user.lat}&userLng=${user.lng}`
-        : '/api/jobs';
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        setJobs(data.jobs || []);
-      }
+      const data = await jobService.getAllJobs(
+        user?.lat && user?.lng ? { userLat: user.lat, userLng: user.lng } : {}
+      );
+      setJobs(data || []);
     } catch (err) {
       console.error('Failed to fetch jobs:', err);
     }
   };
 
-  // Fetch seekers
+  // Fetch seekers via UserService
   const fetchSeekers = async () => {
     try {
-      const res = await fetch('/api/auth/seekers');
-      if (res.ok) {
-        const data = await res.json();
-        setSeekers(data.seekers || []);
-      }
+      const data = await userService.getSeekers();
+      setSeekers(data || []);
     } catch (err) {
       console.error('Failed to fetch seekers:', err);
     }
   };
 
-  // Fetch employers
+  // Fetch employers via UserService
   const fetchEmployers = async () => {
     try {
-      const res = await fetch('/api/auth/employers');
-      if (res.ok) {
-        const data = await res.json();
-        setEmployers(data.employers || []);
-      }
+      const data = await userService.getEmployers();
+      setEmployers(data || []);
     } catch (err) {
       console.error('Failed to fetch employers:', err);
     }
@@ -176,13 +213,20 @@ function MainApp() {
     }
   }, [currentTab]);
 
-  // Background polling to ensure live updates across multiple windows/browsers
+  // Background synchronization for multiple windows/browsers (pauses when tab is hidden)
   useEffect(() => {
-    const timer = setInterval(() => {
-      fetchSeekers();
-      fetchEmployers();
-    }, 5000);
-    return () => clearInterval(timer);
+    const sync = () => {
+      if (!document.hidden) {
+        fetchSeekers();
+        fetchEmployers();
+      }
+    };
+    const timer = setInterval(sync, 15000);
+    document.addEventListener('visibilitychange', sync);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', sync);
+    };
   }, []);
 
   // Handle posting job from map pin
@@ -280,8 +324,21 @@ function MainApp() {
   }
 
   return (
-    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 text-slate-900 flex flex-col font-sans antialiased">
+    <div className="min-h-screen w-full max-w-full overflow-x-clip bg-slate-50 text-slate-900 flex flex-col font-sans antialiased">
       
+      {/* Offline / Reconnected Banner */}
+      {!isOnline && (
+        <div className="bg-amber-500 text-slate-900 text-xs font-bold py-2 px-4 text-center flex items-center justify-center gap-2 shadow-sm transition-all z-[1200]">
+          <span className="w-2 h-2 rounded-full bg-slate-900 animate-ping" />
+          <span>Offline mode: Trying to reconnect to JobScout real-time grid...</span>
+        </div>
+      )}
+      {showReconnectedToast && (
+        <div className="bg-emerald-600 text-white text-xs font-bold py-2 px-4 text-center flex items-center justify-center gap-2 shadow-sm transition-all z-[1200] animate-in fade-in duration-300">
+          <span>✓ Back online! Real-time sync restored.</span>
+        </div>
+      )}
+
       {/* Top Desktop/Tablet Navbar */}
       <Navbar
         currentTab={currentTab}
@@ -304,16 +361,23 @@ function MainApp() {
         jobsCount={jobs.length}
         seekersCount={seekers.length}
         employersCount={employers.length}
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
       />
 
       {/* Main Content Area */}
-      <main className={`flex-1 w-full max-w-full relative ${currentTab === 'map' ? 'overflow-hidden' : 'pb-20 md:pb-0 overflow-x-hidden'}`}>
+      <main className={`flex-1 w-full max-w-full relative ${currentTab === 'map' ? 'overflow-hidden' : 'pb-20 md:pb-0 overflow-x-clip'}`}>
 
         {currentTab === 'feed' && (
           <Feed
+            jobs={jobs}
+            seekers={seekers}
+            employers={employers}
             onSelectSeeker={(seeker) => setSelectedSeeker(seeker)}
             onSelectJob={(job) => setSelectedJob(job)}
             onNavigateToMap={() => handleNavigateTab('map')}
+            onNavigateToJobs={() => handleNavigateTab('jobs')}
+            onNavigateToNetwork={() => handleNavigateTab('network')}
+            onNavigateToConnect={() => handleNavigateTab('connect')}
             onNavigateToAnon={() => handleNavigateTab('anon')}
             onNavigateToApplications={() => {
               handleNavigateTab('applications');
@@ -326,6 +390,7 @@ function MainApp() {
             }}
             onOpenProfile={handleOpenProfile}
             onOpenAuth={() => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
+            onOpenPostJob={() => setIsPostJobOpen(true)}
           />
         )}
 
@@ -454,16 +519,33 @@ function MainApp() {
         }}
       />
 
+      {/* Global Spotlight Search & Command Palette (Ctrl + K) */}
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        jobs={jobs}
+        seekers={seekers}
+        onNavigateTab={(tab) => handleNavigateTab(tab)}
+        onSelectJob={(job) => setSelectedJob(job)}
+        onSelectSeeker={(seeker) => handleOpenProfile(seeker)}
+        onOpenPostJob={() => {
+          setPostJobCoords(null);
+          setIsPostJobOpen(true);
+        }}
+      />
+
     </div>
   );
 }
 
 export default function App() {
   return (
-    <AuthProvider>
-      <SocketProvider>
-        <MainApp />
-      </SocketProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <SocketProvider>
+          <MainApp />
+        </SocketProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }

@@ -7,12 +7,32 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://127.0.0.1:5000',
         changeOrigin: true
       },
       '/socket.io': {
-        target: 'http://localhost:5000',
-        ws: true
+        target: 'http://127.0.0.1:5000',
+        ws: true,
+        configure: (proxy) => {
+          proxy.on('error', (err) => {
+            if (err.code !== 'ECONNABORTED' && err.code !== 'ECONNRESET') {
+              console.error('[vite-ws-error]', err);
+            }
+          });
+        }
+      }
+    }
+  },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-map': ['leaflet', 'react-leaflet'],
+          'vendor-icons': ['lucide-react'],
+          'vendor-socket': ['socket.io-client']
+        }
       }
     }
   }

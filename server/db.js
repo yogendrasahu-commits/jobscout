@@ -589,10 +589,24 @@ class Database {
           if (!this.data.anonDiscussions || this.data.anonDiscussions.length === 0) {
             this.data.anonDiscussions = initial.anonDiscussions;
           }
+
+          // Purge any admin user
+          this.data.users = this.data.users.filter(u => u.role !== 'admin' && u.id !== 'usr_admin_001' && u.email !== 'admin@jobscout.io');
           this.save();
         }
       } catch (err) {
-        console.error('Error reading data.json, reinitializing...', err);
+        console.error('Error reading data.json, attempting backup recovery...', err);
+        const backupPath = `${DB_PATH}.bak`;
+        if (fs.existsSync(backupPath)) {
+          try {
+            const rawBackup = fs.readFileSync(backupPath, 'utf8');
+            this.data = JSON.parse(rawBackup);
+            console.log('✅ Successfully recovered database from safe backup!');
+            return;
+          } catch (bakErr) {
+            console.error('Backup recovery also failed:', bakErr);
+          }
+        }
         const initial = getDefaultData();
         fs.writeFileSync(DB_PATH, JSON.stringify(initial, null, 2), 'utf8');
         this.data = initial;
@@ -600,11 +614,28 @@ class Database {
     }
   }
 
+  // Atomic file save with temporary file write, backup rotation, and atomic rename
+  // Prevents file corruption even during unexpected crashes or power loss
   save() {
     try {
-      fs.writeFileSync(DB_PATH, JSON.stringify(this.data, null, 2), 'utf8');
+      const serialized = JSON.stringify(this.data, null, 2);
+      const tempPath = `${DB_PATH}.tmp`;
+      const backupPath = `${DB_PATH}.bak`;
+
+      // 1. Write to temporary file first
+      fs.writeFileSync(tempPath, serialized, 'utf8');
+
+      // 2. Keep backup of previous healthy data
+      if (fs.existsSync(DB_PATH)) {
+        try {
+          fs.copyFileSync(DB_PATH, backupPath);
+        } catch {}
+      }
+
+      // 3. Atomically rename temp file to live DB_PATH (atomic on OS level)
+      fs.renameSync(tempPath, DB_PATH);
     } catch (err) {
-      console.error('Error saving data.json:', err);
+      console.error('Error saving data.json atomically:', err);
     }
   }
 
@@ -658,6 +689,55 @@ class Database {
       return this.data.users[idx];
     }
     return null;
+  }
+
+  getSavedJobs(userId) {
+    const user = this.findUserById(userId);
+    return user?.savedJobs || [];
+  }
+
+  toggleSavedJob(userId, jobId) {
+    const user = this.findUserById(userId);
+    if (!user) return [];
+    const current = Array.isArray(user.savedJobs) ? user.savedJobs : [];
+    const updated = current.includes(jobId)
+      ? current.filter(id => id !== jobId)
+      : [...current, jobId];
+    this.updateUser(userId, { savedJobs: updated });
+    return updated;
+  }
+
+  deleteUser(id) {
+    const idx = this.data.users.findIndex(u => u.id === id);
+    if (idx !== -1) {
+      const removed = this.data.users.splice(idx, 1)[0];
+      this.save();
+      return removed;
+    }
+    return null;
+  }
+
+  getPlatformStats() {
+    const users = this.data.users || [];
+    const jobs = this.data.jobs || [];
+    const applications = this.data.applications || [];
+    const posts = this.data.posts || [];
+
+    return {
+      totalUsers: users.length,
+      seekersCount: users.filter(u => u.role === 'seeker').length,
+      employersCount: users.filter(u => u.role === 'emp').length,
+      adminsCount: users.filter(u => u.role === 'admin').length,
+      onlineUsersCount: users.filter(u => u.isOnline).length,
+      totalJobs: jobs.length,
+      openJobs: jobs.filter(j => j.status === 'open').length,
+      totalApplications: applications.length,
+      offeredApplications: applications.filter(a => a.status === 'offered').length,
+      hiredApplications: applications.filter(a => a.status === 'accepted' || a.status === 'hired').length,
+      totalPosts: posts.length,
+      systemUptime: Math.floor(process.uptime()),
+      emailConfig: this.getEmailConfig()
+    };
   }
 
   // --- JOBS ---

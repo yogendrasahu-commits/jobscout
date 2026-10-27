@@ -18,7 +18,12 @@ import {
   ArrowRight,
   ShieldCheck,
   Building,
-  Settings
+  Settings,
+  LayoutGrid,
+  List,
+  ChevronRight,
+  CheckCircle2,
+  Zap
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
@@ -26,6 +31,8 @@ import { IssueOfferModal } from '../components/IssueOfferModal';
 import { ViewOfferLetterModal } from '../components/ViewOfferLetterModal';
 import { ProfileEditModal } from '../components/ProfileEditModal';
 import { ResumePreviewModal } from '../components/ResumePreviewModal';
+import { EmailSettingsModal } from '../components/EmailSettingsModal';
+import { playMessageChime, playSuccessChime } from '../utils/soundEffects';
 
 export const ApplicationsView = ({ 
   onOpenProfile, 
@@ -44,6 +51,65 @@ export const ApplicationsView = ({
   const [selectedAppForView, setSelectedAppForView] = useState(null);
   const [selectedCandidateForCV, setSelectedCandidateForCV] = useState(null);
   const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
+  const [isEmailSettingsOpen, setIsEmailSettingsOpen] = useState(false);
+  const [viewMode, setViewMode] = useState(isEmployer ? 'kanban' : 'list');
+
+  const KANBAN_STAGES = [
+    { 
+      id: 'pending', 
+      label: 'New Applied', 
+      badge: 'bg-indigo-50 text-indigo-700 border-indigo-200', 
+      accent: 'border-t-indigo-500', 
+      filter: (a) => a.status === 'pending',
+      nextStatus: 'reviewed', 
+      nextLabel: 'Shortlist' 
+    },
+    { 
+      id: 'reviewed', 
+      label: 'Shortlisted', 
+      badge: 'bg-sky-50 text-sky-700 border-sky-200', 
+      accent: 'border-t-sky-500', 
+      filter: (a) => a.status === 'reviewed',
+      nextStatus: 'interview', 
+      nextLabel: 'Interview' 
+    },
+    { 
+      id: 'interview', 
+      label: 'Interviewing', 
+      badge: 'bg-violet-50 text-violet-700 border-violet-200', 
+      accent: 'border-t-violet-500', 
+      filter: (a) => a.status === 'interview' || a.status === 'accepted',
+      nextStatus: 'offer_modal', 
+      nextLabel: 'Issue Offer' 
+    },
+    { 
+      id: 'offered', 
+      label: 'Offer Dispatched', 
+      badge: 'bg-amber-50 text-amber-800 border-amber-300', 
+      accent: 'border-t-amber-500', 
+      filter: (a) => a.status === 'offered',
+      nextStatus: 'hired', 
+      nextLabel: 'Mark Hired' 
+    },
+    { 
+      id: 'hired', 
+      label: 'Hired 🎉', 
+      badge: 'bg-emerald-50 text-emerald-700 border-emerald-200', 
+      accent: 'border-t-emerald-500', 
+      filter: (a) => a.status === 'hired',
+      nextStatus: null, 
+      nextLabel: null 
+    },
+    { 
+      id: 'rejected', 
+      label: 'Declined', 
+      badge: 'bg-rose-50 text-rose-700 border-rose-200', 
+      accent: 'border-t-rose-500', 
+      filter: (a) => a.status === 'rejected',
+      nextStatus: 'pending', 
+      nextLabel: 'Reopen' 
+    }
+  ];
 
   const fetchApplications = async () => {
     if (!token) {
@@ -85,8 +151,10 @@ export const ApplicationsView = ({
     const handleNewApp = (newApp) => {
       if (isEmployer && newApp.employerId === user?.id) {
         setApplications(prev => [newApp, ...prev.filter(a => a.id !== newApp.id)]);
+        playMessageChime();
       } else if (!isEmployer && newApp.seekerId === user?.id) {
         setApplications(prev => [newApp, ...prev.filter(a => a.id !== newApp.id)]);
+        playMessageChime();
       }
     };
 
@@ -94,6 +162,9 @@ export const ApplicationsView = ({
       setApplications(prev => prev.map(a => a.id === updatedApp.id ? updatedApp : a));
       if (selectedAppForView && selectedAppForView.id === updatedApp.id) {
         setSelectedAppForView(updatedApp);
+      }
+      if (updatedApp.status === 'offered' || updatedApp.status === 'hired') {
+        playSuccessChime();
       }
     };
 
@@ -120,6 +191,9 @@ export const ApplicationsView = ({
         setApplications(prev =>
           prev.map(a => (a.id === appId ? { ...a, status: newStatus } : a))
         );
+        if (newStatus === 'hired' || newStatus === 'offered') {
+          playSuccessChime();
+        }
       }
     } catch (err) {
       console.error('Failed to update application status:', err);
@@ -129,11 +203,13 @@ export const ApplicationsView = ({
   const handleOfferDispatched = (updatedApp) => {
     setApplications(prev => prev.map(a => a.id === updatedApp.id ? updatedApp : a));
     setSelectedAppForOffer(null);
+    playSuccessChime();
   };
 
   const handleOfferAccepted = (updatedApp) => {
     setApplications(prev => prev.map(a => a.id === updatedApp.id ? updatedApp : a));
     setSelectedAppForView(updatedApp);
+    playSuccessChime();
   };
 
   const handleOfferDeclined = (updatedApp) => {
@@ -229,7 +305,35 @@ export const ApplicationsView = ({
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
+          {/* Mode Switcher: Pipeline Board vs List View */}
+          <div className="flex items-center p-1 rounded-2xl bg-white/95 backdrop-blur-2xl border border-slate-200/90 shadow-sm">
+            <button
+              type="button"
+              onClick={() => setViewMode('kanban')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                viewMode === 'kanban'
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span>Pipeline Board</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('list')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                viewMode === 'list'
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              <List className="w-3.5 h-3.5" />
+              <span>Table List</span>
+            </button>
+          </div>
+
           {/* Profile Email Indicator with Update Button */}
           <div className="flex items-center gap-2.5 p-2 sm:px-3.5 sm:py-2 rounded-2xl bg-white/95 backdrop-blur-2xl border border-slate-200/90 shadow-sm">
             <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0">
@@ -243,15 +347,26 @@ export const ApplicationsView = ({
                 {user.email || <span className="text-amber-600 italic">No email linked</span>}
               </span>
             </div>
-            <button
-              type="button"
-              onClick={() => setIsProfileEditOpen(true)}
-              className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white text-[11px] font-bold border border-emerald-200 transition-all flex items-center gap-1 active:scale-95 whitespace-nowrap ml-auto shadow-xs"
-              title="Edit Profile"
-            >
-              <Edit3 className="w-3 h-3" />
-              <span>Edit Profile (प्रोफाइल एडिट करें)</span>
-            </button>
+            <div className="flex items-center gap-1.5 ml-auto">
+              <button
+                type="button"
+                onClick={() => setIsEmailSettingsOpen(true)}
+                className="px-2.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white text-[11px] font-bold border border-indigo-200 transition-all flex items-center gap-1 active:scale-95 whitespace-nowrap shadow-xs"
+                title="Configure Real Gmail Delivery"
+              >
+                <Settings className="w-3 h-3" />
+                <span>Email SMTP Settings</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsProfileEditOpen(true)}
+                className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white text-[11px] font-bold border border-emerald-200 transition-all flex items-center gap-1 active:scale-95 whitespace-nowrap shadow-xs"
+                title="Edit Profile"
+              >
+                <Edit3 className="w-3 h-3" />
+                <span>Edit Profile</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -269,6 +384,250 @@ export const ApplicationsView = ({
               ? 'When candidates apply to your job postings on the map, their profiles will appear here for review and offer letter issuance.'
               : 'Explore the live map to discover nearby opportunities, submit applications, and receive direct offer letters!'}
           </p>
+        </div>
+      ) : viewMode === 'kanban' ? (
+        /* KANBAN BOARD */
+        <div className="flex gap-4 overflow-x-auto pb-6 pt-2 items-start custom-scrollbar">
+          {KANBAN_STAGES.map((stage) => {
+            const stageApps = applications.filter(stage.filter);
+            return (
+              <div
+                key={stage.id}
+                className="min-w-[300px] max-w-[320px] flex-1 flex-shrink-0 bg-slate-50/90 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col"
+              >
+                {/* Column Header */}
+                <div className={`p-3.5 border-b border-slate-200/80 flex items-center justify-between rounded-t-2xl border-t-4 ${stage.accent} bg-white`}>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-xs text-slate-800">{stage.label}</span>
+                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${stage.badge}`}>
+                      {stageApps.length}
+                    </span>
+                  </div>
+                  {stage.id === 'hired' && (
+                    <span className="text-xs">🏆</span>
+                  )}
+                  {stage.id === 'offered' && (
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
+                  )}
+                </div>
+
+                {/* Cards Container */}
+                <div className="p-3 space-y-3 min-h-[160px] max-h-[calc(100vh-270px)] overflow-y-auto">
+                  {stageApps.length === 0 ? (
+                    <div className="h-32 flex flex-col items-center justify-center text-center p-4 border border-dashed border-slate-200 rounded-xl text-slate-400">
+                      <p className="text-[11px] font-medium">No candidates in this stage</p>
+                    </div>
+                  ) : (
+                    stageApps.map((app) => {
+                      const isAppOffered = app.status === 'offered';
+                      const isAppHired = app.status === 'hired';
+                      const isAppAccepted = app.status === 'accepted';
+
+                      return (
+                        <div
+                          key={app.id}
+                          className={`bg-white rounded-xl p-3.5 border shadow-xs transition-all hover:shadow-md ${
+                            isAppOffered 
+                              ? 'border-amber-300 ring-1 ring-amber-400/20' 
+                              : isAppHired 
+                              ? 'border-emerald-300 ring-1 ring-emerald-400/20' 
+                              : 'border-slate-200/90 hover:border-indigo-300'
+                          }`}
+                        >
+                          {/* Candidate / Job Title Header */}
+                          <div className="mb-2">
+                            <div className="flex items-start justify-between gap-1.5 mb-1">
+                              <span className="text-xs font-bold text-indigo-600 line-clamp-1">{app.jobTitle}</span>
+                              {app.jobSalary && (
+                                <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 whitespace-nowrap">
+                                  {app.jobSalary}
+                                </span>
+                              )}
+                            </div>
+
+                            <div
+                              onClick={() => onOpenProfile && onOpenProfile(isEmployer ? app.seekerId : app.employerId)}
+                              className="flex items-center gap-2 cursor-pointer group mt-1.5"
+                              title="Click to view profile"
+                            >
+                              <div className="w-7 h-7 rounded-full overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0 group-hover:border-indigo-400">
+                                {app.seekerAvatar ? (
+                                  <img src={app.seekerAvatar} alt="Avatar" className="w-full h-full object-cover" />
+                                ) : (
+                                  <User className="w-3.5 h-3.5 text-slate-500" />
+                                )}
+                              </div>
+                              <div className="min-w-0">
+                                <h4 className="font-bold text-xs text-slate-900 group-hover:text-indigo-600 truncate flex items-center gap-1">
+                                  {isEmployer ? app.seekerName : app.employerName}
+                                  <ExternalLink className="w-2.5 h-2.5 text-slate-400" />
+                                </h4>
+                                <p className="text-[10px] text-slate-400 truncate">
+                                  {isEmployer ? (app.seekerEmail || 'Verified candidate') : 'Hiring Employer'}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Cover Note Snippet */}
+                          {app.coverNote && (
+                            <p className="text-[11px] text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-100 line-clamp-2 my-2 italic leading-relaxed">
+                              "{app.coverNote}"
+                            </p>
+                          )}
+
+                          {/* Quick Connect Bar */}
+                          <div className="flex items-center justify-between pt-2 border-t border-slate-100 mt-2">
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() =>
+                                  startCall(
+                                    {
+                                      id: isEmployer ? app.seekerId : app.employerId,
+                                      name: isEmployer ? app.seekerName : app.employerName,
+                                      avatar: app.seekerAvatar
+                                    },
+                                    false
+                                  )
+                                }
+                                title="Voice Call"
+                                className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition-colors"
+                              >
+                                <Phone className="w-3 h-3" />
+                              </button>
+                              <button
+                                onClick={() =>
+                                  startCall(
+                                    {
+                                      id: isEmployer ? app.seekerId : app.employerId,
+                                      name: isEmployer ? app.seekerName : app.employerName,
+                                      avatar: app.seekerAvatar
+                                    },
+                                    true
+                                  )
+                                }
+                                title="Video Call"
+                                className="p-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-colors"
+                              >
+                                <Video className="w-3 h-3" />
+                              </button>
+                              <button
+                                onClick={() =>
+                                  setActiveChatUser({
+                                    id: isEmployer ? app.seekerId : app.employerId,
+                                    name: isEmployer ? app.seekerName : app.employerName,
+                                    avatar: app.seekerAvatar
+                                  })
+                                }
+                                title="Direct Chat"
+                                className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors"
+                              >
+                                <MessageSquare className="w-3 h-3" />
+                              </button>
+                              <button
+                                onClick={() =>
+                                  setSelectedCandidateForCV({
+                                    id: isEmployer ? app.seekerId : app.employerId,
+                                    name: isEmployer ? app.seekerName : app.employerName,
+                                    avatar: app.seekerAvatar,
+                                    title: app.jobTitle,
+                                    experience: '3.5+ Years Verified',
+                                    expectedSalary: app.salary || 'Competitive',
+                                    skills: ['Fullstack Architecture', 'React & Node.js', 'System Design', 'Problem Solving'],
+                                    bio: app.coverLetter || 'Results-driven professional with verified credentials and identity on JobScout.',
+                                    email: app.seekerEmail || 'verified.candidate@jobscout.io',
+                                    phone: app.seekerPhone || '9876543210',
+                                    address: app.jobLocation || 'Mumbai, India'
+                                  })
+                                }
+                                title="Candidate CV"
+                                className="p-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 transition-colors"
+                              >
+                                <FileText className="w-3 h-3" />
+                              </button>
+                            </div>
+
+                            <span className="text-[10px] text-slate-400">
+                              {new Date(app.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                            </span>
+                          </div>
+
+                          {/* Pipeline Advancement Buttons */}
+                          <div className="pt-2.5 mt-2 border-t border-slate-100">
+                            {isEmployer ? (
+                              <div className="flex items-center gap-1.5">
+                                {stage.nextStatus === 'offer_modal' ? (
+                                  <button
+                                    onClick={() => setSelectedAppForOffer(app)}
+                                    className="flex-1 py-1.5 px-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-[11px] shadow-xs flex items-center justify-center gap-1 active:scale-95"
+                                  >
+                                    <Sparkles className="w-3 h-3 text-emerald-200" />
+                                    <span>Issue Offer Letter</span>
+                                  </button>
+                                ) : stage.nextStatus ? (
+                                  <button
+                                    onClick={() => updateStatus(app.id, stage.nextStatus)}
+                                    className="flex-1 py-1.5 px-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[11px] shadow-xs flex items-center justify-center gap-1 active:scale-95"
+                                  >
+                                    <span>{stage.nextLabel}</span>
+                                    <ChevronRight className="w-3 h-3" />
+                                  </button>
+                                ) : null}
+
+                                {(isAppOffered || isAppHired) && (
+                                  <button
+                                    onClick={() => setSelectedAppForView(app)}
+                                    className="p-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-[11px] font-bold"
+                                    title="View Offer Letter"
+                                  >
+                                    <FileText className="w-3 h-3" />
+                                  </button>
+                                )}
+
+                                {app.status !== 'rejected' && app.status !== 'hired' && (
+                                  <button
+                                    onClick={() => updateStatus(app.id, 'rejected')}
+                                    className="p-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200 text-[11px]"
+                                    title="Decline Candidate"
+                                  >
+                                    <XCircle className="w-3 h-3" />
+                                  </button>
+                                )}
+                              </div>
+                            ) : (
+                              <div>
+                                {isAppOffered ? (
+                                  <button
+                                    onClick={() => setSelectedAppForView(app)}
+                                    className="w-full py-1.5 px-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-[11px] shadow-xs flex items-center justify-center gap-1 active:scale-95 animate-pulse"
+                                  >
+                                    <Sparkles className="w-3 h-3 text-emerald-200" />
+                                    <span>Review & Sign Offer ➔</span>
+                                  </button>
+                                ) : isAppHired ? (
+                                  <button
+                                    onClick={() => setSelectedAppForView(app)}
+                                    className="w-full py-1.5 px-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold text-[11px] flex items-center justify-center gap-1"
+                                  >
+                                    <CheckCircle className="w-3 h-3" />
+                                    <span>View Signed Contract</span>
+                                  </button>
+                                ) : (
+                                  <div className="text-[10px] text-center font-medium text-slate-500 py-1 bg-slate-50 rounded-lg">
+                                    {app.status === 'reviewed' ? 'Recruiter shortlisted your profile' : 'Under recruiter review'}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       ) : (
         <div className="space-y-4">
@@ -586,6 +945,12 @@ export const ApplicationsView = ({
           onClose={() => setSelectedCandidateForCV(null)}
         />
       )}
+
+      {/* 6. Modal for Email Delivery & SMTP Settings */}
+      <EmailSettingsModal
+        isOpen={isEmailSettingsOpen}
+        onClose={() => setIsEmailSettingsOpen(false)}
+      />
 
     </div>
   );

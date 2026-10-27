@@ -19,7 +19,8 @@ import {
   Globe,
   MapPin,
   Layers,
-  FileText
+  FileText,
+  Mail
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { JobScoutLogo } from '../components/JobScoutLogo';
@@ -27,6 +28,7 @@ import { LocationPickerInput } from '../components/LocationPickerInput';
 
 export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole = 'seeker', onSuccess }) => {
   const { 
+    login,
     sendOtp, 
     loginWithPhoneOtp, 
     loginWithPhonePassword, 
@@ -53,6 +55,7 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
   // Common User fields
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   // Live Phone Check Result: { checking: boolean, exists: boolean, role: string, name: string, companyName: string, title: string }
@@ -181,7 +184,7 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
         setOtpVerified(true);
         setSuccessMsg('Phone verified! Please select your profile type and complete sign up.');
       } else {
-        if (onSuccess) onSuccess();
+        if (onSuccess) onSuccess(res?.user || res);
         onClose();
       }
     } catch (err) {
@@ -206,11 +209,36 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
 
     setLoading(true);
     try {
-      await loginWithPhonePassword(phone, password);
-      if (onSuccess) onSuccess();
+      const loggedUser = await loginWithPhonePassword(phone, password);
+      if (onSuccess) onSuccess(loggedUser);
       onClose();
     } catch (err) {
       setError(err.message || 'Invalid credentials');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle Login via Email + Password
+  const handleLoginEmail = async (e) => {
+    e.preventDefault();
+    setError('');
+    if (!email.trim() || !email.includes('@')) {
+      setError('Please enter a valid email address');
+      return;
+    }
+    if (!password) {
+      setError('Please enter your password');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const loggedUser = await login(email.trim(), password);
+      if (onSuccess) onSuccess(loggedUser);
+      onClose();
+    } catch (err) {
+      setError(err.message || 'Invalid email or password');
     } finally {
       setLoading(false);
     }
@@ -425,7 +453,19 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
                     : 'border-transparent text-slate-500 hover:text-slate-700'
                 }`}
               >
-                🔑 Login with Password
+                🔑 Password
+              </button>
+              <span className="text-slate-300">•</span>
+              <button
+                type="button"
+                onClick={() => { setLoginMethod('email'); setError(''); }}
+                className={`pb-1 border-b-2 transition-all ${
+                  loginMethod === 'email'
+                    ? 'border-indigo-600 text-slate-900 font-bold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                ✉️ Email
               </button>
             </div>
 
@@ -625,6 +665,64 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
                     className="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 active:scale-95"
                   >
                     {loading ? 'Signing In...' : 'Sign In with Password'}
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* Email Login Form */}
+            {loginMethod === 'email' && (
+              <form onSubmit={handleLoginEmail} className="space-y-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Email Address (ईमेल पता)
+                  </label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                    <input
+                      type="email"
+                      required
+                      placeholder="user@company.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 font-medium"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Password (पासवर्ड)
+                  </label>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                    <input
+                      type="password"
+                      required
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 mt-2">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="py-2.5 px-3.5 sm:px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                    <span>Cancel (रद्द करें)</span>
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 active:scale-95"
+                  >
+                    {loading ? 'Authenticating...' : 'Sign In with Email'}
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>

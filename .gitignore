@@ -26,3 +26,5 @@ client/.env
 Thumbs.db
 .vscode/
 .idea/
+*.bak
+*.tmp

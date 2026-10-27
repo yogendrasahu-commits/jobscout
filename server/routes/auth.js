@@ -2,10 +2,19 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { db } from '../db.js';
-import { verifyEmailConfig } from '../email.js';
+import { verifyEmailConfig, sendTestEmail } from '../email.js';
+import { rateLimiter } from '../middleware/security.js';
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'jobradar_secret_jwt_key_2026';
+
+// Strict rate limiter for authentication endpoints to prevent brute-force attacks
+const authRateLimiter = rateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  keyPrefix: 'auth',
+  message: 'Too many authentication attempts. Please wait 15 minutes before trying again.'
+});
 
 // In-memory OTP storage: phone (last 10 digits) -> { otp, expiresAt }
 const otpStore = new Map();
@@ -123,7 +132,7 @@ router.get('/check-phone/:phone', (req, res) => {
 });
 
 // 1. Send OTP to Phone Number
-router.post('/send-otp', (req, res) => {
+router.post('/send-otp', authRateLimiter, (req, res) => {
   const { phone, purpose } = req.body; // purpose: 'login' | 'register'
   const cleaned = cleanPhone(phone);
 
@@ -184,7 +193,7 @@ router.post('/verify-otp', (req, res) => {
 });
 
 // 3. Login with Phone & OTP
-router.post('/login-phone-otp', (req, res) => {
+router.post('/login-phone-otp', authRateLimiter, (req, res) => {
   const { phone, otp } = req.body;
   const cleaned = cleanPhone(phone);
 
@@ -222,7 +231,7 @@ router.post('/login-phone-otp', (req, res) => {
 });
 
 // 4. Login with Phone & Password
-router.post('/login-phone-password', async (req, res) => {
+router.post('/login-phone-password', authRateLimiter, async (req, res) => {
   try {
     const { phone, password } = req.body;
     const cleaned = cleanPhone(phone);
@@ -256,7 +265,7 @@ router.post('/login-phone-password', async (req, res) => {
 });
 
 // 5. Signup / Register with Phone Number, Verified OTP & Password
-router.post('/register-phone', async (req, res) => {
+router.post('/register-phone', authRateLimiter, async (req, res) => {
   try {
     const { 
       phone, otp, password, name, role, 
@@ -358,7 +367,7 @@ router.post('/register-phone', async (req, res) => {
 // -------------------------------------------------------------
 
 // Email Register
-router.post('/register', async (req, res) => {
+router.post('/register', authRateLimiter, async (req, res) => {
   try {
     const { name, email, password, role, companyName, title, skills, phone, lat, lng, address } = req.body;
 
@@ -425,7 +434,7 @@ router.post('/register', async (req, res) => {
 });
 
 // Email Login
-router.post('/login', async (req, res) => {
+router.post('/login', authRateLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -563,6 +572,32 @@ router.put('/profile', authenticateToken, (req, res) => {
   res.json({ user: safeUser, token, message: 'Profile updated successfully' });
 });
 
+// Get saved job IDs for current logged-in user
+router.get('/saved-jobs', authenticateToken, (req, res) => {
+  try {
+    const savedJobs = db.getSavedJobs(req.user.id);
+    res.json({ savedJobs });
+  } catch (err) {
+    console.error('Error fetching saved jobs:', err);
+    res.status(500).json({ error: 'Failed to fetch saved jobs' });
+  }
+});
+
+// Toggle saved job for current logged-in user (syncs with database)
+router.post('/saved-jobs/toggle', authenticateToken, (req, res) => {
+  const { jobId } = req.body;
+  if (!jobId) {
+    return res.status(400).json({ error: 'jobId is required' });
+  }
+  try {
+    const updated = db.toggleSavedJob(req.user.id, jobId);
+    res.json({ success: true, savedJobs: updated });
+  } catch (err) {
+    console.error('Error toggling saved job:', err);
+    res.status(500).json({ error: 'Failed to update saved jobs' });
+  }
+});
+
 // Get all employers (visible to seekers on the live map and Connect Hub)
 router.get('/employers', (req, res) => {
   const employers = db.getEmployers().map(u => {
@@ -579,6 +614,21 @@ router.get('/seekers', (req, res) => {
     return safe;
   });
   res.json({ seekers });
+});
+
+// Get single user profile by ID (public view)
+router.get('/user/:id', (req, res) => {
+  try {
+    const targetUser = db.findUserById(req.params.id);
+    if (!targetUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const { password, ...safeUser } = targetUser;
+    res.json({ user: safeUser });
+  } catch (err) {
+    console.error('Error fetching user profile:', err);
+    res.status(500).json({ error: 'Failed to fetch user profile' });
+  }
 });
 
 
@@ -632,6 +682,30 @@ router.post('/settings/email', async (req, res) => {
     console.error('Email verification error:', err);
     res.status(400).json({
       error: `Connection verification failed: ${err.message}. Please check your Gmail address and 16-character App Password.`
+    });
+  }
+});
+
+// Test email dispatch to a specific target address
+router.post('/settings/email/test', async (req, res) => {
+  const { targetEmail } = req.body;
+  const to = (targetEmail && String(targetEmail).trim().toLowerCase()) || db.getEmailConfig().gmailUser;
+
+  if (!to || !to.includes('@')) {
+    return res.status(400).json({ error: 'Valid recipient email is required to send test email' });
+  }
+
+  try {
+    const result = await sendTestEmail(to);
+    res.json({
+      success: true,
+      message: `Test email successfully delivered to ${to}! Please check your Inbox / Spam folder.`,
+      result
+    });
+  } catch (err) {
+    console.error('Test email sending error:', err);
+    res.status(400).json({
+      error: `Failed to send test email: ${err.message}. Please verify your Gmail address and 16-character App Password.`
     });
   }
 });

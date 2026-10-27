@@ -10,19 +10,20 @@ export function setupSocket(io) {
     // Register user when they connect
     socket.on('user:join', (userId) => {
       if (!userId) return;
-      currentUserId = userId;
-      socket.userId = userId;
+      const uid = String(userId);
+      currentUserId = uid;
+      socket.userId = uid;
 
-      if (!userSockets.has(userId)) {
-        userSockets.set(userId, new Set());
+      if (!userSockets.has(uid)) {
+        userSockets.set(uid, new Set());
       }
-      userSockets.get(userId).add(socket.id);
+      userSockets.get(uid).add(socket.id);
 
       // Mark user online
-      db.updateUser(userId, { isOnline: true });
-      io.emit('user:online_status', { userId, isOnline: true });
+      db.updateUser(uid, { isOnline: true });
+      io.emit('user:online_status', { userId: uid, isOnline: true });
 
-      console.log(`User connected: ${userId} (Socket: ${socket.id})`);
+      console.log(`User connected: ${uid} (Socket: ${socket.id})`);
     });
 
     // Uber-style Real-time Location Updates
@@ -54,7 +55,7 @@ export function setupSocket(io) {
       });
 
       // Send to recipient if online
-      const receiverSockets = userSockets.get(receiverId);
+      const receiverSockets = userSockets.get(String(receiverId));
       if (receiverSockets) {
         receiverSockets.forEach(socketId => {
           io.to(socketId).emit('chat:receive', savedMsg);
@@ -62,7 +63,7 @@ export function setupSocket(io) {
       }
 
       // Also confirm to sender's own other tabs
-      const senderSockets = userSockets.get(senderId);
+      const senderSockets = userSockets.get(String(senderId));
       if (senderSockets) {
         senderSockets.forEach(socketId => {
           io.to(socketId).emit('chat:sent', savedMsg);
@@ -72,7 +73,7 @@ export function setupSocket(io) {
 
     // Typing indicator
     socket.on('chat:typing', ({ senderId, receiverId, isTyping }) => {
-      const receiverSockets = userSockets.get(receiverId);
+      const receiverSockets = userSockets.get(String(receiverId));
       if (receiverSockets) {
         receiverSockets.forEach(socketId => {
           io.to(socketId).emit('chat:typing', { senderId, isTyping });
@@ -91,6 +92,20 @@ export function setupSocket(io) {
       const receiverSockets = userSockets.get(targetId);
 
       if (!receiverSockets || receiverSockets.size === 0) {
+        // If target is a seeded demo profile, auto-answer via interactive demo attendant
+        const targetUser = db.findUserById(targetId);
+        if (targetUser && (targetId.startsWith('usr_emp_') || targetId.startsWith('usr_seeker_') || !targetUser.password)) {
+          console.log(`[WebRTC] Demo attendant auto-answering call for: ${targetUser.name} (${targetId})`);
+          setTimeout(() => {
+            socket.emit('call:accepted', {
+              receiverId: targetId,
+              receiverName: targetUser.name,
+              isDemoAttendant: true
+            });
+          }, 1200);
+          return;
+        }
+
         console.log(`[WebRTC] Call initiate failed: target user ${targetId} is offline. Active users:`, Array.from(userSockets.keys()));
         socket.emit('call:user_offline', { toUserId: targetId });
         return;
@@ -98,12 +113,14 @@ export function setupSocket(io) {
 
       console.log(`[WebRTC] Ringing target user ${targetId} on ${receiverSockets.size} socket(s) from caller ${fromUserId} (${fromName})`);
       receiverSockets.forEach(socketId => {
-        io.to(socketId).emit('call:incoming', {
-          callerId: String(fromUserId),
-          callerName: fromName,
-          callerAvatar: fromAvatar,
-          isVideo: Boolean(isVideo)
-        });
+        if (socketId !== socket.id) {
+          io.to(socketId).emit('call:incoming', {
+            callerId: String(fromUserId),
+            callerName: fromName,
+            callerAvatar: fromAvatar,
+            isVideo: Boolean(isVideo)
+          });
+        }
       });
     });
 
@@ -116,10 +133,12 @@ export function setupSocket(io) {
       console.log(`[WebRTC] Call accepted by receiver ${receiverId} (${receiverName}) for caller ${targetCallerId}`);
       if (callerSockets) {
         callerSockets.forEach(socketId => {
-          io.to(socketId).emit('call:accepted', {
-            receiverId: String(receiverId),
-            receiverName
-          });
+          if (socketId !== socket.id) {
+            io.to(socketId).emit('call:accepted', {
+              receiverId: String(receiverId),
+              receiverName
+            });
+          }
         });
       }
     });
@@ -133,9 +152,11 @@ export function setupSocket(io) {
       console.log(`[WebRTC] Call declined by peer for caller ${targetCallerId}: ${reason}`);
       if (callerSockets) {
         callerSockets.forEach(socketId => {
-          io.to(socketId).emit('call:rejected', {
-            reason: reason || 'Call declined'
-          });
+          if (socketId !== socket.id) {
+            io.to(socketId).emit('call:rejected', {
+              reason: reason || 'Call declined'
+            });
+          }
         });
       }
     });
@@ -148,10 +169,12 @@ export function setupSocket(io) {
 
       if (receiverSockets) {
         receiverSockets.forEach(socketId => {
-          io.to(socketId).emit('call:signal', {
-            fromUserId: String(fromUserId),
-            signal
-          });
+          if (socketId !== socket.id) {
+            io.to(socketId).emit('call:signal', {
+              fromUserId: String(fromUserId),
+              signal
+            });
+          }
         });
       }
     });
@@ -165,7 +188,9 @@ export function setupSocket(io) {
       console.log(`[WebRTC] Call ended for target user ${targetId}`);
       if (receiverSockets) {
         receiverSockets.forEach(socketId => {
-          io.to(socketId).emit('call:ended');
+          if (socketId !== socket.id) {
+            io.to(socketId).emit('call:ended');
+          }
         });
       }
     });

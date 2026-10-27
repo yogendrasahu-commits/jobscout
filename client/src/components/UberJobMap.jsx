@@ -43,7 +43,11 @@ import {
   Sun,
   Plus,
   Minus,
-  ArrowLeft
+  ArrowLeft,
+  Zap,
+  Clock,
+  ArrowRight,
+  ExternalLink
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
@@ -303,105 +307,174 @@ function MapBoundsFitter({ boundsTrigger, jobs, seekers, centerCoords }) {
   return null;
 }
 
-// Custom Leaflet DivIcon for Job Markers with Distance Badge
-const createJobIcon = (job) => {
+// Custom Leaflet DivIcon for Job Markers with Distance Badge & Urgent Pulse
+const createJobIcon = (job, isSelected = false) => {
   const isInside = job.isInsideRadar;
+  const isUrgent = Boolean(job.urgent || job.isUrgent || (typeof job.category === 'string' && job.category.toLowerCase().includes('urgent')));
+  const bgBadge = isSelected
+    ? 'linear-gradient(135deg, #4338ca, #312e81)'
+    : isUrgent
+    ? 'linear-gradient(135deg, #ef4444, #dc2626)'
+    : isInside
+    ? 'linear-gradient(135deg, #4f46e5, #4338ca)'
+    : '#475569';
+  const badgeBorder = isSelected ? '#a5b4fc' : isUrgent ? '#fca5a5' : '#ffffff';
+  const circleBg = isSelected
+    ? '#312e81'
+    : isUrgent
+    ? '#991b1b'
+    : isInside
+    ? '#3730a3'
+    : '#334155';
+  const circleBorder = isSelected
+    ? '#c7d2fe'
+    : isUrgent
+    ? '#f87171'
+    : isInside
+    ? '#818cf8'
+    : '#94a3b8';
+  const circleSize = isSelected ? 36 : 32;
+
   return L.divIcon({
     className: 'custom-job-icon',
     html: `
-      <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform 0.2s;">
+      <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform 0.25s cubic-bezier(0.16,1,0.3,1); transform: ${isSelected ? 'scale(1.15) translateY(-4px)' : 'scale(1)'};">
+        ${(isUrgent || isSelected) ? `
+          <div style="
+            position: absolute;
+            top: 22px;
+            width: ${isSelected ? '56px' : '48px'};
+            height: ${isSelected ? '56px' : '48px'};
+            border-radius: 50%;
+            background: ${isUrgent ? 'rgba(239, 68, 68, 0.45)' : 'rgba(99, 102, 241, 0.45)'};
+            animation: pulseRadar 1.8s infinite;
+            pointer-events: none;
+            z-index: 0;
+          "></div>
+        ` : ''}
         <div style="
-          background: ${isInside ? '#4f46e5' : '#475569'};
+          background: ${bgBadge};
           color: white;
-          padding: 2px 7px;
+          padding: 2.5px 8px;
           border-radius: 9999px;
           font-size: 10px;
-          font-weight: 700;
+          font-weight: 800;
+          letter-spacing: -0.01em;
           white-space: nowrap;
-          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5);
-          border: 1.5px solid white;
+          box-shadow: 0 4px 10px -1px rgba(0,0,0,0.4), 0 0 ${isSelected ? '12px rgba(99,102,241,0.6)' : '0px transparent'};
+          border: 1.5px solid ${badgeBorder};
           margin-bottom: 2px;
           display: flex;
           align-items: center;
           gap: 4px;
+          z-index: 2;
         ">
+          ${isUrgent ? '<span style="font-size: 11px;">⚡</span>' : ''}
           <span>${job.salary ? job.salary.split('-')[0].trim() : 'Job'}</span>
-          <span style="opacity: 0.9; font-size: 9px; background: rgba(0,0,0,0.3); padding: 0.5px 4px; border-radius: 4px;">
+          <span style="opacity: 0.95; font-size: 9px; font-weight: 600; background: rgba(0,0,0,0.3); padding: 0.5px 5px; border-radius: 9999px;">
             ${job.distanceKm}km
           </span>
         </div>
         <div style="
-          width: 32px;
-          height: 32px;
-          background: ${isInside ? '#3730a3' : '#334155'};
-          border: 2px solid ${isInside ? '#818cf8' : '#94a3b8'};
+          width: ${circleSize}px;
+          height: ${circleSize}px;
+          background: ${circleBg};
+          border: 2.5px solid ${circleBorder};
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 0 ${isInside ? '14px rgba(99, 102, 241, 0.8)' : '4px rgba(0,0,0,0.4)'};
+          box-shadow: 0 0 ${isSelected ? '18px rgba(99, 102, 241, 0.9)' : isUrgent ? '14px rgba(239, 68, 68, 0.8)' : isInside ? '12px rgba(99, 102, 241, 0.7)' : '4px rgba(0,0,0,0.3)'};
+          z-index: 2;
         ">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="${isSelected ? '17' : '15'}" height="${isSelected ? '17' : '15'}" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
             <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
           </svg>
         </div>
       </div>
     `,
-    iconSize: [80, 58],
-    iconAnchor: [40, 48],
-    popupAnchor: [0, -45]
+    iconSize: [90, 64],
+    iconAnchor: [45, 52],
+    popupAnchor: [0, -48]
   });
 };
 
-// Custom Leaflet DivIcon for Seeker Markers with Distance Badge
-const createSeekerIcon = (seeker) => {
+// Custom Leaflet DivIcon for Seeker Markers with Distance Badge & Active Pulse
+const createSeekerIcon = (seeker, isSelected = false) => {
   const isInside = seeker.isInsideRadar;
+  const isAvailable = seeker.isAvailable !== false;
+  const bgBadge = isSelected
+    ? 'linear-gradient(135deg, #047857, #064e3b)'
+    : isInside
+    ? 'linear-gradient(135deg, #059669, #047857)'
+    : '#475569';
+  const badgeBorder = isSelected ? '#a7f3d0' : '#ffffff';
+  const circleBg = isSelected ? '#064e3b' : isInside ? '#065f46' : '#334155';
+  const circleBorder = isSelected ? '#6ee7b7' : isInside ? '#34d399' : '#94a3b8';
+  const circleSize = isSelected ? 34 : 30;
+
   return L.divIcon({
     className: 'custom-seeker-icon',
     html: `
-      <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform 0.2s;">
+      <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform 0.25s cubic-bezier(0.16,1,0.3,1); transform: ${isSelected ? 'scale(1.15) translateY(-4px)' : 'scale(1)'};">
+        ${(isAvailable || isSelected) ? `
+          <div style="
+            position: absolute;
+            top: 20px;
+            width: ${isSelected ? '52px' : '44px'};
+            height: ${isSelected ? '52px' : '44px'};
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.4);
+            animation: pulseRadar 2s infinite;
+            pointer-events: none;
+            z-index: 0;
+          "></div>
+        ` : ''}
         <div style="
-          background: ${isInside ? '#059669' : '#475569'};
+          background: ${bgBadge};
           color: white;
-          padding: 2px 6px;
+          padding: 2.5px 7px;
           border-radius: 9999px;
           font-size: 9px;
-          font-weight: 700;
+          font-weight: 800;
           white-space: nowrap;
-          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5);
-          border: 1.5px solid white;
+          box-shadow: 0 4px 10px -1px rgba(0,0,0,0.4);
+          border: 1.5px solid ${badgeBorder};
           margin-bottom: 2px;
           display: flex;
           align-items: center;
           gap: 3px;
+          z-index: 2;
         ">
+          <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #4ade80;"></span>
           <span>${seeker.name.split(' ')[0]}</span>
-          <span style="opacity: 0.9; font-size: 8px; background: rgba(0,0,0,0.3); padding: 0.5px 3px; border-radius: 4px;">
+          <span style="opacity: 0.95; font-size: 8px; font-weight: 600; background: rgba(0,0,0,0.3); padding: 0.5px 4px; border-radius: 9999px;">
             ${seeker.distanceKm}km
           </span>
         </div>
         <div style="
-          width: 30px;
-          height: 30px;
-          background: ${isInside ? '#065f46' : '#334155'};
-          border: 2px solid ${isInside ? '#34d399' : '#94a3b8'};
+          width: ${circleSize}px;
+          height: ${circleSize}px;
+          background: ${circleBg};
+          border: 2.5px solid ${circleBorder};
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 0 ${isInside ? '14px rgba(16, 185, 129, 0.8)' : '4px rgba(0,0,0,0.4)'};
+          box-shadow: 0 0 ${isSelected ? '16px rgba(16, 185, 129, 0.9)' : isInside ? '12px rgba(16, 185, 129, 0.7)' : '4px rgba(0,0,0,0.3)'};
+          z-index: 2;
         ">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="${isSelected ? '16' : '14'}" height="${isSelected ? '16' : '14'}" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
             <circle cx="12" cy="7" r="4"></circle>
           </svg>
         </div>
       </div>
     `,
-    iconSize: [70, 50],
-    iconAnchor: [35, 42],
-    popupAnchor: [0, -40]
+    iconSize: [80, 56],
+    iconAnchor: [40, 46],
+    popupAnchor: [0, -42]
   });
 };
 
@@ -485,6 +558,7 @@ export const UberJobMap = ({
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeTabDrawer, setActiveTabDrawer] = useState('jobs'); // 'jobs' | 'seekers'
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [selectedPin, setSelectedPin] = useState(null); // { type: 'job' | 'seeker', data: Object }
 
   // Search Functionality States
   const [searchQuery, setSearchQuery] = useState(user?.address || '');
@@ -809,35 +883,46 @@ export const UberJobMap = ({
       .sort((a, b) => a.distanceKm - b.distanceKm);
   }, [processedSeekers, strictRadar, showSeekersLayer]);
 
-  // Handle HTML5 GPS Geolocation
+  // Handle HTML5 GPS Geolocation (with Chrome Windows fallback)
   const locateMe = () => {
-    if (navigator.geolocation) {
+    if (typeof navigator !== 'undefined' && navigator.geolocation) {
       setGpsLoading(true);
+
+      const onGpsSuccess = (pos) => {
+        let lat = pos.coords.latitude;
+        let lng = pos.coords.longitude;
+        if (!isWithinIndia(lat, lng)) {
+          [lat, lng] = clampToIndia(lat, lng);
+        }
+        setTargetZoomLevel(17);
+        setCenterCoords([lat, lng]);
+        const gpsLabel = 'My GPS Location';
+        setActiveLocationName(gpsLabel);
+        setSearchQuery(gpsLabel);
+        updateLocation(lat, lng, gpsLabel);
+        broadcastLocation(lat, lng, gpsLabel);
+        setFlyTrigger((prev) => prev + 1);
+        if (mapInstance) {
+          mapInstance.flyTo([lat, lng], 17, { animate: true, duration: 1.0 });
+        }
+        setGpsLoading(false);
+      };
+
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          let lat = pos.coords.latitude;
-          let lng = pos.coords.longitude;
-          if (!isWithinIndia(lat, lng)) {
-            [lat, lng] = clampToIndia(lat, lng);
-          }
-          setTargetZoomLevel(17);
-          setCenterCoords([lat, lng]);
-          const gpsLabel = 'My GPS Location';
-          setActiveLocationName(gpsLabel);
-          setSearchQuery(gpsLabel);
-          updateLocation(lat, lng, gpsLabel);
-          broadcastLocation(lat, lng, gpsLabel);
-          setFlyTrigger((prev) => prev + 1);
-          if (mapInstance) {
-            mapInstance.flyTo([lat, lng], 17, { animate: true, duration: 1.0 });
-          }
-          setGpsLoading(false);
-        },
+        onGpsSuccess,
         (err) => {
-          console.warn('Geolocation error:', err.message);
-          setGpsLoading(false);
+          console.warn('High-accuracy GPS timeout/denied in Chrome, retrying with network positioning:', err.message);
+          // Chrome Desktop Fallback: retry with standard accuracy (Wi-Fi/IP location)
+          navigator.geolocation.getCurrentPosition(
+            onGpsSuccess,
+            (err2) => {
+              console.warn('Geolocation fallback also failed:', err2.message);
+              setGpsLoading(false);
+            },
+            { enableHighAccuracy: false, timeout: 8000, maximumAge: 120000 }
+          );
         },
-        { enableHighAccuracy: true, timeout: 8000 }
+        { enableHighAccuracy: true, timeout: 5000 }
       );
     }
   };
@@ -850,6 +935,7 @@ export const UberJobMap = ({
     setCenterCoords([lat, lng]);
     const clickedLabel = `Location [${lat.toFixed(3)}, ${lng.toFixed(3)}]`;
     setActiveLocationName(clickedLabel);
+    setSelectedPin(null); // Close active preview card on map click
   };
 
   return (
@@ -1553,8 +1639,17 @@ export const UberJobMap = ({
             {activeTabDrawer === 'jobs' && visibleJobs.map((job) => (
               <div
                 key={job.id}
-                onClick={() => onSelectJob(job)}
-                className="min-w-[210px] sm:min-w-[230px] max-w-[230px] bg-slate-50 hover:bg-slate-100/90 p-3 rounded-2xl border border-slate-200/90 hover:border-indigo-400 cursor-pointer transition-all flex flex-col justify-between flex-shrink-0 shadow-xs"
+                onClick={() => {
+                  setSelectedPin({ type: 'job', data: job });
+                  if (job.lat && job.lng && mapInstance) {
+                    mapInstance.flyTo([job.lat, job.lng], 16, { animate: true });
+                  }
+                }}
+                className={`min-w-[210px] sm:min-w-[230px] max-w-[230px] p-3 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between flex-shrink-0 shadow-xs ${
+                  selectedPin?.type === 'job' && selectedPin.data?.id === job.id
+                    ? 'bg-indigo-50/90 border-indigo-500 ring-2 ring-indigo-500/20'
+                    : 'bg-slate-50 hover:bg-slate-100/90 border-slate-200/90 hover:border-indigo-400'
+                }`}
               >
                 <div>
                   <div className="flex items-center justify-between text-[10px] text-indigo-600 font-bold mb-1">
@@ -1565,20 +1660,18 @@ export const UberJobMap = ({
                   <p className="text-[11px] text-slate-500 truncate">{job.company}</p>
                 </div>
                 <div className="mt-2 pt-2 border-t border-slate-200 flex items-center justify-between">
-                  <span className="text-xs font-bold text-emerald-700">{job.salary ? job.salary.split('-')[0].trim() : 'Active'}</span>
+                  <span className="text-xs font-mono font-bold text-emerald-700">{job.salary ? job.salary.split('-')[0].trim() : 'Active'}</span>
                   <div className="flex items-center gap-1.5">
-                    <a
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${job.lat},${job.lng}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="text-[10px] text-slate-600 hover:text-indigo-600 flex items-center gap-1 bg-white hover:bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200 shadow-xs font-semibold"
-                      title="Open Directions in Google Maps"
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectJob(job);
+                      }}
+                      className="text-[10px] px-2 py-0.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-colors shadow-2xs"
                     >
-                      <Navigation className="w-2.5 h-2.5 text-indigo-500" />
-                      <span>Route</span>
-                    </a>
-                    <span className="text-[10px] px-2 py-0.5 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold">Apply</span>
+                      Apply
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1591,8 +1684,17 @@ export const UberJobMap = ({
             {activeTabDrawer === 'seekers' && visibleSeekers.map((seeker) => (
               <div
                 key={seeker.id}
-                onClick={() => onSelectSeeker(seeker)}
-                className="min-w-[210px] sm:min-w-[230px] max-w-[230px] bg-slate-50 hover:bg-slate-100/90 p-3 rounded-2xl border border-slate-200/90 hover:border-emerald-400 cursor-pointer transition-all flex flex-col justify-between flex-shrink-0 shadow-xs"
+                onClick={() => {
+                  setSelectedPin({ type: 'seeker', data: seeker });
+                  if (seeker.lat && seeker.lng && mapInstance) {
+                    mapInstance.flyTo([seeker.lat, seeker.lng], 16, { animate: true });
+                  }
+                }}
+                className={`min-w-[210px] sm:min-w-[230px] max-w-[230px] p-3 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between flex-shrink-0 shadow-xs ${
+                  selectedPin?.type === 'seeker' && selectedPin.data?.id === seeker.id
+                    ? 'bg-emerald-50/90 border-emerald-500 ring-2 ring-emerald-500/20'
+                    : 'bg-slate-50 hover:bg-slate-100/90 border-slate-200/90 hover:border-emerald-400'
+                }`}
               >
                 <div className="flex items-center gap-2 mb-2">
                   <img
@@ -1607,12 +1709,212 @@ export const UberJobMap = ({
                 </div>
                 <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-200">
                   <span className="text-slate-500 text-[10px]">{seeker.distanceKm} km away</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">Connect</span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectSeeker(seeker);
+                    }}
+                    className="text-[10px] px-2 py-0.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-colors shadow-2xs"
+                  >
+                    View
+                  </button>
                 </div>
               </div>
             ))}
           </div>
 
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* FLOATING GLASS ACTIVE PIN PREVIEW CARD (Uber / Apple Maps Style) */}
+      {/* ============================================================== */}
+      {selectedPin && (
+        <div className="absolute bottom-4 left-3 right-3 sm:bottom-6 sm:left-6 sm:right-auto sm:w-[410px] max-w-md bg-white/95 backdrop-blur-2xl rounded-3xl p-4 sm:p-5 shadow-[0_20px_50px_rgba(0,0,0,0.18)] border border-white/80 ring-1 ring-slate-900/5 transition-all animate-in fade-in slide-in-from-bottom-5 duration-300 z-[535] pointer-events-auto">
+          {selectedPin.type === 'job' ? (
+            <div className="flex flex-col gap-3">
+              {/* Top Row: Commute Badge + Close Button */}
+              <div className="flex items-center justify-between">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-[11px] font-extrabold shadow-2xs">
+                  <Car className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>~{Math.max(2, Math.round(selectedPin.data.distanceKm * 2.5))} min drive</span>
+                  <span className="text-emerald-400">•</span>
+                  <span>{selectedPin.data.distanceKm} km away</span>
+                </div>
+                
+                <button
+                  type="button"
+                  onClick={() => setSelectedPin(null)}
+                  className="p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                  aria-label="Close Preview"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Main Info */}
+              <div className="flex items-start gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 text-white flex items-center justify-center font-black text-lg shadow-md flex-shrink-0">
+                  {selectedPin.data.company ? selectedPin.data.company.charAt(0).toUpperCase() : 'J'}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200">
+                      {selectedPin.data.jobType || 'Full-time'}
+                    </span>
+                    {(selectedPin.data.urgent || selectedPin.data.isUrgent) && (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-200 flex items-center gap-0.5">
+                        <Zap className="w-2.5 h-2.5 text-rose-600 fill-rose-600" /> Urgent
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="font-extrabold text-slate-900 text-base leading-snug truncate mt-1">
+                    {selectedPin.data.title}
+                  </h3>
+                  <p className="text-xs text-slate-500 truncate flex items-center gap-1 mt-0.5">
+                    <Building className="w-3 h-3 text-slate-400" />
+                    <span>{selectedPin.data.company}</span>
+                    {selectedPin.data.location && (
+                      <>
+                        <span>•</span>
+                        <span className="truncate">{selectedPin.data.location}</span>
+                      </>
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              {/* Salary & Details Pill */}
+              <div className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Offered Compensation</span>
+                  <span className="text-sm font-mono font-extrabold text-emerald-700 tracking-tight">
+                    {selectedPin.data.salary || 'Competitive'}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Category</span>
+                  <span className="text-xs font-semibold text-slate-700">
+                    {selectedPin.data.category || 'General'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2 pt-0.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onSelectJob(selectedPin.data);
+                  }}
+                  className="flex-1 py-2.5 px-4 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white rounded-2xl text-xs font-extrabold transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5"
+                >
+                  <span>View Details & Apply</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${selectedPin.data.lat},${selectedPin.data.lng}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="py-2.5 px-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 transition-all flex items-center justify-center gap-1.5 text-xs font-bold active:scale-95"
+                  title="Turn-by-turn Navigation in Google Maps"
+                >
+                  <Navigation className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Route</span>
+                </a>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {/* Top Row: Distance & Close */}
+              <div className="flex items-center justify-between">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-[11px] font-extrabold shadow-2xs">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Verified Candidate</span>
+                  <span className="text-emerald-400">•</span>
+                  <span>{selectedPin.data.distanceKm} km away</span>
+                </div>
+                
+                <button
+                  type="button"
+                  onClick={() => setSelectedPin(null)}
+                  className="p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                  aria-label="Close Preview"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Main Seeker Info */}
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <img
+                    src={selectedPin.data.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedPin.data.name}`}
+                    alt={selectedPin.data.name}
+                    className="w-12 h-12 rounded-2xl border-2 border-emerald-500/60 object-cover shadow-sm"
+                  />
+                  <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-extrabold text-slate-900 text-base leading-snug truncate">
+                    {selectedPin.data.name}
+                  </h3>
+                  <p className="text-xs text-emerald-700 font-bold truncate">
+                    {selectedPin.data.title || 'Available Candidate'}
+                  </p>
+                  <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                    {selectedPin.data.experience ? `${selectedPin.data.experience} exp • ` : ''}{selectedPin.data.address || 'Local Talent'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Candidate Skills pills */}
+              {selectedPin.data.skills && Array.isArray(selectedPin.data.skills) && selectedPin.data.skills.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {selectedPin.data.skills.slice(0, 4).map((sk, idx) => (
+                    <span key={idx} className="text-[10px] font-semibold px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 border border-slate-200">
+                      {sk}
+                    </span>
+                  ))}
+                  {selectedPin.data.skills.length > 4 && (
+                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-lg bg-slate-50 text-slate-400">
+                      +{selectedPin.data.skills.length - 4}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* Quick Communication Grid */}
+              <div className="grid grid-cols-2 gap-2 pt-0.5">
+                <button
+                  type="button"
+                  onClick={() => startCall(selectedPin.data, false)}
+                  className="py-2 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all active:scale-95"
+                >
+                  <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Voice Call</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => startCall(selectedPin.data, true)}
+                  className="py-2 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all active:scale-95"
+                >
+                  <Video className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Video Call</span>
+                </button>
+              </div>
+
+              {/* Full Profile button */}
+              <button
+                type="button"
+                onClick={() => onSelectSeeker(selectedPin.data)}
+                className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-extrabold transition-all border border-slate-200 active:scale-95"
+              >
+                View Full Profile & Experience
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -1722,110 +2024,126 @@ export const UberJobMap = ({
         </Marker>
 
         {/* Job Markers */}
-        {visibleJobs.map((job) => (
-          <Marker
-            key={job.id}
-            position={[job.lat, job.lng]}
-            icon={createJobIcon(job)}
-          >
-            <Popup>
-              <div className="min-w-[210px] p-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider block">
-                    {job.jobType}
-                  </span>
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
-                    {job.distanceKm} km away
-                  </span>
-                </div>
-                
-                <h4 className="font-bold text-sm text-slate-900 leading-tight mt-1">{job.title}</h4>
-                <p className="text-xs text-slate-500 mt-0.5">{job.company}</p>
-                
-                <div className="my-2 p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs">
-                  <span className="text-emerald-700 font-bold">{job.salary}</span>
-                  <span className="text-slate-500 flex items-center gap-1 text-[11px]">
-                    <Car className="w-3 h-3 text-slate-400" />
-                    ~{Math.max(2, Math.round(job.distanceKm * 2.5))} min
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => onSelectJob(job)}
-                    className="flex-1 py-1.5 px-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-colors shadow-sm"
-                  >
-                    View & Apply
-                  </button>
-                  <a
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${job.lat},${job.lng}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 transition-colors flex items-center justify-center gap-1 text-[11px] font-semibold"
-                    title="Open Directions in Google Maps"
-                  >
-                    <Navigation className="w-3.5 h-3.5 text-indigo-600" />
-                    <span>Route</span>
-                  </a>
-                </div>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-
-        {/* Seeker Markers */}
-        {visibleSeekers.map((seeker) => (
-          <Marker
-            key={seeker.id}
-            position={[seeker.lat, seeker.lng]}
-            icon={createSeekerIcon(seeker)}
-          >
-            <Popup>
-              <div className="min-w-[200px] p-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <img
-                    src={seeker.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${seeker.name}`}
-                    alt={seeker.name}
-                    className="w-9 h-9 rounded-full border border-emerald-500/60 object-cover"
-                  />
-                  <div>
-                    <h4 className="font-bold text-sm text-slate-900 leading-tight">{seeker.name}</h4>
-                    <p className="text-[11px] text-emerald-700 font-semibold">{seeker.title || 'Available Candidate'}</p>
-                    <span className="text-[10px] text-slate-500 font-semibold">
-                      📍 {seeker.distanceKm} km away
+        {visibleJobs.map((job) => {
+          const isSelected = selectedPin?.type === 'job' && selectedPin.data?.id === job.id;
+          return (
+            <Marker
+              key={job.id}
+              position={[job.lat, job.lng]}
+              icon={createJobIcon(job, isSelected)}
+              eventHandlers={{
+                click: () => {
+                  setSelectedPin({ type: 'job', data: job });
+                }
+              }}
+            >
+              <Popup>
+                <div className="min-w-[210px] p-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider block">
+                      {job.jobType}
+                    </span>
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
+                      {job.distanceKm} km away
                     </span>
                   </div>
-                </div>
+                  
+                  <h4 className="font-bold text-sm text-slate-900 leading-tight mt-1">{job.title}</h4>
+                  <p className="text-xs text-slate-500 mt-0.5">{job.company}</p>
+                  
+                  <div className="my-2 p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs">
+                    <span className="text-emerald-700 font-bold">{job.salary}</span>
+                    <span className="text-slate-500 flex items-center gap-1 text-[11px]">
+                      <Car className="w-3 h-3 text-slate-400" />
+                      ~{Math.max(2, Math.round(job.distanceKm * 2.5))} min
+                    </span>
+                  </div>
 
-                <div className="grid grid-cols-2 gap-1.5 my-2">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => onSelectJob(job)}
+                      className="flex-1 py-1.5 px-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-colors shadow-sm"
+                    >
+                      View & Apply
+                    </button>
+                    <a
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${job.lat},${job.lng}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 transition-colors flex items-center justify-center gap-1 text-[11px] font-semibold"
+                      title="Open Directions in Google Maps"
+                    >
+                      <Navigation className="w-3.5 h-3.5 text-indigo-600" />
+                      <span>Route</span>
+                    </a>
+                  </div>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
+
+        {/* Seeker Markers */}
+        {visibleSeekers.map((seeker) => {
+          const isSelected = selectedPin?.type === 'seeker' && selectedPin.data?.id === seeker.id;
+          return (
+            <Marker
+              key={seeker.id}
+              position={[seeker.lat, seeker.lng]}
+              icon={createSeekerIcon(seeker, isSelected)}
+              eventHandlers={{
+                click: () => {
+                  setSelectedPin({ type: 'seeker', data: seeker });
+                }
+              }}
+            >
+              <Popup>
+                <div className="min-w-[200px] p-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <img
+                      src={seeker.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${seeker.name}`}
+                      alt={seeker.name}
+                      className="w-9 h-9 rounded-full border border-emerald-500/60 object-cover"
+                    />
+                    <div>
+                      <h4 className="font-bold text-sm text-slate-900 leading-tight">{seeker.name}</h4>
+                      <p className="text-[11px] text-emerald-700 font-semibold">{seeker.title || 'Available Candidate'}</p>
+                      <span className="text-[10px] text-slate-500 font-semibold">
+                        📍 {seeker.distanceKm} km away
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-1.5 my-2">
+                    <button
+                      onClick={() => {
+                        startCall(seeker, false);
+                      }}
+                      className="py-1 px-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition-colors"
+                    >
+                      <Phone className="w-3 h-3 text-emerald-600" /> Voice
+                    </button>
+                    <button
+                      onClick={() => {
+                        startCall(seeker, true);
+                      }}
+                      className="py-1 px-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition-colors"
+                    >
+                      <Video className="w-3 h-3 text-indigo-600" /> Video
+                    </button>
+                  </div>
+
                   <button
-                    onClick={() => {
-                      startCall(seeker, false);
-                    }}
-                    className="py-1 px-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition-colors"
+                    onClick={() => onSelectSeeker(seeker)}
+                    className="w-full py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-colors border border-slate-200"
                   >
-                    <Phone className="w-3 h-3 text-emerald-600" /> Voice
-                  </button>
-                  <button
-                    onClick={() => {
-                      startCall(seeker, true);
-                    }}
-                    className="py-1 px-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition-colors"
-                  >
-                    <Video className="w-3 h-3 text-indigo-600" /> Video
+                    View Profile & Skills
                   </button>
                 </div>
-
-                <button
-                  onClick={() => onSelectSeeker(seeker)}
-                  className="w-full py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-colors border border-slate-200"
-                >
-                  View Profile & Skills
-                </button>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+              </Popup>
+            </Marker>
+          );
+        })}
 
       </MapContainer>
 

@@ -1,4 +1,5 @@
 import express from 'express';
+import jwt from 'jsonwebtoken';
 import { db } from '../db.js';
 
 const router = express.Router();
@@ -66,12 +67,21 @@ router.post('/', (req, res) => {
 // POST toggle like on post
 router.post('/:id/like', (req, res) => {
   try {
-    const { userId } = req.body;
+    let { userId } = req.body || {};
+    if (!userId && req.headers.authorization) {
+      try {
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.decode(token);
+        if (decoded && decoded.id) userId = decoded.id;
+      } catch {
+        // ignore decoding error
+      }
+    }
     const post = db.likePost(req.params.id, userId || 'anon');
     if (!post) {
       return res.status(404).json({ error: 'Post not found' });
     }
-    res.json({ post });
+    res.json({ post, likes: post.likes, likedBy: post.likedBy });
   } catch (err) {
     console.error('Error liking post:', err);
     res.status(500).json({ error: 'Failed to like post' });
@@ -81,8 +91,17 @@ router.post('/:id/like', (req, res) => {
 // POST comment on post
 router.post('/:id/comment', (req, res) => {
   try {
-    const { authorName, authorAvatar, text } = req.body;
-    const trimmedText = text ? String(text).trim() : '';
+    let { authorName, authorAvatar, text, content } = req.body || {};
+    if (!authorName && req.headers.authorization) {
+      try {
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.decode(token);
+        if (decoded && decoded.name) authorName = decoded.name;
+      } catch {
+        // ignore decoding error
+      }
+    }
+    const trimmedText = (text || content) ? String(text || content).trim() : '';
     if (!trimmedText) {
       return res.status(400).json({ error: 'Comment text is required' });
     }
@@ -97,7 +116,7 @@ router.post('/:id/comment', (req, res) => {
     if (!post) {
       return res.status(404).json({ error: 'Post not found' });
     }
-    res.json({ post });
+    res.status(201).json({ post, comments: post.comments });
   } catch (err) {
     console.error('Error commenting on post:', err);
     res.status(500).json({ error: 'Failed to add comment' });

@@ -255,7 +255,7 @@ export const Welcome = ({
       {/* ========================================================== */}
       {/* 1. STANDALONE HEADER */}
       {/* ========================================================== */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200/90 shadow-xs">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-2xl border-b border-slate-200/60 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.03)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
           
           {/* Brand Logo & Tag */}
@@ -275,33 +275,33 @@ export const Welcome = ({
           </div>
 
           {/* Center Quick Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-5 text-xs font-bold text-slate-600">
-            <button onClick={onNavigateToFeed} className="hover:text-indigo-600 transition-colors flex items-center gap-1.5">
+          <nav className="hidden lg:flex items-center gap-1 bg-slate-100/70 backdrop-blur-md p-1 rounded-full border border-slate-200/60 text-xs font-semibold text-slate-600 flex-nowrap flex-shrink-0">
+            <button onClick={onNavigateToFeed} className="px-3.5 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/60 whitespace-nowrap flex-shrink-0 transition-all flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
               <span>Feed</span>
             </button>
-            <button onClick={onNavigateToNetwork} className="hover:text-indigo-600 transition-colors flex items-center gap-1.5">
+            <button onClick={onNavigateToNetwork} className="px-3.5 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/60 whitespace-nowrap flex-shrink-0 transition-all flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5 text-emerald-600" />
               <span>Emp & Seeker</span>
             </button>
-            <button onClick={onNavigateToMap} className="hover:text-indigo-600 transition-colors flex items-center gap-1.5">
+            <button onClick={onNavigateToMap} className="px-3.5 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/60 whitespace-nowrap flex-shrink-0 transition-all flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5 text-cyan-600" />
               <span>Live Map</span>
               {!user && (
-                <span className="text-[9px] font-bold px-1 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-200 leading-none">
+                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-amber-50 text-amber-700 border border-amber-200 leading-none">
                   Login
                 </span>
               )}
             </button>
-            <button onClick={onNavigateToJobs} className="hover:text-indigo-600 transition-colors flex items-center gap-1.5">
+            <button onClick={onNavigateToJobs} className="px-3.5 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/60 whitespace-nowrap flex-shrink-0 transition-all flex items-center gap-1.5">
               <Briefcase className="w-3.5 h-3.5 text-indigo-600" />
               <span>Jobs ({jobs.length > 0 ? jobs.length : '35+'})</span>
             </button>
-            <button onClick={onNavigateToAnon} className="hover:text-indigo-600 transition-colors flex items-center gap-1.5">
+            <button onClick={onNavigateToAnon} className="px-3.5 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/60 whitespace-nowrap flex-shrink-0 transition-all flex items-center gap-1.5">
               <MessageSquare className="w-3.5 h-3.5 text-amber-600" />
               <span>Anon Salon</span>
               {!user && (
-                <span className="text-[9px] font-bold px-1 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-200 leading-none">
+                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-amber-50 text-amber-700 border border-amber-200 leading-none">
                   Login
                 </span>
               )}
@@ -314,14 +314,14 @@ export const Welcome = ({
               <div className="flex items-center gap-2">
                 <button
                   onClick={onNavigateToFeed}
-                  className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5 active:scale-95"
+                  className="px-4 py-2 rounded-full bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5 active:scale-95"
                 >
                   <span>Go to App Dashboard</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={logout}
-                  className="p-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 transition-colors"
+                  className="p-2 rounded-full bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 transition-colors"
                   title="Sign Out"
                 >
                   <LogOut className="w-4 h-4" />
@@ -331,7 +331,7 @@ export const Welcome = ({
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => onExploreAsGuest ? onExploreAsGuest('feed') : onNavigateToFeed()}
-                  className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all active:scale-95"
+                  className="hidden sm:flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 text-xs font-bold transition-all active:scale-95"
                   title="Browse without logging in"
                 >
                   <span>Explore as Guest</span>
@@ -339,7 +339,7 @@ export const Welcome = ({
 
                 <button
                   onClick={() => scrollToAuth('login')}
-                  className="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200 shadow-xs transition-all flex items-center gap-1.5 active:scale-95"
+                  className="px-4 py-2 rounded-full bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold border border-slate-200/80 shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-all flex items-center gap-1.5 active:scale-95"
                 >
                   <LogIn className="w-3.5 h-3.5 text-indigo-600" />
                   <span>Log In (लॉगिन)</span>
@@ -347,7 +347,7 @@ export const Welcome = ({
 
                 <button
                   onClick={() => scrollToAuth('register', 'seeker')}
-                  className="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold shadow-md shadow-indigo-600/20 border border-indigo-400/30 transition-all flex items-center gap-1.5 active:scale-95"
+                  className="px-4 py-2 rounded-full bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold shadow-md shadow-indigo-600/20 border border-indigo-400/30 transition-all flex items-center gap-1.5 active:scale-95"
                 >
                   <UserPlus className="w-3.5 h-3.5" />
                   <span>Sign Up Free</span>
@@ -442,7 +442,8 @@ export const Welcome = ({
 
           {/* Right Column: THE ONE UNIFIED AUTHENTICATION CARD */}
           <div className="lg:col-span-5" ref={authCardRef} id="auth-card">
-            <div className="bg-white border-2 border-indigo-100 rounded-3xl p-6 sm:p-7 shadow-2xl relative overflow-hidden">
+            <div className="bg-white/95 backdrop-blur-2xl border-2 border-indigo-100/90 rounded-3xl p-6 sm:p-7 shadow-[0_20px_50px_-12px_rgba(79,70,229,0.18)] relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-indigo-500 via-cyan-400 to-emerald-400" />
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-indigo-500/10 to-transparent pointer-events-none rounded-bl-full" />
               
               {/* Tabs: Log In vs Sign Up */}

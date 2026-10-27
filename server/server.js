@@ -17,6 +17,9 @@ import anonRoutes from './routes/anon.js';
 import { setupSocket } from './socket.js';
 import { db } from './db.js';
 import { verifyEmailConfig } from './email.js';
+import { requestLogger } from './middleware/requestLogger.js';
+import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
+import { securityHeaders, rateLimiter } from './middleware/security.js';
 
 dotenv.config();
 
@@ -26,7 +29,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const server = http.createServer(app);
 
-// Dynamic CORS configuration for REST & WebSockets (supports online deployment e.g. Vercel, Render)
+// Dynamic CORS configuration for REST & WebSockets
 const clientUrl = process.env.CLIENT_URL;
 const allowedOrigins = [
   'http://localhost:5173',
@@ -38,7 +41,6 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Permissive for mobile browsers, curl, local dev, or when origin is in allowed list
     if (!origin || allowedOrigins.includes(origin) || !clientUrl || process.env.NODE_ENV !== 'production') {
       return callback(null, true);
     }
@@ -48,6 +50,19 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+// Security headers (OWASP protection against clickjacking, sniffing, XSS)
+app.use(securityHeaders);
+
+// Performance & Request observability logger
+app.use(requestLogger);
+
+// Global API rate limiter (600 requests per 15 minutes per IP)
+app.use('/api', rateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 600,
+  message: 'Too many requests to JobScout API. Please wait a moment before trying again.'
+}));
 
 // Socket.IO Setup
 const io = new Server(server, {
@@ -69,7 +84,8 @@ app.use((req, res, next) => {
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    time: new Date().toISOString(),
+    uptime: Math.round(process.uptime()),
+    timestamp: new Date().toISOString(),
     service: 'JobRadar Backend API'
   });
 });
@@ -97,7 +113,7 @@ app.get('/api/settings/email', (req, res) => {
   });
 });
 
-app.post('/api/settings/email', async (req, res) => {
+app.post('/api/settings/email', async (req, res, next) => {
   const { gmailUser, gmailPass, smtpHost, smtpPort, smtpUser, smtpPass, emailFrom } = req.body;
 
   try {
@@ -128,10 +144,7 @@ app.post('/api/settings/email', async (req, res) => {
       configured: Boolean((saved.gmailUser && saved.gmailPass) || (saved.smtpHost && saved.smtpUser && saved.smtpPass))
     });
   } catch (err) {
-    console.error('Email verification error:', err);
-    res.status(400).json({
-      error: `Connection verification failed: ${err.message}. Please check your Gmail address and 16-character App Password.`
-    });
+    next(err);
   }
 });
 
@@ -148,11 +161,11 @@ if (fs.existsSync(clientDistPath)) {
   });
 }
 
-// Error Handling
-app.use((err, req, res, next) => {
-  console.error('Unhandled server error:', err);
-  res.status(500).json({ error: 'Internal Server Error' });
-});
+// 404 handler for API routes
+app.use(notFoundHandler);
+
+// Centralized Error Handling Middleware
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
@@ -162,3 +175,24 @@ server.listen(PORT, () => {
   console.log(`🌐 Base API: http://localhost:${PORT}/api`);
   console.log(`=============================================`);
 });
+
+// Graceful Process Lifecycle & Shutdown
+const gracefulShutdown = (signal) => {
+  console.log(`\n🛑 Received ${signal}. Starting graceful shutdown...`);
+  io.close(() => {
+    console.log('📡 WebRTC & Socket.IO connections closed.');
+  });
+  server.close(() => {
+    console.log('🌐 HTTP Server closed cleanly.');
+    process.exit(0);
+  });
+
+  // Force shutdown after 10s timeout if hung
+  setTimeout(() => {
+    console.error('⚠️ Forcing process exit after shutdown timeout.');
+    process.exit(1);
+  }, 10000);
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));

@@ -123,4 +123,14 @@ router.get('/:otherUserId', authenticateToken, (req, res) => {
   res.json({ messages });
 });
 
+// 4. Mark conversation messages as read
+const handleMarkRead = (req, res) => {
+  const currentUserId = req.user.id;
+  const otherUserId = req.params.otherUserId;
+  db.markMessagesRead(otherUserId, currentUserId);
+  res.json({ success: true, message: 'Messages marked as read' });
+};
+router.put('/:otherUserId/read', authenticateToken, handleMarkRead);
+router.post('/:otherUserId/read', authenticateToken, handleMarkRead);
+
 export default router;

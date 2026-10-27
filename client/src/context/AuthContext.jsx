@@ -4,8 +4,14 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('jobradar_user');
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const saved = localStorage.getItem('jobradar_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      console.warn('Corrupt user data in localStorage, resetting session:', e);
+      try { localStorage.removeItem('jobradar_user'); } catch {}
+      return null;
+    }
   });
   const [token, setToken] = useState(() => localStorage.getItem('jobradar_token') || null);
   const [loading, setLoading] = useState(true);

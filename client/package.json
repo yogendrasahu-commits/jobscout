@@ -10,11 +10,10 @@
   },
   "dependencies": {
     "@capacitor/android": "^8.5.3",
-    "@capacitor/cli": "^6.2.2",
+    "@capacitor/cli": "^8.5.3",
     "@capacitor/core": "^8.5.3",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.20",
-    "jobmap-platform": "file:..",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.441.0",
     "postcss": "^8.4.47",

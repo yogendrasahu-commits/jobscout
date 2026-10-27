@@ -1,4 +1,5 @@
 import express from 'express';
+import jwt from 'jsonwebtoken';
 import { db } from '../db.js';
 
 const router = express.Router();
@@ -74,8 +75,28 @@ router.post('/', (req, res) => {
 // POST vote on anonymous discussion (upvote +1, downvote -1)
 router.post('/:id/vote', (req, res) => {
   try {
-    const { userId, direction } = req.body;
-    const post = db.voteAnonDiscussion(req.params.id, userId, Number(direction) || 1);
+    let { userId, direction, type } = req.body || {};
+    let voteDir = 1;
+    if (type === 'down' || direction === -1 || direction === 'down') {
+      voteDir = -1;
+    } else if (type === 'up' || direction === 1 || direction === 'up') {
+      voteDir = 1;
+    } else if (direction !== undefined) {
+      voteDir = Number(direction) || 1;
+    }
+
+    let voterId = userId;
+    if (!voterId && req.headers.authorization) {
+      try {
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.decode(token);
+        if (decoded && decoded.id) voterId = decoded.id;
+      } catch {
+        // ignore decoding error
+      }
+    }
+
+    const post = db.voteAnonDiscussion(req.params.id, voterId || 'anon_voter', voteDir);
     if (!post) {
       return res.status(404).json({ error: 'Discussion not found' });
     }
@@ -91,7 +112,12 @@ router.post('/:id/vote', (req, res) => {
       });
     }
 
-    res.json({ post });
+    res.json({
+      post,
+      score: post.score,
+      upvotes: post.upvotes,
+      downvotes: post.downvotes
+    });
   } catch (err) {
     console.error('Error voting on discussion:', err);
     res.status(500).json({ error: 'Failed to vote' });

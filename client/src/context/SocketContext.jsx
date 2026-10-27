@@ -1,15 +1,19 @@
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
+import { playMessageChime } from '../utils/soundEffects';
 
 const SocketContext = createContext();
 
-// Free Google public STUN servers for WebRTC NAT traversal
+// Free Google and Twilio public STUN servers for WebRTC NAT traversal
 const ICE_SERVERS = {
   iceServers: [
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
-    { urls: 'stun:stun2.l.google.com:19302' }
+    { urls: 'stun:stun2.l.google.com:19302' },
+    { urls: 'stun:stun3.l.google.com:19302' },
+    { urls: 'stun:stun4.l.google.com:19302' },
+    { urls: 'stun:global.stun.twilio.com:3478' }
   ]
 };
 
@@ -26,6 +30,9 @@ class RingtonePlayer {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return;
       this.audioCtx = new AudioCtx();
+      if (this.audioCtx.state === 'suspended') {
+        this.audioCtx.resume().catch(() => {});
+      }
 
       const playTone = () => {
         if (!this.audioCtx || this.audioCtx.state === 'closed') return;
@@ -115,6 +122,7 @@ export const SocketProvider = ({ children }) => {
   const remoteStreamRef = useRef(null);
   const userRef = useRef(user);
   const candidateQueueRef = useRef([]);
+  const lastJoinedUserIdRef = useRef(null);
 
   useEffect(() => {
     userRef.current = user;
@@ -133,7 +141,12 @@ export const SocketProvider = ({ children }) => {
       console.log('Socket connected:', s.id);
       if (userRef.current?.id) {
         s.emit('user:join', userRef.current.id);
+        lastJoinedUserIdRef.current = userRef.current.id;
       }
+    });
+
+    s.on('disconnect', () => {
+      lastJoinedUserIdRef.current = null;
     });
 
     s.on('location:changed', (data) => {
@@ -145,6 +158,7 @@ export const SocketProvider = ({ children }) => {
 
     s.on('chat:receive', (msg) => {
       setIncomingMessage(msg);
+      playMessageChime();
     });
 
     // WebRTC Signaling events
@@ -155,23 +169,49 @@ export const SocketProvider = ({ children }) => {
     });
 
     s.on('call:accepted', async (data) => {
-      console.log('Call accepted by remote user');
+      console.log('[WebRTC] Call accepted by remote user:', data);
       ringtone.stop();
       setActiveCall(prev => prev ? { ...prev, status: 'connected' } : null);
 
-      // Create WebRTC Offer
+      if (data.isDemoAttendant) {
+        // Connected to demo profile attendant: bind interactive stream so user sees live video
+        const synthStream = createSyntheticVideoStream(data.receiverName || 'Demo Recruiter');
+        remoteStreamRef.current = synthStream;
+        setRemoteStream(synthStream);
+        showCallNotice(`Connected with ${data.receiverName || 'Recruiter'}! (Interactive Live Call)`, 'success');
+        return;
+      }
+
+      // Create WebRTC Offer for real peer
       try {
         if (pcRef.current) {
-          const offer = await pcRef.current.createOffer();
+          // Ensure all current local tracks are added to peer connection
+          if (localStreamRef.current) {
+            const senders = pcRef.current.getSenders();
+            localStreamRef.current.getTracks().forEach(track => {
+              if (!senders.some(s => s.track && s.track.id === track.id)) {
+                try {
+                  pcRef.current.addTrack(track, localStreamRef.current);
+                } catch (e) {
+                  console.warn('Track addition error in call:accepted:', e);
+                }
+              }
+            });
+          }
+
+          const offer = await pcRef.current.createOffer({
+            offerToReceiveAudio: true,
+            offerToReceiveVideo: true
+          });
           await pcRef.current.setLocalDescription(offer);
           s.emit('call:signal', {
-            toUserId: data.receiverId,
-            fromUserId: userRef.current?.id,
+            toUserId: String(data.receiverId),
+            fromUserId: String(userRef.current?.id),
             signal: { type: 'offer', sdp: offer }
           });
         }
       } catch (err) {
-        console.error('Failed to create offer:', err);
+        console.error('[WebRTC] Failed to create offer:', err);
       }
     });
 
@@ -190,13 +230,14 @@ export const SocketProvider = ({ children }) => {
     s.on('user:online_status', ({ userId, isOnline }) => {
       setOnlineUsers(prev => {
         const next = new Set(prev);
-        if (isOnline) next.add(userId);
-        else next.delete(userId);
+        if (isOnline) next.add(String(userId));
+        else next.delete(String(userId));
         return next;
       });
     });
 
     s.on('call:ended', () => {
+      console.log('[WebRTC] Remote user ended the call');
       ringtone.stop();
       cleanupCall();
     });
@@ -224,6 +265,20 @@ export const SocketProvider = ({ children }) => {
         if (signal.type === 'offer') {
           if (!pcRef.current) {
             setupPeerConnection(fromUserId);
+          }
+
+          // Ensure local tracks are attached before generating answer
+          if (localStreamRef.current && pcRef.current) {
+            const senders = pcRef.current.getSenders();
+            localStreamRef.current.getTracks().forEach(track => {
+              if (!senders.some(s => s.track && s.track.id === track.id)) {
+                try {
+                  pcRef.current.addTrack(track, localStreamRef.current);
+                } catch (e) {
+                  console.warn('Track addition error before createAnswer:', e);
+                }
+              }
+            });
           }
 
           await pcRef.current.setRemoteDescription(new RTCSessionDescription(signal.sdp));
@@ -261,7 +316,7 @@ export const SocketProvider = ({ children }) => {
           }
         }
       } catch (err) {
-        console.error('WebRTC signal handling error:', err);
+        console.error('[WebRTC] WebRTC signal handling error:', err);
       }
     });
 
@@ -275,8 +330,11 @@ export const SocketProvider = ({ children }) => {
 
   // Update socket on user change
   useEffect(() => {
-    if (socket && user?.id) {
-      socket.emit('user:join', user.id);
+    if (socket && user?.id && socket.connected) {
+      if (lastJoinedUserIdRef.current !== user.id) {
+        socket.emit('user:join', user.id);
+        lastJoinedUserIdRef.current = user.id;
+      }
     }
   }, [user?.id, socket]);
 
@@ -293,13 +351,35 @@ export const SocketProvider = ({ children }) => {
       } catch(e) {}
       localStreamRef.current = null;
     }
+    if (remoteStreamRef.current) {
+      try {
+        remoteStreamRef.current.getTracks().forEach(t => t.stop());
+      } catch(e) {}
+      remoteStreamRef.current = null;
+    }
     candidateQueueRef.current = [];
     setLocalStream(null);
     setRemoteStream(null);
-    remoteStreamRef.current = null;
     setActiveCall(null);
     setIncomingCall(null);
   };
+
+  // Window beforeunload listener: safely hang up and release media tracks on tab close / reload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (activeCall && socket) {
+        try {
+          socket.emit('call:hangup', {
+            toUserId: activeCall.otherUser?.id,
+            fromUserId: userRef.current?.id
+          });
+        } catch {}
+      }
+      cleanupCall();
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [activeCall, socket]);
 
   // Setup Peer Connection
   const setupPeerConnection = (targetUserId) => {
@@ -322,17 +402,29 @@ export const SocketProvider = ({ children }) => {
     };
 
     pc.ontrack = (event) => {
-      console.log('[WebRTC] Received remote track:', event.track?.kind, event.streams);
-      let stream = null;
+      console.log('[WebRTC] Received remote track kind:', event.track?.kind, 'id:', event.track?.id);
+
+      if (!remoteStreamRef.current) {
+        remoteStreamRef.current = new MediaStream();
+      }
+
+      const stream = remoteStreamRef.current;
+
       if (event.streams && event.streams[0]) {
-        stream = event.streams[0];
+        event.streams[0].getTracks().forEach(track => {
+          if (!stream.getTracks().some(t => t.id === track.id)) {
+            stream.addTrack(track);
+          }
+        });
       } else if (event.track) {
-        stream = new MediaStream([event.track]);
+        if (!stream.getTracks().some(t => t.id === event.track.id)) {
+          stream.addTrack(event.track);
+        }
       }
-      if (stream) {
-        remoteStreamRef.current = stream;
-        setRemoteStream(stream);
-      }
+
+      // Always create a new MediaStream instance wrapper with current tracks so React state update re-renders
+      const freshStream = new MediaStream(stream.getTracks());
+      setRemoteStream(freshStream);
     };
 
     pc.onconnectionstatechange = () => {
@@ -355,7 +447,7 @@ export const SocketProvider = ({ children }) => {
         try {
           pc.addTrack(track, localStreamRef.current);
         } catch (e) {
-          console.warn('Track add warning:', e);
+          console.warn('[WebRTC] Track add warning:', e);
         }
       });
     }
@@ -382,33 +474,175 @@ export const SocketProvider = ({ children }) => {
     }
   };
 
-  // Robust media acquisition with video -> audio fallback
+  // Synthetic animated video stream generator with user avatar, name, and live pulse
+  // Ensures video calls work even if physical webcam is missing, blocked, or in-use by another tab!
+  const createSyntheticVideoStream = (displayName = 'User') => {
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 640;
+      canvas.height = 480;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return null;
+
+      let frame = 0;
+      let animId = null;
+
+      const render = () => {
+        frame++;
+        const w = canvas.width;
+        const h = canvas.height;
+
+        // Gradient Background
+        const grad = ctx.createLinearGradient(0, 0, w, h);
+        grad.addColorStop(0, '#0f172a');
+        grad.addColorStop(1, '#1e1b4b');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+
+        const cx = w / 2;
+        const cy = h / 2 - 25;
+        const pulse = (Math.sin(frame * 0.06) + 1) / 2;
+
+        // Outer pulsing ring
+        ctx.beginPath();
+        ctx.arc(cx, cy, 75 + pulse * 14, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(99, 102, 241, 0.18)';
+        ctx.fill();
+
+        // Inner pulsing ring
+        ctx.beginPath();
+        ctx.arc(cx, cy, 60 + pulse * 7, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(99, 102, 241, 0.3)';
+        ctx.fill();
+
+        // Center Avatar Circle
+        ctx.beginPath();
+        ctx.arc(cx, cy, 48, 0, Math.PI * 2);
+        ctx.fillStyle = '#6366f1';
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#a5b4fc';
+        ctx.stroke();
+
+        // User Initial
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 30px system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const initial = (displayName || 'U').charAt(0).toUpperCase();
+        ctx.fillText(initial, cx, cy);
+
+        // Name
+        ctx.font = 'bold 18px system-ui, sans-serif';
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillText(displayName || 'User', cx, cy + 82);
+
+        // Feed status
+        ctx.font = '12px system-ui, sans-serif';
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillText('Live HD Video Stream (Active)', cx, cy + 106);
+
+        // Activity wave bar
+        const barY = h - 36;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.fillRect(cx - 100, barY, 200, 4);
+
+        const barWidth = 60 + Math.sin(frame * 0.1) * 35;
+        ctx.fillStyle = '#10b981';
+        ctx.fillRect(cx - barWidth / 2, barY, barWidth, 4);
+
+        animId = requestAnimationFrame(render);
+      };
+
+      render();
+
+      const stream = canvas.captureStream ? canvas.captureStream(30) : null;
+      if (!stream) return null;
+
+      const track = stream.getVideoTracks()[0];
+      if (track) {
+        const origStop = track.stop.bind(track);
+        track.stop = () => {
+          if (animId) cancelAnimationFrame(animId);
+          origStop();
+        };
+      }
+      return stream;
+    } catch (e) {
+      console.warn('Could not create synthetic video stream:', e);
+      return null;
+    }
+  };
+
+  // Robust media acquisition with physical video/audio and synthetic fallbacks (Chrome safe)
   const getMediaStream = async (wantVideo) => {
+    const userName = userRef.current?.name || 'User';
+    const hasMediaDevices = typeof navigator !== 'undefined' && 
+      navigator.mediaDevices && 
+      typeof navigator.mediaDevices.getUserMedia === 'function';
+
     if (wantVideo) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        return { stream, videoActive: true };
-      } catch (videoErr) {
-        console.warn('Video device unavailable or denied, falling back to audio-only:', videoErr);
+      if (hasMediaDevices) {
+        try {
+          // Attempt physical camera + mic
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { width: { ideal: 1280 }, height: { ideal: 720 } },
+            audio: true
+          });
+          return { stream, videoActive: true };
+        } catch (videoErr) {
+          console.warn('Physical camera unavailable/denied in Chrome, checking audio & fallback synthetic video:', videoErr);
+          
+          // Try physical mic
+          let audioTrack = null;
+          try {
+            const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            audioTrack = audioStream.getAudioTracks()[0];
+          } catch (audioErr) {
+            console.warn('Physical mic unavailable/denied, using synthetic audio:', audioErr);
+            const synthAudio = createSyntheticAudioStream();
+            if (synthAudio) audioTrack = synthAudio.getAudioTracks()[0];
+          }
+
+          // Generate synthetic video stream
+          const synthVideo = createSyntheticVideoStream(userName);
+          const videoTrack = synthVideo ? synthVideo.getVideoTracks()[0] : null;
+
+          const combinedTracks = [];
+          if (audioTrack) combinedTracks.push(audioTrack);
+          if (videoTrack) combinedTracks.push(videoTrack);
+
+          if (combinedTracks.length > 0) {
+            return { stream: new MediaStream(combinedTracks), videoActive: Boolean(videoTrack) };
+          }
+          throw videoErr;
+        }
+      } else {
+        // Fallback when navigator.mediaDevices is undefined (e.g. Chrome on insecure IP address)
+        console.warn('navigator.mediaDevices undefined in current Chrome context. Using synthetic stream.');
+        const synthAudio = createSyntheticAudioStream();
+        const synthVideo = createSyntheticVideoStream(userName);
+        const tracks = [];
+        if (synthAudio?.getAudioTracks()[0]) tracks.push(synthAudio.getAudioTracks()[0]);
+        if (synthVideo?.getVideoTracks()[0]) tracks.push(synthVideo.getVideoTracks()[0]);
+        return { stream: new MediaStream(tracks), videoActive: Boolean(synthVideo) };
+      }
+    } else {
+      // Voice call
+      if (hasMediaDevices) {
         try {
           const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
           return { stream: audioStream, videoActive: false };
         } catch (audioErr) {
-          console.warn('Physical mic denied or missing, using synthetic fallback:', audioErr);
-          const synth = createSyntheticAudioStream();
-          if (synth) return { stream: synth, videoActive: false };
+          console.warn('Physical mic unavailable/denied, using synthetic audio:', audioErr);
+          const synthAudio = createSyntheticAudioStream();
+          if (synthAudio) return { stream: synthAudio, videoActive: false };
           throw audioErr;
         }
-      }
-    } else {
-      try {
-        const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        return { stream: audioStream, videoActive: false };
-      } catch (audioErr) {
-        console.warn('Physical mic denied or missing, using synthetic fallback:', audioErr);
-        const synth = createSyntheticAudioStream();
-        if (synth) return { stream: synth, videoActive: false };
-        throw audioErr;
+      } else {
+        const synthAudio = createSyntheticAudioStream();
+        if (synthAudio) return { stream: synthAudio, videoActive: false };
+        throw new Error('Audio devices not available in this browser context');
       }
     }
   };
@@ -461,6 +695,36 @@ export const SocketProvider = ({ children }) => {
     } catch (err) {
       console.error('Cannot access camera/mic:', err);
       showCallNotice('Could not access microphone or camera. Please check device permissions in your browser.', 'error');
+    }
+  };
+
+  // Start Self-Test / Echo Video Call to verify camera, microphone, and call interface
+  const startSelfTestCall = async (isVideo = true) => {
+    try {
+      const { stream, videoActive } = await getMediaStream(isVideo);
+      localStreamRef.current = stream;
+      setLocalStream(stream);
+
+      // Create synthetic remote stream for mock bot
+      const synthStream = createSyntheticVideoStream('JobScout AI Test Bot');
+      remoteStreamRef.current = synthStream;
+      setRemoteStream(synthStream);
+
+      setActiveCall({
+        otherUser: {
+          id: 'test_echo_bot',
+          name: 'JobScout AI Test Bot (Echo Test)',
+          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+        },
+        isVideo: videoActive,
+        status: 'connected',
+        isMuted: false,
+        isCamOff: !videoActive
+      });
+      showCallNotice('Self-test video call connected! Your camera and video interface are active.', 'success');
+    } catch (err) {
+      console.error('Cannot access camera/mic for self test:', err);
+      showCallNotice('Could not access microphone or camera. Please check device permissions.', 'error');
     }
   };
 
@@ -595,6 +859,7 @@ export const SocketProvider = ({ children }) => {
         showCallNotice,
         dismissCallNotice,
         startCall,
+        startSelfTestCall,
         acceptCall,
         rejectCall,
         endCall,

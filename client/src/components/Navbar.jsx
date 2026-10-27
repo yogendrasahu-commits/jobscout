@@ -58,7 +58,8 @@ export const Navbar = ({
   onSelectSeeker,
   jobsCount = 0,
   seekersCount = 0,
-  employersCount = 0
+  employersCount = 0,
+  onOpenCommandPalette
 }) => {
   const { user, isEmployer, isSeeker, logout } = useAuth();
   const { setActiveChatUser, socket } = useSocket();
@@ -291,9 +292,9 @@ export const Navbar = ({
   };
 
   return (
-    <header className="bg-white/90 backdrop-blur-2xl border-b border-slate-200/80 sticky top-0 z-[800] select-none shadow-sm w-full max-w-full overflow-x-clip">
+    <header className="bg-white/85 backdrop-blur-2xl border-b border-slate-200/70 sticky top-0 z-[800] select-none shadow-[0_4px_24px_-4px_rgba(0,0,0,0.03)] w-full max-w-full transition-all">
       <div className="w-full max-w-[1700px] mx-auto px-2 sm:px-4 lg:px-6">
-        <div className="flex items-center justify-between h-[56px] sm:h-[60px] md:h-[68px] gap-2 lg:gap-4 w-full min-w-0">
+        <div className="flex items-center justify-between h-[56px] sm:h-[60px] md:h-[68px] gap-1.5 sm:gap-2 lg:gap-3 w-full min-w-0">
           
           {/* ========================================================== */}
           {/* 1. BRAND LOGO & LOCATION PILL & SEARCH BAR */}
@@ -326,22 +327,22 @@ export const Navbar = ({
             </div>
 
             {/* Quick Live Search Bar (Desktop / Laptop >= md) */}
-            <div className="hidden md:block relative flex-shrink-0" ref={searchRef}>
+            <div className="hidden md:flex items-center gap-1.5 flex-shrink-0 relative" ref={searchRef}>
               <form onSubmit={handleSearchSubmit} className="relative group">
                 <Search className="w-3.5 h-3.5 text-slate-400 group-focus-within:text-indigo-600 absolute left-3 top-2.5 transition-colors" />
                 <input
                   type="text"
-                  placeholder="Search..."
+                  placeholder="Search jobs, talent..."
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
                     setSearchFocused(true);
                   }}
                   onFocus={() => setSearchFocused(true)}
-                  className="w-20 md:w-24 lg:w-32 xl:w-44 2xl:w-60 bg-slate-100/90 hover:bg-slate-100 border border-slate-200/90 hover:border-slate-300 rounded-xl pl-8 pr-7 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 shadow-xs transition-all"
+                  className="w-24 md:w-28 lg:w-36 xl:w-52 bg-slate-100/70 hover:bg-slate-100 border border-slate-200/70 hover:border-slate-300 rounded-full pl-8 pr-7 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-all"
                   title="Search Jobs, Companies, Candidates"
                 />
-                {searchQuery && (
+                {searchQuery ? (
                   <button
                     type="button"
                     onClick={() => {
@@ -353,6 +354,14 @@ export const Navbar = ({
                   >
                     <X className="w-3 h-3" />
                   </button>
+                ) : (
+                  <kbd 
+                    onClick={onOpenCommandPalette}
+                    className="hidden xl:inline-flex items-center gap-0.5 absolute right-2.5 top-2 px-1.5 py-0.5 text-[9px] font-black text-slate-400 bg-slate-200/60 border border-slate-300/60 rounded-md cursor-pointer hover:bg-slate-300/80 transition-colors"
+                    title="Press Ctrl+K for Global Spotlight Search"
+                  >
+                    Ctrl K
+                  </kbd>
                 )}
               </form>
 
@@ -508,16 +517,16 @@ export const Navbar = ({
           {/* ========================================================== */}
           {/* 2. LAPTOP & DESKTOP NAVIGATION TABS (Centered in Header) */}
           {/* ========================================================== */}
-          <div className="hidden md:flex justify-center items-center flex-1 min-w-0 px-1">
-            <nav className="flex items-center gap-0.5 lg:gap-1 bg-slate-100/90 p-1 rounded-2xl border border-slate-200/90 shadow-xs max-w-full overflow-x-auto no-scrollbar">
+          <div className="hidden md:flex justify-center items-center flex-1 min-w-0 mx-1 lg:mx-3">
+            <nav className="flex items-center gap-0.5 lg:gap-1 bg-slate-100/80 backdrop-blur-md p-1 rounded-full border border-slate-200/80 shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)] flex-nowrap shrink-0">
               
               {/* 1. Feed (Home) */}
               <button
                 onClick={() => setCurrentTab('feed')}
-                className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'feed'
-                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
+                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/5 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold'
                 }`}
                 title="Feed (Home)"
               >
@@ -525,18 +534,19 @@ export const Navbar = ({
                 <span>Feed</span>
               </button>
 
-              {/* 2. Emp & Seeker / Network */}
+              {/* 2. Network */}
               <button
                 onClick={() => setCurrentTab('network')}
-                className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'network'
-                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
+                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/5 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold'
                 }`}
                 title={user ? `My Professional Network (${seekersCount + employersCount})` : 'Emp & Seeker (Employers & Job Seekers)'}
               >
                 <NavNetworkIcon active={currentTab === 'network'} className="w-4 h-4 flex-shrink-0" />
-                <span>{user ? 'Network' : 'Emp & Seeker'}</span>
+                <span className="hidden 2xl:inline">{user ? 'Network' : 'Emp & Seeker'}</span>
+                <span className="2xl:hidden">Network</span>
               </button>
 
               {/* 3. Live Map */}
@@ -548,38 +558,34 @@ export const Navbar = ({
                     setCurrentTab('map');
                   }
                 }}
-                className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'map'
-                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
+                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/5 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold'
                 }`}
                 title={user ? 'Live Map' : 'Live Map (Login Required)'}
               >
                 <NavRadarIcon active={currentTab === 'map'} className="w-4 h-4 flex-shrink-0" />
                 <span>Map</span>
-                {user ? (
+                {user && (
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse ml-0.5 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-                ) : (
-                  <span className="text-[9px] font-bold px-1 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-200 leading-none">
-                    Login
-                  </span>
                 )}
               </button>
 
               {/* 4. Jobs & Applied */}
               <button
                 onClick={() => setCurrentTab('jobs')}
-                className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'jobs' || currentTab === 'applications'
-                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
+                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/5 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold'
                 }`}
                 title={`Job Board & Applications (${jobsCount} openings)`}
               >
                 <NavJobsIcon active={currentTab === 'jobs' || currentTab === 'applications'} className="w-4 h-4 flex-shrink-0" />
                 <span>Jobs</span>
                 {jobsCount > 0 && (
-                  <span className="text-[10px] bg-indigo-50 px-1.5 py-0.2 rounded-full text-indigo-700 border border-indigo-200 font-extrabold">
+                  <span className="text-[10px] bg-indigo-50 px-1.5 py-0.2 rounded-full text-indigo-700 border border-indigo-200 font-bold">
                     {jobsCount}
                   </span>
                 )}
@@ -594,20 +600,15 @@ export const Navbar = ({
                     setCurrentTab('connect');
                   }
                 }}
-                className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'connect'
-                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
+                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/5 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold'
                 }`}
                 title={user ? 'Speed Connect Hub (Audio & Video Calls)' : 'Speed Connect (Login Required)'}
               >
                 <NavConnectIcon active={currentTab === 'connect'} className="w-4 h-4 flex-shrink-0" />
                 <span>Connect</span>
-                {!user && (
-                  <span className="text-[9px] font-bold px-1 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-200 leading-none">
-                    Login
-                  </span>
-                )}
               </button>
 
               {/* 6. Anonymous Discussions */}
@@ -619,23 +620,18 @@ export const Navbar = ({
                     setCurrentTab('anon');
                   }
                 }}
-                className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'anon'
-                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
+                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/5 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold'
                 }`}
                 title={user ? 'JobScout Anon Talk' : 'Anon Talk (Login Required)'}
               >
-                <div className="relative">
+                <div className="relative flex-shrink-0">
                   <NavAnonIcon active={currentTab === 'anon'} className="w-4 h-4 flex-shrink-0" />
                   <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" />
                 </div>
                 <span>Anon</span>
-                {!user && (
-                  <span className="text-[9px] font-bold px-1 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-200 leading-none">
-                    Login
-                  </span>
-                )}
               </button>
 
               {/* 7. Full-Page Messaging */}
@@ -647,32 +643,27 @@ export const Navbar = ({
                     setCurrentTab('messages');
                   }
                 }}
-                className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl text-xs transition-all duration-150 ${
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'messages'
-                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/90 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/70 font-semibold'
+                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/5 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold'
                 }`}
                 title={user ? 'Full-Page Messaging (चैट)' : 'Messages (Login Required)'}
               >
-                <div className="relative">
+                <div className="relative flex-shrink-0">
                   <NavMessagesIcon active={currentTab === 'messages'} className="w-4 h-4 flex-shrink-0" />
                   <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
                 </div>
-                <span className="hidden xl:inline">Messages</span>
-                <span className="xl:hidden">Chat</span>
-                {!user && (
-                  <span className="text-[9px] font-bold px-1 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-200 leading-none">
-                    Login
-                  </span>
-                )}
+                <span>Chat</span>
               </button>
+
             </nav>
           </div>
 
           {/* ========================================================== */}
           {/* 3. RIGHT CONTROLS: MOBILE SEARCH, POST JOB, BELL, PROFILE, HAMBURGER */}
           {/* ========================================================== */}
-          <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 justify-end flex-shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 justify-end flex-shrink-0 ml-2">
             
             {/* Mobile Search Toggle Button (Phone Only) */}
             <div className="md:hidden relative" ref={mobileSearchRef}>
@@ -743,11 +734,11 @@ export const Navbar = ({
             {user && isEmployer && (
               <button
                 onClick={onOpenPostJob}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 text-white shadow-md shadow-emerald-600/20 border border-emerald-500/30 transition-all active:scale-95 flex-shrink-0"
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 text-white shadow-md shadow-emerald-600/20 border border-emerald-500/30 transition-all active:scale-95 flex-shrink-0"
                 title="Post a New Job on Map"
               >
-                <PlusCircle className="w-4 h-4" />
-                <span className="hidden md:inline">Post Job</span>
+                <PlusCircle className="w-4 h-4 flex-shrink-0" />
+                <span className="hidden xl:inline whitespace-nowrap">Post Job</span>
               </button>
             )}
 
@@ -756,9 +747,9 @@ export const Navbar = ({
               <button
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
                 title={`Notifications (${unreadNotifsCount} unread)`}
-                className="relative p-1.5 sm:p-2 rounded-xl bg-slate-100/90 hover:bg-slate-200/90 border border-slate-200/90 text-slate-700 hover:text-slate-900 transition-all shadow-xs flex-shrink-0"
+                className="relative p-2 rounded-full bg-slate-100/80 hover:bg-slate-200/80 border border-slate-200/70 text-slate-700 hover:text-slate-900 transition-all shadow-[0_1px_2px_rgba(0,0,0,0.03)] flex-shrink-0"
               >
-                <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <Bell className="w-4 h-4" />
                 {unreadNotifsCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-[8px] font-black text-white flex items-center justify-center shadow-xs animate-pulse">
                     {unreadNotifsCount}
@@ -843,25 +834,28 @@ export const Navbar = ({
               <div className="relative group flex-shrink-0" ref={profileRef}>
                 <button
                   onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                  className="flex items-center gap-1 sm:gap-2 px-1.5 py-1 sm:px-2.5 sm:py-1 rounded-xl bg-slate-100/90 hover:bg-slate-200/90 border border-slate-200/90 transition-all text-left flex-shrink-0 cursor-pointer shadow-xs"
-                  title="Profile & Settings"
+                  className="flex items-center gap-1.5 sm:gap-2 pl-1 pr-1.5 sm:pr-2.5 py-1 rounded-full bg-slate-100/80 hover:bg-slate-200/80 border border-slate-200/70 transition-all text-left flex-shrink-0 cursor-pointer shadow-[0_1px_2px_rgba(0,0,0,0.03)] max-w-[140px] sm:max-w-[175px] lg:max-w-[210px]"
+                  title={`${user.name} • Profile & Settings`}
                 >
                   <div className="relative flex-shrink-0">
                     <img
-                      src={user.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.name}`}
+                      src={user.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(user.name || 'user')}`}
                       alt={user.name}
-                      className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-slate-200 object-cover bg-slate-100 ring-2 ring-indigo-500/20"
+                      className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-slate-200 object-cover bg-slate-100 ring-2 ring-indigo-500/15 flex-shrink-0"
                     />
                     <span className={`absolute bottom-0 right-0 w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full border-2 border-white ${
                       isSeeker ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.7)]' : 'bg-indigo-500 shadow-[0_0_6px_rgba(99,102,241,0.7)]'
                     }`} />
                   </div>
 
-                  <div className="flex flex-col text-left min-w-0">
-                    <div className="text-[11px] sm:text-xs font-bold text-slate-900 truncate max-w-[42px] xs:max-w-[65px] sm:max-w-[95px] md:max-w-[110px] lg:max-w-[130px] xl:max-w-[150px] leading-tight">
-                      {user.name}
+                  <div className="hidden sm:flex flex-col text-left min-w-0 flex-1 overflow-hidden">
+                    <div 
+                      className="text-[11px] sm:text-xs font-bold text-slate-900 truncate max-w-[65px] md:max-w-[85px] lg:max-w-[110px] xl:max-w-[130px] leading-tight"
+                      title={user.name}
+                    >
+                      {user.name?.trim().split(' ')[0] || user.name || 'User'}
                     </div>
-                    <div className="hidden sm:flex text-[10px] text-slate-500 items-center gap-1 leading-tight mt-0.5">
+                    <div className="hidden lg:flex text-[10px] text-slate-500 items-center gap-1 leading-tight mt-0.5">
                       <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isEmployer ? 'bg-indigo-500' : 'bg-emerald-500'}`} />
                       <span className="truncate">{isEmployer ? 'Recruiter' : 'Seeker'}</span>
                     </div>
@@ -876,10 +870,10 @@ export const Navbar = ({
                     
                     {/* Profile Header Details */}
                     <div className="p-2 border-b border-slate-100 mb-2">
-                      <div className="font-bold text-sm text-slate-900 truncate">{user.name}</div>
+                      <div className="font-bold text-sm text-slate-900 truncate" title={user.name}>{user.name}</div>
                       <div className="text-xs text-indigo-600 flex items-center gap-1 mt-0.5 font-medium">
-                        <Phone className="w-3 h-3" />
-                        <span>{user.phone || '9876543210'}</span>
+                        <Phone className="w-3 h-3 flex-shrink-0" />
+                        <span className="truncate">{user.phone || '9876543210'}</span>
                       </div>
 
                       {/* Official Email */}
@@ -1270,6 +1264,7 @@ export const Navbar = ({
                   </span>
                 )}
               </button>
+
             </div>
 
             {/* 2. USER PROFILE & ROLE SWITCH SECTION */}

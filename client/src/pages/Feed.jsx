@@ -22,20 +22,38 @@ import {
   TrendingUp,
   X,
   UserCheck,
-  ArrowLeft
+  ArrowLeft,
+  PlusCircle,
+  ChevronRight,
+  Compass,
+  Users,
+  Award,
+  Zap,
+  ShieldCheck,
+  Building,
+  ArrowUp
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
+import { postService } from '../services/postService';
+import { networkService } from '../services/networkService';
 
 export const Feed = ({ 
+  jobs = [],
+  seekers = [],
+  employers = [],
   onSelectSeeker, 
   onSelectJob, 
   onNavigateToMap, 
+  onNavigateToJobs,
+  onNavigateToNetwork,
+  onNavigateToConnect,
   onNavigateToAnon,
   onNavigateToApplications,
   onNavigateToSavedJobs,
   onOpenProfile,
-  onOpenAuth
+  onOpenAuth,
+  onOpenPostJob
 }) => {
   const { user, isEmployer, isSeeker } = useAuth();
   const { startCall, setActiveChatUser } = useSocket();
@@ -49,10 +67,24 @@ export const Feed = ({
   const [submitting, setSubmitting] = useState(false);
   const [postError, setPostError] = useState('');
   const [copiedPostId, setCopiedPostId] = useState(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   
   // Active comments drawer per post
   const [activeCommentsPostId, setActiveCommentsPostId] = useState(null);
   const [commentInputs, setCommentInputs] = useState({});
+
+  // Floating Back to Top scroll listener
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 350);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Connected state synchronized with localStorage and backend network
   const [connectedUsers, setConnectedUsers] = useState(() => {
@@ -68,14 +100,11 @@ export const Feed = ({
     return { usr_seek_2: true, usr_emp_1: true };
   });
 
-  // Fetch feed posts
+  // Fetch feed posts via PostService
   const fetchPosts = async () => {
     try {
-      const res = await fetch('/api/posts');
-      if (res.ok) {
-        const data = await res.json();
-        setPosts(data.posts || []);
-      }
+      const postsData = await postService.getPosts();
+      setPosts(postsData || []);
     } catch (err) {
       console.error('Failed to fetch posts:', err);
     } finally {
@@ -87,7 +116,7 @@ export const Feed = ({
     fetchPosts();
   }, []);
 
-  // Handle Create Post
+  // Handle Create Post via PostService
   const handleCreatePost = async (e) => {
     e.preventDefault();
     setPostError('');
@@ -120,28 +149,18 @@ export const Feed = ({
       if (isSeeker) tags.push('#OpenToWork');
       if (selectedTag) tags.push(selectedTag);
 
-      const res = await fetch('/api/posts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          authorId: user?.id || 'guest',
-          authorName: user?.name || (isEmployer ? 'Tech Recruiter' : 'Software Candidate'),
-          authorRole: user?.role || 'seeker',
-          authorTitle: user?.title || user?.companyName || (isEmployer ? 'Talent Acquisition' : 'Full-Stack Developer'),
-          authorAvatar: user?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(user?.name || 'user')}`,
-          content: trimmedContent,
-          image: cleanedImage,
-          tags
-        })
+      const created = await postService.createPost({
+        authorId: user?.id || 'guest',
+        authorName: user?.name || (isEmployer ? 'Tech Recruiter' : 'Software Candidate'),
+        authorRole: user?.role || 'seeker',
+        authorTitle: user?.title || user?.companyName || (isEmployer ? 'Talent Acquisition' : 'Full-Stack Developer'),
+        authorAvatar: user?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(user?.name || 'user')}`,
+        content: trimmedContent,
+        image: cleanedImage,
+        tags
       });
 
-      const data = await res.json();
-      if (!res.ok) {
-        setPostError(data.error || 'Failed to create post');
-        return;
-      }
-
-      setPosts([data.post, ...posts]);
+      setPosts([created, ...posts]);
       setNewContent('');
       setNewImage('');
       setSelectedTag('');
@@ -149,13 +168,13 @@ export const Feed = ({
       setIsCreateOpen(false);
     } catch (err) {
       console.error('Error creating post:', err);
-      setPostError('Network error while creating post');
+      setPostError(err.message || 'Network error while creating post');
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Handle Like
+  // Handle Like via PostService
   const handleLike = async (postId) => {
     try {
       // Optimistic update
@@ -174,37 +193,26 @@ export const Feed = ({
         return p;
       }));
 
-      await fetch(`/api/posts/${postId}/like`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user?.id || 'guest' })
-      });
+      await postService.toggleLike(postId, user?.id || 'guest');
     } catch (err) {
       console.error('Like error:', err);
     }
   };
 
-  // Handle Comment Submission
+  // Handle Comment Submission via PostService
   const handleAddComment = async (postId) => {
     const text = commentInputs[postId]?.trim();
     if (!text) return;
 
     try {
-      const res = await fetch(`/api/posts/${postId}/comment`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          authorName: user?.name || 'Community Member',
-          authorAvatar: user?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(user?.name || 'user')}`,
-          text
-        })
+      const updatedPost = await postService.addComment(postId, {
+        authorName: user?.name || 'Community Member',
+        authorAvatar: user?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(user?.name || 'user')}`,
+        text
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        setPosts(prev => prev.map(p => p.id === postId ? data.post : p));
-        setCommentInputs(prev => ({ ...prev, [postId]: '' }));
-      }
+      setPosts(prev => prev.map(p => p.id === postId ? updatedPost : p));
+      setCommentInputs(prev => ({ ...prev, [postId]: '' }));
     } catch (err) {
       console.error('Comment error:', err);
     }
@@ -225,11 +233,7 @@ export const Feed = ({
     });
 
     if (user?.id) {
-      fetch('/api/network/connect', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id, targetId })
-      }).catch(() => {});
+      networkService.toggleConnect(user.id, targetId).catch(() => {});
     }
   };
 
@@ -237,19 +241,20 @@ export const Feed = ({
     <div className="max-w-[1600px] w-full mx-auto px-3 sm:px-6 lg:px-8 py-6">
       
       {/* Professional Feed Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* ========================================================== */}
-        {/* LEFT COLUMN: USER PROFILE MINI CARD & STATS */}
+        {/* LEFT COLUMN: USER PROFILE & QUICK ACTIONS */}
         {/* ========================================================== */}
-        <div className="hidden lg:block lg:col-span-3 space-y-4">
+        <div className="hidden lg:block lg:col-span-3 space-y-4 sticky top-20 self-start max-h-[calc(100vh-5.5rem)] overflow-y-auto overscroll-contain no-scrollbar pb-6">
           
-          {/* Profile Identity Card */}
-          <div className="bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm">
+          {/* 1. Profile Identity Card */}
+          <div className="bg-white/90 backdrop-blur-xl border border-slate-200/80 rounded-3xl overflow-hidden shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)]">
             {/* Cover photo */}
             <div className="h-20 bg-gradient-to-r from-indigo-100 via-indigo-50 to-emerald-50 relative">
-              <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-white/90 text-[10px] text-emerald-700 font-bold backdrop-blur-md border border-emerald-200 shadow-xs">
-                Live GPS Active
+              <span className="absolute top-2 right-2 px-2.5 py-0.5 rounded-full bg-white/90 text-[10px] text-emerald-700 font-bold backdrop-blur-md border border-emerald-200 shadow-xs flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Live GPS Radar</span>
               </span>
             </div>
 
@@ -261,7 +266,6 @@ export const Feed = ({
                   alt={user?.name || 'User'}
                   className="w-16 h-16 rounded-full border-4 border-white object-cover shadow-md bg-slate-100 ring-2 ring-indigo-500/20"
                 />
-                {/* Profile Signature Frame */}
                 {isSeeker && (
                   <span className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-full bg-emerald-600 border-2 border-white text-[8px] font-extrabold text-white tracking-wider shadow-xs">
                     #OPENTOWORK
@@ -276,9 +280,10 @@ export const Feed = ({
 
               <h3 
                 onClick={() => onOpenProfile && onOpenProfile(user)}
-                className="font-extrabold text-sm text-slate-900 hover:text-indigo-600 cursor-pointer transition-colors"
+                className="font-extrabold text-sm text-slate-900 hover:text-indigo-600 cursor-pointer transition-colors flex items-center gap-1"
               >
-                {user?.name || 'Guest Professional'}
+                <span>{user?.name || 'Guest Professional'}</span>
+                {user && <ShieldCheck className="w-3.5 h-3.5 text-indigo-600 inline" />}
               </h3>
               <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">
                 {user?.title || user?.companyName || (isEmployer ? 'Recruiter & Hiring Lead' : 'Full Stack Developer')}
@@ -290,85 +295,127 @@ export const Feed = ({
               </div>
 
               {/* View Full Profile Button */}
-              {user && (
+              {user ? (
                 <button
                   onClick={() => onOpenProfile && onOpenProfile(user)}
-                  className="w-full mt-1 py-1.5 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                  className="w-full mt-1 py-1.5 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 shadow-2xs"
                 >
                   <UserCheck className="w-3.5 h-3.5" />
-                  <span>View My Full Profile</span>
+                  <span>View & Edit Profile</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => onOpenAuth && onOpenAuth()}
+                  className="w-full mt-1 py-1.5 px-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 shadow-sm"
+                >
+                  <span>Sign In / Register</span>
                 </button>
               )}
             </div>
 
-            {/* Professional Connection Metrics */}
+            {/* Dynamic Activity Metrics */}
             <div className="border-t border-slate-100 px-4 py-3 space-y-2 text-xs">
-              <div className="flex items-center justify-between text-slate-600 hover:text-slate-900 cursor-pointer transition-colors">
-                <span>Connections</span>
-                <span className="font-extrabold text-indigo-600">540+</span>
+              <div 
+                onClick={() => onNavigateToJobs && onNavigateToJobs()}
+                className="flex items-center justify-between text-slate-600 hover:text-indigo-600 cursor-pointer transition-colors"
+              >
+                <span>Live Openings</span>
+                <span className="font-extrabold text-indigo-600">{jobs.length || '35+'}</span>
               </div>
-              <div className="flex items-center justify-between text-slate-600 hover:text-slate-900 cursor-pointer transition-colors">
-                <span>Profile views</span>
-                <span className="font-extrabold text-emerald-600">184</span>
+              <div 
+                onClick={() => onNavigateToNetwork && onNavigateToNetwork()}
+                className="flex items-center justify-between text-slate-600 hover:text-emerald-600 cursor-pointer transition-colors"
+              >
+                <span>Verified Talent</span>
+                <span className="font-extrabold text-emerald-600">{seekers.length || '48+'}</span>
               </div>
-              <div className="flex items-center justify-between text-slate-600 hover:text-slate-900 cursor-pointer transition-colors">
-                <span>Post impressions</span>
-                <span className="font-extrabold text-slate-700">1,280</span>
+              <div 
+                onClick={() => onNavigateToApplications && onNavigateToApplications()}
+                className="flex items-center justify-between text-slate-600 hover:text-amber-600 cursor-pointer transition-colors"
+              >
+                <span>{isEmployer ? 'Candidate Pipeline' : 'My Applications'}</span>
+                <span className="font-extrabold text-amber-600">Track ➔</span>
               </div>
             </div>
 
-            {/* Quick Map Jump */}
-            <div className="p-3 bg-slate-50 border-t border-slate-100">
-              <button
-                onClick={() => {
-                  if (!user) {
-                    onOpenAuth ? onOpenAuth() : onNavigateToMap && onNavigateToMap();
-                  } else {
-                    onNavigateToMap && onNavigateToMap();
-                  }
-                }}
-                className="w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
-              >
-                <Radio className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
-                <span>Open Live Map</span>
-                {!user && (
-                  <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 leading-none ml-1">
-                    Login
-                  </span>
-                )}
-              </button>
+            {/* Primary Action Button */}
+            <div className="p-3 bg-slate-50/80 border-t border-slate-100">
+              {isEmployer ? (
+                <button
+                  onClick={() => onOpenPostJob ? onOpenPostJob() : onNavigateToJobs && onNavigateToJobs()}
+                  className="w-full py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm shadow-emerald-600/20 active:scale-95"
+                >
+                  <PlusCircle className="w-3.5 h-3.5" />
+                  <span>Post a New Job on Map</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => onNavigateToMap && onNavigateToMap()}
+                  className="w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 shadow-2xs"
+                >
+                  <Radio className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
+                  <span>Explore Jobs on Live Map</span>
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Quick Shortcuts */}
-          <div className="bg-white border border-slate-200/90 rounded-3xl p-4 shadow-sm text-xs space-y-2.5">
-            <h4 className="font-bold text-slate-400 text-[11px] uppercase tracking-wider mb-2">My Shortcuts</h4>
+          {/* 2. Quick Navigation Shortcuts */}
+          <div className="bg-white/90 backdrop-blur-xl border border-slate-200/80 rounded-3xl p-4 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)] text-xs space-y-2.5">
+            <h4 className="font-extrabold text-slate-400 text-[10px] uppercase tracking-wider mb-2">Platform Shortcuts</h4>
             <div 
-              onClick={() => onNavigateToSavedJobs && onNavigateToSavedJobs()}
-              className="flex items-center gap-2 text-slate-600 hover:text-indigo-600 cursor-pointer transition-colors"
-            >
-              <Bookmark className="w-4 h-4 text-indigo-600" />
-              <span>Saved Jobs & Opportunities</span>
-            </div>
-            <div 
-              onClick={() => {
-                if (!user) {
-                  onOpenAuth ? onOpenAuth() : onNavigateToApplications && onNavigateToApplications();
-                } else {
-                  onNavigateToApplications && onNavigateToApplications();
-                }
-              }}
-              className="flex items-center justify-between text-slate-600 hover:text-emerald-600 cursor-pointer transition-colors"
+              onClick={() => onNavigateToJobs && onNavigateToJobs()}
+              className="flex items-center justify-between text-slate-600 hover:text-indigo-600 cursor-pointer transition-colors p-1.5 rounded-xl hover:bg-slate-50"
             >
               <div className="flex items-center gap-2">
-                <Briefcase className="w-4 h-4 text-emerald-600" />
-                <span>Submitted Applications</span>
+                <Briefcase className="w-4 h-4 text-indigo-600" />
+                <span className="font-semibold">Browse All Jobs</span>
               </div>
-              {!user && (
-                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 leading-none">
-                  Login
-                </span>
-              )}
+              <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+            </div>
+
+            <div 
+              onClick={() => onNavigateToApplications && onNavigateToApplications()}
+              className="flex items-center justify-between text-slate-600 hover:text-emerald-600 cursor-pointer transition-colors p-1.5 rounded-xl hover:bg-slate-50"
+            >
+              <div className="flex items-center gap-2">
+                <Award className="w-4 h-4 text-emerald-600" />
+                <span className="font-semibold">{isEmployer ? 'Candidate ATS Pipeline' : 'My Applied Jobs & Offers'}</span>
+              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+            </div>
+
+            <div 
+              onClick={() => onNavigateToConnect && onNavigateToConnect()}
+              className="flex items-center justify-between text-slate-600 hover:text-violet-600 cursor-pointer transition-colors p-1.5 rounded-xl hover:bg-slate-50"
+            >
+              <div className="flex items-center gap-2">
+                <Video className="w-4 h-4 text-violet-600" />
+                <span className="font-semibold">Speed Video Connect</span>
+              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+            </div>
+
+            <div 
+              onClick={() => onNavigateToAnon && onNavigateToAnon()}
+              className="flex items-center justify-between text-slate-600 hover:text-orange-600 cursor-pointer transition-colors p-1.5 rounded-xl hover:bg-slate-50"
+            >
+              <div className="flex items-center gap-2">
+                <Flame className="w-4 h-4 text-orange-500" />
+                <span className="font-semibold">Anon Salary & Tech Talk</span>
+              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+            </div>
+
+            <div 
+              onClick={() => onNavigateToSavedJobs && onNavigateToSavedJobs()}
+              className="flex items-center justify-between text-slate-600 hover:text-amber-600 cursor-pointer transition-colors p-1.5 rounded-xl hover:bg-slate-50"
+            >
+              <div className="flex items-center gap-2">
+                <Bookmark className="w-4 h-4 text-amber-500" />
+                <span className="font-semibold">Saved Opportunities</span>
+              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
             </div>
           </div>
 
@@ -380,7 +427,7 @@ export const Feed = ({
         <div className="lg:col-span-6 space-y-5">
           
           {/* Start a Post Input Box */}
-          <div className="bg-white border border-slate-200/90 rounded-3xl p-4 shadow-sm">
+          <div className="bg-white/90 backdrop-blur-xl border border-slate-200/80 rounded-3xl p-5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)]">
             <div className="flex items-center gap-3">
               <img
                 src={user?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${user?.name || 'user'}`}
@@ -454,7 +501,25 @@ export const Feed = ({
           {loading ? (
             <div className="space-y-4">
               {[1, 2, 3].map(i => (
-                <div key={i} className="bg-white border border-slate-200 rounded-3xl p-5 h-48 animate-pulse shadow-sm" />
+                <div key={i} className="bg-white/90 backdrop-blur-xl border border-slate-200/90 rounded-3xl p-5 shadow-sm space-y-4 animate-pulse">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-slate-200" />
+                    <div className="space-y-2 flex-1">
+                      <div className="h-3.5 bg-slate-200 rounded-md w-1/3" />
+                      <div className="h-2.5 bg-slate-100 rounded-md w-1/4" />
+                    </div>
+                  </div>
+                  <div className="space-y-2 pt-1">
+                    <div className="h-3 bg-slate-100 rounded-md w-full" />
+                    <div className="h-3 bg-slate-100 rounded-md w-5/6" />
+                    <div className="h-3 bg-slate-100 rounded-md w-3/4" />
+                  </div>
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-around">
+                    <div className="h-6 bg-slate-100 rounded-xl w-16" />
+                    <div className="h-6 bg-slate-100 rounded-xl w-20" />
+                    <div className="h-6 bg-slate-100 rounded-xl w-16" />
+                  </div>
+                </div>
               ))}
             </div>
           ) : posts.length === 0 ? (
@@ -470,7 +535,7 @@ export const Feed = ({
               return (
                 <article
                   key={post.id}
-                  className="bg-white border border-slate-200/90 hover:border-slate-300 rounded-3xl p-5 shadow-sm transition-all"
+                  className="card-spotlight bg-white/95 hover:bg-white backdrop-blur-2xl border border-slate-200/90 hover:border-indigo-400/90 rounded-3xl p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_-8px_rgba(99,102,241,0.12)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
                 >
                   
                   {/* Post Author Header */}
@@ -701,83 +766,213 @@ export const Feed = ({
         </div>
 
         {/* ========================================================== */}
-        {/* RIGHT COLUMN: INDUSTRY NEWS & HIGHLIGHTS */}
+        {/* RIGHT COLUMN: RADAR, DISCOVERY & HIGH-TECH WIDGETS */}
         {/* ========================================================== */}
-        <div className="hidden lg:block lg:col-span-3 space-y-4">
+        <div className="hidden lg:block lg:col-span-3 space-y-4 sticky top-20 self-start max-h-[calc(100vh-5.5rem)] overflow-y-auto overscroll-contain no-scrollbar pb-6">
           
-          {/* Industry News & Trends */}
-          <div className="bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-3xl p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-1.5">
-                <TrendingUp className="w-4 h-4 text-indigo-600" />
-                <span>JobScout Trends</span>
-              </h4>
-              <span className="text-[10px] font-bold text-slate-400 uppercase">India Tech</span>
-            </div>
+          {/* Live Speed Match & WebRTC Radar Card */}
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white p-5 shadow-xl border border-indigo-500/20">
+            {/* Background glowing blur */}
+            <div className="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/20 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute -bottom-8 -left-8 w-28 h-28 bg-emerald-500/20 rounded-full blur-2xl pointer-events-none" />
 
-            <div className="space-y-3 text-xs">
-              <div className="cursor-pointer group">
-                <p className="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">
-                  Mumbai BKC tech hiring surges 28%
-                </p>
-                <p className="text-[10px] text-slate-400 mt-0.5">Top stories • 4,820 readers</p>
+            <div className="relative z-10 space-y-3.5">
+              <div className="flex items-center justify-between">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-[10px] font-black uppercase tracking-wider text-emerald-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                  Live Radar Online
+                </span>
+                <Radio className="w-4 h-4 text-indigo-300 animate-pulse" />
               </div>
 
-              <div className="cursor-pointer group">
-                <p className="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">
-                  WebRTC P2P audio/video in high demand
+              <div>
+                <h3 className="text-sm font-black tracking-tight text-white flex items-center gap-1.5">
+                  <Zap className="w-4 h-4 text-amber-400 fill-amber-400" />
+                  Instant Speed Connect
+                </h3>
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                  Direct peer-to-peer WebRTC video screening without middleman delays.
                 </p>
-                <p className="text-[10px] text-slate-400 mt-0.5">2h ago • 2,150 readers</p>
               </div>
 
-              <div className="cursor-pointer group">
-                <p className="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">
-                  Immediate spot hiring for contract roles
-                </p>
-                <p className="text-[10px] text-slate-400 mt-0.5">4h ago • 1,320 readers</p>
+              {/* Dynamic Ecosystem Counts */}
+              <div className="grid grid-cols-2 gap-2 py-1">
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-2.5 border border-white/10 text-center">
+                  <div className="text-base font-black text-white">{seekers?.length || 24}</div>
+                  <div className="text-[10px] font-semibold text-slate-300 uppercase tracking-wider">Talent Online</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-2.5 border border-white/10 text-center">
+                  <div className="text-base font-black text-amber-400">{jobs?.length || 38}</div>
+                  <div className="text-[10px] font-semibold text-slate-300 uppercase tracking-wider">Active Jobs</div>
+                </div>
               </div>
 
-              <div className="cursor-pointer group">
-                <p className="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">
-                  Interactive geospatial maps become industry standard
-                </p>
-                <p className="text-[10px] text-slate-400 mt-0.5">6h ago • 3,490 readers</p>
-              </div>
+              {/* Action Trigger */}
+              <button
+                type="button"
+                onClick={() => onNavigateToConnect ? onNavigateToConnect() : (onNavigateToMap && onNavigateToMap())}
+                className="w-full py-2.5 px-3 rounded-2xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/50 transition-all flex items-center justify-center gap-2 active:scale-98 group cursor-pointer"
+              >
+                <Zap className="w-3.5 h-3.5 group-hover:scale-110 transition-transform text-amber-300 fill-amber-300" />
+                <span>Launch Speed Match</span>
+                <ChevronRight className="w-3.5 h-3.5 ml-auto text-indigo-200 group-hover:translate-x-0.5 transition-transform" />
+              </button>
             </div>
           </div>
 
-          {/* Quick Connect People Widget */}
-          <div className="bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-3xl p-4 shadow-sm">
-            <h4 className="font-extrabold text-xs text-slate-900 uppercase tracking-wider mb-3">
-              Recommended Professionals
-            </h4>
+          {/* Quick Connect People Widget with Audio/Video/Chat triggers */}
+          <div className="bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-3xl p-4 shadow-sm space-y-3.5">
+            <div className="flex items-center justify-between">
+              <h4 className="font-extrabold text-xs text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                <Users className="w-3.5 h-3.5 text-indigo-600" />
+                <span>Verified Professionals</span>
+              </h4>
+              <button 
+                type="button"
+                onClick={() => onNavigateToNetwork ? onNavigateToNetwork() : (onNavigateToMap && onNavigateToMap())}
+                className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors cursor-pointer"
+              >
+                View all
+              </button>
+            </div>
 
             <div className="space-y-3">
-              {[
-                { name: 'Rohan Sharma', title: 'React & WebRTC Engineer', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150', id: 'usr_seek_1' },
-                { name: 'Priya Patel', title: 'Product UI/UX Designer', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150', id: 'usr_seek_2' },
-                { name: 'Sneha Rao', title: 'Backend Python Engineer', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150', id: 'usr_seek_4' }
-              ].map((p) => (
-                <div key={p.id} className="flex items-center justify-between gap-2">
-                  <div 
-                    onClick={() => onOpenProfile && onOpenProfile(p.id)}
-                    className="flex items-center gap-2 truncate cursor-pointer group/prof"
-                    title={`View ${p.name}'s Profile`}
-                  >
-                    <img src={p.avatar} alt={p.name} className="w-8 h-8 rounded-full object-cover border border-slate-200 group-hover/prof:border-indigo-500 transition-colors" />
-                    <div className="truncate">
-                      <p className="text-xs font-bold text-slate-900 truncate group-hover/prof:text-indigo-600 transition-colors">{p.name}</p>
-                      <p className="text-[10px] text-emerald-600 font-medium truncate">{p.title}</p>
+              {(seekers && seekers.length > 0 ? seekers.slice(0, 3) : [
+                { id: 'usr_seek_1', name: 'Rohan Sharma', title: 'React & WebRTC Engineer', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150', hourlyRate: 850, skills: ['React', 'WebRTC'] },
+                { id: 'usr_seek_2', name: 'Priya Patel', title: 'Product UI/UX Designer', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150', hourlyRate: 950, skills: ['Figma', 'System'] },
+                { id: 'usr_seek_4', name: 'Sneha Rao', title: 'Backend Python Engineer', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150', hourlyRate: 1100, skills: ['Python', 'Docker'] }
+              ]).map((p) => {
+                const isConn = !!connectedUsers[p.id];
+                return (
+                  <div key={p.id} className="p-2.5 rounded-2xl bg-slate-50/70 hover:bg-slate-100/80 border border-slate-100 transition-all space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div 
+                        onClick={() => onOpenProfile && onOpenProfile(p.id)}
+                        className="flex items-center gap-2.5 cursor-pointer group/prof flex-1 min-w-0"
+                        title={`View ${p.name}'s Profile`}
+                      >
+                        <div className="relative flex-shrink-0">
+                          <img 
+                            src={p.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(p.name)}`} 
+                            alt={p.name} 
+                            className="w-9 h-9 rounded-full object-cover border border-slate-200 group-hover/prof:border-indigo-500 transition-colors" 
+                          />
+                          <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-bold text-slate-900 truncate group-hover/prof:text-indigo-600 transition-colors flex items-center gap-1">
+                            <span>{p.name}</span>
+                            <ShieldCheck className="w-3 h-3 text-emerald-500 flex-shrink-0" />
+                          </p>
+                          <p className="text-[10.5px] text-slate-500 font-medium truncate">{p.title || 'Software Engineer'}</p>
+                        </div>
+                      </div>
+
+                      {/* Connect Toggle */}
+                      <button
+                        type="button"
+                        onClick={() => toggleConnectUser(p.id)}
+                        className={`px-2.5 py-1 rounded-xl text-[10.5px] font-bold border transition-all flex items-center gap-1 flex-shrink-0 active:scale-95 cursor-pointer ${
+                          isConn 
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                            : 'bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white border-indigo-200 hover:border-indigo-600 shadow-sm'
+                        }`}
+                      >
+                        {isConn ? <Check className="w-3 h-3 text-emerald-600" /> : <UserPlus className="w-3 h-3" />}
+                        <span>{isConn ? 'Connected' : 'Connect'}</span>
+                      </button>
+                    </div>
+
+                    {/* Instant Direct Communication Actions */}
+                    <div className="flex items-center justify-between pt-1 border-t border-slate-200/60 text-[10px]">
+                      <span className="text-slate-400 font-medium">Quick actions:</span>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => startCall && startCall(p, false)}
+                          className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition-all active:scale-95 cursor-pointer"
+                          title="Instant Audio Call"
+                        >
+                          <Phone className="w-3 h-3" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => startCall && startCall(p, true)}
+                          className="p-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-all active:scale-95 cursor-pointer"
+                          title="Instant Video Interview"
+                        >
+                          <Video className="w-3 h-3" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveChatUser && setActiveChatUser(p)}
+                          className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-all active:scale-95 cursor-pointer"
+                          title="Direct Message"
+                        >
+                          <MessageSquare className="w-3 h-3" />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  <button
-                    onClick={() => toggleConnectUser(p.id)}
-                    className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white rounded-lg text-[10px] font-bold border border-indigo-200 hover:border-indigo-600 transition-all flex-shrink-0 shadow-sm"
-                  >
-                    {connectedUsers[p.id] ? 'Connected' : '+ Connect'}
-                  </button>
-                </div>
-              ))}
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Industry News & Trends */}
+          <div className="bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-3xl p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="font-extrabold text-xs text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                <TrendingUp className="w-3.5 h-3.5 text-indigo-600" />
+                <span>JobScout Trends</span>
+              </h4>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 uppercase">Live Tech</span>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div 
+                onClick={() => onNavigateToJobs && onNavigateToJobs()}
+                className="cursor-pointer group p-2 rounded-xl hover:bg-indigo-50/50 transition-colors border border-transparent hover:border-indigo-100"
+              >
+                <p className="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors flex items-center justify-between">
+                  <span>Mumbai & Bengaluru Tech Surge</span>
+                  <ChevronRight className="w-3 h-3 text-slate-400 group-hover:text-indigo-600 transition-colors" />
+                </p>
+                <p className="text-[10px] text-slate-400 mt-0.5">Top stories • 4,820 readers exploring jobs</p>
+              </div>
+
+              <div 
+                onClick={() => onNavigateToConnect && onNavigateToConnect()}
+                className="cursor-pointer group p-2 rounded-xl hover:bg-indigo-50/50 transition-colors border border-transparent hover:border-indigo-100"
+              >
+                <p className="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors flex items-center justify-between">
+                  <span>WebRTC P2P Speed Matching active</span>
+                  <ChevronRight className="w-3 h-3 text-slate-400 group-hover:text-indigo-600 transition-colors" />
+                </p>
+                <p className="text-[10px] text-slate-400 mt-0.5">2h ago • 2,150 instant calls initiated</p>
+              </div>
+
+              <div 
+                onClick={() => onNavigateToAnon && onNavigateToAnon()}
+                className="cursor-pointer group p-2 rounded-xl hover:bg-indigo-50/50 transition-colors border border-transparent hover:border-indigo-100"
+              >
+                <p className="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors flex items-center justify-between">
+                  <span>Anonymous Salary Salon Index</span>
+                  <ChevronRight className="w-3 h-3 text-slate-400 group-hover:text-indigo-600 transition-colors" />
+                </p>
+                <p className="text-[10px] text-slate-400 mt-0.5">Community • Real offer letters & benchmarks</p>
+              </div>
+            </div>
+
+            {/* Micro footer */}
+            <div className="mt-4 pt-3 border-t border-slate-100 text-[10px] text-slate-400 flex flex-wrap gap-x-2 gap-y-1 justify-center font-medium">
+              <span>About</span>
+              <span>•</span>
+              <span>Accessibility</span>
+              <span>•</span>
+              <span>Privacy</span>
+              <span>•</span>
+              <span>JobScout © 2026</span>
             </div>
           </div>
 
@@ -896,6 +1091,19 @@ export const Feed = ({
 
           </div>
         </div>
+      )}
+
+      {/* Floating Scroll to Top Pill */}
+      {showScrollTop && (
+        <button
+          type="button"
+          onClick={scrollToTop}
+          className="fixed bottom-20 md:bottom-8 right-6 z-[600] px-4 py-2.5 rounded-full bg-slate-900/90 hover:bg-slate-900 text-white shadow-xl backdrop-blur-md border border-slate-700/50 text-xs font-bold flex items-center gap-2 transition-all transform hover:-translate-y-1 active:scale-95 animate-in fade-in slide-in-from-bottom-4 duration-200 cursor-pointer group"
+          title="Scroll to top"
+        >
+          <ArrowUp className="w-3.5 h-3.5 text-indigo-400 group-hover:-translate-y-0.5 transition-transform" />
+          <span>Back to Top</span>
+        </button>
       )}
 
     </div>

@@ -1,9 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Phone, PhoneCall, PhoneOff, Video, User, AlertCircle, X } from 'lucide-react';
 import { useSocket } from '../context/SocketContext';
+import { playRingtone, stopRingtone } from '../utils/soundEffects';
 
 export const IncomingCallBanner = () => {
   const { incomingCall, acceptCall, rejectCall, callNotice, dismissCallNotice } = useSocket();
+
+  useEffect(() => {
+    if (incomingCall) {
+      playRingtone();
+    } else {
+      stopRingtone();
+    }
+    return () => {
+      stopRingtone();
+    };
+  }, [incomingCall]);
 
   return (
     <>

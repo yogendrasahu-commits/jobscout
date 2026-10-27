@@ -16,7 +16,9 @@ import {
   BookmarkCheck,
   Globe,
   SlidersHorizontal,
-  ArrowUpDown
+  ArrowUpDown,
+  Car,
+  Building
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { ApplicationsView } from './ApplicationsView';
@@ -44,7 +46,7 @@ export const JobsList = ({
 
   const [applicationsCount, setApplicationsCount] = useState(0);
 
-  // Bookmarking / Saved Jobs State
+  // Bookmarking / Saved Jobs State (with cloud sync & localStorage offline fallback)
   const [savedJobIds, setSavedJobIds] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('jobscout_saved_jobs') || '[]');
@@ -52,6 +54,22 @@ export const JobsList = ({
       return [];
     }
   });
+
+  // Sync saved jobs from backend when user logs in
+  useEffect(() => {
+    if (!token) return;
+    fetch('/api/auth/saved-jobs', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.savedJobs && Array.isArray(data.savedJobs)) {
+          setSavedJobIds(data.savedJobs);
+          localStorage.setItem('jobscout_saved_jobs', JSON.stringify(data.savedJobs));
+        }
+      })
+      .catch(() => {});
+  }, [token]);
 
   const toggleSaveJob = (e, jobId) => {
     e.stopPropagation();
@@ -62,6 +80,17 @@ export const JobsList = ({
       localStorage.setItem('jobscout_saved_jobs', JSON.stringify(updated));
       return updated;
     });
+
+    if (token) {
+      fetch('/api/auth/saved-jobs/toggle', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ jobId })
+      }).catch(() => {});
+    }
   };
 
   // Sync with defaultSubTab if changed externally
@@ -161,73 +190,96 @@ export const JobsList = ({
   return (
     <div className="max-w-[1600px] w-full mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
       
-      {/* Top Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            {activeSubTab === 'browse'
-              ? 'Discover Live Nearby Jobs'
-              : (isEmployer ? 'Candidate Applications & Resumes' : 'My Applied Jobs')}
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            {activeSubTab === 'browse'
-              ? 'Realtime location-matched openings ready for instant chat & interviews'
-              : (isEmployer 
-                  ? 'Review applicants for your posted jobs, schedule live video/voice interviews' 
-                  : 'Track your submitted applications and interview requests')}
-          </p>
+      {/* Ultra-Luxury Hero Screen Header */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-white via-indigo-50/40 to-white border border-slate-200/90 backdrop-blur-2xl p-6 sm:p-8 mb-6 shadow-sm">
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-2 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50/90 border border-indigo-200/80 text-indigo-700 text-xs font-bold shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-600 animate-pulse" />
+              <span>Smart Match Engine • Verified Compensation & Distance</span>
+            </div>
+            <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+              {activeSubTab === 'browse' ? (
+                <>
+                  Discover Nearby Tech Jobs on{' '}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-indigo-600 to-cyan-500">
+                    Live Radar
+                  </span>
+                </>
+              ) : (
+                <>
+                  {isEmployer ? 'Candidate Applications & ATS' : 'My Applied Jobs & Stamped Offers'}
+                </>
+              )}
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+              {activeSubTab === 'browse'
+                ? 'Hyper-local openings with exact commute distance, verified CTC brackets, and 1-click spot video interviews.'
+                : (isEmployer 
+                    ? 'Review applicants, screen via peer-to-peer WebRTC video, and dispatch stamped offer letters directly to candidate email.' 
+                    : 'Track your applications in real time and digitally accept official offer letters with instant hire confirmation.')}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            {isEmployer && (
+              <button
+                onClick={onOpenPostJob}
+                className="px-5 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-extrabold text-xs shadow-lg shadow-indigo-600/25 transition-all flex items-center gap-2 active:scale-95 cursor-pointer"
+              >
+                <Briefcase className="w-4 h-4 text-cyan-200" />
+                <span>+ Post New Opening</span>
+              </button>
+            )}
+          </div>
         </div>
 
-        {isEmployer && (
-          <button
-            onClick={onOpenPostJob}
-            className="self-start md:self-auto px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center gap-2 active:scale-95"
-          >
-            <Briefcase className="w-4 h-4" />
-            Post New Opening
-          </button>
-        )}
+        {/* Ambient subtle lighting orbs */}
+        <div className="absolute -right-16 -bottom-16 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -left-16 -top-16 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       {/* Segmented Sub-Tab Switcher: Explore Jobs vs Applied Jobs */}
-      <div className="flex items-center gap-2 mb-6 border-b border-slate-200 pb-4">
-        <button
-          type="button"
-          onClick={() => setActiveSubTab('browse')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-            activeSubTab === 'browse'
-              ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-600/20 border border-indigo-400/30'
-              : 'bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/90 shadow-xs'
-          }`}
-        >
-          <Briefcase className="w-4 h-4" />
-          <span>Explore Openings</span>
-          <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
-            activeSubTab === 'browse' ? 'bg-indigo-700/80 text-white' : 'bg-slate-100 text-slate-600'
-          }`}>
-            {jobs.length}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveSubTab('applied')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-            activeSubTab === 'applied'
-              ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-600/20 border border-indigo-400/30'
-              : 'bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200/90 shadow-xs'
-          }`}
-        >
-          <FileText className="w-4 h-4" />
-          <span>{isEmployer ? 'Candidate Applications' : 'Applied Jobs'}</span>
-          {applicationsCount > 0 && (
-            <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
-              activeSubTab === 'applied' ? 'bg-indigo-700/80 text-white' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+      <div className="flex items-center gap-2 mb-6">
+        <div className="flex items-center gap-1 p-1 bg-slate-100/80 backdrop-blur-md rounded-full border border-slate-200/70 shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)]">
+          <button
+            type="button"
+            onClick={() => setActiveSubTab('browse')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
+              activeSubTab === 'browse'
+                ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/5'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+            }`}
+          >
+            <Briefcase className="w-4 h-4 text-indigo-600" />
+            <span>Explore Openings</span>
+            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+              activeSubTab === 'browse' ? 'bg-indigo-50 text-indigo-700' : 'bg-slate-200/70 text-slate-600'
             }`}>
-              {applicationsCount}
+              {jobs.length}
             </span>
-          )}
-        </button>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveSubTab('applied')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
+              activeSubTab === 'applied'
+                ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/5'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+            }`}
+          >
+            <FileText className="w-4 h-4 text-emerald-600" />
+            <span>{isEmployer ? 'Candidate Applications' : 'Applied Jobs'}</span>
+            {applicationsCount > 0 && (
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                activeSubTab === 'applied' ? 'bg-emerald-50 text-emerald-700' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+              }`}>
+                {applicationsCount}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Active Sub-Tab View */}
@@ -303,7 +355,7 @@ export const JobsList = ({
           </div>
 
           {/* Filter and Search Bar */}
-          <div className="bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-2xl p-4 mb-6 shadow-sm space-y-3">
+          <div className="bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-2xl p-4 mb-6 shadow-sm space-y-3 sticky top-20 z-20">
             <div className="flex flex-col lg:flex-row gap-3">
               {/* Search Input */}
               <div className="relative flex-1">
@@ -422,27 +474,45 @@ export const JobsList = ({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-5">
               {filteredJobs.map((job) => {
                 const isSaved = savedJobIds.includes(job.id);
+                
+                // Compute smart skill match percentage if user has skills defined
+                const userSkills = (user?.skills || []).map(s => String(s).toLowerCase().trim());
+                const jobSkills = (job.skills || []).map(s => String(s).toLowerCase().trim());
+                let matchPercentage = null;
+                if (userSkills.length > 0 && jobSkills.length > 0) {
+                  const matched = jobSkills.filter(s => userSkills.includes(s));
+                  matchPercentage = Math.min(98, Math.max(55, Math.round((matched.length / jobSkills.length) * 100)));
+                }
+
                 return (
                   <div
                     key={job.id}
                     onClick={() => onSelectJob(job)}
-                    className="group bg-white/95 hover:bg-white backdrop-blur-2xl border border-slate-200/90 hover:border-indigo-300 rounded-2xl p-5 shadow-sm hover:shadow-xl transition-all cursor-pointer flex flex-col justify-between relative"
+                    className="group card-spotlight bg-white/95 hover:bg-white backdrop-blur-2xl border border-slate-200/90 hover:border-indigo-400/90 rounded-3xl p-5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_-8px_rgba(99,102,241,0.16)] hover:-translate-y-1.5 transition-all duration-300 cursor-pointer flex flex-col justify-between relative overflow-hidden"
                   >
+                    {/* Top subtle hairline glow */}
+                    <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-indigo-500 via-cyan-400 to-emerald-400 opacity-60 group-hover:opacity-100 transition-opacity" />
+
                     <div>
                       {/* Top Badges & Bookmark */}
-                      <div className="flex items-start justify-between gap-2 mb-2.5">
+                      <div className="flex items-start justify-between gap-2 mb-3.5">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200">
+                          <span className="px-2.5 py-1 text-[10px] font-black tracking-wider uppercase rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200/80 shadow-2xs">
                             {job.jobType}
                           </span>
                           {job.workMode && (
-                            <span className="px-2 py-0.5 text-[10px] font-semibold rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                            <span className="px-2 py-0.5 text-[10px] font-bold rounded-lg bg-slate-100 text-slate-700 border border-slate-200">
                               {job.workMode}
                             </span>
                           )}
                           {job.urgent && (
-                            <span className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-md">
-                              <Flame className="w-3 h-3 text-amber-500" /> Urgent
+                            <span className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-extrabold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg shadow-2xs">
+                              <Flame className="w-3 h-3 text-rose-500 fill-rose-500 animate-pulse" /> Urgent
+                            </span>
+                          )}
+                          {matchPercentage && (
+                            <span className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-black text-indigo-800 bg-indigo-50/90 border border-indigo-200 rounded-lg shadow-2xs">
+                              <Sparkles className="w-2.5 h-2.5 text-indigo-600 animate-pulse" /> {matchPercentage}% Match
                             </span>
                           )}
                         </div>
@@ -451,7 +521,7 @@ export const JobsList = ({
                         <button
                           type="button"
                           onClick={(e) => toggleSaveJob(e, job.id)}
-                          className={`p-1.5 rounded-xl border transition-all ${
+                          className={`p-2 rounded-xl border transition-all active:scale-95 ${
                             isSaved 
                               ? 'bg-amber-50 border-amber-300 text-amber-600 shadow-xs' 
                               : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-400 hover:text-slate-600'
@@ -462,41 +532,66 @@ export const JobsList = ({
                         </button>
                       </div>
 
-                      <h3 className="font-bold text-base text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">
-                        {job.title}
-                      </h3>
-                      <p className="text-xs text-slate-600 font-medium mt-0.5">{job.company}</p>
-
-                      <div className="mt-3 flex items-center gap-1.5 text-xs text-emerald-700 font-bold">
-                        <span>{job.salary}</span>
+                      {/* Company Avatar & Job Title */}
+                      <div className="flex items-start gap-3 mb-2">
+                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-50 to-indigo-100/80 border border-indigo-200/70 flex items-center justify-center font-black text-sm text-indigo-700 flex-shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                          {(job.company || 'JS').slice(0, 2).toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-extrabold text-base text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1 leading-snug">
+                            {job.title}
+                          </h3>
+                          <p className="text-xs text-slate-600 font-semibold truncate flex items-center gap-1 mt-0.5">
+                            <Building className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                            <span className="truncate">{job.company}</span>
+                          </p>
+                        </div>
                       </div>
 
-                      <div className="mt-2 flex items-center gap-1 text-[11px] text-slate-500">
-                        <MapPin className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-                        <span className="truncate">{job.address}</span>
+                      {/* Prominent Tabular Figures Salary & Commute */}
+                      <div className="mt-3.5 flex items-center justify-between gap-2">
+                        <span className="font-mono tracking-tight font-black text-xs sm:text-sm text-emerald-800 bg-emerald-50/90 px-3 py-1 rounded-xl border border-emerald-200/90 shadow-2xs flex items-center gap-1">
+                          <DollarSign className="w-3.5 h-3.5 text-emerald-600 -mr-0.5" />
+                          <span>{job.salary || 'Competitive'}</span>
+                        </span>
                         {job.distanceKm && (
-                          <span className="ml-auto text-[10px] font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200">
-                            {job.distanceKm} km
+                          <span className="flex items-center gap-1 text-[10px] font-bold text-slate-700 bg-slate-100/90 px-2.5 py-1 rounded-xl border border-slate-200">
+                            <Car className="w-3 h-3 text-indigo-600" />
+                            <span>~{Math.max(2, Math.round(job.distanceKm * 2.5))}m</span>
+                            <span className="text-slate-300">•</span>
+                            <span>{job.distanceKm} km</span>
                           </span>
                         )}
                       </div>
 
-                      <p className="mt-3 text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                      <div className="mt-2.5 flex items-center gap-1.5 text-[11px] text-slate-500 font-medium">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+                        <span className="truncate">{job.address}</span>
+                      </div>
+
+                      <p className="mt-2.5 text-xs text-slate-600 line-clamp-2 leading-relaxed">
                         {job.description}
                       </p>
 
                       {job.skills && job.skills.length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-1">
-                          {job.skills.slice(0, 3).map((s, idx) => (
-                            <span
-                              key={idx}
-                              className="px-2 py-0.5 text-[10px] font-medium bg-slate-50 text-slate-700 rounded border border-slate-200"
-                            >
-                              {s}
-                            </span>
-                          ))}
+                          {job.skills.slice(0, 3).map((s, idx) => {
+                            const isMatched = userSkills.includes(s.toLowerCase().trim());
+                            return (
+                              <span
+                                key={idx}
+                                className={`px-2 py-0.5 text-[10px] font-semibold rounded-lg border ${
+                                  isMatched 
+                                    ? 'bg-indigo-50 text-indigo-700 border-indigo-200 font-bold' 
+                                    : 'bg-slate-50 text-slate-700 border-slate-200'
+                                }`}
+                              >
+                                {isMatched ? '✓ ' : ''}{s}
+                              </span>
+                            );
+                          })}
                           {job.skills.length > 3 && (
-                            <span className="px-1.5 py-0.5 text-[10px] text-slate-400">
+                            <span className="px-1.5 py-0.5 text-[10px] font-semibold text-slate-400 bg-slate-50 rounded-lg">
                               +{job.skills.length - 3}
                             </span>
                           )}
@@ -504,12 +599,12 @@ export const JobsList = ({
                       )}
                     </div>
 
-                    <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                      <span className="flex items-center gap-1 text-emerald-700 font-extrabold text-[11px] bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
-                        <Zap className="w-3 h-3 fill-emerald-600 text-emerald-600" /> Easy Apply
+                    <div className="mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs">
+                      <span className="flex items-center gap-1.5 text-emerald-700 font-black text-[11px] bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200/80 shadow-2xs group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                        <Zap className="w-3 h-3 fill-current" /> Easy Apply
                       </span>
-                      <span className="text-slate-500 font-semibold group-hover:text-indigo-600 flex items-center gap-1 transition-colors">
-                        Details <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                      <span className="text-slate-500 font-bold group-hover:text-indigo-600 flex items-center gap-1 transition-colors">
+                        View Role <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                       </span>
                     </div>
                   </div>

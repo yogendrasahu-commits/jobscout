@@ -14,8 +14,10 @@ import {
   Eye,
   CheckCircle,
   ShieldCheck,
+  Settings
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { EmailSettingsModal } from './EmailSettingsModal';
 
 export const IssueOfferModal = ({ application, isOpen, onClose, onSuccess }) => {
   const { user, token } = useAuth();
@@ -23,6 +25,7 @@ export const IssueOfferModal = ({ application, isOpen, onClose, onSuccess }) => 
   const [activeTab, setActiveTab] = useState('form'); // 'form' | 'preview'
   const [candidateEmail, setCandidateEmail] = useState('');
   const [designation, setDesignation] = useState('');
+  const [isEmailSettingsOpen, setIsEmailSettingsOpen] = useState(false);
   const [salary, setSalary] = useState('');
   const [joiningDate, setJoiningDate] = useState('Immediate (Within 7-15 Days)');
   const [location, setLocation] = useState('Bandra Kurla Complex (BKC), Mumbai / Hybrid');
@@ -85,14 +88,20 @@ export const IssueOfferModal = ({ application, isOpen, onClose, onSuccess }) => 
         throw new Error(data.error || 'Failed to dispatch offer letter');
       }
 
-      setSuccess(`🎉 आधिकारिक ऑफर लेटर पोर्टल में उम्मीदवार के प्रोफाइल पर सफलतापूर्वक जारी कर दिया गया है!`);
+      if (data.emailResult?.sentReal) {
+        setSuccess(`🎉 आधिकारिक ऑफर लेटर उम्मीदवार के Gmail (${cleanEmail}) इनबॉक्स में सफलतापूर्वक डिलीवर कर दिया गया है!`);
+      } else if (data.emailResult?.error) {
+        setSuccess(`🎉 ऑफर लेटर पोर्टल में जारी हो गया है। ध्यान दें: ${data.emailResult.error} (Email Settings में Gmail App Password अपडेट करें)।`);
+      } else {
+        setSuccess(`🎉 आधिकारिक ऑफर लेटर पोर्टल में उम्मीदवार के प्रोफाइल पर सफलतापूर्वक जारी कर दिया गया है!`);
+      }
 
       if (onSuccess) {
         onSuccess(data.application);
       }
       setTimeout(() => {
         onClose();
-      }, 2200);
+      }, 2600);
     } catch (err) {
       setError(err.message || 'ऑफर लेटर भेजने में त्रुटि हुई।');
     } finally {
@@ -200,9 +209,19 @@ export const IssueOfferModal = ({ application, isOpen, onClose, onSuccess }) => 
 
               {/* Candidate Email Input (Required to send Offer) */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  Candidate Email (उम्मीदवार का ईमेल) <span className="text-rose-500">*</span>
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-bold text-slate-700">
+                    Candidate Email (उम्मीदवार का ईमेल) <span className="text-rose-500">*</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setIsEmailSettingsOpen(true)}
+                    className="text-[11px] text-indigo-600 hover:text-indigo-700 font-bold flex items-center gap-1 active:scale-95"
+                  >
+                    <Settings className="w-3 h-3" />
+                    <span>Email Delivery Settings</span>
+                  </button>
+                </div>
                 <div className="relative">
                   <input
                     type="email"
@@ -416,6 +435,11 @@ export const IssueOfferModal = ({ application, isOpen, onClose, onSuccess }) => 
         </div>
 
       </div>
+
+      <EmailSettingsModal
+        isOpen={isEmailSettingsOpen}
+        onClose={() => setIsEmailSettingsOpen(false)}
+      />
     </div>
   );
 };

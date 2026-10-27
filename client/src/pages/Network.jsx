@@ -300,13 +300,13 @@ export const Network = ({
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* ========================================================== */}
         {/* LEFT COLUMN: MANAGE MY NETWORK */}
         {/* ========================================================== */}
-        <div className="hidden lg:block lg:col-span-3 space-y-4">
-          <div className="bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-3xl p-5 shadow-sm sticky top-24">
+        <div className="hidden lg:block lg:col-span-3 space-y-4 sticky top-20 self-start max-h-[calc(100vh-5.5rem)] overflow-y-auto overscroll-contain no-scrollbar">
+          <div className="bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-3xl p-5 shadow-sm">
             <h3 className="font-extrabold text-sm text-slate-900 border-b border-slate-100 pb-3 mb-3">
               Manage My Network
             </h3>
@@ -589,20 +589,27 @@ export const Network = ({
                   return (
                     <div
                       key={person.id}
-                      className="bg-slate-50/80 border border-slate-200/80 rounded-3xl overflow-hidden hover:border-indigo-300 hover:shadow-md transition-all flex flex-col justify-between group"
+                      className="bg-white/95 hover:bg-white backdrop-blur-2xl border border-slate-200/90 hover:border-indigo-400/90 rounded-3xl overflow-hidden shadow-xs hover:shadow-[0_20px_40px_-8px_rgba(99,102,241,0.12)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group relative"
                     >
-                      {/* Cover photo header */}
-                      <div className={`h-16 relative border-b border-slate-200/60 ${
+                      {/* Top luxury iridescent highlight hairline */}
+                      <div className={`h-[3px] w-full ${
                         isCandidate 
-                          ? 'bg-gradient-to-r from-emerald-50 via-teal-100/50 to-emerald-50' 
-                          : 'bg-gradient-to-r from-indigo-50 via-violet-100/50 to-indigo-50'
+                          ? 'bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-500' 
+                          : 'bg-gradient-to-r from-indigo-500 via-violet-400 to-cyan-400'
+                      }`} />
+
+                      {/* Cover photo header */}
+                      <div className={`h-14 relative border-b border-slate-100 ${
+                        isCandidate 
+                          ? 'bg-gradient-to-r from-emerald-50/70 via-teal-50/50 to-emerald-50/70' 
+                          : 'bg-gradient-to-r from-indigo-50/70 via-violet-50/50 to-indigo-50/70'
                       }`}>
-                        <span className={`absolute top-2 right-2 px-1.5 py-0.5 rounded text-[8px] font-extrabold border shadow-xs ${
+                        <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[9px] font-black border shadow-2xs tracking-wider uppercase ${
                           isCandidate 
                             ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
                             : 'bg-indigo-50 text-indigo-700 border-indigo-200'
                         }`}>
-                          {isCandidate ? 'OPENTOWORK' : 'HIRING'}
+                          {isCandidate ? '#OPENTOWORK' : '#HIRING'}
                         </span>
                       </div>
 
