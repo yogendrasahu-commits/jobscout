@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocketProvider, useSocket } from './context/SocketContext';
-import { LanguageProvider } from './context/LanguageContext';
 import { Navbar } from './components/Navbar';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { UberJobMap } from './components/UberJobMap';
@@ -542,13 +541,11 @@ function MainApp() {
 export default function App() {
   return (
     <ErrorBoundary>
-      <LanguageProvider>
-        <AuthProvider>
-          <SocketProvider>
-            <MainApp />
-          </SocketProvider>
-        </AuthProvider>
-      </LanguageProvider>
+      <AuthProvider>
+        <SocketProvider>
+          <MainApp />
+        </SocketProvider>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }

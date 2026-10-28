@@ -3,7 +3,6 @@
 
 import { io } from 'socket.io-client';
 import { calculateDistanceKm, estimateCommuteProfile } from '../client/src/utils/commuteService.js';
-import { translations } from '../client/src/utils/translations.js';
 
 const BASE_URL = 'http://127.0.0.1:5000';
 let totalPassed = 0;
@@ -660,9 +659,9 @@ async function runTestSuite() {
   }
 
   // ----------------------------------------------------
-  // SUITE 14: Smart Commute Estimator, Multi-Language & Resume Engine
+  // SUITE 14: Smart Commute Estimator & ATS Harvard Resume Engine
   // ----------------------------------------------------
-  console.log('\n--- SUITE 14: Smart Commute Estimator, Multi-Language & Resume Engine ---');
+  console.log('\n--- SUITE 14: Smart Commute Estimator & ATS Harvard Resume Engine ---');
   try {
     // 14.1 Commute Distance & Profile Calculations
     const dist = calculateDistanceKm(19.0760, 72.8777, 19.1136, 72.8697); // BKC to Andheri East
@@ -680,14 +679,6 @@ async function runTestSuite() {
     assert(commute.co2SavedKg > 0, 'Calculates positive carbon footprint savings (kg CO2)');
     assert(Boolean(commute.recommendation?.title), 'Provides AI transit recommendation');
     assert(commute.gmapsUrl.includes('google.com/maps/dir'), 'Generates valid Google Maps navigation link');
-
-    // 14.2 Multi-Language Dictionary Integrity (English, Hindi, Marathi)
-    assert(Boolean(translations.en && translations.hi && translations.mr), 'Contains dictionaries for en, hi, and mr');
-    assert(translations.en.nav_jobs === 'Job Board', 'English navigation key "nav_jobs" verified');
-    assert(translations.hi.nav_jobs === 'नौकरियां', 'Hindi navigation key "nav_jobs" verified');
-    assert(translations.mr.nav_jobs === 'नोकऱ्या', 'Marathi navigation key "nav_jobs" verified');
-    assert(Boolean(translations.hi.search_placeholder), 'Hindi search placeholder configured');
-    assert(Boolean(translations.mr.search_placeholder), 'Marathi search placeholder configured');
   } catch (err) {
     console.error('Suite 14 halted:', err.message);
   }

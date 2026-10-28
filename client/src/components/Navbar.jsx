@@ -28,12 +28,10 @@ import {
   Edit3,
   Settings,
   Mic,
-  MicOff,
-  Globe
+  MicOff
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
-import { useTranslation } from '../context/LanguageContext';
 import { startVoiceRecognition, isVoiceRecognitionSupported } from '../utils/voiceSearch';
 import { JobScoutLogo } from './JobScoutLogo';
 import { AlertSettingsModal } from './AlertSettingsModal';
@@ -70,7 +68,6 @@ export const Navbar = ({
 }) => {
   const { user, isEmployer, isSeeker, logout } = useAuth();
   const { setActiveChatUser, socket } = useSocket();
-  const { t, language, setLanguage, languages } = useTranslation();
 
   // Dropdown & Drawer states
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -86,7 +83,7 @@ export const Navbar = ({
   const handleVoiceSearch = () => {
     if (isListening) return;
     startVoiceRecognition({
-      language,
+      language: 'en',
       onStart: () => setIsListening(true),
       onEnd: () => setIsListening(false),
       onError: (err) => {
@@ -801,25 +798,6 @@ export const Navbar = ({
                 <span className="hidden xl:inline whitespace-nowrap">Post Job</span>
               </button>
             )}
-
-            {/* Language Switcher Pill (EN | हिं | मरा) */}
-            <div className="flex items-center p-0.5 rounded-full bg-slate-100/90 border border-slate-200/80 text-[10px] font-bold flex-shrink-0 shadow-2xs">
-              {languages.map((l) => (
-                <button
-                  key={l.code}
-                  type="button"
-                  onClick={() => setLanguage(l.code)}
-                  className={`px-2 py-0.5 rounded-full transition-all ${
-                    language === l.code
-                      ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-                  }`}
-                  title={`Switch language to ${l.label}`}
-                >
-                  {l.short}
-                </button>
-              ))}
-            </div>
 
             {/* Notifications Bell Dropdown */}
             <div className="relative" ref={notifRef}>
