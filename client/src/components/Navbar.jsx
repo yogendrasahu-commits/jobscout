@@ -360,7 +360,7 @@ export const Navbar = ({
             {/* Quick Live Search Bar (Desktop / Laptop >= md) */}
             <div className="hidden md:flex items-center gap-1.5 flex-shrink-0 relative" ref={searchRef}>
               <form onSubmit={handleSearchSubmit} className="relative group">
-                <Search className="w-3.5 h-3.5 text-slate-400 group-focus-within:text-indigo-600 absolute left-3 top-2.5 transition-colors" />
+                <Search className="w-3.5 h-3.5 text-indigo-500 group-focus-within:text-indigo-600 absolute left-3 top-2.5 transition-colors" />
                 <input
                   type="text"
                   placeholder="Search jobs, talent..."
@@ -396,14 +396,14 @@ export const Navbar = ({
                 )}
               </form>
 
-              {/* Instant Voice Search Button (Desktop) */}
+              {/* Instant Voice Search Button (Desktop) - Catchy & Colorful */}
               <button
                 type="button"
                 onClick={handleVoiceSearch}
                 className={`p-1.5 rounded-full border transition-all ${
                   isListening
-                    ? 'bg-rose-500 text-white border-rose-400 ring-2 ring-rose-400/30 animate-pulse'
-                    : 'bg-slate-100/80 hover:bg-indigo-50 border-slate-200/80 text-slate-500 hover:text-indigo-600'
+                    ? 'bg-rose-500 text-white border-rose-400 ring-2 ring-rose-400/40 animate-pulse'
+                    : 'bg-gradient-to-r from-violet-50 to-indigo-50 hover:from-indigo-600 hover:to-violet-600 border-indigo-200/80 text-indigo-600 hover:text-white shadow-2xs hover:scale-105 active:scale-95'
                 }`}
                 title={isListening ? 'Listening... Speak now' : 'Voice Search (बोलकर खोजें)'}
               >
@@ -714,10 +714,10 @@ export const Navbar = ({
             <div className="md:hidden relative" ref={mobileSearchRef}>
               <button
                 onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
-                className={`p-1.5 sm:p-2 rounded-xl border transition-colors ${
+                className={`p-1.5 sm:p-2 rounded-xl border transition-all ${
                   mobileSearchOpen 
-                    ? 'bg-indigo-600 text-white border-indigo-500' 
-                    : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700'
+                    ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white border-indigo-500 shadow-md shadow-indigo-600/30' 
+                    : 'bg-gradient-to-r from-indigo-50 to-violet-50 hover:bg-indigo-100 border-indigo-200/80 text-indigo-600 shadow-2xs'
                 }`}
                 title="Search Jobs & People"
               >
@@ -728,7 +728,7 @@ export const Navbar = ({
               {mobileSearchOpen && (
                 <div className="fixed left-2 right-2 top-16 bg-white border border-slate-200 rounded-2xl p-3 shadow-xl z-[900] animate-in fade-in zoom-in-95 duration-150">
                   <form onSubmit={handleSearchSubmit} className="relative">
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                    <Search className="w-4 h-4 text-indigo-500 absolute left-3 top-2.5" />
                     <input
                       type="text"
                       placeholder="Search jobs, skills, candidates..."
@@ -752,7 +752,7 @@ export const Navbar = ({
                       className={`absolute right-2 top-2 p-1 rounded-lg border transition-all ${
                         isListening
                           ? 'bg-rose-500 text-white border-rose-400 animate-pulse'
-                          : 'bg-slate-100 hover:bg-indigo-50 border-slate-200 text-slate-500 hover:text-indigo-600'
+                          : 'bg-gradient-to-r from-violet-50 to-indigo-50 hover:bg-indigo-100 border-indigo-200 text-indigo-600 shadow-2xs'
                       }`}
                       title="Voice Search"
                     >
@@ -799,12 +799,12 @@ export const Navbar = ({
               </button>
             )}
 
-            {/* Notifications Bell Dropdown */}
+            {/* Notifications Bell Dropdown - Premium Warm Amber Sheen */}
             <div className="relative" ref={notifRef}>
               <button
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
                 title={`Notifications (${unreadNotifsCount} unread)`}
-                className="relative p-2 rounded-full bg-slate-100/80 hover:bg-slate-200/80 border border-slate-200/70 text-slate-700 hover:text-slate-900 transition-all shadow-[0_1px_2px_rgba(0,0,0,0.03)] flex-shrink-0"
+                className="relative p-2 rounded-full bg-gradient-to-br from-amber-50 to-orange-50/80 hover:from-amber-100 hover:to-orange-100 border border-amber-200/80 text-amber-600 hover:text-amber-700 transition-all shadow-[0_1px_3px_rgba(245,158,11,0.12)] hover:scale-105 active:scale-95 flex-shrink-0"
               >
                 <Bell className="w-4 h-4" />
                 {unreadNotifsCount > 0 && (
