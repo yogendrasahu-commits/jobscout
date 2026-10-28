@@ -33,7 +33,7 @@ export const MobileBottomNav = ({
           <div className="relative">
             <NavFeedIcon active={currentTab === 'feed'} className="w-5 h-5 flex-shrink-0" />
           </div>
-          <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center ${currentTab === 'feed' ? 'text-indigo-600 font-bold' : ''}`}>Feed</span>
+          <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'feed' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>Feed</span>
           {currentTab === 'feed' && (
             <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
           )}
@@ -51,7 +51,7 @@ export const MobileBottomNav = ({
           <div className="relative">
             <NavNetworkIcon active={currentTab === 'network'} className="w-5 h-5 flex-shrink-0" />
           </div>
-          <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center ${currentTab === 'network' ? 'text-indigo-600 font-bold' : ''}`}>
+          <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'network' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>
             {user ? 'Network' : 'Seeker/Emp'}
           </span>
           {currentTab === 'network' && (
@@ -92,7 +92,7 @@ export const MobileBottomNav = ({
 
             <div className="flex items-center gap-0.5 mt-1">
               <span className={`text-[10px] font-black tracking-wider uppercase ${
-                currentTab === 'map' ? 'text-indigo-600' : 'text-slate-500'
+                currentTab === 'map' ? 'text-indigo-600' : 'text-slate-700'
               }`}>
                 Map
               </span>
@@ -122,7 +122,7 @@ export const MobileBottomNav = ({
               </span>
             )}
           </div>
-          <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center ${currentTab === 'jobs' ? 'text-indigo-600 font-bold' : ''}`}>Jobs</span>
+          <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'jobs' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>Jobs</span>
           {currentTab === 'jobs' && (
             <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
           )}
@@ -148,7 +148,7 @@ export const MobileBottomNav = ({
             <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-500 rounded-full shadow-xs border border-white" />
           </div>
           <div className="flex items-center gap-0.5 mt-0.5">
-            <span className={`text-[10px] tracking-tight truncate max-w-full text-center ${currentTab === 'messages' ? 'text-indigo-600 font-bold' : ''}`}>Chat</span>
+            <span className={`text-[10px] tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'messages' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>Chat</span>
             {!user && (
               <span className="text-[8px] font-extrabold px-1 rounded bg-amber-100 text-amber-800 leading-none">
                 Login

@@ -570,13 +570,13 @@ export const Navbar = ({
                 onClick={() => setCurrentTab('feed')}
                 className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'feed'
-                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/5 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold'
+                    ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
+                    : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
                 }`}
                 title="Feed (Home)"
               >
                 <NavFeedIcon active={currentTab === 'feed'} className="w-4 h-4 flex-shrink-0" />
-                <span>Feed</span>
+                <span className="font-bold tracking-tight">Feed</span>
               </button>
 
               {/* 2. Network */}
@@ -584,14 +584,14 @@ export const Navbar = ({
                 onClick={() => setCurrentTab('network')}
                 className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'network'
-                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/5 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold'
+                    ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
+                    : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
                 }`}
                 title={user ? `My Professional Network (${seekersCount + employersCount})` : 'Emp & Seeker (Employers & Job Seekers)'}
               >
                 <NavNetworkIcon active={currentTab === 'network'} className="w-4 h-4 flex-shrink-0" />
-                <span className="hidden 2xl:inline">{user ? 'Network' : 'Emp & Seeker'}</span>
-                <span className="2xl:hidden">Network</span>
+                <span className="font-bold tracking-tight hidden 2xl:inline">{user ? 'Network' : 'Emp & Seeker'}</span>
+                <span className="font-bold tracking-tight 2xl:hidden">Network</span>
               </button>
 
               {/* 3. Live Map */}
@@ -605,13 +605,13 @@ export const Navbar = ({
                 }}
                 className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'map'
-                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/5 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold'
+                    ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
+                    : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
                 }`}
                 title={user ? 'Live Map' : 'Live Map (Login Required)'}
               >
                 <NavRadarIcon active={currentTab === 'map'} className="w-4 h-4 flex-shrink-0" />
-                <span>Map</span>
+                <span className="font-bold tracking-tight">Map</span>
                 {user && (
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse ml-0.5 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
                 )}
@@ -622,15 +622,15 @@ export const Navbar = ({
                 onClick={() => setCurrentTab('jobs')}
                 className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'jobs' || currentTab === 'applications'
-                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/5 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold'
+                    ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
+                    : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
                 }`}
                 title={`Job Board & Applications (${jobsCount} openings)`}
               >
                 <NavJobsIcon active={currentTab === 'jobs' || currentTab === 'applications'} className="w-4 h-4 flex-shrink-0" />
-                <span>Jobs</span>
+                <span className="font-bold tracking-tight">Jobs</span>
                 {jobsCount > 0 && (
-                  <span className="text-[10px] bg-indigo-50 px-1.5 py-0.2 rounded-full text-indigo-700 border border-indigo-200 font-bold">
+                  <span className="text-[10px] bg-indigo-50 px-1.5 py-0.2 rounded-full text-indigo-700 border border-indigo-200 font-extrabold">
                     {jobsCount}
                   </span>
                 )}
@@ -647,13 +647,13 @@ export const Navbar = ({
                 }}
                 className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'connect'
-                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/5 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold'
+                    ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
+                    : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
                 }`}
                 title={user ? 'Speed Connect Hub (Audio & Video Calls)' : 'Speed Connect (Login Required)'}
               >
                 <NavConnectIcon active={currentTab === 'connect'} className="w-4 h-4 flex-shrink-0" />
-                <span>Connect</span>
+                <span className="font-bold tracking-tight">Connect</span>
               </button>
 
               {/* 6. Anonymous Discussions */}
@@ -667,8 +667,8 @@ export const Navbar = ({
                 }}
                 className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'anon'
-                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/5 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold'
+                    ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
+                    : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
                 }`}
                 title={user ? 'JobScout Anon Talk' : 'Anon Talk (Login Required)'}
               >
@@ -676,7 +676,7 @@ export const Navbar = ({
                   <NavAnonIcon active={currentTab === 'anon'} className="w-4 h-4 flex-shrink-0" />
                   <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" />
                 </div>
-                <span>Anon</span>
+                <span className="font-bold tracking-tight">Anon</span>
               </button>
 
               {/* 7. Full-Page Messaging */}
@@ -690,8 +690,8 @@ export const Navbar = ({
                 }}
                 className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'messages'
-                    ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/5 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold'
+                    ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
+                    : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
                 }`}
                 title={user ? 'Full-Page Messaging (चैट)' : 'Messages (Login Required)'}
               >
@@ -699,7 +699,7 @@ export const Navbar = ({
                   <NavMessagesIcon active={currentTab === 'messages'} className="w-4 h-4 flex-shrink-0" />
                   <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
                 </div>
-                <span>Chat</span>
+                <span className="font-bold tracking-tight">Chat</span>
               </button>
 
             </nav>
