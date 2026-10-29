@@ -1,8 +1,23 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import { db } from '../db.js';
+import { parseCookies } from '../middleware/security.js';
 
 const router = express.Router();
+const JWT_SECRET = process.env.JWT_SECRET || 'jobradar_secret_jwt_key_2026';
+
+// Optional Authentication Middleware
+const optionalAuth = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const bearerToken = authHeader && authHeader.split(' ')[1];
+  const cookieToken = parseCookies(req.headers.cookie)?.jobscout_token;
+  const token = bearerToken || cookieToken;
+  if (!token) return next();
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (!err && user) req.user = user;
+    next();
+  });
+};
 
 // GET all posts
 router.get('/', (req, res) => {
@@ -32,8 +47,8 @@ function sanitizeImageUrl(rawUrl) {
   }
 }
 
-// POST new post
-router.post('/', (req, res) => {
+// POST new post (authenticated author binding if token present)
+router.post('/', optionalAuth, (req, res) => {
   try {
     const { authorId, authorName, authorRole, authorTitle, authorAvatar, content, image, tags } = req.body;
     const trimmedContent = content ? String(content).trim() : '';
@@ -47,12 +62,18 @@ router.post('/', (req, res) => {
       return res.status(400).json({ error: 'Please enter a valid http/https image URL' });
     }
 
+    const effAuthorId = req.user ? req.user.id : (authorId || 'guest');
+    const effAuthorName = req.user ? req.user.name : (authorName || 'Anonymous User');
+    const effAuthorRole = req.user ? req.user.role : (authorRole || 'seeker');
+    const effAuthorTitle = req.user ? (req.user.title || req.user.companyName || (req.user.role === 'emp' ? 'Hiring Manager' : 'Job Seeker')) : (authorTitle || (authorRole === 'emp' ? 'Hiring Manager' : 'Job Seeker'));
+    const effAuthorAvatar = req.user?.avatar || authorAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(effAuthorName)}`;
+
     const newPost = db.createPost({
-      authorId: authorId || 'guest',
-      authorName: authorName || 'Anonymous User',
-      authorRole: authorRole || 'seeker',
-      authorTitle: authorTitle || (authorRole === 'emp' ? 'Hiring Manager' : 'Job Seeker'),
-      authorAvatar: authorAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(authorName || 'user')}`,
+      authorId: effAuthorId,
+      authorName: effAuthorName,
+      authorRole: effAuthorRole,
+      authorTitle: effAuthorTitle,
+      authorAvatar: effAuthorAvatar,
       content: trimmedContent,
       image: sanitizeImageUrl(image),
       tags: Array.isArray(tags) ? tags : []

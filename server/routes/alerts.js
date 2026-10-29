@@ -10,13 +10,17 @@ import {
   dispatchCandidateAlert 
 } from '../alerts.js';
 
+import { parseCookies } from '../middleware/security.js';
+
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'jobscout_super_secret_jwt_key_2024';
+const JWT_SECRET = process.env.JWT_SECRET || 'jobradar_secret_jwt_key_2026';
 
 // Optional Authentication Middleware
 const optionalAuth = (req, res, next) => {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const bearerToken = authHeader && authHeader.split(' ')[1];
+  const cookieToken = parseCookies(req.headers.cookie)?.jobscout_token;
+  const token = bearerToken || cookieToken;
   if (!token) return next();
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (!err && user) req.user = user;

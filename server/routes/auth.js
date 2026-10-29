@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { db } from '../db.js';
 import { verifyEmailConfig, sendTestEmail } from '../email.js';
-import { rateLimiter } from '../middleware/security.js';
+import { rateLimiter, parseCookies } from '../middleware/security.js';
 import { extractSkillsFromResume } from '../utils/aiMatchEngine.js';
 
 const router = express.Router();
@@ -89,10 +89,21 @@ function resolveCoordsFromAddress(address, lat, lng) {
   return { lat: 19.0760, lng: 72.8777 }; // Default Mumbai
 }
 
-// Middleware to authenticate JWT
+// Helper to attach an encrypted, HttpOnly, SameSite session cookie
+export function attachAuthCookie(res, token) {
+  const isProd = process.env.NODE_ENV === 'production';
+  res.setHeader(
+    'Set-Cookie',
+    `jobscout_token=${token}; Path=/; Max-Age=604800; HttpOnly; SameSite=Lax${isProd ? '; Secure' : ''}`
+  );
+}
+
+// Middleware to authenticate JWT via Bearer Authorization header OR HttpOnly session cookie
 export const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const bearerToken = authHeader && authHeader.split(' ')[1];
+  const cookieToken = parseCookies(req.headers.cookie)?.jobscout_token;
+  const token = bearerToken || cookieToken;
 
   if (!token) {
     return res.status(401).json({ error: 'Access token required' });
@@ -228,6 +239,7 @@ router.post('/login-phone-otp', authRateLimiter, (req, res) => {
   );
 
   const { password: _, ...safeUser } = user;
+  attachAuthCookie(res, token);
   res.json({ token, user: safeUser, isNewUser: false });
 });
 
@@ -258,6 +270,7 @@ router.post('/login-phone-password', authRateLimiter, async (req, res) => {
     );
 
     const { password: _, ...safeUser } = user;
+    attachAuthCookie(res, token);
     res.json({ token, user: safeUser });
   } catch (err) {
     console.error('Phone login error:', err);
@@ -356,6 +369,7 @@ router.post('/register-phone', authRateLimiter, async (req, res) => {
       req.io.emit('user:registered', safeUser);
     }
 
+    attachAuthCookie(res, token);
     res.status(201).json({ token, user: safeUser });
   } catch (err) {
     console.error('Phone register error:', err);
@@ -427,6 +441,7 @@ router.post('/register', authRateLimiter, async (req, res) => {
       req.io.emit('user:registered', safeUser);
     }
 
+    attachAuthCookie(res, token);
     res.status(201).json({ token, user: safeUser });
   } catch (err) {
     console.error('Register error:', err);
@@ -459,6 +474,7 @@ router.post('/login', authRateLimiter, async (req, res) => {
     );
 
     const { password: _, ...safeUser } = user;
+    attachAuthCookie(res, token);
     res.json({ token, user: safeUser });
   } catch (err) {
     console.error('Login error:', err);
@@ -570,7 +586,14 @@ router.put('/profile', authenticateToken, (req, res) => {
     { expiresIn: '7d' }
   );
 
+  attachAuthCookie(res, token);
   res.json({ user: safeUser, token, message: 'Profile updated successfully' });
+});
+
+// Logout endpoint (clears HttpOnly session cookie)
+router.post('/logout', (req, res) => {
+  res.setHeader('Set-Cookie', 'jobscout_token=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax');
+  res.json({ success: true, message: 'Logged out successfully' });
 });
 
 // Get saved job IDs for current logged-in user
@@ -647,8 +670,8 @@ router.get('/settings/email', (req, res) => {
   });
 });
 
-// Update & verify email sender configuration
-router.post('/settings/email', async (req, res) => {
+// Update & verify email sender configuration (protected: requires authenticated user)
+router.post('/settings/email', authenticateToken, async (req, res) => {
   const { gmailUser, gmailPass, smtpHost, smtpPort, smtpUser, smtpPass, emailFrom } = req.body;
 
   try {
@@ -687,8 +710,8 @@ router.post('/settings/email', async (req, res) => {
   }
 });
 
-// Test email dispatch to a specific target address
-router.post('/settings/email/test', async (req, res) => {
+// Test email dispatch to a specific target address (protected: requires authenticated user)
+router.post('/settings/email/test', authenticateToken, async (req, res) => {
   const { targetEmail } = req.body;
   const to = (targetEmail && String(targetEmail).trim().toLowerCase()) || db.getEmailConfig().gmailUser;
 

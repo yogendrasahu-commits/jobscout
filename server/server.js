@@ -20,7 +20,8 @@ import { db } from './db.js';
 import { verifyEmailConfig } from './email.js';
 import { requestLogger } from './middleware/requestLogger.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
-import { securityHeaders, rateLimiter } from './middleware/security.js';
+import { securityHeaders, rateLimiter, xssSanitizer } from './middleware/security.js';
+import { authenticateToken } from './routes/auth.js';
 
 dotenv.config();
 
@@ -50,9 +51,14 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.json());
+// Secure body parser with strict size limits to prevent payload flooding / DoS attacks
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 
-// Security headers (OWASP protection against clickjacking, sniffing, XSS)
+// Deep recursive XSS & script injection sanitizer across all incoming payloads
+app.use(xssSanitizer);
+
+// Security headers (OWASP protection against clickjacking, sniffing, XSS, and CSP)
 app.use(securityHeaders);
 
 // Performance & Request observability logger
@@ -115,7 +121,7 @@ app.get('/api/settings/email', (req, res) => {
   });
 });
 
-app.post('/api/settings/email', async (req, res, next) => {
+app.post('/api/settings/email', authenticateToken, async (req, res, next) => {
   const { gmailUser, gmailPass, smtpHost, smtpPort, smtpUser, smtpPass, emailFrom } = req.body;
 
   try {
