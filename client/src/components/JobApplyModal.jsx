@@ -50,6 +50,7 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
 
   // Compute comprehensive AI skill and role match score
   const matchResult = calculateAIMatch(user, job);
+  const matchPercentage = matchResult?.score || 0;
   const userSkills = (user?.skills || []).map(s => String(s).toLowerCase().trim());
 
   const handleGenerateAIPitch = () => {

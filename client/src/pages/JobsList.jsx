@@ -42,6 +42,7 @@ export const JobsList = ({
   onQuickFilterChange
 }) => {
   const { user, token, isEmployer } = useAuth();
+  const userSkills = (user?.skills || []).map(s => String(s).toLowerCase().trim());
   const [internalSearchTerm, setInternalSearchTerm] = useState('');
   const [internalActiveSubTab, setInternalActiveSubTab] = useState(defaultSubTab);
   const [selectedMatchJob, setSelectedMatchJob] = useState(null);
