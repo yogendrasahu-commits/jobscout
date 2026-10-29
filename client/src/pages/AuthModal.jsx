@@ -370,8 +370,8 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
 
         {/* Brand / Title Header */}
         <div className="text-center mb-4">
-          <div className="inline-flex items-center justify-center mb-2 shadow-sm rounded-2xl">
-            <JobScoutLogo size={46} />
+          <div className="inline-flex items-center justify-center mb-2">
+            <JobScoutLogo size={54} />
           </div>
           <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
             {mode === 'login' ? 'JobScout Account Login' : 'Create Tailored Account'}
