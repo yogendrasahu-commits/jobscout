@@ -43,6 +43,7 @@ export const Welcome = ({
   onNavigateToJobs,
   onNavigateToNetwork,
   onNavigateToFeed,
+  onNavigateToConnect,
   onNavigateToAnon,
   onSelectJob,
   onSelectSeeker,
@@ -287,24 +288,18 @@ export const Welcome = ({
             <button onClick={onNavigateToMap} className="px-3.5 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/60 whitespace-nowrap flex-shrink-0 transition-all flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5 text-cyan-600" />
               <span>Live Map</span>
-              {!user && (
-                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-amber-50 text-amber-700 border border-amber-200 leading-none">
-                  Login
-                </span>
-              )}
             </button>
             <button onClick={onNavigateToJobs} className="px-3.5 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/60 whitespace-nowrap flex-shrink-0 transition-all flex items-center gap-1.5">
               <Briefcase className="w-3.5 h-3.5 text-indigo-600" />
               <span>Jobs ({jobs.length > 0 ? jobs.length : '35+'})</span>
             </button>
+            <button onClick={onNavigateToConnect} className="px-3.5 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/60 whitespace-nowrap flex-shrink-0 transition-all flex items-center gap-1.5">
+              <Video className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Speed Connect</span>
+            </button>
             <button onClick={onNavigateToAnon} className="px-3.5 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/60 whitespace-nowrap flex-shrink-0 transition-all flex items-center gap-1.5">
               <MessageSquare className="w-3.5 h-3.5 text-amber-600" />
               <span>Anon Salon</span>
-              {!user && (
-                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-amber-50 text-amber-700 border border-amber-200 leading-none">
-                  Login
-                </span>
-              )}
             </button>
           </nav>
 
@@ -806,7 +801,7 @@ export const Welcome = ({
 
             {/* Pillar 2 */}
             <div 
-              onClick={onNavigateToMap}
+              onClick={onNavigateToConnect || onNavigateToMap}
               className="p-5 rounded-3xl bg-slate-50 hover:bg-white border border-slate-200 hover:border-emerald-300 hover:shadow-xl transition-all cursor-pointer group"
             >
               <div className="w-12 h-12 rounded-2xl bg-emerald-100/80 text-emerald-700 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">

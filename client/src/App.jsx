@@ -32,10 +32,14 @@ function MainApp() {
     return localStorage.getItem('jobradar_guest_mode') === 'true';
   });
   const [currentTab, setCurrentTab] = useState(() => {
+    const hash = typeof window !== 'undefined' ? window.location.hash.replace(/^#\/?/, '').toLowerCase().trim() : '';
+    const validTabs = ['welcome', 'feed', 'network', 'map', 'jobs', 'connect', 'anon', 'applications', 'messages'];
+    if (validTabs.includes(hash)) return hash;
     if (localStorage.getItem('jobradar_token')) return 'feed';
     if (localStorage.getItem('jobradar_guest_mode') === 'true') return 'feed';
     return 'welcome';
   }); // 'welcome' | 'feed' | 'network' | 'map' | 'jobs' | 'connect' | 'anon' | 'applications' | 'messages'
+  const [pendingTabAfterAuth, setPendingTabAfterAuth] = useState(null);
   const [jobsSubTab, setJobsSubTab] = useState('browse'); // 'browse' | 'applied'
 
   const [jobs, setJobs] = useState([]);
@@ -251,18 +255,23 @@ function MainApp() {
     localStorage.setItem('jobradar_guest_mode', 'true');
     setIsGuestMode(true);
     setCurrentTab(targetTab);
+    if (targetTab !== 'welcome') {
+      window.history.pushState(null, '', `#/${targetTab}`);
+    }
   };
 
   const handleExitGuest = () => {
     localStorage.removeItem('jobradar_guest_mode');
     setIsGuestMode(false);
     setCurrentTab('welcome');
+    window.history.pushState(null, '', window.location.pathname);
   };
 
   // Once logged in or exploring as guest, completely bypass and remove the welcome page
   useEffect(() => {
     if ((user || isGuestMode) && currentTab === 'welcome') {
       setCurrentTab('feed');
+      window.history.replaceState(null, '', '#/feed');
     }
   }, [user, isGuestMode, currentTab]);
 
@@ -270,11 +279,46 @@ function MainApp() {
   const handleNavigateTab = (tab) => {
     const publicTabs = ['welcome', 'feed', 'network', 'jobs', 'map', 'connect', 'anon'];
     if (!user && !publicTabs.includes(tab)) {
+      setPendingTabAfterAuth(tab);
       setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' });
       return;
     }
     setCurrentTab(tab);
+    if (tab && tab !== 'welcome') {
+      if (window.location.hash.replace(/^#\/?/, '') !== tab) {
+        window.history.pushState(null, '', `#/${tab}`);
+      }
+    } else {
+      if (window.location.hash) {
+        window.history.pushState(null, '', window.location.pathname);
+      }
+    }
   };
+
+  // Listen for browser Back/Forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase().trim();
+      const validTabs = ['welcome', 'feed', 'network', 'map', 'jobs', 'connect', 'anon', 'applications', 'messages'];
+      if (validTabs.includes(hash)) {
+        const publicTabs = ['welcome', 'feed', 'network', 'jobs', 'map', 'connect', 'anon'];
+        if (!user && !publicTabs.includes(hash)) {
+          setCurrentTab('feed');
+        } else {
+          setCurrentTab(hash);
+        }
+      } else if (!hash) {
+        if (!user && !isGuestMode) {
+          setCurrentTab('welcome');
+        } else {
+          setCurrentTab('feed');
+        }
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [user, isGuestMode]);
 
   // Route guard: without login allow public exploratory tabs (Feed, Network, Jobs, Map, Connect, Anon)
   useEffect(() => {
@@ -290,13 +334,14 @@ function MainApp() {
     return (
       <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 text-slate-900 flex flex-col font-sans antialiased">
         <Welcome
-          onNavigateToMap={() => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
+          onNavigateToMap={() => handleExploreAsGuest('map')}
           onNavigateToJobs={() => handleExploreAsGuest('jobs')}
           onNavigateToNetwork={() => handleExploreAsGuest('network')}
           onNavigateToFeed={() => handleExploreAsGuest('feed')}
-          onNavigateToAnon={() => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
+          onNavigateToConnect={() => handleExploreAsGuest('connect')}
+          onNavigateToAnon={() => handleExploreAsGuest('anon')}
           onExploreAsGuest={(tab) => {
-            const allowed = ['feed', 'network', 'jobs'];
+            const allowed = ['welcome', 'feed', 'network', 'jobs', 'map', 'connect', 'anon'];
             handleExploreAsGuest(allowed.includes(tab) ? tab : 'feed');
           }}
           onOpenLogin={(phone) => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
@@ -313,10 +358,18 @@ function MainApp() {
           isOpen={authConfig.isOpen}
           initialMode={authConfig.mode}
           initialRole={authConfig.role}
-          onClose={() => setAuthConfig(prev => ({ ...prev, isOpen: false }))}
+          onClose={() => {
+            setAuthConfig(prev => ({ ...prev, isOpen: false }));
+            setPendingTabAfterAuth(null);
+          }}
           onSuccess={() => {
             setAuthConfig(prev => ({ ...prev, isOpen: false }));
-            setCurrentTab('feed');
+            if (pendingTabAfterAuth) {
+              handleNavigateTab(pendingTabAfterAuth);
+              setPendingTabAfterAuth(null);
+            } else {
+              handleNavigateTab('feed');
+            }
           }}
         />
       </div>
@@ -512,10 +565,18 @@ function MainApp() {
         isOpen={authConfig.isOpen}
         initialMode={authConfig.mode}
         initialRole={authConfig.role}
-        onClose={() => setAuthConfig(prev => ({ ...prev, isOpen: false }))}
+        onClose={() => {
+          setAuthConfig(prev => ({ ...prev, isOpen: false }));
+          setPendingTabAfterAuth(null);
+        }}
         onSuccess={() => {
           setAuthConfig(prev => ({ ...prev, isOpen: false }));
-          setCurrentTab('feed');
+          if (pendingTabAfterAuth) {
+            handleNavigateTab(pendingTabAfterAuth);
+            setPendingTabAfterAuth(null);
+          } else if (currentTab === 'welcome') {
+            handleNavigateTab('feed');
+          }
         }}
       />
 
