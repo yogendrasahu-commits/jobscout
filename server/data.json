@@ -1234,9 +1234,116 @@
       "lng": 72.8697,
       "address": "Andheri East, Mumbai",
       "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Automated%20Test%20Employer"
+    },
+    {
+      "id": "usr_1793272521397_emqq",
+      "createdAt": "2026-10-29T11:15:21.397Z",
+      "isOnline": false,
+      "name": "Automated Test Seeker",
+      "phone": "+91 9852117111",
+      "email": "9852117111@user.jobradar.io",
+      "password": "$2a$10$oYmLdR31Cm.K.AMrsO4apObnvB4n1Xby6qsxCcK8kHccZoPhTD.4S",
+      "role": "seeker",
+      "companyName": "",
+      "industry": "",
+      "companySize": "",
+      "website": "",
+      "hiringType": "",
+      "title": "Senior Lead QA Architect",
+      "skills": [
+        "React",
+        "Node.js",
+        "Jest",
+        "Automation"
+      ],
+      "experience": "Fresher",
+      "expectedSalary": "Negotiable",
+      "availability": "Immediate",
+      "vehicle": false,
+      "bio": "Passionate about bulletproof reliable software and WebRTC.",
+      "lat": 19.076,
+      "lng": 72.8777,
+      "address": "BKC, Mumbai",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Automated%20Test%20Seeker",
+      "savedJobs": []
+    },
+    {
+      "id": "usr_1793272521506_vt91",
+      "createdAt": "2026-10-29T11:15:21.506Z",
+      "isOnline": true,
+      "name": "Automated Test Employer",
+      "phone": "+91 9952117122",
+      "email": "9952117122@user.jobradar.io",
+      "password": "$2a$10$QdKH.A4reXfpCQhbAXCKh.UbQJzVbtO147OHmO.2oQZ/2v55m7vXe",
+      "role": "emp",
+      "companyName": "Apex HyperTech Labs",
+      "industry": "Software & Cloud Solutions",
+      "companySize": "1-10 Employees",
+      "website": "",
+      "hiringType": "Full-time",
+      "title": "",
+      "skills": [],
+      "experience": "",
+      "expectedSalary": "",
+      "availability": "",
+      "vehicle": false,
+      "bio": "",
+      "lat": 19.1136,
+      "lng": 72.8697,
+      "address": "Andheri East, Mumbai",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Automated%20Test%20Employer"
+    },
+    {
+      "id": "usr_1793272524799_tp3w",
+      "createdAt": "2026-10-29T11:15:24.799Z",
+      "isOnline": true,
+      "name": "Security Test User",
+      "phone": "+91 9891638778",
+      "email": "9891638778@user.jobradar.io",
+      "password": "$2a$10$xaee7G2AKagIFUnQju0wyOTau0g4CcSgiVGMHt41cntJlgHiUhd3K",
+      "role": "seeker",
+      "companyName": "",
+      "industry": "",
+      "companySize": "",
+      "website": "",
+      "hiringType": "",
+      "title": "Job Seeker",
+      "skills": [],
+      "experience": "Fresher",
+      "expectedSalary": "Negotiable",
+      "availability": "Immediate",
+      "vehicle": false,
+      "bio": "",
+      "lat": 19.076,
+      "lng": 72.8777,
+      "address": "Mumbai, India",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Security%20Test%20User"
     }
   ],
   "jobs": [
+    {
+      "id": "job_1793272521635_zws6",
+      "createdAt": "2026-10-29T11:15:21.635Z",
+      "status": "open",
+      "employerId": "usr_1793272521506_vt91",
+      "employerName": "Automated Test Employer",
+      "company": "Automated Test Employer",
+      "title": "Principal Cloud Platform Engineer",
+      "description": "Lead our next-generation cloud architecture and real-time streaming services.",
+      "category": "Technology",
+      "jobType": "Full-time",
+      "salary": "₹28,00,000 - ₹36,00,000 / yr",
+      "lat": 19.1136,
+      "lng": 72.8697,
+      "address": "Andheri East, Mumbai",
+      "skills": [
+        "Node.js",
+        "React",
+        "AWS",
+        "Docker"
+      ],
+      "urgent": true
+    },
     {
       "id": "job_1793272142065_01tc",
       "createdAt": "2026-10-29T11:09:02.065Z",
@@ -2606,6 +2713,40 @@
   ],
   "applications": [
     {
+      "id": "app_1793272521678_jo62",
+      "status": "hired",
+      "createdAt": "2026-10-29T11:15:21.678Z",
+      "jobId": "job_1793272521635_zws6",
+      "jobTitle": "Principal Cloud Platform Engineer",
+      "employerId": "usr_1793272521506_vt91",
+      "employerName": "Automated Test Employer",
+      "seekerId": "usr_1793272521397_emqq",
+      "seekerName": "Automated Test Seeker",
+      "seekerEmail": "9852117111@user.jobradar.io",
+      "seekerPhone": "+91 9852117111",
+      "seekerAvatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Automated%20Test%20Seeker",
+      "coverNote": "Excited about the Principal Cloud Platform position at Apex Labs!",
+      "offerLetter": {
+        "refNo": "JS-OFFER-521710",
+        "letterNumber": "JS-OFFER-521710",
+        "candidateName": "Automated Test Seeker",
+        "candidateEmail": "9852117111@user.jobradar.io",
+        "candidatePhone": "+91 9852117111",
+        "designation": "Principal Cloud Platform Engineer",
+        "salary": "₹32,00,000 / annum CTC",
+        "joiningDate": "2026-11-15",
+        "location": "Bandra Kurla Complex (BKC), Mumbai",
+        "terms": "Standard probation 3 months with health insurance.",
+        "customNote": "",
+        "issuedAt": "2026-10-29T11:15:21.710Z",
+        "employerName": "Automated Test Employer",
+        "companyName": "Automated Test Employer",
+        "status": "offered",
+        "acceptedAt": "2026-10-29T11:15:23.780Z"
+      },
+      "updatedAt": "2026-10-29T11:15:23.780Z"
+    },
+    {
       "id": "app_1793272142112_56rj",
       "status": "hired",
       "createdAt": "2026-10-29T11:09:02.112Z",
@@ -3908,9 +4049,71 @@
       "senderName": "Automated Test Employer",
       "message": "Hello! We reviewed your profile and wanted to connect.",
       "content": "Hello! We reviewed your profile and wanted to connect."
+    },
+    {
+      "id": "msg_1793272523722_8cy1",
+      "timestamp": "2026-10-29T11:15:23.722Z",
+      "createdAt": "2026-10-29T11:15:23.722Z",
+      "read": true,
+      "senderId": "usr_1793272521506_vt91",
+      "receiverId": "usr_1793272521397_emqq",
+      "senderName": "Automated Test Employer",
+      "message": "🎉 Congratulations Automated Test Seeker! We have issued your formal Job Offer Letter for \"Principal Cloud Platform Engineer\" at Automated Test Employer with compensation of ₹32,00,000 / annum CTC. An official copy has been dispatched to your email (9852117111@user.jobradar.io). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!",
+      "content": "🎉 Congratulations Automated Test Seeker! We have issued your formal Job Offer Letter for \"Principal Cloud Platform Engineer\" at Automated Test Employer with compensation of ₹32,00,000 / annum CTC. An official copy has been dispatched to your email (9852117111@user.jobradar.io). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!"
+    },
+    {
+      "id": "msg_1793272523806_wdwe",
+      "timestamp": "2026-10-29T11:15:23.806Z",
+      "createdAt": "2026-10-29T11:15:23.806Z",
+      "read": false,
+      "senderId": "usr_1793272521397_emqq",
+      "receiverId": "usr_1793272521506_vt91",
+      "senderName": "Automated Test Seeker",
+      "message": "🤝 I am thrilled to formally accept your Job Offer Letter for \"Principal Cloud Platform Engineer\"! Looking forward to joining Automated Test Employer on 2026-11-15.",
+      "content": "🤝 I am thrilled to formally accept your Job Offer Letter for \"Principal Cloud Platform Engineer\"! Looking forward to joining Automated Test Employer on 2026-11-15."
+    },
+    {
+      "id": "msg_1793272523874_e73s",
+      "timestamp": "2026-10-29T11:15:23.874Z",
+      "createdAt": "2026-10-29T11:15:23.874Z",
+      "read": true,
+      "senderId": "usr_1793272521506_vt91",
+      "receiverId": "usr_1793272521397_emqq",
+      "senderName": "Automated Test Employer",
+      "message": "Hello! We reviewed your profile and wanted to connect.",
+      "content": "Hello! We reviewed your profile and wanted to connect."
     }
   ],
   "posts": [
+    {
+      "id": "post_1793272523841_95es",
+      "createdAt": "2026-10-29T11:15:23.841Z",
+      "likes": 1,
+      "likedBy": [
+        "usr_1793272521397_emqq"
+      ],
+      "comments": [
+        {
+          "id": "c_1793272523864_kqji",
+          "createdAt": "2026-10-29T11:15:23.864Z",
+          "authorName": "Automated Test Seeker",
+          "authorAvatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Automated%20Test%20Seeker",
+          "text": "Exciting news! Great team to join."
+        }
+      ],
+      "authorId": "usr_1793272521506_vt91",
+      "authorName": "Automated Test Employer",
+      "authorRole": "emp",
+      "authorTitle": "Hiring Manager",
+      "authorAvatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Automated%20Test%20Employer",
+      "content": "🎉 Apex Labs is officially expanding Mumbai engineering! Hiring cloud engineers.",
+      "image": null,
+      "tags": [
+        "#Hiring",
+        "#MumbaiTech",
+        "#CloudEngineering"
+      ]
+    },
     {
       "id": "post_1793272143151_ow98",
       "createdAt": "2026-10-29T11:09:03.151Z",
@@ -4819,6 +5022,47 @@
     }
   ],
   "anonDiscussions": [
+    {
+      "id": "anon_1793272524688_nz62",
+      "title": "Senior React Engineer",
+      "content": "Looking for a dev <img src=x> with modern skills",
+      "channel": "r/ChaiCharcha",
+      "authorAlias": "CodeMaster",
+      "authorAvatarSeed": "fox",
+      "authorBadge": "Verified Community Member",
+      "score": 1,
+      "upvotes": 1,
+      "downvotes": 0,
+      "upvotedBy": [
+        "anon_creator"
+      ],
+      "downvotedBy": [],
+      "commentsCount": 0,
+      "comments": [],
+      "views": 1,
+      "createdAt": "2026-10-29T11:15:24.688Z"
+    },
+    {
+      "id": "anon_1793272523893_3h85",
+      "title": "Mumbai Tech Salary Benchmarking 2026: BKC vs CyberCity Gurgaon",
+      "content": "Comparing fixed CTC and in-hand deductions between Mumbai and Gurgaon tech hubs.",
+      "channel": "r/SalaryTalk",
+      "authorAlias": "Anonymous Fox",
+      "authorAvatarSeed": "fox",
+      "authorBadge": "Verified Community Member",
+      "score": 2,
+      "upvotes": 2,
+      "downvotes": 0,
+      "upvotedBy": [
+        "anon_creator",
+        "usr_1793272521506_vt91"
+      ],
+      "downvotedBy": [],
+      "commentsCount": 0,
+      "comments": [],
+      "views": 1,
+      "createdAt": "2026-10-29T11:15:23.893Z"
+    },
     {
       "id": "anon_1793272143207_tunh",
       "title": "Mumbai Tech Salary Benchmarking 2026: BKC vs CyberCity Gurgaon",

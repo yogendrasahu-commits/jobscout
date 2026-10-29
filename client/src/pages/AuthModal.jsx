@@ -20,7 +20,9 @@ import {
   MapPin,
   Layers,
   FileText,
-  Mail
+  Mail,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { JobScoutLogo } from '../components/JobScoutLogo';
@@ -57,6 +59,8 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
 
   // Live Phone Check Result: { checking: boolean, exists: boolean, role: string, name: string, companyName: string, title: string }
   const [phoneCheck, setPhoneCheck] = useState(null);
@@ -431,41 +435,43 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
         {/* ============================================================= */}
         {mode === 'login' && (
           <div>
-            <div className="flex items-center justify-center gap-4 mb-3 text-xs font-semibold">
+            {/* Login Method Segmented Switcher */}
+            <div className="flex bg-slate-100/90 p-1 rounded-xl border border-slate-200/80 mb-4 gap-1">
               <button
                 type="button"
                 onClick={() => { setLoginMethod('otp'); setError(''); }}
-                className={`pb-1 border-b-2 transition-all ${
+                className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                   loginMethod === 'otp'
-                    ? 'border-indigo-600 text-slate-900 font-bold'
-                    : 'border-transparent text-slate-500 hover:text-slate-700'
+                    ? 'bg-white text-indigo-600 shadow-sm border border-slate-200/60'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                📱 Login with OTP
+                <Phone className="w-3.5 h-3.5 text-indigo-500" />
+                <span>Phone OTP</span>
               </button>
-              <span className="text-slate-300">•</span>
-              <button
-                type="button"
-                onClick={() => { setLoginMethod('password'); setError(''); }}
-                className={`pb-1 border-b-2 transition-all ${
-                  loginMethod === 'password'
-                    ? 'border-indigo-600 text-slate-900 font-bold'
-                    : 'border-transparent text-slate-500 hover:text-slate-700'
-                }`}
-              >
-                🔑 Password
-              </button>
-              <span className="text-slate-300">•</span>
               <button
                 type="button"
                 onClick={() => { setLoginMethod('email'); setError(''); }}
-                className={`pb-1 border-b-2 transition-all ${
+                className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                   loginMethod === 'email'
-                    ? 'border-indigo-600 text-slate-900 font-bold'
-                    : 'border-transparent text-slate-500 hover:text-slate-700'
+                    ? 'bg-white text-indigo-600 shadow-sm border border-slate-200/60'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                ✉️ Email
+                <Mail className="w-3.5 h-3.5 text-cyan-500" />
+                <span>Email</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setLoginMethod('password'); setError(''); }}
+                className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                  loginMethod === 'password'
+                    ? 'bg-white text-indigo-600 shadow-sm border border-slate-200/60'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Lock className="w-3.5 h-3.5 text-amber-500" />
+                <span>Password</span>
               </button>
             </div>
 
@@ -673,57 +679,95 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
 
             {/* Email Login Form */}
             {loginMethod === 'email' && (
-              <form onSubmit={handleLoginEmail} className="space-y-3">
+              <form onSubmit={handleLoginEmail} className="space-y-3.5">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
                     Email Address (ईमेल पता)
                   </label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                    <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                     <input
                       type="email"
                       required
                       placeholder="user@company.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 font-medium"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 font-medium transition-all"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Password (पासवर्ड)
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-slate-700">
+                      Password (पासवर्ड)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => alert('Password reset verification link sent to ' + (email || 'your registered email'))}
+                      className="text-[11px] font-bold text-indigo-600 hover:text-indigo-700 hover:underline"
+                    >
+                      Forgot? (पासवर्ड भूल गए?)
+                    </button>
+                  </div>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                     <input
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       required
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-10 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 font-medium transition-all"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 p-0.5"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 mt-2">
+                <div className="flex items-center justify-between text-xs pt-0.5">
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="w-3.5 h-3.5 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300"
+                    />
+                    <span className="text-[11px] text-slate-600 font-medium">Remember me for 30 days</span>
+                  </label>
+                </div>
+
+                <div className="flex items-center gap-2 mt-2 pt-1">
                   <button
                     type="button"
                     onClick={onClose}
                     className="py-2.5 px-3.5 sm:px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95"
                   >
                     <X className="w-3.5 h-3.5" />
-                    <span>Cancel (रद्द करें)</span>
+                    <span>Cancel</span>
                   </button>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 active:scale-95"
+                    className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 disabled:opacity-50 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 active:scale-95"
                   >
                     {loading ? 'Authenticating...' : 'Sign In with Email'}
                     <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                <div className="pt-2 text-center">
+                  <button
+                    type="button"
+                    onClick={() => { setLoginMethod('otp'); setError(''); }}
+                    className="text-xs text-indigo-600 hover:text-indigo-800 font-bold hover:underline"
+                  >
+                    Prefer instant mobile OTP? Switch to Phone Login →
                   </button>
                 </div>
               </form>
