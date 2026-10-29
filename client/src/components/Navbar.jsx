@@ -576,7 +576,7 @@ export const Navbar = ({
                 title="Feed (Home)"
               >
                 <NavFeedIcon active={currentTab === 'feed'} className="w-4 h-4 flex-shrink-0" />
-                <span className="font-bold tracking-tight">Feed</span>
+                <span className={`font-bold tracking-tight ${currentTab === 'feed' ? 'inline' : 'hidden xl:inline'}`}>Feed</span>
               </button>
 
               {/* 2. Network */}
@@ -590,8 +590,9 @@ export const Navbar = ({
                 title={user ? `My Professional Network (${seekersCount + employersCount})` : 'Emp & Seeker (Employers & Job Seekers)'}
               >
                 <NavNetworkIcon active={currentTab === 'network'} className="w-4 h-4 flex-shrink-0" />
-                <span className="font-bold tracking-tight hidden 2xl:inline">{user ? 'Network' : 'Emp & Seeker'}</span>
-                <span className="font-bold tracking-tight 2xl:hidden">Network</span>
+                <span className={`font-bold tracking-tight ${currentTab === 'network' ? 'inline' : 'hidden xl:inline'}`}>
+                  {user ? 'Network' : 'Emp & Seeker'}
+                </span>
               </button>
 
               {/* 3. Live Map */}
@@ -611,7 +612,7 @@ export const Navbar = ({
                 title={user ? 'Live Map' : 'Live Map (Login Required)'}
               >
                 <NavRadarIcon active={currentTab === 'map'} className="w-4 h-4 flex-shrink-0" />
-                <span className="font-bold tracking-tight">Map</span>
+                <span className={`font-bold tracking-tight ${currentTab === 'map' ? 'inline' : 'hidden xl:inline'}`}>Map</span>
                 {user && (
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse ml-0.5 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
                 )}
@@ -628,7 +629,7 @@ export const Navbar = ({
                 title={`Job Board & Applications (${jobsCount} openings)`}
               >
                 <NavJobsIcon active={currentTab === 'jobs' || currentTab === 'applications'} className="w-4 h-4 flex-shrink-0" />
-                <span className="font-bold tracking-tight">Jobs</span>
+                <span className={`font-bold tracking-tight ${currentTab === 'jobs' || currentTab === 'applications' ? 'inline' : 'hidden xl:inline'}`}>Jobs</span>
                 {jobsCount > 0 && (
                   <span className="text-[10px] bg-indigo-50 px-1.5 py-0.2 rounded-full text-indigo-700 border border-indigo-200 font-extrabold">
                     {jobsCount}
@@ -653,7 +654,7 @@ export const Navbar = ({
                 title={user ? 'Speed Connect Hub (Audio & Video Calls)' : 'Speed Connect (Login Required)'}
               >
                 <NavConnectIcon active={currentTab === 'connect'} className="w-4 h-4 flex-shrink-0" />
-                <span className="font-bold tracking-tight">Connect</span>
+                <span className={`font-bold tracking-tight ${currentTab === 'connect' ? 'inline' : 'hidden xl:inline'}`}>Connect</span>
               </button>
 
               {/* 6. Anonymous Discussions */}
@@ -676,7 +677,7 @@ export const Navbar = ({
                   <NavAnonIcon active={currentTab === 'anon'} className="w-4 h-4 flex-shrink-0" />
                   <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" />
                 </div>
-                <span className="font-bold tracking-tight">Anon</span>
+                <span className={`font-bold tracking-tight ${currentTab === 'anon' ? 'inline' : 'hidden xl:inline'}`}>Anon</span>
               </button>
 
               {/* 7. Full-Page Messaging */}
@@ -699,7 +700,7 @@ export const Navbar = ({
                   <NavMessagesIcon active={currentTab === 'messages'} className="w-4 h-4 flex-shrink-0" />
                   <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
                 </div>
-                <span className="font-bold tracking-tight">Chat</span>
+                <span className={`font-bold tracking-tight ${currentTab === 'messages' ? 'inline' : 'hidden xl:inline'}`}>Chat</span>
               </button>
 
             </nav>

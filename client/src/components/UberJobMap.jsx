@@ -1457,7 +1457,7 @@ export const UberJobMap = ({
       {/* ============================================================== */}
       {/* FLOATING ACTION BUTTONS (Bottom Right) */}
       {/* ============================================================== */}
-      <div className="absolute bottom-4 right-3 sm:bottom-6 sm:right-6 z-[500] flex flex-col gap-2.5 items-end pointer-events-auto">
+      <div className="absolute bottom-20 md:bottom-6 right-3 sm:right-6 z-[500] flex flex-col gap-2.5 items-end pointer-events-auto">
         
         {/* Google Maps Style Move & Zoom Navigation Controller (Transparent Glassmorphic) */}
         <div className="flex flex-col items-center bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-2xl shadow-lg p-1.5 gap-1 transition-all duration-200">
@@ -1591,7 +1591,7 @@ export const UberJobMap = ({
       {/* BOTTOM COLLAPSIBLE DISCOVERY DRAWER */}
       {/* ============================================================== */}
       {isDrawerOpen && (
-        <div className="absolute bottom-2 left-2 right-2 sm:bottom-6 sm:left-6 sm:right-auto sm:w-[480px] lg:w-[540px] max-w-[calc(100vw-1.5rem)] max-h-64 sm:max-h-72 z-[520] bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-3xl p-3 sm:p-4 shadow-2xl flex flex-col gap-2.5 animate-in slide-in-from-bottom duration-200 pointer-events-auto text-slate-900">
+        <div className="absolute bottom-20 md:bottom-6 left-2 right-2 sm:bottom-6 sm:left-6 sm:right-auto sm:w-[480px] lg:w-[540px] max-w-[calc(100vw-1.5rem)] max-h-64 sm:max-h-72 z-[520] bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-3xl p-3 sm:p-4 shadow-2xl flex flex-col gap-2.5 animate-in slide-in-from-bottom duration-200 pointer-events-auto text-slate-900">
           
           {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-100 pb-2">
@@ -1735,7 +1735,7 @@ export const UberJobMap = ({
       {/* FLOATING GLASS ACTIVE PIN PREVIEW CARD (Uber / Apple Maps Style) */}
       {/* ============================================================== */}
       {selectedPin && (
-        <div className="absolute bottom-4 left-3 right-3 sm:bottom-6 sm:left-6 sm:right-auto sm:w-[410px] max-w-md bg-white/95 backdrop-blur-2xl rounded-3xl p-4 sm:p-5 shadow-[0_20px_50px_rgba(0,0,0,0.18)] border border-white/80 ring-1 ring-slate-900/5 transition-all animate-in fade-in slide-in-from-bottom-5 duration-300 z-[535] pointer-events-auto">
+        <div className="absolute bottom-20 md:bottom-6 left-3 right-3 sm:bottom-6 sm:left-6 sm:right-auto sm:w-[410px] max-w-md bg-white/95 backdrop-blur-2xl rounded-3xl p-4 sm:p-5 shadow-[0_20px_50px_rgba(0,0,0,0.18)] border border-white/80 ring-1 ring-slate-900/5 transition-all animate-in fade-in slide-in-from-bottom-5 duration-300 z-[535] pointer-events-auto">
           {selectedPin.type === 'job' ? (
             <div className="flex flex-col gap-3">
               {/* Top Row: Commute Badge + Close Button */}
