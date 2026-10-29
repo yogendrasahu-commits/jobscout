@@ -1,5 +1,5 @@
 // WhatsApp & Telegram Instant Alerts Service for JobScout
-// Supports direct deep-links, webhooks, Telegram Bot API, and real-time Socket.IO dispatch.
+// Supports direct deep-links, automated server-side Meta/Twilio/Telegram bot dispatch, and real-time Socket.IO events.
 
 import { db } from './db.js';
 
@@ -44,20 +44,149 @@ export function generateTelegramUrl(text, url = 'https://jobscout.io') {
 }
 
 /**
+ * Sends automated server-side message to WhatsApp via Meta Cloud API, Twilio, or Gateway Webhook.
+ */
+export async function sendWhatsAppAutomatedMessage({ phone, message }) {
+  const cleanPhone = formatWhatsAppPhone(phone);
+  if (!cleanPhone) {
+    return { success: false, reason: 'INVALID_PHONE', error: 'Invalid phone number format' };
+  }
+
+  const alertConfig = db.getAlertConfig ? db.getAlertConfig() : {};
+
+  // 1. Meta / WhatsApp Cloud API (Official)
+  const metaToken = (alertConfig.whatsappToken || process.env.WHATSAPP_TOKEN || '').trim();
+  const phoneId = (alertConfig.whatsappPhoneNumberId || process.env.WHATSAPP_PHONE_NUMBER_ID || '').trim();
+
+  if (metaToken && phoneId) {
+    try {
+      const url = `https://graph.facebook.com/v19.0/${phoneId}/messages`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${metaToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          messaging_product: 'whatsapp',
+          recipient_type: 'individual',
+          to: cleanPhone,
+          type: 'text',
+          text: { preview_url: true, body: message }
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error?.message || 'Meta Cloud API error');
+      }
+
+      console.log('[WhatsAppService] Meta Cloud API delivered message to:', cleanPhone);
+      return {
+        success: true,
+        delivered: true,
+        provider: 'meta_cloud',
+        messageId: data.messages?.[0]?.id
+      };
+    } catch (err) {
+      console.warn('[WhatsAppService] Meta Cloud delivery failed:', err.message);
+    }
+  }
+
+  // 2. Twilio WhatsApp API
+  const twilioSid = (alertConfig.twilioAccountSid || process.env.TWILIO_ACCOUNT_SID || '').trim();
+  const twilioToken = (alertConfig.twilioAuthToken || process.env.TWILIO_AUTH_TOKEN || '').trim();
+  const twilioFrom = (alertConfig.twilioFromNumber || process.env.TWILIO_WHATSAPP_NUMBER || '').trim();
+
+  if (twilioSid && twilioToken && twilioFrom) {
+    try {
+      const url = `https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`;
+      const params = new URLSearchParams();
+      params.append('From', twilioFrom.startsWith('whatsapp:') ? twilioFrom : `whatsapp:${twilioFrom}`);
+      params.append('To', `whatsapp:+${cleanPhone}`);
+      params.append('Body', message);
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ` + Buffer.from(`${twilioSid}:${twilioToken}`).toString('base64'),
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: params
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Twilio WhatsApp error');
+
+      console.log('[WhatsAppService] Twilio WhatsApp delivered to:', cleanPhone);
+      return {
+        success: true,
+        delivered: true,
+        provider: 'twilio',
+        messageId: data.sid
+      };
+    } catch (err) {
+      console.warn('[WhatsAppService] Twilio WhatsApp failed:', err.message);
+    }
+  }
+
+  // 3. Custom Gateway / UltraMsg / Webhook
+  const gatewayUrl = (alertConfig.gatewayUrl || process.env.WHATSAPP_GATEWAY_URL || '').trim();
+  const gatewayToken = (alertConfig.gatewayToken || process.env.WHATSAPP_GATEWAY_TOKEN || '').trim();
+
+  if (gatewayUrl) {
+    try {
+      const res = await fetch(gatewayUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(gatewayToken ? { 'Authorization': `Bearer ${gatewayToken}` } : {})
+        },
+        body: JSON.stringify({
+          to: cleanPhone,
+          phone: cleanPhone,
+          message,
+          token: gatewayToken
+        })
+      });
+
+      const data = await res.json();
+      console.log('[WhatsAppService] Gateway webhook delivered to:', cleanPhone);
+      return {
+        success: true,
+        delivered: true,
+        provider: 'gateway',
+        data
+      };
+    } catch (err) {
+      console.warn('[WhatsAppService] Custom gateway failed:', err.message);
+    }
+  }
+
+  return {
+    success: false,
+    delivered: false,
+    reason: 'NO_GATEWAY_CONFIGURED',
+    message: 'No server-side WhatsApp gateway credentials configured. Generated direct Click-to-Chat card.'
+  };
+}
+
+/**
  * Sends a Telegram message using official Telegram Bot API (if BOT_TOKEN & CHAT_ID configured)
- * Falls back safely to simulation mode without failing.
+ * Supports user-level bot token or system-wide alertConfig bot token.
  */
 export async function sendTelegramBotMessage({ botToken, chatId, message, parseMode = 'Markdown' }) {
-  const token = (botToken || process.env.TELEGRAM_BOT_TOKEN || '').trim();
-  const chat = (chatId || process.env.TELEGRAM_CHAT_ID || '').trim();
+  const alertConfig = db.getAlertConfig ? db.getAlertConfig() : {};
+  const token = (botToken || alertConfig.telegramBotToken || process.env.TELEGRAM_BOT_TOKEN || '').trim();
+  const rawChat = (chatId || alertConfig.telegramDefaultChatId || process.env.TELEGRAM_CHAT_ID || '').trim();
 
-  if (!token || !chat) {
+  if (!token || !rawChat) {
     console.log('[TelegramService] Telegram Bot not configured. Simulated dispatch:', message.slice(0, 80));
     return {
-      success: true,
-      simulated: true,
-      channel: 'telegram',
-      message: 'Telegram alert generated in simulated mode'
+      success: false,
+      delivered: false,
+      reason: 'MISSING_CREDENTIALS',
+      message: 'Telegram Bot Token or Chat ID not configured'
     };
   }
 
@@ -67,7 +196,7 @@ export async function sendTelegramBotMessage({ botToken, chatId, message, parseM
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        chat_id: chat,
+        chat_id: rawChat,
         text: message,
         parse_mode: parseMode
       })
@@ -78,10 +207,10 @@ export async function sendTelegramBotMessage({ botToken, chatId, message, parseM
       throw new Error(data.description || 'Telegram API returned error');
     }
 
-    console.log('[TelegramService] Telegram Bot alert delivered to chat:', chat);
+    console.log('[TelegramService] Telegram Bot alert delivered to chat:', rawChat);
     return {
       success: true,
-      simulated: false,
+      delivered: true,
       messageId: data.result?.message_id,
       channel: 'telegram'
     };
@@ -89,6 +218,7 @@ export async function sendTelegramBotMessage({ botToken, chatId, message, parseM
     console.warn('[TelegramService] Telegram delivery failed:', err.message);
     return {
       success: false,
+      delivered: false,
       error: err.message,
       channel: 'telegram'
     };
@@ -103,7 +233,7 @@ export async function dispatchCandidateAlert({
   candidateName,
   employerName,
   jobTitle,
-  type, // 'interview_invite' | 'offer_issued' | 'status_update' | 'custom'
+  type, // 'application_submitted' | 'interview_invite' | 'offer_issued' | 'status_update' | 'custom'
   details = {},
   io
 }) {
@@ -122,7 +252,7 @@ export async function dispatchCandidateAlert({
         `Your application for *${safeTitle}* at *${safeCompany}* has been successfully recorded!\n\n` +
         `🏢 *Company:* ${safeCompany}\n` +
         `💼 *Role:* ${safeTitle}\n` +
-        `📄 *Application ID:* ${details.applicationId || 'JS-APP'}\n` +
+        `📄 *Application ID:* ${details.applicationId || 'JS-' + Date.now().toString().slice(-6)}\n` +
         `📅 *Date:* ${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}\n\n` +
         `You will receive instant notifications here as soon as the hiring team reviews your CV or schedules an interview.\n\n` +
         `👉 View Application: https://jobscout.io/applications\n\n` +
@@ -187,10 +317,15 @@ export async function dispatchCandidateAlert({
   const waUrl = generateWhatsAppUrl(cleanPhone, alertText);
   const tgUrl = generateTelegramUrl(alertText);
 
-  // Attempt background Telegram Bot delivery if configured
-  const telegramResult = await sendTelegramBotMessage({
-    botToken: process.env.TELEGRAM_BOT_TOKEN,
-    chatId: details.telegramChatId || process.env.TELEGRAM_CHAT_ID,
+  // 1. Attempt Automated WhatsApp background dispatch (Meta / Twilio / Gateway)
+  const whatsappAutomated = await sendWhatsAppAutomatedMessage({
+    phone: cleanPhone,
+    message: alertText
+  });
+
+  // 2. Attempt Automated Telegram Bot delivery
+  const telegramAutomated = await sendTelegramBotMessage({
+    chatId: details.telegramChatId,
     message: alertText
   });
 
@@ -205,6 +340,9 @@ export async function dispatchCandidateAlert({
     whatsappUrl: waUrl,
     telegramUrl: tgUrl,
     messageText: alertText,
+    whatsappAutomated,
+    telegramAutomated,
+    autoDelivered: Boolean(whatsappAutomated?.delivered || telegramAutomated?.delivered),
     sentAt: new Date().toISOString()
   };
 
@@ -218,6 +356,8 @@ export async function dispatchCandidateAlert({
     alertRecord,
     whatsappUrl: waUrl,
     telegramUrl: tgUrl,
-    telegramResult
+    whatsappAutomated,
+    telegramAutomated,
+    autoDelivered: Boolean(whatsappAutomated?.delivered || telegramAutomated?.delivered)
   };
 }

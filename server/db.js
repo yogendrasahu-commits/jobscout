@@ -1143,6 +1143,33 @@ class Database {
     this.save();
     return this.data.emailConfig;
   }
+
+  getAlertConfig() {
+    if (!this.data.alertConfig) {
+      this.data.alertConfig = {
+        telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || '',
+        telegramDefaultChatId: process.env.TELEGRAM_CHAT_ID || '',
+        whatsappProvider: 'meta',
+        whatsappToken: process.env.WHATSAPP_TOKEN || '',
+        whatsappPhoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID || '',
+        twilioAccountSid: process.env.TWILIO_ACCOUNT_SID || '',
+        twilioAuthToken: process.env.TWILIO_AUTH_TOKEN || '',
+        twilioFromNumber: process.env.TWILIO_WHATSAPP_NUMBER || '',
+        gatewayUrl: process.env.WHATSAPP_GATEWAY_URL || '',
+        gatewayToken: process.env.WHATSAPP_GATEWAY_TOKEN || ''
+      };
+    }
+    return this.data.alertConfig;
+  }
+
+  saveAlertConfig(config) {
+    this.data.alertConfig = {
+      ...(this.data.alertConfig || {}),
+      ...config
+    };
+    this.save();
+    return this.data.alertConfig;
+  }
 }
 
 export const db = new Database();

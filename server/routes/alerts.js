@@ -7,6 +7,7 @@ import {
   generateWhatsAppUrl, 
   generateTelegramUrl, 
   sendTelegramBotMessage, 
+  sendWhatsAppAutomatedMessage,
   dispatchCandidateAlert 
 } from '../alerts.js';
 
@@ -127,35 +128,46 @@ router.post('/test', optionalAuth, async (req, res) => {
     const candidateName = req.user?.name || 'JobScout User';
 
     const testText = `✅ *JobScout Live Notification Test*\n\n` +
-      `Hello *${candidateName}*! Your mobile messaging alerts for WhatsApp & Telegram are successfully active.\n\n` +
-      `You will receive instant pings whenever:\n` +
+      `Hello *${candidateName}*! Your automated mobile messaging alerts for WhatsApp & Telegram are successfully active.\n\n` +
+      `You will receive instant automated pings whenever:\n` +
+      `• You apply for a job\n` +
       `• An employer invites you to an interview\n` +
       `• An official offer letter is issued\n` +
       `• Your application status updates\n\n` +
       `👉 https://jobscout.io\n` +
-      `— *JobScout Notification System*`;
+      `— *JobScout Automated Alerts*`;
 
     const waUrl = generateWhatsAppUrl(targetPhone, testText);
     const tgUrl = generateTelegramUrl(testText);
 
-    let botResult = null;
-    const targetChat = telegramChatId || (channel === 'telegram' ? target : null);
-    if (channel === 'telegram' && targetChat) {
-      botResult = await sendTelegramBotMessage({
-        chatId: targetChat,
+    let whatsappResult = null;
+    let telegramResult = null;
+
+    if (channel === 'whatsapp' || !channel) {
+      whatsappResult = await sendWhatsAppAutomatedMessage({
+        phone: targetPhone,
+        message: testText
+      });
+    }
+
+    if (channel === 'telegram' || !channel) {
+      telegramResult = await sendTelegramBotMessage({
+        chatId: telegramChatId || target,
         message: testText
       });
     }
 
     res.json({
       success: true,
-      message: `Test alert successfully prepared for ${channel || 'WhatsApp & Telegram'}!`,
+      message: `Test alert prepared for ${channel || 'WhatsApp & Telegram'}!`,
       previewUrl: channel === 'telegram' ? tgUrl : waUrl,
       whatsappUrl: waUrl,
       telegramUrl: tgUrl,
       channel,
       target: targetPhone,
-      botResult
+      whatsappResult,
+      telegramResult,
+      autoDelivered: Boolean(whatsappResult?.delivered || telegramResult?.delivered)
     });
   } catch (err) {
     console.error('Error sending test alert:', err);
@@ -163,10 +175,11 @@ router.post('/test', optionalAuth, async (req, res) => {
   }
 });
 
-// 5. Get Alert Preferences for Current User
+// 5. Get Alert Preferences & Gateway Status
 router.get('/settings', optionalAuth, (req, res) => {
   try {
     const user = req.user ? db.findUserById(req.user.id) : null;
+    const alertConfig = db.getAlertConfig ? db.getAlertConfig() : {};
     const prefs = user?.notificationPrefs || {
       whatsappEnabled: true,
       telegramEnabled: false,
@@ -180,14 +193,23 @@ router.get('/settings', optionalAuth, (req, res) => {
     res.json({ 
       success: true, 
       settings: prefs, 
-      preferences: prefs 
+      preferences: prefs,
+      gatewayConfig: {
+        hasTelegramBot: Boolean(alertConfig.telegramBotToken),
+        telegramBotToken: alertConfig.telegramBotToken ? '••••••••' + alertConfig.telegramBotToken.slice(-4) : '',
+        telegramDefaultChatId: alertConfig.telegramDefaultChatId || '',
+        hasWhatsAppGateway: Boolean(alertConfig.whatsappToken || alertConfig.twilioAuthToken || alertConfig.gatewayUrl),
+        whatsappProvider: alertConfig.whatsappProvider || 'meta',
+        whatsappPhoneNumberId: alertConfig.whatsappPhoneNumberId || '',
+        gatewayUrl: alertConfig.gatewayUrl || ''
+      }
     });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch alert settings' });
   }
 });
 
-// 6. Update Alert Preferences for Current User
+// 6. Update Alert Preferences and Optional Server-Side Gateway Config
 router.put('/settings', optionalAuth, (req, res) => {
   try {
     const {
@@ -198,7 +220,8 @@ router.put('/settings', optionalAuth, (req, res) => {
       telegramChatId,
       notifyOnOffer,
       notifyOnInterview,
-      notifyOnApplication
+      notifyOnApplication,
+      gatewayConfig
     } = req.body;
 
     const targetPhone = (phone || whatsappPhone || '').toString().trim();
@@ -221,10 +244,15 @@ router.put('/settings', optionalAuth, (req, res) => {
       }
     }
 
+    if (gatewayConfig && typeof gatewayConfig === 'object') {
+      db.saveAlertConfig(gatewayConfig);
+    }
+
     res.json({ 
       success: true, 
       settings: updatedPrefs, 
-      preferences: updatedPrefs 
+      preferences: updatedPrefs,
+      gatewayConfig: db.getAlertConfig ? db.getAlertConfig() : {}
     });
   } catch (err) {
     res.status(500).json({ error: 'Failed to update alert settings' });

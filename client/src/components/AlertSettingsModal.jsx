@@ -13,7 +13,13 @@ import {
   Zap,
   Radio,
   Check,
-  Loader2
+  Loader2,
+  Bot,
+  Key,
+  ChevronDown,
+  ChevronUp,
+  Info,
+  Server
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { sendTestAlert, generateWhatsAppUrl, generateTelegramUrl } from '../utils/alertService';
@@ -30,6 +36,20 @@ export const AlertSettingsModal = ({ isOpen, onClose }) => {
   const [notifyOnOffer, setNotifyOnOffer] = useState(true);
   const [notifyOnInterview, setNotifyOnInterview] = useState(true);
   const [notifyOnApplication, setNotifyOnApplication] = useState(true);
+
+  // Gateway / Automated credentials state
+  const [showGatewayConfig, setShowGatewayConfig] = useState(false);
+  const [telegramBotToken, setTelegramBotToken] = useState('');
+  const [whatsappToken, setWhatsappToken] = useState('');
+  const [whatsappPhoneNumberId, setWhatsappPhoneNumberId] = useState('');
+  const [whatsappProvider, setWhatsappProvider] = useState('meta');
+  const [twilioAccountSid, setTwilioAccountSid] = useState('');
+  const [twilioAuthToken, setTwilioAuthToken] = useState('');
+  const [twilioFromNumber, setTwilioFromNumber] = useState('');
+  const [gatewayUrl, setGatewayUrl] = useState('');
+
+  const [hasTelegramBot, setHasTelegramBot] = useState(false);
+  const [hasWhatsAppGateway, setHasWhatsAppGateway] = useState(false);
 
   const [saving, setSaving] = useState(false);
   const [testingChannel, setTestingChannel] = useState(null); // 'whatsapp' | 'telegram'
@@ -77,6 +97,15 @@ export const AlertSettingsModal = ({ isOpen, onClose }) => {
             setNotifyOnInterview(p.notifyOnInterview !== false);
             setNotifyOnApplication(p.notifyOnApplication !== false);
           }
+          if (data.gatewayConfig) {
+            const g = data.gatewayConfig;
+            setHasTelegramBot(Boolean(g.hasTelegramBot));
+            setHasWhatsAppGateway(Boolean(g.hasWhatsAppGateway));
+            setTelegramBotToken(g.telegramBotToken || '');
+            setWhatsappPhoneNumberId(g.whatsappPhoneNumberId || '');
+            setWhatsappProvider(g.whatsappProvider || 'meta');
+            setGatewayUrl(g.gatewayUrl || '');
+          }
         })
         .catch(err => console.error('Failed to load alert settings:', err));
     }
@@ -91,27 +120,40 @@ export const AlertSettingsModal = ({ isOpen, onClose }) => {
     setSuccessMsg('');
 
     try {
+      const payload = {
+        whatsappEnabled,
+        telegramEnabled,
+        whatsappPhone: whatsappPhone.trim(),
+        telegramChatId: telegramChatId.trim(),
+        notifyOnOffer,
+        notifyOnInterview,
+        notifyOnApplication,
+        gatewayConfig: {
+          telegramBotToken: telegramBotToken.trim(),
+          telegramDefaultChatId: telegramChatId.trim(),
+          whatsappToken: whatsappToken.trim(),
+          whatsappPhoneNumberId: whatsappPhoneNumberId.trim(),
+          whatsappProvider,
+          twilioAccountSid: twilioAccountSid.trim(),
+          twilioAuthToken: twilioAuthToken.trim(),
+          twilioFromNumber: twilioFromNumber.trim(),
+          gatewayUrl: gatewayUrl.trim()
+        }
+      };
+
       const res = await fetch('/api/alerts/settings', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({
-          whatsappEnabled,
-          telegramEnabled,
-          whatsappPhone: whatsappPhone.trim(),
-          telegramChatId: telegramChatId.trim(),
-          notifyOnOffer,
-          notifyOnInterview,
-          notifyOnApplication
-        })
+        body: JSON.stringify(payload)
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to update alert settings');
 
-      setSuccessMsg('✅ Notification channels saved! Instant alerts are now active.');
+      setSuccessMsg('✅ Notification channels & automated dispatch saved!');
       triggerConfetti();
       playSuccessChime();
 
@@ -145,12 +187,16 @@ export const AlertSettingsModal = ({ isOpen, onClose }) => {
         telegramChatId: telegramChatId.trim()
       });
 
-      if (channel === 'whatsapp' && data.whatsappUrl) {
-        window.open(data.whatsappUrl, '_blank');
-        setSuccessMsg('📲 Opened WhatsApp with pre-filled live notification card!');
-      } else if (channel === 'telegram' && data.telegramUrl) {
-        window.open(data.telegramUrl, '_blank');
-        setSuccessMsg('✈️ Opened Telegram with live notification card!');
+      if (data.autoDelivered) {
+        setSuccessMsg(`⚡ Automated ${channel === 'telegram' ? 'Telegram Bot' : 'WhatsApp'} alert delivered directly to your device in the background!`);
+      } else {
+        if (channel === 'whatsapp' && data.whatsappUrl) {
+          window.open(data.whatsappUrl, '_blank');
+          setSuccessMsg('📲 Opened WhatsApp with pre-filled live notification card! (Configure Meta/Twilio API below for silent 100% automated background delivery).');
+        } else if (channel === 'telegram' && data.telegramUrl) {
+          window.open(data.telegramUrl, '_blank');
+          setSuccessMsg('✈️ Opened Telegram share window! (Add your free Telegram Bot Token & Chat ID below for direct 100% automated bot delivery).');
+        }
       }
       playSuccessChime();
     } catch (err) {
@@ -172,20 +218,21 @@ export const AlertSettingsModal = ({ isOpen, onClose }) => {
         {/* Header - Sticky with prominent Close Button */}
         <div className="sticky top-0 z-10 flex items-center justify-between px-5 sm:px-6 py-4 border-b border-slate-100 bg-white/95 backdrop-blur-sm">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-600/25 flex-shrink-0">
-              <MessageSquare className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-md shadow-emerald-600/25 flex-shrink-0">
+              <Zap className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-black text-sm sm:text-base text-slate-900">
-                  WhatsApp & Telegram Alerts
+                  Instant Alerts & Automation
                 </h3>
-                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 uppercase">
+                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 uppercase flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
                   Real-time
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-0.5 hidden xs:block">
-                Instant mobile alerts for interviews, offers & updates
+                Automated WhatsApp & Telegram mobile alerts
               </p>
             </div>
           </div>
@@ -223,7 +270,16 @@ export const AlertSettingsModal = ({ isOpen, onClose }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
                 <span className="text-lg">💬</span>
-                <span>WhatsApp Instant Alerts</span>
+                <span>WhatsApp Mobile Alerts</span>
+                {hasWhatsAppGateway ? (
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-700 border border-emerald-200">
+                    ⚡ Auto-API
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                    🔗 1-Click Link
+                  </span>
+                )}
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -252,7 +308,7 @@ export const AlertSettingsModal = ({ isOpen, onClose }) => {
                 />
               </div>
               <span className="text-[10px] text-slate-500 mt-1 block">
-                Indian numbers default to +91 country code automatically.
+                Direct mobile number for instant job status, interviews & offer letters.
               </span>
             </div>
 
@@ -279,6 +335,15 @@ export const AlertSettingsModal = ({ isOpen, onClose }) => {
               <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
                 <span className="text-lg">✈️</span>
                 <span>Telegram Bot Alerts</span>
+                {hasTelegramBot ? (
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-sky-100 text-sky-700 border border-sky-200">
+                    ⚡ Automated Bot Active
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                    🤖 Bot Ready
+                  </span>
+                )}
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -295,16 +360,19 @@ export const AlertSettingsModal = ({ isOpen, onClose }) => {
               <label className="block text-[11px] font-bold text-slate-700 mb-1">
                 Telegram Chat ID or Username
               </label>
-              <input
-                type="text"
-                placeholder="@username or 12345678"
-                value={telegramChatId}
-                onChange={(e) => setTelegramChatId(e.target.value)}
-                disabled={!telegramEnabled}
-                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-sky-500 font-mono text-xs disabled:opacity-60"
-              />
+              <div className="relative">
+                <Bot className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+                <input
+                  type="text"
+                  placeholder="e.g. 123456789 or @username"
+                  value={telegramChatId}
+                  onChange={(e) => setTelegramChatId(e.target.value)}
+                  disabled={!telegramEnabled}
+                  className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-sky-500 font-mono text-xs disabled:opacity-60"
+                />
+              </div>
               <span className="text-[10px] text-slate-500 mt-1 block">
-                Connect your Telegram account to receive instant bot pings without SMS delays.
+                Tip: Get your numeric chat ID instantly from free Telegram bot <b>@userinfobot</b> or <b>@raw_data_bot</b>.
               </span>
             </div>
 
@@ -325,10 +393,156 @@ export const AlertSettingsModal = ({ isOpen, onClose }) => {
             )}
           </div>
 
-          {/* 3. Notification Triggers Checklist */}
+          {/* 3. Automated Server Dispatch / Gateway Settings (Expandable) */}
+          <div className="p-3.5 rounded-2xl bg-indigo-50/50 border border-indigo-200/80">
+            <button
+              type="button"
+              onClick={() => setShowGatewayConfig(!showGatewayConfig)}
+              className="w-full flex items-center justify-between font-bold text-slate-900 text-xs cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <Server className="w-4 h-4 text-indigo-600" />
+                <span>⚡ Automated Background Dispatch Configuration</span>
+              </div>
+              {showGatewayConfig ? (
+                <ChevronUp className="w-4 h-4 text-slate-500" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-slate-500" />
+              )}
+            </button>
+
+            {showGatewayConfig && (
+              <div className="mt-3 pt-3 border-t border-indigo-100 space-y-3 animate-in fade-in">
+                <div className="p-2.5 rounded-xl bg-white/80 border border-indigo-100 text-[11px] text-slate-600 leading-relaxed">
+                  <p className="font-semibold text-indigo-900 mb-1 flex items-center gap-1">
+                    <Info className="w-3.5 h-3.5 text-indigo-600" /> How 100% Silent Background Delivery Works:
+                  </p>
+                  <ul className="list-disc pl-4 space-y-1">
+                    <li><b>Telegram Bot:</b> Free to set up! Open Telegram, talk to <b>@BotFather</b>, type <code>/newbot</code>, copy the Bot Token here. Telegram delivers alerts silently to phones with zero fees.</li>
+                    <li><b>WhatsApp Cloud API:</b> Requires Meta Developer token or Twilio account to send background WhatsApp messages without opening a browser tab.</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                    Telegram Bot Token (from @BotFather)
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="e.g. 123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ"
+                    value={telegramBotToken}
+                    onChange={(e) => setTelegramBotToken(e.target.value)}
+                    className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 font-mono text-xs"
+                  />
+                </div>
+
+                <div className="pt-2 border-t border-indigo-100/60">
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                    WhatsApp Automated Provider
+                  </label>
+                  <select
+                    value={whatsappProvider}
+                    onChange={(e) => setWhatsappProvider(e.target.value)}
+                    className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-xs font-semibold mb-2"
+                  >
+                    <option value="meta">Meta WhatsApp Cloud API (Official)</option>
+                    <option value="twilio">Twilio WhatsApp API</option>
+                    <option value="gateway">Custom Webhook / UltraMsg Gateway</option>
+                  </select>
+
+                  {whatsappProvider === 'meta' && (
+                    <div className="space-y-2">
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-600 mb-0.5">
+                          Meta Cloud API Permanent Token
+                        </label>
+                        <input
+                          type="password"
+                          placeholder="EAAB..."
+                          value={whatsappToken}
+                          onChange={(e) => setWhatsappToken(e.target.value)}
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 font-mono text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-600 mb-0.5">
+                          WhatsApp Phone Number ID
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. 104523948572019"
+                          value={whatsappPhoneNumberId}
+                          onChange={(e) => setWhatsappPhoneNumberId(e.target.value)}
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 font-mono text-xs"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {whatsappProvider === 'twilio' && (
+                    <div className="space-y-2">
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-600 mb-0.5">
+                          Twilio Account SID
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="AC..."
+                          value={twilioAccountSid}
+                          onChange={(e) => setTwilioAccountSid(e.target.value)}
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl focus:outline-none font-mono text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-600 mb-0.5">
+                          Twilio Auth Token
+                        </label>
+                        <input
+                          type="password"
+                          placeholder="••••••••"
+                          value={twilioAuthToken}
+                          onChange={(e) => setTwilioAuthToken(e.target.value)}
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl focus:outline-none font-mono text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-600 mb-0.5">
+                          Twilio From Number
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="+14155238886"
+                          value={twilioFromNumber}
+                          onChange={(e) => setTwilioFromNumber(e.target.value)}
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl focus:outline-none font-mono text-xs"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {whatsappProvider === 'gateway' && (
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-600 mb-0.5">
+                        Gateway Webhook URL
+                      </label>
+                      <input
+                        type="url"
+                        placeholder="https://api.ultramsg.com/instance123/messages/chat"
+                        value={gatewayUrl}
+                        onChange={(e) => setGatewayUrl(e.target.value)}
+                        className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl focus:outline-none font-mono text-xs"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 4. Notification Triggers Checklist */}
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
             <span className="font-extrabold text-slate-900 block text-xs">
-              When should JobScout notify your mobile?
+              When should JobScout dispatch mobile alerts?
             </span>
 
             <label className="flex items-center gap-2.5 cursor-pointer text-slate-700 font-medium">
@@ -358,14 +572,14 @@ export const AlertSettingsModal = ({ isOpen, onClose }) => {
                 onChange={(e) => setNotifyOnApplication(e.target.checked)}
                 className="w-4 h-4 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500"
               />
-              <span>📢 Application Status Updates (Reviewed, Shortlisted, Hired)</span>
+              <span>📢 Application Status Updates (Submitted, Reviewed, Hired)</span>
             </label>
           </div>
 
           {/* Footer Actions */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-100">
             <span className="text-[11px] text-slate-400 text-center sm:text-left">
-              Zero spam policy • Only verified employer events
+              Zero spam policy • 100% Encrypted & Safe
             </span>
 
             <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
