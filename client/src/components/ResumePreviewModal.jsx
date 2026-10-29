@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   X, 
   Printer, 
@@ -22,6 +23,26 @@ export const ResumePreviewModal = ({ candidate, isOpen, onClose }) => {
 
   const [copied, setCopied] = React.useState(false);
 
+  // Escape key handler & Body scroll lock
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isOpen, onClose]);
+
   const handlePrint = () => {
     window.print();
   };
@@ -34,17 +55,24 @@ export const ResumePreviewModal = ({ candidate, isOpen, onClose }) => {
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-[960] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-3 sm:p-6 overflow-y-auto print:p-0 print:bg-white print:fixed print:inset-0">
-      <div className="relative w-full max-w-3xl bg-white border border-slate-200/90 rounded-3xl shadow-2xl overflow-hidden my-auto animate-in zoom-in-95 duration-200 print:border-none print:shadow-none print:rounded-none print:m-0 print:max-w-none">
-        
-        {/* Top Control Bar (Hidden when printing) */}
-        <div className="flex items-center justify-between px-6 py-4 bg-slate-50 border-b border-slate-200 print:hidden">
+  const modalContent = (
+    <div 
+      className="fixed inset-0 z-[9999] overflow-y-auto bg-slate-950/75 backdrop-blur-md flex justify-center items-start sm:items-center p-2 sm:p-4 md:p-6 print:p-0 print:bg-white print:fixed print:inset-0 animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div 
+        className="relative w-full max-w-3xl bg-white border border-slate-200/90 rounded-3xl shadow-2xl overflow-hidden my-auto animate-in zoom-in-95 duration-200 print:border-none print:shadow-none print:rounded-none print:m-0 print:max-w-none flex flex-col max-h-[92vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Top Control Bar (Hidden when printing) - Sticky */}
+        <div className="sticky top-0 z-10 flex items-center justify-between px-4 sm:px-6 py-3.5 bg-slate-50/95 backdrop-blur-sm border-b border-slate-200 print:hidden flex-shrink-0">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-indigo-600" />
-            <span className="font-extrabold text-sm text-slate-900">JobScout Verified Executive CV</span>
-            <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-bold">
-              Identity Verified
+            <ShieldCheck className="w-5 h-5 text-indigo-600 flex-shrink-0" />
+            <span className="font-extrabold text-xs sm:text-sm text-slate-900 truncate">
+              JobScout Verified CV
+            </span>
+            <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-bold hidden xs:inline">
+              Verified
             </span>
           </div>
 
@@ -52,7 +80,7 @@ export const ResumePreviewModal = ({ candidate, isOpen, onClose }) => {
             <button
               type="button"
               onClick={handleShare}
-              className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 shadow-xs ${
+              className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 shadow-2xs ${
                 copied 
                   ? 'bg-emerald-50 text-emerald-700 border-emerald-300' 
                   : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
@@ -70,31 +98,33 @@ export const ResumePreviewModal = ({ candidate, isOpen, onClose }) => {
               title="Print or Save as PDF"
             >
               <Printer className="w-4 h-4" />
-              <span>Print / Save PDF</span>
+              <span>Print / PDF</span>
             </button>
 
+            {/* Prominent Catchy Close Button */}
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-200 transition-colors ml-1"
-              title="Close"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-200/80 hover:bg-rose-50 text-slate-700 hover:text-rose-600 border border-slate-300/80 hover:border-rose-200 transition-all font-bold text-xs active:scale-95 shadow-2xs group ml-1"
+              title="Close Profile (बंद करें)"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4 text-slate-500 group-hover:text-rose-600" />
+              <span className="font-extrabold hidden xs:inline">Close</span>
             </button>
           </div>
         </div>
 
-        {/* Printable Resume Canvas */}
-        <div className="p-6 sm:p-10 max-h-[85vh] overflow-y-auto print:max-h-none print:p-8 print:overflow-visible">
+        {/* Printable Resume Canvas - Scrollable */}
+        <div className="p-4 sm:p-8 md:p-10 overflow-y-auto print:max-h-none print:p-8 print:overflow-visible flex-1">
           
           {/* Header Card */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-6 border-b-2 border-slate-100">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 pb-6 border-b-2 border-slate-100">
             <div className="flex items-center gap-4">
               <div className="relative flex-shrink-0">
                 <img
                   src={candidate.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}
                   alt={candidate.name}
-                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-indigo-500/30 shadow-md ring-4 ring-indigo-50"
+                  className="w-16 h-16 sm:w-22 sm:h-22 rounded-2xl object-cover border-2 border-indigo-500/30 shadow-md ring-4 ring-indigo-50"
                 />
                 <span className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 border-2 border-white rounded-full flex items-center justify-center">
                   <CheckCircle className="w-3 h-3 text-white" />
@@ -103,7 +133,7 @@ export const ResumePreviewModal = ({ candidate, isOpen, onClose }) => {
 
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
                     {candidate.name}
                   </h1>
                   <span className="text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded-md font-extrabold print:border-slate-300">
@@ -166,7 +196,7 @@ export const ResumePreviewModal = ({ candidate, isOpen, onClose }) => {
               {(candidate.skills || ['React', 'Node.js', 'TypeScript', 'WebSockets', 'Tailwind CSS', 'SQL']).map((skill, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1 rounded-xl bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200/90 shadow-xs print:border-slate-300"
+                  className="px-3 py-1 rounded-xl bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200/90 shadow-2xs print:border-slate-300"
                 >
                   {skill}
                 </span>
@@ -217,7 +247,35 @@ export const ResumePreviewModal = ({ candidate, isOpen, onClose }) => {
 
         </div>
 
+        {/* Modal Bottom Footer (Hidden on print) */}
+        <div className="p-3 sm:px-6 sm:py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between flex-shrink-0 print:hidden text-xs">
+          <span className="text-slate-500 hidden sm:inline">
+            JobScout ATS-Verified Candidate Dossier
+          </span>
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold border border-slate-200 transition-all active:scale-95"
+            >
+              Close (बंद करें)
+            </button>
+            <button
+              type="button"
+              onClick={handlePrint}
+              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black flex items-center gap-1.5 shadow-md shadow-indigo-600/20 active:scale-95 transition-all"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              <span>Print / Download</span>
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
+
+export default ResumePreviewModal;

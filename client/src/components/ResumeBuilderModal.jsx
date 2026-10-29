@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   X, 
   Download, 
@@ -19,7 +20,9 @@ import {
   ExternalLink,
   RotateCcw,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Eye,
+  Edit3
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -30,6 +33,8 @@ export const ResumeBuilderModal = ({ isOpen, onClose }) => {
   // Resume form state
   const [copied, setCopied] = useState(false);
   const [template, setTemplate] = useState('harvard'); // 'harvard' | 'modern'
+  const [mobileViewTab, setMobileViewTab] = useState('editor'); // 'editor' | 'preview' (for < lg screens)
+
   const [resumeData, setResumeData] = useState({
     fullName: user?.name || 'Aarav Sharma',
     headline: user?.title || 'Senior Full-Stack Software Engineer',
@@ -87,6 +92,40 @@ export const ResumeBuilderModal = ({ isOpen, onClose }) => {
       }
     ]
   });
+
+  // Escape key handler & Body scroll lock
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isOpen, onClose]);
+
+  // Sync if user data updates
+  useEffect(() => {
+    if (user && isOpen) {
+      setResumeData(prev => ({
+        ...prev,
+        fullName: prev.fullName || user.name || '',
+        headline: prev.headline || user.title || '',
+        email: prev.email || user.email || '',
+        phone: prev.phone || user.phone || '',
+        location: prev.location || user.address || ''
+      }));
+    }
+  }, [user, isOpen]);
 
   // Calculate ATS Compatibility Score
   const calculateATSScore = () => {
@@ -157,9 +196,11 @@ KEY PROJECTS
 ${resumeData.projects.map((p) => `• ${p.name}: ${p.description}`).join('\n')}
 `.trim();
 
-    navigator.clipboard.writeText(plainText);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(plainText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
   };
 
   // Add Experience
@@ -167,10 +208,10 @@ ${resumeData.projects.map((p) => `• ${p.name}: ${p.description}`).join('\n')}
     const newExp = {
       id: `exp_${Date.now()}`,
       title: 'Software Developer',
-      company: 'Tech Corp',
-      location: 'Remote',
+      company: 'Tech Solutions',
+      location: 'India',
       duration: '2023 - Present',
-      bullets: ['Developed responsive web interfaces with modern performance practices.']
+      bullets: ['Engineered scalable user experiences with clean code and high performance.']
     };
     setResumeData({ ...resumeData, experience: [...resumeData.experience, newExp] });
   };
@@ -185,25 +226,27 @@ ${resumeData.projects.map((p) => `• ${p.name}: ${p.description}`).join('\n')}
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-[1250] flex items-center justify-center p-2 sm:p-4 bg-slate-900/70 backdrop-blur-md animate-in fade-in duration-200">
-      
+  const modalContent = (
+    <div 
+      className="fixed inset-0 z-[9999] overflow-y-auto bg-slate-950/75 backdrop-blur-md flex justify-center items-start sm:items-center p-2 sm:p-4 md:p-6 animate-in fade-in duration-200"
+      onClick={onClose}
+    >
       {/* Styles injected specifically for clean printing */}
       <style>{`
         @media print {
           body * {
-            visibility: hidden;
+            visibility: hidden !important;
           }
           #harvard-resume-sheet, #harvard-resume-sheet * {
-            visibility: visible;
+            visibility: visible !important;
           }
           #harvard-resume-sheet {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            margin: 0;
-            padding: 20mm;
+            position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 15mm 20mm !important;
             border: none !important;
             box-shadow: none !important;
             background: white !important;
@@ -212,49 +255,55 @@ ${resumeData.projects.map((p) => `• ${p.name}: ${p.description}`).join('\n')}
         }
       `}</style>
 
-      <div className="bg-white rounded-3xl max-w-5xl w-full max-h-[94vh] shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
-        
-        {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-t-3xl">
+      <div 
+        className="bg-white rounded-3xl max-w-5xl w-full max-h-[92vh] shadow-2xl border border-slate-200 flex flex-col overflow-hidden my-auto animate-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header - Sticky with Prominent Close Button */}
+        <div className="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-t-3xl flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 flex items-center justify-center flex-shrink-0 shadow-inner">
               <FileText className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-white">1-Click ATS Harvard Resume Builder</h3>
-                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                <h3 className="text-sm sm:text-base font-bold text-white">1-Click ATS Harvard Resume Builder</h3>
+                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/25 text-emerald-300 border border-emerald-400/30">
                   ATS Ready
                 </span>
               </div>
-              <p className="text-xs text-slate-300">
+              <p className="text-xs text-slate-300 hidden xs:block">
                 100% Parser-friendly format guaranteed to pass HR Applicant Tracking Systems
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* ATS Score Meter */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-xl bg-white/10 border border-white/15">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/10 border border-white/15">
               <Sparkles className="w-3.5 h-3.5 text-amber-300" />
               <span className="text-xs font-bold text-white">ATS Score:</span>
               <span className="text-xs font-black text-emerald-400">{atsScore}%</span>
             </div>
 
+            {/* Prominent Catchy Close Button */}
             <button
+              type="button"
               onClick={onClose}
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/15 hover:bg-rose-600 text-white border border-white/20 hover:border-rose-500 transition-all font-bold text-xs active:scale-95 shadow-xs group"
+              title="Close Resume Builder (बंद करें)"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4 text-slate-200 group-hover:text-white" />
+              <span className="font-extrabold">Close</span>
             </button>
           </div>
         </div>
 
         {/* Toolbar: Template toggle, Print, Copy plain text */}
-        <div className="p-3 sm:px-6 sm:py-2.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div className="p-3 sm:px-6 sm:py-2.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs flex-shrink-0">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-600">Template Style:</span>
-            <div className="flex items-center rounded-xl bg-white border border-slate-200 p-0.5">
+            <span className="font-bold text-slate-600 hidden sm:inline">Style:</span>
+            <div className="flex items-center rounded-xl bg-white border border-slate-200 p-0.5 shadow-2xs">
               <button
                 type="button"
                 onClick={() => setTemplate('harvard')}
@@ -276,52 +325,80 @@ ${resumeData.projects.map((p) => `• ${p.name}: ${p.description}`).join('\n')}
             </div>
           </div>
 
+          {/* Mobile Tab Switcher (< lg) */}
+          <div className="flex lg:hidden items-center rounded-xl bg-white border border-slate-200 p-0.5 shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setMobileViewTab('editor')}
+              className={`px-2.5 py-1 rounded-lg font-bold flex items-center gap-1 transition-all ${
+                mobileViewTab === 'editor' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600'
+              }`}
+            >
+              <Edit3 className="w-3 h-3" />
+              <span>Edit</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileViewTab('preview')}
+              className={`px-2.5 py-1 rounded-lg font-bold flex items-center gap-1 transition-all ${
+                mobileViewTab === 'preview' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600'
+              }`}
+            >
+              <Eye className="w-3 h-3" />
+              <span>Preview</span>
+            </button>
+          </div>
+
           <div className="flex items-center gap-2">
             <button
               onClick={handleCopyPlainText}
-              className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold border border-slate-200 transition-colors flex items-center gap-1.5 active:scale-95 shadow-xs"
-              title="Copy clean plain text for pasting into Workday/Taleo"
+              className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold border border-slate-200 transition-colors flex items-center gap-1.5 active:scale-95 shadow-2xs"
+              title="Copy clean plain text for pasting into HR portals"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
-              <span>{copied ? 'Copied ATS Text!' : 'Copy ATS Plain Text'}</span>
+              <span className="hidden sm:inline">{copied ? 'Copied ATS Text!' : 'Copy ATS Plain Text'}</span>
+              <span className="sm:hidden">{copied ? 'Copied' : 'Copy'}</span>
             </button>
 
             <button
               onClick={handlePrint}
-              className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition-all flex items-center gap-1.5 active:scale-95 shadow-md shadow-indigo-600/20"
+              className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition-all flex items-center gap-1.5 active:scale-95 shadow-md shadow-indigo-600/25"
+              title="Print or Save as PDF"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Print to PDF (A4)</span>
+              <span>Print to PDF</span>
             </button>
           </div>
         </div>
 
         {/* Content Area: Two Panels (Left: Live Editor, Right: Sheet Preview) */}
-        <div className="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+        <div className="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-0">
           
           {/* Left Panel: Form Inputs */}
-          <div className="lg:col-span-5 p-4 sm:p-5 overflow-y-auto space-y-4 border-r border-slate-200 bg-slate-50/50 max-h-[calc(94vh-140px)]">
+          <div className={`lg:col-span-5 p-4 sm:p-5 overflow-y-auto space-y-4 border-r border-slate-200 bg-slate-50/50 ${
+            mobileViewTab === 'editor' ? 'block' : 'hidden lg:block'
+          }`}>
             <div className="flex items-center justify-between">
               <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Edit Resume Content</h4>
               <span className="text-[11px] text-indigo-600 font-semibold">Auto-synced</span>
             </div>
 
             {/* Basic Info */}
-            <div className="p-3 bg-white rounded-2xl border border-slate-200 space-y-2 text-xs">
+            <div className="p-3 bg-white rounded-2xl border border-slate-200 space-y-2 text-xs shadow-2xs">
               <span className="font-bold text-slate-800 block">Personal Details</span>
               <input
                 type="text"
                 placeholder="Full Name"
                 value={resumeData.fullName}
                 onChange={(e) => setResumeData({ ...resumeData, fullName: e.target.value })}
-                className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500"
+                className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500 text-xs"
               />
               <input
                 type="text"
                 placeholder="Professional Headline"
                 value={resumeData.headline}
                 onChange={(e) => setResumeData({ ...resumeData, headline: e.target.value })}
-                className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500"
+                className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500 text-xs"
               />
               <div className="grid grid-cols-2 gap-2">
                 <input
@@ -329,14 +406,14 @@ ${resumeData.projects.map((p) => `• ${p.name}: ${p.description}`).join('\n')}
                   placeholder="Email"
                   value={resumeData.email}
                   onChange={(e) => setResumeData({ ...resumeData, email: e.target.value })}
-                  className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500 text-xs"
                 />
                 <input
                   type="text"
                   placeholder="Phone"
                   value={resumeData.phone}
                   onChange={(e) => setResumeData({ ...resumeData, phone: e.target.value })}
-                  className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500 text-xs"
                 />
               </div>
               <input
@@ -344,12 +421,12 @@ ${resumeData.projects.map((p) => `• ${p.name}: ${p.description}`).join('\n')}
                 placeholder="City, State, Country"
                 value={resumeData.location}
                 onChange={(e) => setResumeData({ ...resumeData, location: e.target.value })}
-                className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500"
+                className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500 text-xs"
               />
             </div>
 
             {/* Summary */}
-            <div className="p-3 bg-white rounded-2xl border border-slate-200 space-y-1.5 text-xs">
+            <div className="p-3 bg-white rounded-2xl border border-slate-200 space-y-1.5 text-xs shadow-2xs">
               <span className="font-bold text-slate-800 block">Professional Summary</span>
               <textarea
                 rows={3}
@@ -361,7 +438,7 @@ ${resumeData.projects.map((p) => `• ${p.name}: ${p.description}`).join('\n')}
             </div>
 
             {/* Skills */}
-            <div className="p-3 bg-white rounded-2xl border border-slate-200 space-y-2 text-xs">
+            <div className="p-3 bg-white rounded-2xl border border-slate-200 space-y-2 text-xs shadow-2xs">
               <span className="font-bold text-slate-800 block">Core Skills (comma separated)</span>
               <input
                 type="text"
@@ -372,7 +449,7 @@ ${resumeData.projects.map((p) => `• ${p.name}: ${p.description}`).join('\n')}
                     skills: e.target.value.split(',').map((s) => s.trim()).filter(Boolean)
                   })
                 }
-                className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500"
+                className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500 text-xs"
               />
               <div className="flex flex-wrap gap-1 mt-1">
                 {resumeData.skills.map((sk, idx) => (
@@ -384,7 +461,7 @@ ${resumeData.projects.map((p) => `• ${p.name}: ${p.description}`).join('\n')}
             </div>
 
             {/* Experience */}
-            <div className="p-3 bg-white rounded-2xl border border-slate-200 space-y-2.5 text-xs">
+            <div className="p-3 bg-white rounded-2xl border border-slate-200 space-y-2.5 text-xs shadow-2xs">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-slate-800">Experience History</span>
                 <button
@@ -437,7 +514,7 @@ ${resumeData.projects.map((p) => `• ${p.name}: ${p.description}`).join('\n')}
                   <div className="grid grid-cols-2 gap-1.5">
                     <input
                       type="text"
-                      placeholder="Duration (e.g. 2022 - Present)"
+                      placeholder="Duration"
                       value={exp.duration}
                       onChange={(e) => {
                         const updated = [...resumeData.experience];
@@ -461,26 +538,40 @@ ${resumeData.projects.map((p) => `• ${p.name}: ${p.description}`).join('\n')}
                 </div>
               ))}
             </div>
+
+            {/* Bottom quick view button on mobile */}
+            <div className="lg:hidden pt-2">
+              <button
+                type="button"
+                onClick={() => setMobileViewTab('preview')}
+                className="w-full py-2 bg-indigo-600 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span>View Formatted PDF Sheet</span>
+              </button>
+            </div>
           </div>
 
           {/* Right Panel: Live Clean Resume Sheet (A4 format) */}
-          <div className="lg:col-span-7 p-4 sm:p-6 overflow-y-auto bg-slate-200/60 flex justify-center max-h-[calc(94vh-140px)]">
+          <div className={`lg:col-span-7 p-3 sm:p-6 overflow-y-auto bg-slate-200/70 flex justify-center ${
+            mobileViewTab === 'preview' ? 'block' : 'hidden lg:flex'
+          }`}>
             <div
               id="harvard-resume-sheet"
               ref={printRef}
-              className={`bg-white w-full max-w-[210mm] min-h-[297mm] p-8 sm:p-12 shadow-xl border border-slate-300 transition-all ${
+              className={`bg-white w-full max-w-[210mm] min-h-[297mm] p-6 sm:p-12 shadow-xl border border-slate-300 transition-all my-auto ${
                 template === 'harvard' ? 'font-serif text-slate-900' : 'font-sans text-slate-800'
               }`}
             >
               {/* Header */}
               <div className="text-center pb-4 border-b border-black">
-                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight uppercase">
+                <h1 className="text-xl sm:text-3xl font-bold tracking-tight uppercase">
                   {resumeData.fullName}
                 </h1>
-                <p className="text-sm font-semibold tracking-wide text-slate-700 mt-1">
+                <p className="text-xs sm:text-sm font-semibold tracking-wide text-slate-700 mt-1">
                   {resumeData.headline}
                 </p>
-                <div className="text-xs text-slate-600 mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5">
+                <div className="text-[11px] sm:text-xs text-slate-600 mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5">
                   <span>{resumeData.email}</span>
                   <span>•</span>
                   <span>{resumeData.phone}</span>
@@ -497,7 +588,7 @@ ${resumeData.projects.map((p) => `• ${p.name}: ${p.description}`).join('\n')}
 
               {/* Summary */}
               {resumeData.summary && (
-                <div className="mt-5">
+                <div className="mt-4 sm:mt-5">
                   <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider pb-1 border-b border-black">
                     Professional Summary
                   </h2>
@@ -508,7 +599,7 @@ ${resumeData.projects.map((p) => `• ${p.name}: ${p.description}`).join('\n')}
               )}
 
               {/* Core Skills */}
-              <div className="mt-5">
+              <div className="mt-4 sm:mt-5">
                 <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider pb-1 border-b border-black">
                   Technical Expertise & Core Competencies
                 </h2>
@@ -519,11 +610,11 @@ ${resumeData.projects.map((p) => `• ${p.name}: ${p.description}`).join('\n')}
               </div>
 
               {/* Experience */}
-              <div className="mt-5">
+              <div className="mt-4 sm:mt-5">
                 <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider pb-1 border-b border-black">
                   Professional Experience
                 </h2>
-                <div className="mt-3 space-y-4">
+                <div className="mt-2.5 sm:mt-3 space-y-3 sm:space-y-4">
                   {resumeData.experience.map((exp) => (
                     <div key={exp.id}>
                       <div className="flex items-baseline justify-between text-xs sm:text-[13px]">
@@ -534,7 +625,7 @@ ${resumeData.projects.map((p) => `• ${p.name}: ${p.description}`).join('\n')}
                         <span className="font-semibold text-slate-600 text-xs">{exp.duration}</span>
                       </div>
                       <div className="text-[11px] text-slate-500 italic mt-0.5">{exp.location}</div>
-                      <ul className="list-disc list-outside ml-4 mt-1.5 space-y-1 text-xs sm:text-[12.5px] leading-relaxed text-slate-800">
+                      <ul className="list-disc list-outside ml-4 mt-1 space-y-1 text-xs sm:text-[12.5px] leading-relaxed text-slate-800">
                         {exp.bullets.map((b, i) => (
                           <li key={i}>{b}</li>
                         ))}
@@ -545,11 +636,11 @@ ${resumeData.projects.map((p) => `• ${p.name}: ${p.description}`).join('\n')}
               </div>
 
               {/* Education */}
-              <div className="mt-5">
+              <div className="mt-4 sm:mt-5">
                 <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider pb-1 border-b border-black">
                   Education & Credentials
                 </h2>
-                <div className="mt-3 space-y-2">
+                <div className="mt-2.5 sm:mt-3 space-y-2">
                   {resumeData.education.map((edu) => (
                     <div key={edu.id} className="flex items-baseline justify-between text-xs sm:text-[13px]">
                       <div>
@@ -567,7 +658,7 @@ ${resumeData.projects.map((p) => `• ${p.name}: ${p.description}`).join('\n')}
 
               {/* Projects */}
               {resumeData.projects && resumeData.projects.length > 0 && (
-                <div className="mt-5">
+                <div className="mt-4 sm:mt-5">
                   <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider pb-1 border-b border-black">
                     Key Projects & Technical Implementations
                   </h2>
@@ -587,7 +678,35 @@ ${resumeData.projects.map((p) => `• ${p.name}: ${p.description}`).join('\n')}
 
         </div>
 
+        {/* Modal Footer with Clear Close Option */}
+        <div className="p-3 sm:px-6 sm:py-3 bg-white border-t border-slate-200 flex items-center justify-between flex-shrink-0 text-xs">
+          <span className="text-slate-500 hidden sm:inline">
+            ATS Score: <strong className="text-emerald-600">{atsScore}%</strong> • Optimized for Harvard standards
+          </span>
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold border border-slate-200 transition-all active:scale-95"
+            >
+              Close (बंद करें)
+            </button>
+            <button
+              type="button"
+              onClick={handlePrint}
+              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black flex items-center gap-1.5 shadow-md shadow-indigo-600/20 active:scale-95 transition-all"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              <span>Download / Print PDF</span>
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
+
+export default ResumeBuilderModal;

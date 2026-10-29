@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   Mail, 
   Check, 
@@ -70,6 +71,18 @@ export const EmailSettingsModal = ({ isOpen, onClose, onConfigSaved }) => {
         setTestEmailAddress(user.email);
       }
       fetchStatus();
+
+      const handleKeyDown = (e) => {
+        if (e.key === 'Escape') onClose();
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      const origOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+        document.body.style.overflow = origOverflow;
+      };
     }
   }, [isOpen]);
 
@@ -153,9 +166,15 @@ export const EmailSettingsModal = ({ isOpen, onClose, onConfigSaved }) => {
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-7 shadow-2xl animate-in zoom-in-95 duration-200 my-auto text-slate-900">
+  const modalContent = (
+    <div 
+      className="fixed inset-0 z-[9999] flex items-start sm:items-center justify-center bg-slate-950/75 backdrop-blur-md p-3 sm:p-5 overflow-y-auto animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div 
+        className="relative w-full max-w-lg bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-7 shadow-2xl animate-in zoom-in-95 duration-200 my-auto text-slate-900"
+        onClick={(e) => e.stopPropagation()}
+      >
         
         {/* Top-Left Back Button */}
         <button
@@ -439,4 +458,6 @@ export const EmailSettingsModal = ({ isOpen, onClose, onConfigSaved }) => {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
