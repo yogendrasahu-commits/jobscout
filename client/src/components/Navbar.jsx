@@ -576,7 +576,7 @@ export const Navbar = ({
                 title="Feed (Home)"
               >
                 <NavFeedIcon active={currentTab === 'feed'} className="w-4 h-4 flex-shrink-0" />
-                <span className={`font-bold tracking-tight ${currentTab === 'feed' ? 'inline' : 'hidden xl:inline'}`}>Feed</span>
+                <span className="font-bold tracking-tight">Feed</span>
               </button>
 
               {/* 2. Network */}
@@ -590,32 +590,24 @@ export const Navbar = ({
                 title={user ? `My Professional Network (${seekersCount + employersCount})` : 'Emp & Seeker (Employers & Job Seekers)'}
               >
                 <NavNetworkIcon active={currentTab === 'network'} className="w-4 h-4 flex-shrink-0" />
-                <span className={`font-bold tracking-tight ${currentTab === 'network' ? 'inline' : 'hidden xl:inline'}`}>
+                <span className="font-bold tracking-tight">
                   {user ? 'Network' : 'Emp & Seeker'}
                 </span>
               </button>
 
               {/* 3. Live Map */}
               <button
-                onClick={() => {
-                  if (!user) {
-                    onOpenAuth ? onOpenAuth() : setCurrentTab('map');
-                  } else {
-                    setCurrentTab('map');
-                  }
-                }}
+                onClick={() => setCurrentTab('map')}
                 className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'map'
                     ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
                     : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
                 }`}
-                title={user ? 'Live Map' : 'Live Map (Login Required)'}
+                title="Live Geospatial Job Radar Map"
               >
                 <NavRadarIcon active={currentTab === 'map'} className="w-4 h-4 flex-shrink-0" />
-                <span className={`font-bold tracking-tight ${currentTab === 'map' ? 'inline' : 'hidden xl:inline'}`}>Map</span>
-                {user && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse ml-0.5 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-                )}
+                <span className="font-bold tracking-tight">Map</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse ml-0.5 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
               </button>
 
               {/* 4. Jobs & Applied */}
@@ -629,7 +621,7 @@ export const Navbar = ({
                 title={`Job Board & Applications (${jobsCount} openings)`}
               >
                 <NavJobsIcon active={currentTab === 'jobs' || currentTab === 'applications'} className="w-4 h-4 flex-shrink-0" />
-                <span className={`font-bold tracking-tight ${currentTab === 'jobs' || currentTab === 'applications' ? 'inline' : 'hidden xl:inline'}`}>Jobs</span>
+                <span className="font-bold tracking-tight">Jobs</span>
                 {jobsCount > 0 && (
                   <span className="text-[10px] bg-indigo-50 px-1.5 py-0.2 rounded-full text-indigo-700 border border-indigo-200 font-extrabold">
                     {jobsCount}
@@ -639,45 +631,33 @@ export const Navbar = ({
 
               {/* 5. Speed Connect Hub */}
               <button
-                onClick={() => {
-                  if (!user) {
-                    onOpenAuth ? onOpenAuth() : setCurrentTab('connect');
-                  } else {
-                    setCurrentTab('connect');
-                  }
-                }}
+                onClick={() => setCurrentTab('connect')}
                 className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'connect'
                     ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
                     : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
                 }`}
-                title={user ? 'Speed Connect Hub (Audio & Video Calls)' : 'Speed Connect (Login Required)'}
+                title="Speed Connect Hub (Audio & Video Calls)"
               >
                 <NavConnectIcon active={currentTab === 'connect'} className="w-4 h-4 flex-shrink-0" />
-                <span className={`font-bold tracking-tight ${currentTab === 'connect' ? 'inline' : 'hidden xl:inline'}`}>Connect</span>
+                <span className="font-bold tracking-tight">Connect</span>
               </button>
 
               {/* 6. Anonymous Discussions */}
               <button
-                onClick={() => {
-                  if (!user) {
-                    onOpenAuth ? onOpenAuth() : setCurrentTab('anon');
-                  } else {
-                    setCurrentTab('anon');
-                  }
-                }}
+                onClick={() => setCurrentTab('anon')}
                 className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'anon'
                     ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
                     : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
                 }`}
-                title={user ? 'JobScout Anon Talk' : 'Anon Talk (Login Required)'}
+                title="JobScout Anon Talk"
               >
                 <div className="relative flex-shrink-0">
                   <NavAnonIcon active={currentTab === 'anon'} className="w-4 h-4 flex-shrink-0" />
                   <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" />
                 </div>
-                <span className={`font-bold tracking-tight ${currentTab === 'anon' ? 'inline' : 'hidden xl:inline'}`}>Anon</span>
+                <span className="font-bold tracking-tight">Anon</span>
               </button>
 
               {/* 7. Full-Page Messaging */}
@@ -700,7 +680,7 @@ export const Navbar = ({
                   <NavMessagesIcon active={currentTab === 'messages'} className="w-4 h-4 flex-shrink-0" />
                   <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
                 </div>
-                <span className={`font-bold tracking-tight ${currentTab === 'messages' ? 'inline' : 'hidden xl:inline'}`}>Chat</span>
+                <span className="font-bold tracking-tight">Chat</span>
               </button>
 
             </nav>
@@ -1183,11 +1163,7 @@ export const Navbar = ({
               <button
                 onClick={() => {
                   setMobileDrawerOpen(false);
-                  if (!user) {
-                    onOpenAuth ? onOpenAuth() : setCurrentTab('map');
-                  } else {
-                    setCurrentTab('map');
-                  }
+                  setCurrentTab('map');
                 }}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
                   currentTab === 'map'
@@ -1200,16 +1176,8 @@ export const Navbar = ({
                   <span>Live Map</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  {user ? (
-                    <>
-                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                      <span className={`text-[10px] font-extrabold uppercase ${currentTab === 'map' ? 'text-cyan-200' : 'text-cyan-600'}`}>Live</span>
-                    </>
-                  ) : (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                      Login
-                    </span>
-                  )}
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                  <span className={`text-[10px] font-extrabold uppercase ${currentTab === 'map' ? 'text-cyan-200' : 'text-cyan-600'}`}>Live</span>
                 </div>
               </button>
 
@@ -1268,11 +1236,7 @@ export const Navbar = ({
               <button
                 onClick={() => {
                   setMobileDrawerOpen(false);
-                  if (!user) {
-                    onOpenAuth ? onOpenAuth() : setCurrentTab('connect');
-                  } else {
-                    setCurrentTab('connect');
-                  }
+                  setCurrentTab('connect');
                 }}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
                   currentTab === 'connect'
@@ -1284,26 +1248,16 @@ export const Navbar = ({
                   <NavConnectIcon active={currentTab === 'connect'} className="w-4 h-4 flex-shrink-0" />
                   <span>Speed Connect</span>
                 </div>
-                {user ? (
-                  <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase border ${currentTab === 'connect' ? 'bg-white/20 border-white/30 text-white' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
-                    Calls
-                  </span>
-                ) : (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                    Login
-                  </span>
-                )}
+                <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase border ${currentTab === 'connect' ? 'bg-white/20 border-white/30 text-white' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
+                  Calls
+                </span>
               </button>
 
               {/* Anon Talk */}
               <button
                 onClick={() => {
                   setMobileDrawerOpen(false);
-                  if (!user) {
-                    onOpenAuth ? onOpenAuth() : setCurrentTab('anon');
-                  } else {
-                    setCurrentTab('anon');
-                  }
+                  setCurrentTab('anon');
                 }}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
                   currentTab === 'anon'
@@ -1315,15 +1269,9 @@ export const Navbar = ({
                   <NavAnonIcon active={currentTab === 'anon'} className="w-4 h-4 flex-shrink-0" />
                   <span>Anon Talk (गुमनाम चर्चा)</span>
                 </div>
-                {user ? (
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${currentTab === 'anon' ? 'bg-white/20 border-white/30 text-white' : 'bg-orange-50 text-orange-700 border-orange-200'}`}>
-                    Community
-                  </span>
-                ) : (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                    Login
-                  </span>
-                )}
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${currentTab === 'anon' ? 'bg-white/20 border-white/30 text-white' : 'bg-orange-50 text-orange-700 border-orange-200'}`}>
+                  Community
+                </span>
               </button>
 
               {/* Full-Page Messaging */}

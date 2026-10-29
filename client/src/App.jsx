@@ -268,7 +268,7 @@ function MainApp() {
 
   // Centralized tab navigation: public tabs accessible to guests, protected tabs require login
   const handleNavigateTab = (tab) => {
-    const publicTabs = ['welcome', 'feed', 'network', 'jobs'];
+    const publicTabs = ['welcome', 'feed', 'network', 'jobs', 'map', 'connect', 'anon'];
     if (!user && !publicTabs.includes(tab)) {
       setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' });
       return;
@@ -276,9 +276,9 @@ function MainApp() {
     setCurrentTab(tab);
   };
 
-  // Route guard: without login only allow 'welcome', 'feed', 'network', 'jobs'
+  // Route guard: without login allow public exploratory tabs (Feed, Network, Jobs, Map, Connect, Anon)
   useEffect(() => {
-    const publicTabs = ['welcome', 'feed', 'network', 'jobs'];
+    const publicTabs = ['welcome', 'feed', 'network', 'jobs', 'map', 'connect', 'anon'];
     if (!user && !publicTabs.includes(currentTab)) {
       setCurrentTab('feed');
       setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' });

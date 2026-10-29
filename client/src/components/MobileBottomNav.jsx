@@ -62,13 +62,7 @@ export const MobileBottomNav = ({
         {/* 3. Center Elevated JobScout Radar Button (Map) */}
         <div className="col-span-1 flex flex-col items-center justify-center relative">
           <button
-            onClick={() => {
-              if (!user) {
-                onOpenAuth ? onOpenAuth() : setCurrentTab('map');
-              } else {
-                setCurrentTab('map');
-              }
-            }}
+            onClick={() => setCurrentTab('map')}
             className="relative -top-3.5 flex flex-col items-center group active:scale-95 transition-transform"
           >
             {/* Ambient Aura Halo */}
@@ -96,11 +90,6 @@ export const MobileBottomNav = ({
               }`}>
                 Map
               </span>
-              {!user && (
-                <span className="text-[8px] font-extrabold px-1 rounded bg-amber-100 text-amber-800 leading-none">
-                  Login
-                </span>
-              )}
             </div>
           </button>
         </div>
