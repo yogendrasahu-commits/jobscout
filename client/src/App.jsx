@@ -16,6 +16,7 @@ import { SeekerProfileModal } from './components/SeekerProfileModal';
 import { ChatDrawer } from './components/ChatDrawer';
 import { VideoCallModal } from './components/VideoCallModal';
 import { IncomingCallBanner } from './components/IncomingCallBanner';
+import { AlertNotificationToast } from './components/AlertNotificationToast';
 import { AuthModal } from './pages/AuthModal';
 import { FullPageChat } from './pages/FullPageChat';
 import { AnonDiscuss } from './pages/AnonDiscuss';
@@ -525,6 +526,7 @@ function MainApp() {
       />
 
       {/* Global Realtime Components */}
+      <AlertNotificationToast />
       <IncomingCallBanner />
       <VideoCallModal />
       <ChatDrawer 

@@ -5,7 +5,7 @@ import { dispatchCandidateAlert } from '../alerts.js';
 
 export const applicationController = {
   // Apply for a job (Seeker only)
-  apply: (req, res, next) => {
+  apply: async (req, res, next) => {
     try {
       if (req.user.role !== 'seeker') {
         throw AppError.forbidden('Only job seekers can apply for jobs');
@@ -29,16 +29,19 @@ export const applicationController = {
       }
 
       const seeker = db.findUserById(req.user.id);
+      const userPrefs = seeker?.notificationPrefs || {};
+      const targetPhone = userPrefs.whatsappPhone || seeker?.phone || '';
+      const telegramChatId = userPrefs.telegramChatId || '';
 
       const application = db.createApplication({
         jobId,
         jobTitle: job.title,
         employerId: job.employerId,
-        employerName: job.employerName,
+        employerName: job.employerName || job.company,
         seekerId: req.user.id,
         seekerName: req.user.name,
         seekerEmail: req.user.email,
-        seekerPhone: seeker ? seeker.phone : '',
+        seekerPhone: targetPhone || (seeker ? seeker.phone : ''),
         seekerAvatar: seeker ? seeker.avatar : '',
         coverNote: (coverNote && String(coverNote).trim().slice(0, 1000)) || 'I am interested in this role and available for immediate discussion.',
         status: 'pending'
@@ -48,7 +51,33 @@ export const applicationController = {
         req.io.emit('application:created', application);
       }
 
-      res.status(201).json({ application });
+      // Automatically dispatch candidate confirmation alert (WhatsApp + Telegram)
+      let alertData = null;
+      try {
+        alertData = await dispatchCandidateAlert({
+          candidatePhone: targetPhone,
+          candidateName: seeker?.name || req.user.name,
+          employerName: job.employerName || job.company,
+          jobTitle: job.title,
+          type: 'application_submitted',
+          details: {
+            applicationId: application.id,
+            jobId: job.id,
+            company: job.employerName || job.company,
+            telegramChatId
+          },
+          io: req.io
+        });
+      } catch (alertErr) {
+        console.warn('[AlertService] Failed to dispatch application alert:', alertErr.message);
+      }
+
+      res.status(201).json({ 
+        application,
+        alert: alertData,
+        whatsappUrl: alertData?.whatsappUrl,
+        telegramUrl: alertData?.telegramUrl
+      });
     } catch (err) {
       next(err);
     }
@@ -109,13 +138,21 @@ export const applicationController = {
 
       // Background instant mobile alert (WhatsApp & Telegram)
       if (['reviewed', 'interview', 'accepted', 'hired'].includes(status)) {
+        const candidateUser = db.findUserById(existingApp.seekerId);
+        const prefs = candidateUser?.notificationPrefs || {};
+        const targetPhone = prefs.whatsappPhone || existingApp.seekerPhone || candidateUser?.phone;
+        const targetTelegram = prefs.telegramChatId;
+
         dispatchCandidateAlert({
-          candidatePhone: existingApp.seekerPhone,
+          candidatePhone: targetPhone,
           candidateName: existingApp.seekerName,
           employerName: req.user.companyName || req.user.name,
           jobTitle: existingApp.jobTitle,
           type: 'status_update',
-          details: { status },
+          details: { 
+            status,
+            telegramChatId: targetTelegram
+          },
           io: req.io
         }).catch(e => console.warn('[AlertService] Status alert error:', e.message));
       }
@@ -222,8 +259,11 @@ export const applicationController = {
       }
 
       // Generate & dispatch Instant WhatsApp / Telegram alert
+      const targetPhone = seeker?.notificationPrefs?.whatsappPhone || app.seekerPhone || (seeker && seeker.phone);
+      const targetTelegram = seeker?.notificationPrefs?.telegramChatId;
+
       const alertResult = await dispatchCandidateAlert({
-        candidatePhone: app.seekerPhone || (seeker && seeker.phone),
+        candidatePhone: targetPhone,
         candidateName: app.seekerName,
         employerName: req.user.companyName || req.user.name,
         jobTitle: offerDetails.designation,
@@ -231,7 +271,8 @@ export const applicationController = {
         details: {
           salary: offerDetails.salary,
           refNo,
-          joiningDate: offerDetails.joiningDate
+          joiningDate: offerDetails.joiningDate,
+          telegramChatId: targetTelegram
         },
         io: req.io
       }).catch(e => {

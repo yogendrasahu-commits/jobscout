@@ -34,6 +34,7 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [alertDetails, setAlertDetails] = useState(null);
   const [showMatchModal, setShowMatchModal] = useState(false);
 
   // Reset form state whenever modal opens or selected job changes
@@ -42,6 +43,7 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
       setCoverNote('');
       setError('');
       setSuccess(false);
+      setAlertDetails(null);
       setLoading(false);
     }
   }, [isOpen, job?.id]);
@@ -97,9 +99,26 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
       triggerConfetti();
       playSuccessChime();
       if (onApplied) onApplied(job.id);
-      setTimeout(() => {
-        onClose();
-      }, 1500);
+
+      if (data.whatsappUrl || data.telegramUrl) {
+        setAlertDetails({
+          whatsappUrl: data.whatsappUrl,
+          telegramUrl: data.telegramUrl
+        });
+
+        // Trigger direct WhatsApp popup window if supported
+        if (data.whatsappUrl) {
+          try {
+            window.open(data.whatsappUrl, '_blank');
+          } catch (e) {
+            console.warn('WhatsApp popup blocked:', e);
+          }
+        }
+      } else {
+        setTimeout(() => {
+          onClose();
+        }, 1800);
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -361,73 +380,125 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
           </div>
         )}
 
-        {success && (
-          <div className="mb-4 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs text-center font-extrabold flex items-center justify-center gap-2 animate-in zoom-in-95">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            <span>Application submitted successfully! Recruiter notified.</span>
-          </div>
-        )}
+        {success ? (
+          <div className="py-2 space-y-4 animate-in zoom-in-95">
+            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-center space-y-1.5 shadow-xs">
+              <div className="w-12 h-12 bg-emerald-600 text-white rounded-full flex items-center justify-center mx-auto shadow-md shadow-emerald-600/30">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
+              <h3 className="font-black text-sm text-slate-900">Application Submitted Successfully!</h3>
+              <p className="text-xs text-slate-600">
+                Your profile has been delivered to <strong>{job.company || job.employerName}</strong>.
+              </p>
+            </div>
 
-        {/* Application Submission Form */}
-        <form onSubmit={handleApply} className="space-y-3.5 pt-2 border-t border-slate-100">
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="block text-xs font-extrabold text-slate-800">
-                Quick Pitch / Candidate Note (Optional)
-              </label>
-              {user?.role !== 'emp' && (
+            {/* Instant Mobile Alerts Section */}
+            {(alertDetails?.whatsappUrl || alertDetails?.telegramUrl) && (
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                <div className="flex items-center gap-2 font-bold text-xs text-slate-800">
+                  <Sparkles className="w-4 h-4 text-emerald-600" />
+                  <span>Instant Mobile Notifications</span>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  Click below to view or send your real-time WhatsApp or Telegram notification card:
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {alertDetails.whatsappUrl && (
+                    <a
+                      href={alertDetails.whatsappUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-emerald-600/20 active:scale-95 transition-all text-center"
+                    >
+                      <span className="text-sm">💬</span>
+                      <span>Open WhatsApp Card</span>
+                    </a>
+                  )}
+                  {alertDetails.telegramUrl && (
+                    <a
+                      href={alertDetails.telegramUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-sky-600/20 active:scale-95 transition-all text-center"
+                    >
+                      <span className="text-sm">✈️</span>
+                      <span>Open Telegram Alert</span>
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-all shadow-sm active:scale-95"
+            >
+              Done & Close (पूर्ण करें)
+            </button>
+          </div>
+        ) : (
+          /* Application Submission Form */
+          <form onSubmit={handleApply} className="space-y-3.5 pt-2 border-t border-slate-100">
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-extrabold text-slate-800">
+                  Quick Pitch / Candidate Note (Optional)
+                </label>
+                {user?.role !== 'emp' && (
+                  <button
+                    type="button"
+                    onClick={handleGenerateAIPitch}
+                    className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <Sparkles className="w-3 h-3" />
+                    <span>Auto-Generate AI Pitch</span>
+                  </button>
+                )}
+              </div>
+              <textarea
+                rows={2}
+                placeholder="Hi, I am ready for this role and available nearby for an immediate discussion..."
+                value={coverNote}
+                onChange={(e) => setCoverNote(e.target.value)}
+                disabled={user?.role === 'emp'}
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 resize-none disabled:opacity-60 transition-all"
+              />
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+              <span className="text-[10px] text-slate-500 flex items-center gap-1.5 order-2 sm:order-1 font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
+                Verified contact & skill profile attached
+              </span>
+
+              <div className="flex items-center gap-2 order-1 sm:order-2 w-full sm:w-auto">
                 <button
                   type="button"
-                  onClick={handleGenerateAIPitch}
-                  className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer transition-colors"
+                  onClick={onClose}
+                  className="flex-1 sm:flex-initial py-2.5 px-4 rounded-2xl text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all active:scale-95"
                 >
-                  <Sparkles className="w-3 h-3" />
-                  <span>Auto-Generate AI Pitch</span>
+                  Cancel
                 </button>
-              )}
+
+                <button
+                  type="submit"
+                  disabled={loading || success || user?.role === 'emp'}
+                  className="flex-1 sm:flex-initial px-6 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 disabled:opacity-50 text-white text-xs font-extrabold shadow-md shadow-emerald-600/20 flex items-center justify-center gap-1.5 transition-all active:scale-95"
+                >
+                  <Zap className="w-3.5 h-3.5 fill-white" />
+                  <span>
+                    {loading
+                      ? 'Submitting...'
+                      : user?.role === 'emp'
+                      ? 'Employer Account'
+                      : '1-Click Easy Apply'}
+                  </span>
+                </button>
+              </div>
             </div>
-            <textarea
-              rows={2}
-              placeholder="Hi, I am ready for this role and available nearby for an immediate discussion..."
-              value={coverNote}
-              onChange={(e) => setCoverNote(e.target.value)}
-              disabled={user?.role === 'emp'}
-              className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 resize-none disabled:opacity-60 transition-all"
-            />
-          </div>
-
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-            <span className="text-[10px] text-slate-500 flex items-center gap-1.5 order-2 sm:order-1 font-medium">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
-              Verified contact & skill profile attached
-            </span>
-
-            <div className="flex items-center gap-2 order-1 sm:order-2 w-full sm:w-auto">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 sm:flex-initial py-2.5 px-4 rounded-2xl text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all active:scale-95"
-              >
-                Cancel
-              </button>
-
-              <button
-                type="submit"
-                disabled={loading || success || user?.role === 'emp'}
-                className="flex-1 sm:flex-initial px-6 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 disabled:opacity-50 text-white text-xs font-extrabold shadow-md shadow-emerald-600/20 flex items-center justify-center gap-1.5 transition-all active:scale-95"
-              >
-                <Zap className="w-3.5 h-3.5 fill-white" />
-                <span>
-                  {loading
-                    ? 'Submitting...'
-                    : user?.role === 'emp'
-                    ? 'Employer Account'
-                    : '1-Click Easy Apply'}
-                </span>
-              </button>
-            </div>
-          </div>
-        </form>
+          </form>
+        )}
 
         {/* AI Skill Breakdown Modal */}
         <AIMatchModal

@@ -115,6 +115,21 @@ export async function dispatchCandidateAlert({
   let whatsappHeadline = '';
 
   switch (type) {
+    case 'application_submitted': {
+      whatsappHeadline = '📋 Job Application Submitted!';
+      alertText = `*JobScout Application Received*\n\n` +
+        `Hello *${safeName}*,\n\n` +
+        `Your application for *${safeTitle}* at *${safeCompany}* has been successfully recorded!\n\n` +
+        `🏢 *Company:* ${safeCompany}\n` +
+        `💼 *Role:* ${safeTitle}\n` +
+        `📄 *Application ID:* ${details.applicationId || 'JS-APP'}\n` +
+        `📅 *Date:* ${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}\n\n` +
+        `You will receive instant notifications here as soon as the hiring team reviews your CV or schedules an interview.\n\n` +
+        `👉 View Application: https://jobscout.io/applications\n\n` +
+        `— *JobScout FastTrack Careers*`;
+      break;
+    }
+
     case 'offer_issued': {
       const salary = details.salary || 'Competitive CTC';
       const refNo = details.refNo || 'JS-OFFER';
