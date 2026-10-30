@@ -104,7 +104,7 @@ export function securityHeaders(req, res, next) {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
     "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.tile.osm.org https://api.dicebear.com https://unpkg.com https://images.unsplash.com",
     "font-src 'self' https://fonts.gstatic.com data:",
-    "connect-src 'self' http://localhost:5000 http://127.0.0.1:5000 ws://localhost:5000 ws://127.0.0.1:5000 http://localhost:5173 ws://localhost:5173 https://api.dicebear.com https://unpkg.com",
+    "connect-src 'self' ws: wss: http://localhost:5000 http://127.0.0.1:5000 ws://localhost:5000 ws://127.0.0.1:5000 http://localhost:5173 ws://localhost:5173 https://api.dicebear.com https://unpkg.com",
     "media-src 'self' blob: data:",
     "frame-ancestors 'self'",
     "object-src 'none'",

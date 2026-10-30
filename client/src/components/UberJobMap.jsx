@@ -373,7 +373,7 @@ const createJobIcon = (job, isSelected = false) => {
           z-index: 2;
         ">
           ${isUrgent ? '<span style="font-size: 11px;">⚡</span>' : ''}
-          <span>${job.salary ? job.salary.split('-')[0].trim() : 'Job'}</span>
+          <span>${job.salary ? String(job.salary).split('-')[0].trim() : 'Job'}</span>
           <span style="opacity: 0.95; font-size: 9px; font-weight: 600; background: rgba(0,0,0,0.3); padding: 0.5px 5px; border-radius: 9999px;">
             ${job.distanceKm}km
           </span>
@@ -1664,7 +1664,7 @@ export const UberJobMap = ({
                   <p className="text-[11px] text-slate-500 truncate">{job.company}</p>
                 </div>
                 <div className="mt-2 pt-2 border-t border-slate-200 flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold text-emerald-700">{job.salary ? job.salary.split('-')[0].trim() : 'Active'}</span>
+                  <span className="text-xs font-mono font-bold text-emerald-700">{job.salary ? String(job.salary).split('-')[0].trim() : 'Active'}</span>
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"

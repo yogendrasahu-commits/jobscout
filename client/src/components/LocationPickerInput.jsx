@@ -39,6 +39,7 @@ export const LocationPickerInput = ({
   const [query, setQuery] = useState(value || '');
   const [isSearching, setIsSearching] = useState(false);
   const [gpsLoading, setGpsLoading] = useState(false);
+  const [gpsError, setGpsError] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const containerRef = useRef(null);
@@ -141,8 +142,9 @@ export const LocationPickerInput = ({
 
   // Browser GPS detection
   const handleDetectGps = () => {
+    setGpsError('');
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser.');
+      setGpsError('Geolocation is not supported by your browser.');
       return;
     }
     setGpsLoading(true);
@@ -177,6 +179,7 @@ export const LocationPickerInput = ({
       },
       (err) => {
         console.warn('GPS error:', err);
+        setGpsError('GPS location access denied or unavailable.');
         setGpsLoading(false);
       },
       { timeout: 9000, enableHighAccuracy: true }
@@ -263,6 +266,12 @@ export const LocationPickerInput = ({
           </div>
         )}
       </div>
+
+      {gpsError && (
+        <p className="text-[11px] text-rose-500 font-semibold flex items-center gap-1 mt-0.5">
+          <span>⚠️</span> {gpsError}
+        </p>
+      )}
 
       {/* Quick 1-Tap City Chips */}
       <div className="flex flex-wrap items-center gap-1.5 pt-1">

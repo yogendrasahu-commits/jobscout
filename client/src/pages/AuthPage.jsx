@@ -304,7 +304,7 @@ export const AuthPage = ({ initialTab = 'email', onComplete, onBack }) => {
                   <label className="block text-xs font-bold text-slate-300">Password</label>
                   <button
                     type="button"
-                    onClick={() => alert('Password reset verification link has been sent to your email.')}
+                    onClick={() => setSuccess('Password reset verification link has been sent to your email.')}
                     className="text-xs font-bold text-cyan-400 hover:underline"
                   >
                     Forgot password?

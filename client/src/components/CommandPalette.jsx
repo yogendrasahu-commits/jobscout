@@ -301,7 +301,7 @@ export const CommandPalette = ({
                         <span className={`text-xs font-mono font-extrabold px-2 py-0.5 rounded-lg ${
                           isSelected ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-800'
                         }`}>
-                          {job.salary ? job.salary.split('-')[0].trim() : 'Active'}
+                          {job.salary ? String(job.salary).split('-')[0].trim() : 'Active'}
                         </span>
                         {isSelected && <CornerDownLeft className="w-3.5 h-3.5 text-white/80" />}
                       </div>

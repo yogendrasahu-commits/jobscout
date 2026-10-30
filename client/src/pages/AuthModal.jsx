@@ -704,7 +704,7 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
                     </label>
                     <button
                       type="button"
-                      onClick={() => alert('Password reset verification link sent to ' + (email || 'your registered email'))}
+                      onClick={() => setSuccessMsg('Password reset verification link sent to ' + (email || 'your registered email'))}
                       className="text-[11px] font-bold text-indigo-600 hover:text-indigo-700 hover:underline"
                     >
                       Forgot? (पासवर्ड भूल गए?)
