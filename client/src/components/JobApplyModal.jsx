@@ -100,23 +100,11 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
       playSuccessChime();
       if (onApplied) onApplied(job.id);
 
-      if (data.whatsappUrl || data.telegramUrl || data.alert) {
+      if (data.whatsappUrl || data.telegramUrl) {
         setAlertDetails({
           whatsappUrl: data.whatsappUrl,
-          telegramUrl: data.telegramUrl,
-          autoDelivered: data.alert?.autoDelivered,
-          whatsappAutomated: data.alert?.whatsappAutomated,
-          telegramAutomated: data.alert?.telegramAutomated
+          telegramUrl: data.telegramUrl
         });
-
-        // Trigger direct WhatsApp popup window if supported and not already auto-delivered
-        if (data.whatsappUrl && !data.alert?.whatsappAutomated?.delivered) {
-          try {
-            window.open(data.whatsappUrl, '_blank');
-          } catch (e) {
-            console.warn('WhatsApp popup blocked:', e);
-          }
-        }
       } else {
         setTimeout(() => {
           onClose();
@@ -396,24 +384,15 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
             </div>
 
             {/* Instant Mobile Alerts Section */}
-            {(alertDetails?.whatsappUrl || alertDetails?.telegramUrl || alertDetails?.autoDelivered) && (
+            {(alertDetails?.whatsappUrl || alertDetails?.telegramUrl) && (
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 font-bold text-xs text-slate-800">
-                    <Sparkles className="w-4 h-4 text-emerald-600" />
-                    <span>Instant Mobile Alerts</span>
-                  </div>
-                  {alertDetails?.autoDelivered && (
-                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
-                      ⚡ Auto-Dispatched
-                    </span>
-                  )}
+                <div className="flex items-center gap-2 font-bold text-xs text-slate-800">
+                  <Sparkles className="w-4 h-4 text-emerald-600" />
+                  <span>Instant Mobile Notifications</span>
                 </div>
 
                 <p className="text-[11px] text-slate-500">
-                  {alertDetails?.autoDelivered 
-                    ? 'Automated notification was sent directly to your phone/bot! You can also view the cards below:' 
-                    : 'Click below to view your real-time WhatsApp or Telegram notification card:'}
+                  Optional: You can preview or open your notification update below:
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {alertDetails.whatsappUrl && (

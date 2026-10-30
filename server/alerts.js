@@ -317,18 +317,6 @@ export async function dispatchCandidateAlert({
   const waUrl = generateWhatsAppUrl(cleanPhone, alertText);
   const tgUrl = generateTelegramUrl(alertText);
 
-  // 1. Attempt Automated WhatsApp background dispatch (Meta / Twilio / Gateway)
-  const whatsappAutomated = await sendWhatsAppAutomatedMessage({
-    phone: cleanPhone,
-    message: alertText
-  });
-
-  // 2. Attempt Automated Telegram Bot delivery
-  const telegramAutomated = await sendTelegramBotMessage({
-    chatId: details.telegramChatId,
-    message: alertText
-  });
-
   const alertRecord = {
     id: `alt_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
     type,
@@ -340,9 +328,6 @@ export async function dispatchCandidateAlert({
     whatsappUrl: waUrl,
     telegramUrl: tgUrl,
     messageText: alertText,
-    whatsappAutomated,
-    telegramAutomated,
-    autoDelivered: Boolean(whatsappAutomated?.delivered || telegramAutomated?.delivered),
     sentAt: new Date().toISOString()
   };
 
@@ -355,9 +340,6 @@ export async function dispatchCandidateAlert({
     success: true,
     alertRecord,
     whatsappUrl: waUrl,
-    telegramUrl: tgUrl,
-    whatsappAutomated,
-    telegramAutomated,
-    autoDelivered: Boolean(whatsappAutomated?.delivered || telegramAutomated?.delivered)
+    telegramUrl: tgUrl
   };
 }

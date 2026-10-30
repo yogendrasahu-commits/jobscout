@@ -140,23 +140,6 @@ router.post('/test', optionalAuth, async (req, res) => {
     const waUrl = generateWhatsAppUrl(targetPhone, testText);
     const tgUrl = generateTelegramUrl(testText);
 
-    let whatsappResult = null;
-    let telegramResult = null;
-
-    if (channel === 'whatsapp' || !channel) {
-      whatsappResult = await sendWhatsAppAutomatedMessage({
-        phone: targetPhone,
-        message: testText
-      });
-    }
-
-    if (channel === 'telegram' || !channel) {
-      telegramResult = await sendTelegramBotMessage({
-        chatId: telegramChatId || target,
-        message: testText
-      });
-    }
-
     res.json({
       success: true,
       message: `Test alert prepared for ${channel || 'WhatsApp & Telegram'}!`,
@@ -164,10 +147,7 @@ router.post('/test', optionalAuth, async (req, res) => {
       whatsappUrl: waUrl,
       telegramUrl: tgUrl,
       channel,
-      target: targetPhone,
-      whatsappResult,
-      telegramResult,
-      autoDelivered: Boolean(whatsappResult?.delivered || telegramResult?.delivered)
+      target: targetPhone
     });
   } catch (err) {
     console.error('Error sending test alert:', err);
