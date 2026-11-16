@@ -1,0 +1,70 @@
+{
+  "short_name": "JobScout",
+  "name": "JobScout - Live Job Map & Hiring",
+  "description": "Hyperlocal Job Discovery, Live Transit Commute, WebRTC Speed Calling, and In-App Hiring Platform.",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ],
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "background_color": "#0f172a",
+  "theme_color": "#4f46e5",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "categories": ["business", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Live Job Radar",
+      "short_name": "Radar",
+      "description": "Open live map with radius job filters",
+      "url": "/#map",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Direct Messages",
+      "short_name": "Inbox",
+      "description": "Chat with employers and candidates",
+      "url": "/#messages",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Speed Connect",
+      "short_name": "Connect",
+      "description": "Instant WebRTC video and audio interviews",
+      "url": "/#connect",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/jobscout-logo.png",
+      "sizes": "868x868",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "JobScout Live Map & Hiring Platform"
+    }
+  ]
+}

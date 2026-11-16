@@ -148,6 +148,52 @@ app.use('/api/anon', anonRoutes);
 app.use('/api/alerts', alertsRoutes);
 app.use('/api/admin', adminRoutes);
 
+// Mobile App Download Endpoints (APK Package & Info)
+const serverApkPath = path.resolve(__dirname, 'public/downloads/jobscout-mobile.apk');
+const clientApkPath = path.resolve(__dirname, '../client/public/downloads/jobscout-mobile.apk');
+
+const handleApkDownload = (req, res) => {
+  const filePath = fs.existsSync(serverApkPath) ? serverApkPath : clientApkPath;
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'JobScout Mobile APK build not found. Please build or generate the APK package.' });
+  }
+
+  const stat = fs.statSync(filePath);
+  res.writeHead(200, {
+    'Content-Type': 'application/vnd.android.package-archive',
+    'Content-Disposition': 'attachment; filename="jobscout-mobile.apk"',
+    'Content-Length': stat.size,
+    'Cache-Control': 'no-cache'
+  });
+  const readStream = fs.createReadStream(filePath);
+  readStream.pipe(res);
+};
+
+app.get('/download/jobscout-mobile.apk', handleApkDownload);
+app.get('/downloads/jobscout-mobile.apk', handleApkDownload);
+app.get('/download/app', handleApkDownload);
+app.get('/api/download/jobscout-mobile.apk', handleApkDownload);
+
+app.get('/api/app-info', (req, res) => {
+  const filePath = fs.existsSync(serverApkPath) ? serverApkPath : clientApkPath;
+  const sizeMb = fs.existsSync(filePath) ? (fs.statSync(filePath).size / (1024 * 1024)).toFixed(2) : '5.07';
+  res.json({
+    appName: 'JobScout',
+    version: '1.0.0',
+    platform: 'Android APK & Progressive Web App',
+    apkUrl: '/download/jobscout-mobile.apk',
+    packageSize: `${sizeMb} MB`,
+    minAndroidVersion: 'Android 7.0 or higher',
+    features: [
+      'Live Geospatial Job Radar & GPS Tracking',
+      '1-Tap WebRTC Speed Connect Video & Voice Calling',
+      'Real-Time In-App Messaging & WhatsApp Alerts',
+      'ATS Harvard Digital Resume & Appointment Letters',
+      '100% Real-Time Cloud Sync with Web Platform'
+    ]
+  });
+});
+
 // Email Sender Settings Endpoints
 app.get('/api/settings/email', (req, res) => {
   const cfg = db.getEmailConfig();

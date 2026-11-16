@@ -40,10 +40,13 @@ import {
   Maximize2,
   ChevronDown,
   User,
-  ArrowLeft
+  ArrowLeft,
+  Download,
+  QrCode
 } from 'lucide-react';
 import { JobScoutLogo } from '../components/JobScoutLogo';
 import { useAuth } from '../context/AuthContext';
+import { MobileAppDownloadModal } from '../components/MobileAppDownloadModal';
 
 export const Welcome = ({
   onNavigateToMap,
@@ -58,6 +61,7 @@ export const Welcome = ({
   onSelectJob,
   onSelectSeeker,
   onExploreAsGuest,
+  onOpenMobileAppModal,
   jobs = [],
   seekers = [],
   employers = []
@@ -74,7 +78,16 @@ export const Welcome = ({
   } = useAuth();
 
   const [activeFaq, setActiveFaq] = useState(null);
+  const [isMobileAppModalOpen, setIsMobileAppModalOpen] = useState(false);
   const authCardRef = useRef(null);
+
+  const handleOpenAppModal = () => {
+    if (onOpenMobileAppModal) {
+      onOpenMobileAppModal();
+    } else {
+      setIsMobileAppModalOpen(true);
+    }
+  };
 
   // Unified Auth State
   const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
@@ -497,6 +510,17 @@ export const Welcome = ({
               </div>
             ) : (
               <div className="flex items-center gap-2">
+                {/* Mobile App Download Button */}
+                <button
+                  onClick={handleOpenAppModal}
+                  className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-full bg-gradient-to-r from-indigo-50 to-cyan-50 hover:from-indigo-100 hover:to-cyan-100 text-indigo-700 text-xs font-bold border border-indigo-200/80 transition-all active:scale-95 shadow-2xs"
+                  title="Download JobScout Mobile App (Android APK & PWA)"
+                >
+                  <Smartphone className="w-3.5 h-3.5 text-indigo-600 animate-pulse" />
+                  <span className="hidden sm:inline">📱 Mobile App</span>
+                  <span className="sm:hidden">📱 App</span>
+                </button>
+
                 <button
                   onClick={() => onOpenLogin ? onOpenLogin() : (window.location.hash = '#/admin')}
                   className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold border border-rose-200/80 transition-all active:scale-95 shadow-xs"
@@ -569,6 +593,14 @@ export const Welcome = ({
                 <Compass className="w-4 h-4 text-cyan-200" />
                 <span>Explore Live Job Map</span>
                 <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={handleOpenAppModal}
+                className="px-4 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-emerald-600/20 transition-all flex items-center gap-2 active:scale-95"
+              >
+                <Smartphone className="w-4 h-4 text-emerald-200 animate-pulse" />
+                <span>📱 Download Mobile App</span>
               </button>
 
               <button
@@ -1539,6 +1571,134 @@ export const Welcome = ({
       )}
 
       {/* ========================================================== */}
+      {/* 5.5 MOBILE APPLICATION SHOWCASE (CONVERT & DOWNLOAD) */}
+      {/* ========================================================== */}
+      <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="relative rounded-[32px] sm:rounded-[36px] bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-white p-6 sm:p-10 lg:p-12 overflow-hidden shadow-2xl border border-indigo-500/20">
+          
+          {/* Ambient Lighting Orbs */}
+          <div className="absolute top-0 right-1/4 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+            
+            {/* Left Column: Narrative & Download CTA */}
+            <div className="lg:col-span-7 space-y-5 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-bold tracking-wide">
+                <Smartphone className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+                <span>OFFICIAL JOBSCOUT MOBILE APP • v1.0.0</span>
+              </div>
+
+              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
+                Experience Full JobScout on Your Phone{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-300">
+                  (मोबाइल ऐप डाउनलोड करें)
+                </span>
+              </h2>
+
+              <p className="text-sm sm:text-base text-slate-300 font-medium leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                Web aur Mobile dono ek dusre se 100% judhe huye hain. Jo bhi job aap post karenge ya apply karenge, wo realtime me web aur mobile dono par bina kisi delay ke update hoga.
+              </p>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
+                <a
+                  href="/download/jobscout-mobile.apk"
+                  download="jobscout-mobile.apk"
+                  className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-500 via-indigo-600 to-cyan-500 hover:from-indigo-400 hover:to-cyan-400 text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-indigo-600/30 transition-all flex items-center gap-2.5 active:scale-95"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Download Android APK (5.07 MB)</span>
+                </a>
+
+                <button
+                  type="button"
+                  onClick={handleOpenAppModal}
+                  className="px-5 py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs sm:text-sm border border-white/20 backdrop-blur-md transition-all flex items-center gap-2 active:scale-95"
+                >
+                  <QrCode className="w-4 h-4 text-cyan-300" />
+                  <span>Scan QR / 1-Click Install</span>
+                </button>
+              </div>
+
+              {/* 4 Feature Badges */}
+              <div className="grid grid-cols-2 gap-2.5 pt-3 max-w-lg mx-auto lg:mx-0 text-xs text-slate-300">
+                <div className="flex items-center gap-2 p-2 rounded-xl bg-white/5 border border-white/10">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Live GPS Radar Map</span>
+                </div>
+                <div className="flex items-center gap-2 p-2 rounded-xl bg-white/5 border border-white/10">
+                  <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                  <span>1-Tap Video Interviews</span>
+                </div>
+                <div className="flex items-center gap-2 p-2 rounded-xl bg-white/5 border border-white/10">
+                  <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>Direct Chat & WhatsApp Alerts</span>
+                </div>
+                <div className="flex items-center gap-2 p-2 rounded-xl bg-white/5 border border-white/10">
+                  <CheckCircle2 className="w-4 h-4 text-indigo-400 shrink-0" />
+                  <span>100% Real-Time Cloud Sync</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Visual Device Mockup Preview */}
+            <div className="lg:col-span-5 flex justify-center">
+              <div className="w-full max-w-xs bg-slate-900 rounded-[28px] p-5 border-2 border-indigo-500/40 shadow-2xl relative">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div className="flex items-center gap-2">
+                    <JobScoutLogo size={24} />
+                    <span className="font-black text-sm text-white">JobScout App</span>
+                  </div>
+                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-500/40 px-2 py-0.5 rounded-full">
+                    LIVE SYNC
+                  </span>
+                </div>
+
+                <div className="py-4 space-y-3">
+                  <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/60">
+                    <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                      <span>Package: com.jobscout.app</span>
+                      <span className="text-cyan-400">Android 7.0+</span>
+                    </div>
+                    <div className="text-lg font-black text-white mt-1">jobscout-mobile.apk</div>
+                    <div className="text-[11px] text-slate-400 mt-0.5">Standalone Android Installer • 5.07 MB</div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-indigo-950/50 border border-indigo-800/50 flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <div className="text-xs font-bold text-indigo-200">WebAPK Standalone</div>
+                      <div className="text-[10px] text-indigo-300">No install warnings • Instant Add</div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleOpenAppModal}
+                      className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold transition shadow-xs"
+                    >
+                      Open
+                    </button>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-slate-800 text-center">
+                  <button
+                    type="button"
+                    onClick={handleOpenAppModal}
+                    className="text-xs font-bold text-cyan-400 hover:text-cyan-300 inline-flex items-center gap-1.5 transition"
+                  >
+                    <span>View QR Code & Setup Guide</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* ========================================================== */}
       {/* 6. FREQUENTLY ASKED QUESTIONS */}
       {/* ========================================================== */}
       <section className="py-14 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
@@ -1647,6 +1807,10 @@ export const Welcome = ({
             <button onClick={onNavigateToMap} className="hover:text-indigo-600 transition-colors">Map</button>
             <button onClick={onNavigateToJobs} className="hover:text-indigo-600 transition-colors">Jobs</button>
             <button onClick={onNavigateToFeed} className="hover:text-indigo-600 transition-colors">Feed</button>
+            <button onClick={handleOpenAppModal} className="text-indigo-600 font-bold hover:underline transition-colors flex items-center gap-1">
+              <Smartphone size={12} />
+              <span>Mobile App</span>
+            </button>
             <button onClick={onNavigateToAnon} className="hover:text-indigo-600 transition-colors">Anon Salon</button>
             <button onClick={() => scrollToAuth('login')} className="hover:text-indigo-600 transition-colors">Log In</button>
             <button onClick={() => scrollToAuth('register', 'seeker')} className="hover:text-indigo-600 transition-colors">Sign Up</button>
@@ -1656,6 +1820,12 @@ export const Welcome = ({
           </p>
         </div>
       </footer>
+
+      {/* Mobile App Download Modal */}
+      <MobileAppDownloadModal
+        isOpen={isMobileAppModalOpen}
+        onClose={() => setIsMobileAppModalOpen(false)}
+      />
 
     </div>
   );

@@ -25,6 +25,7 @@ import { AnonDiscuss } from './pages/AnonDiscuss';
 import { Welcome } from './pages/Welcome';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { CommandPalette } from './components/CommandPalette';
+import { MobileAppDownloadModal } from './components/MobileAppDownloadModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { jobService } from './services/jobService';
 import { userService } from './services/userService';
@@ -78,6 +79,7 @@ function MainApp() {
   const [searchQuery, setSearchQuery] = useState('');
   const [jobsQuickFilter, setJobsQuickFilter] = useState('all');
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isMobileAppModalOpen, setIsMobileAppModalOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
   const [showReconnectedToast, setShowReconnectedToast] = useState(false);
 
@@ -389,6 +391,7 @@ function MainApp() {
           }}
           onSelectJob={(job) => { setSelectedJob(job); handleNavigateTab('jobs'); }}
           onSelectSeeker={(seeker) => { handleOpenProfile(seeker); handleNavigateTab('feed'); }}
+          onOpenMobileAppModal={() => setIsMobileAppModalOpen(true)}
           jobs={jobs}
           seekers={seekers}
           employers={employers}
@@ -419,6 +422,12 @@ function MainApp() {
               handleNavigateTab('feed');
             }
           }}
+        />
+
+        {/* Global Mobile App Download Modal */}
+        <MobileAppDownloadModal
+          isOpen={isMobileAppModalOpen}
+          onClose={() => setIsMobileAppModalOpen(false)}
         />
       </div>
     );
@@ -461,6 +470,7 @@ function MainApp() {
         seekersCount={seekers.length}
         employersCount={employers.length}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        onOpenMobileAppModal={() => setIsMobileAppModalOpen(true)}
       />
 
       {/* Persistent Profile Incomplete Alert Banner */}
@@ -664,6 +674,12 @@ function MainApp() {
           setPostJobCoords(null);
           setIsPostJobOpen(true);
         }}
+      />
+
+      {/* Global Mobile App Download Modal */}
+      <MobileAppDownloadModal
+        isOpen={isMobileAppModalOpen}
+        onClose={() => setIsMobileAppModalOpen(false)}
       />
 
     </div>
