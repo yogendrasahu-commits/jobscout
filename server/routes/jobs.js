@@ -8,12 +8,12 @@ const router = express.Router();
 router.get('/recommended', authenticateToken, jobController.getRecommendedJobs);
 router.get('/:id/match', authenticateToken, jobController.getJobAIMatch);
 
+// Protected routes (Employers - must precede /:id to prevent route shadowing)
+router.get('/my', authenticateToken, jobController.getMyJobs);
+
 // Public routes
 router.get('/', jobController.getAllJobs);
 router.get('/:id', jobController.getJobById);
-
-// Protected routes (Employers)
-router.get('/my', authenticateToken, jobController.getMyJobs);
 router.post('/', authenticateToken, jobController.createJob);
 router.delete('/:id', authenticateToken, jobController.deleteJob);
 

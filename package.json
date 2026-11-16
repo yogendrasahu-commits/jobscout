@@ -9,7 +9,9 @@
     "install:all": "npm --prefix server install && npm --prefix client install --include=dev",
     "server": "npm --prefix server start",
     "client": "npm --prefix client run dev",
-    "test": "node tests/comprehensive-test.mjs"
+    "test": "node tests/comprehensive-test.mjs",
+    "test:e2e": "node tests/comprehensive-e2e-audit.mjs",
+    "test:all": "node tests/comprehensive-test.mjs && node tests/comprehensive-e2e-audit.mjs"
   },
   "keywords": [
     "react",

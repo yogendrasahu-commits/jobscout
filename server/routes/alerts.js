@@ -32,18 +32,20 @@ const optionalAuth = (req, res, next) => {
 // 1. Generate instant WhatsApp Click-to-Chat Link & Dispatch
 router.post('/whatsapp', optionalAuth, (req, res) => {
   try {
-    const { phone, text, type, candidateName, jobTitle } = req.body;
-    if (!text && !type) {
+    const { phone, text, message: inputMsg, type, candidateName, jobTitle } = req.body;
+    const bodyText = text || inputMsg;
+    if (!bodyText && !type) {
       return res.status(400).json({ error: 'Text or notification type is required' });
     }
 
-    const message = text || `Hello from ${req.user?.companyName || req.user?.name || 'JobScout Recruiter'} regarding JobScout!`;
+    const message = bodyText || `Hello from ${req.user?.companyName || req.user?.name || 'JobScout Recruiter'} regarding JobScout!`;
     const cleanPhone = formatWhatsAppPhone(phone);
     const waUrl = generateWhatsAppUrl(phone, message);
 
     res.json({
       success: true,
       whatsappUrl: waUrl,
+      url: waUrl,
       phone: cleanPhone,
       message
     });
@@ -174,6 +176,8 @@ router.get('/settings', optionalAuth, (req, res) => {
       success: true, 
       settings: prefs, 
       preferences: prefs,
+      whatsappEnabled: Boolean(prefs.whatsappEnabled),
+      telegramEnabled: Boolean(prefs.telegramEnabled),
       gatewayConfig: {
         hasTelegramBot: Boolean(alertConfig.telegramBotToken),
         telegramBotToken: alertConfig.telegramBotToken ? '••••••••' + alertConfig.telegramBotToken.slice(-4) : '',

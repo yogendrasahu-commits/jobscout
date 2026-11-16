@@ -56,7 +56,21 @@ export const jobController = {
         jobs.sort((a, b) => a.distanceKm - b.distanceKm);
       }
 
-      res.json({ jobs });
+      const totalCount = jobs.length;
+      if (req.query.limit) {
+        const limit = parseInt(req.query.limit, 10);
+        const page = parseInt(req.query.page, 10) || 1;
+        const startIndex = (page - 1) * limit;
+        const paginatedJobs = jobs.slice(startIndex, startIndex + limit);
+        return res.json({
+          jobs: paginatedJobs,
+          totalCount,
+          page,
+          totalPages: Math.ceil(totalCount / limit)
+        });
+      }
+
+      res.json({ jobs, totalCount });
     } catch (err) {
       next(err);
     }

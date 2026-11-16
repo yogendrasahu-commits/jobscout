@@ -9,7 +9,7 @@ router.get('/', (req, res) => {
   try {
     const { channel, sort, search } = req.query;
     const discussions = db.getAnonDiscussions({ channel, sort, search });
-    res.json({ discussions, total: discussions.length });
+    res.json({ discussions, posts: discussions, total: discussions.length });
   } catch (err) {
     console.error('Error fetching anon discussions:', err);
     res.status(500).json({ error: 'Failed to fetch discussions' });
@@ -65,10 +65,37 @@ router.post('/', (req, res) => {
       req.io.emit('anon:created', newDiscussion);
     }
 
-    res.status(201).json({ discussion: newDiscussion });
+    res.status(201).json({ discussion: newDiscussion, post: newDiscussion });
   } catch (err) {
     console.error('Error creating anon discussion:', err);
     res.status(500).json({ error: 'Failed to create discussion' });
+  }
+});
+
+
+// POST upvote directly
+router.post('/:id/upvote', (req, res) => {
+  try {
+    const voterId = req.body?.userId || (req.user ? req.user.id : 'anon_voter');
+    const post = db.voteAnonDiscussion(req.params.id, voterId, 1);
+    if (!post) return res.status(404).json({ error: 'Discussion not found' });
+    if (req.io) req.io.emit('anon:voted', { id: post.id, score: post.score, upvotes: post.upvotes, downvotes: post.downvotes });
+    res.json({ success: true, post, score: post.score, upvotes: post.upvotes });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to upvote' });
+  }
+});
+
+// POST downvote directly
+router.post('/:id/downvote', (req, res) => {
+  try {
+    const voterId = req.body?.userId || (req.user ? req.user.id : 'anon_voter');
+    const post = db.voteAnonDiscussion(req.params.id, voterId, -1);
+    if (!post) return res.status(404).json({ error: 'Discussion not found' });
+    if (req.io) req.io.emit('anon:voted', { id: post.id, score: post.score, upvotes: post.upvotes, downvotes: post.downvotes });
+    res.json({ success: true, post, score: post.score, downvotes: post.downvotes });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to downvote' });
   }
 });
 
@@ -125,6 +152,10 @@ router.post('/:id/vote', (req, res) => {
 });
 
 // POST add anonymous comment
+router.post('/:id/comment', (req, res, next) => {
+  req.url = req.url.replace('/comment', '/comments');
+  return router.handle(req, res, next);
+});
 router.post('/:id/comments', (req, res) => {
   try {
     const { content, authorAlias, authorAvatarSeed, authorBadge, userId } = req.body;
