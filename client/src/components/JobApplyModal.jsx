@@ -67,6 +67,10 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
       setError('Please sign in as a Job Seeker to submit an application');
       return;
     }
+    if (user.role === 'admin') {
+      setError('You are signed in as an Administrator. Administrators oversee and manage jobs, and cannot submit job applications.');
+      return;
+    }
     if (user.role === 'emp') {
       setError('You are signed in as an Employer. Direct applications are reserved for Job Seekers.');
       return;
@@ -235,6 +239,29 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
         </div>
 
         {/* Direct Connect Action Bar */}
+        {user?.role === 'admin' ? (
+          <div className="p-3.5 bg-rose-50/90 border border-rose-200 rounded-2xl mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+            <div>
+              <span className="text-xs font-extrabold text-rose-900 flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-rose-600" />
+                Administrator Oversight Mode
+              </span>
+              <span className="text-[11px] text-slate-600">
+                You are inspecting this posting with Super Admin privileges.
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                window.location.hash = '#/admin';
+              }}
+              className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all shadow-xs active:scale-95 whitespace-nowrap"
+            >
+              Open in Admin Console
+            </button>
+          </div>
+        ) : (
         <div className="p-3.5 bg-gradient-to-r from-indigo-50/90 via-slate-50 to-indigo-50/70 border border-indigo-200/80 rounded-2xl mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
           <div>
             <span className="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
@@ -288,6 +315,7 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
             )}
           </div>
         </div>
+        )}
 
         {/* Description & Skill Tags */}
         <div className="space-y-3 mb-4">
@@ -428,6 +456,40 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
             >
               Done & Close (पूर्ण करें)
             </button>
+          </div>
+        ) : user?.role === 'admin' ? (
+          /* Administrator Action Bar */
+          <div className="pt-3 border-t border-slate-100 space-y-3">
+            <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
+              <span>🛡️ Listing ID: <strong className="text-slate-900 font-mono">{job.id}</strong></span>
+              <span>Category: <strong className="text-indigo-700">{job.category || 'General'}</strong></span>
+              <span>Work Mode: <strong className="text-slate-900">{job.workMode || 'Office'}</strong></span>
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-[11px] text-slate-500 font-medium">
+                Admin controls: Edit listing details, change status, or remove from platform.
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="py-2.5 px-4 rounded-2xl text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all active:scale-95"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    window.location.hash = '#/admin';
+                  }}
+                  className="px-5 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold shadow-md shadow-rose-600/20 transition-all active:scale-95 flex items-center gap-1.5"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Manage in Admin Portal</span>
+                </button>
+              </div>
+            </div>
           </div>
         ) : (
           /* Application Submission Form */

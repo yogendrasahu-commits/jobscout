@@ -18,7 +18,8 @@ import {
   SlidersHorizontal,
   ArrowUpDown,
   Car,
-  Building
+  Building,
+  ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { ApplicationsView } from './ApplicationsView';
@@ -272,25 +273,27 @@ export const JobsList = ({
             </span>
           </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveSubTab('applied')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
-              activeSubTab === 'applied'
-                ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/5'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
-            }`}
-          >
-            <FileText className="w-4 h-4 text-emerald-600" />
-            <span>{isEmployer ? 'Candidate Applications' : 'Applied Jobs'}</span>
-            {applicationsCount > 0 && (
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                activeSubTab === 'applied' ? 'bg-emerald-50 text-emerald-700' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-              }`}>
-                {applicationsCount}
-              </span>
-            )}
-          </button>
+          {user?.role !== 'admin' && (
+            <button
+              type="button"
+              onClick={() => setActiveSubTab('applied')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                activeSubTab === 'applied'
+                  ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/5'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+              }`}
+            >
+              <FileText className="w-4 h-4 text-emerald-600" />
+              <span>{isEmployer ? 'Candidate Applications' : 'Applied Jobs'}</span>
+              {applicationsCount > 0 && (
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                  activeSubTab === 'applied' ? 'bg-emerald-50 text-emerald-700' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                }`}>
+                  {applicationsCount}
+                </span>
+              )}
+            </button>
+          )}
         </div>
       </div>
 
@@ -622,11 +625,17 @@ export const JobsList = ({
                     </div>
 
                     <div className="mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs">
-                      <span className="flex items-center gap-1.5 text-emerald-700 font-black text-[11px] bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200/80 shadow-2xs group-hover:bg-emerald-600 group-hover:text-white transition-all">
-                        <Zap className="w-3 h-3 fill-current" /> Easy Apply
-                      </span>
+                      {user?.role === 'admin' ? (
+                        <span className="flex items-center gap-1.5 text-rose-700 font-black text-[11px] bg-rose-50 px-2.5 py-1 rounded-xl border border-rose-200 shadow-2xs">
+                          <ShieldCheck className="w-3 h-3 text-rose-600" /> Admin Oversight
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1.5 text-emerald-700 font-black text-[11px] bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200/80 shadow-2xs group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                          <Zap className="w-3 h-3 fill-current" /> Easy Apply
+                        </span>
+                      )}
                       <span className="text-slate-500 font-bold group-hover:text-indigo-600 flex items-center gap-1 transition-colors">
-                        View Role <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                        {user?.role === 'admin' ? 'Manage Role' : 'View Role'} <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                       </span>
                     </div>
                   </div>

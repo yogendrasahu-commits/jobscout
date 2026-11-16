@@ -26,27 +26,32 @@ export const AuthModal = ({
   initialRole = 'seeker', 
   onSuccess 
 }) => {
-  const { login, register, sendOtp } = useAuth();
+  const { login, register, sendOtp, loginWithPhoneOtp } = useAuth();
 
   // Mode: 'login' | 'register'
   const [mode, setMode] = useState(initialMode || 'login');
 
+  // Login Method: 'phone' | 'email'
+  const [loginMethod, setLoginMethod] = useState('phone');
+
   // Role for Signup: 'seeker' | 'emp'
   const [role, setRole] = useState(initialRole || 'seeker');
 
-  // Fields
-  const [identifier, setIdentifier] = useState(''); // Email or Phone
+  // Login Specific Fields
+  const [phoneInput, setPhoneInput] = useState('');
+  const [emailInput, setEmailInput] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [phonePasswordMode, setPhonePasswordMode] = useState(false);
 
-  // OTP State for Signup & OTP Login
+  // OTP State for Phone Login & Signup
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [simulatedOtp, setSimulatedOtp] = useState('');
   const [sendingOtp, setSendingOtp] = useState(false);
 
-  // Login Mode Sub-switch
-  const [showOtpLogin, setShowOtpLogin] = useState(false);
+  // Generic identifier for register (Phone or Email)
+  const [identifier, setIdentifier] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -60,14 +65,133 @@ export const AuthModal = ({
       setSuccess('');
       setOtpSent(false);
       setOtp('');
-      setShowOtpLogin(false);
+      setPhonePasswordMode(false);
     }
   }, [isOpen, initialMode, initialRole]);
 
   if (!isOpen) return null;
 
-  // Send OTP Handler for Phone / Email
-  const handleSendOtp = async () => {
+  // Send OTP Handler for Phone Login
+  const handlePhoneSendOtp = async () => {
+    const cleanPhone = phoneInput.replace(/[^0-9]/g, '').slice(-10);
+    if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+      setError('Please enter a valid 10-digit Indian mobile number');
+      return;
+    }
+
+    setError('');
+    setSendingOtp(true);
+    try {
+      const res = await sendOtp(cleanPhone, 'login');
+      setOtpSent(true);
+      const code = res.otp || '123456';
+      setSimulatedOtp(code);
+      setOtp(code); // Conveniently auto-fill demo OTP
+      setSuccess(`OTP sent to +91 ${cleanPhone} (Demo Passcode: ${code})`);
+    } catch (err) {
+      setError(err.message || 'Failed to send OTP to mobile number');
+    } finally {
+      setSendingOtp(false);
+    }
+  };
+
+  // Phone + OTP Login Handler
+  const handlePhoneOtpLogin = async (e) => {
+    e.preventDefault();
+    const cleanPhone = phoneInput.replace(/[^0-9]/g, '').slice(-10);
+    if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+      setError('Please enter a valid 10-digit Indian mobile number');
+      return;
+    }
+    if (!otp || otp.trim().length < 4) {
+      setError('Please enter the 6-digit OTP received');
+      return;
+    }
+
+    setError('');
+    setLoading(true);
+    try {
+      const res = await loginWithPhoneOtp(cleanPhone, otp.trim());
+      if (res?.isNewUser) {
+        setSuccess('Mobile number verified! Please create your account.');
+        setIdentifier(cleanPhone);
+        setMode('register');
+        setOtp(otp);
+        return;
+      }
+
+      setSuccess(`Welcome back, ${res.name || 'User'}!`);
+      setTimeout(() => {
+        if (onSuccess) onSuccess(res, { isNewSignup: false });
+        onClose();
+      }, 400);
+    } catch (err) {
+      setError(err.message || 'OTP verification failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Phone + Password Login Handler
+  const handlePhonePasswordLogin = async (e) => {
+    e.preventDefault();
+    const cleanPhone = phoneInput.replace(/[^0-9]/g, '').slice(-10);
+    if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+      setError('Please enter a valid 10-digit Indian mobile number');
+      return;
+    }
+    if (!password) {
+      setError('Please enter your password');
+      return;
+    }
+
+    setError('');
+    setLoading(true);
+    try {
+      const loggedUser = await login(cleanPhone, password);
+      setSuccess(`Welcome back, ${loggedUser.name || 'User'}!`);
+      setTimeout(() => {
+        if (onSuccess) onSuccess(loggedUser, { isNewSignup: false });
+        onClose();
+      }, 400);
+    } catch (err) {
+      setError(err.message || 'Invalid mobile number or password.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Email + Password Login Handler
+  const handleEmailLogin = async (e) => {
+    e.preventDefault();
+    const cleanEmail = emailInput.trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes('@')) {
+      setError('Please enter a valid email address');
+      return;
+    }
+    if (!password) {
+      setError('Please enter your password');
+      return;
+    }
+
+    setError('');
+    setLoading(true);
+    try {
+      const loggedUser = await login(cleanEmail, password);
+      setSuccess(`Welcome back, ${loggedUser.name || 'User'}!`);
+      setTimeout(() => {
+        if (onSuccess) onSuccess(loggedUser, { isNewSignup: false });
+        onClose();
+      }, 400);
+    } catch (err) {
+      setError(err.message || 'Invalid email or password. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Send OTP for Registration
+  const handleRegisterSendOtp = async () => {
     const cleanId = identifier.trim();
     if (!cleanId) {
       setError('Please enter your mobile number or email address');
@@ -85,7 +209,7 @@ export const AuthModal = ({
     setError('');
     setSendingOtp(true);
     try {
-      const res = await sendOtp(cleanId, mode === 'register' ? 'register' : 'login');
+      const res = await sendOtp(cleanId, 'register');
       setOtpSent(true);
       const code = res.otp || '123456';
       setSimulatedOtp(code);
@@ -95,35 +219,6 @@ export const AuthModal = ({
       setError(err.message || 'Failed to send OTP');
     } finally {
       setSendingOtp(false);
-    }
-  };
-
-  // Standard Login Handler
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    const cleanId = identifier.trim();
-    if (!cleanId) {
-      setError('Please enter your email or mobile number');
-      return;
-    }
-    if (!password) {
-      setError('Please enter your password');
-      return;
-    }
-
-    setError('');
-    setLoading(true);
-    try {
-      const loggedUser = await login(cleanId, password);
-      setSuccess(`Welcome back, ${loggedUser.name || 'User'}!`);
-      setTimeout(() => {
-        if (onSuccess) onSuccess(loggedUser, { isNewSignup: false });
-        onClose();
-      }, 400);
-    } catch (err) {
-      setError(err.message || 'Invalid credentials. Please try again.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -266,61 +361,214 @@ export const AuthModal = ({
           {/* SIGN IN VIEW                                            */}
           {/* ======================================================== */}
           {mode === 'login' && (
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                  Email or Mobile Number
-                </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
-                    <Mail size={16} />
-                  </span>
-                  <input
-                    type="text"
-                    value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
-                    placeholder="name@example.com or 9876543210"
-                    autoFocus
-                    required
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-10 pr-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
-                  />
-                </div>
+            <div className="space-y-4">
+              {/* Method Switcher Tabs: Phone + OTP vs Email + Password */}
+              <div className="grid grid-cols-2 p-1 bg-slate-950 rounded-xl border border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => { setLoginMethod('phone'); setError(''); setSuccess(''); }}
+                  className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                    loginMethod === 'phone'
+                      ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-xs'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <Phone size={13} />
+                  <span>Mobile + OTP</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setLoginMethod('email'); setError(''); setSuccess(''); }}
+                  className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                    loginMethod === 'email'
+                      ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-xs'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <Mail size={13} />
+                  <span>Email + Password</span>
+                </button>
               </div>
 
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                  Password
-                </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
-                    <Lock size={16} />
-                  </span>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    required
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-10 pr-10 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
-                  />
+              {/* METHOD A: PHONE NUMBER + OTP */}
+              {loginMethod === 'phone' && (
+                <form onSubmit={phonePasswordMode ? handlePhonePasswordLogin : handlePhoneOtpLogin} className="space-y-3.5">
+                  <div>
+                    <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                      10-Digit Mobile Number
+                    </label>
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-xs font-bold pointer-events-none">
+                          +91
+                        </span>
+                        <input
+                          type="tel"
+                          maxLength={10}
+                          value={phoneInput}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/[^0-9]/g, '');
+                            setPhoneInput(val);
+                          }}
+                          placeholder="9876543210"
+                          autoFocus
+                          required
+                          className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-11 pr-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-mono tracking-wider transition"
+                        />
+                      </div>
+
+                      {!phonePasswordMode && (
+                        <button
+                          type="button"
+                          onClick={handlePhoneSendOtp}
+                          disabled={sendingOtp || phoneInput.length < 10}
+                          className="px-3.5 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-xs transition-all whitespace-nowrap active:scale-95 flex items-center gap-1"
+                        >
+                          {sendingOtp ? 'Sending...' : otpSent ? 'Resend' : 'Send OTP'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* OTP Field (if OTP mode) */}
+                  {!phonePasswordMode && (
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block text-xs font-medium text-slate-300">
+                          6-Digit OTP Passcode
+                        </label>
+                        {simulatedOtp && (
+                          <span className="text-[10px] text-emerald-400 font-mono font-bold">
+                            Demo Code: {simulatedOtp}
+                          </span>
+                        )}
+                      </div>
+                      <div className="relative">
+                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
+                          <KeyRound size={16} />
+                        </span>
+                        <input
+                          type="text"
+                          maxLength={6}
+                          value={otp}
+                          onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
+                          placeholder="123456"
+                          required
+                          className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-10 pr-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-mono tracking-widest transition"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Password Field (if Password mode for phone) */}
+                  {phonePasswordMode && (
+                    <div>
+                      <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                        Account Password
+                      </label>
+                      <div className="relative">
+                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
+                          <Lock size={16} />
+                        </span>
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="Enter your account password"
+                          required
+                          className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-10 pr-10 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300"
+                        >
+                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300"
+                    type="submit"
+                    disabled={loading}
+                    className="w-full py-2.5 px-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 active:from-indigo-700 active:to-violet-700 text-white font-bold rounded-xl text-xs transition shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2 disabled:opacity-50"
                   >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    {loading ? 'Verifying...' : phonePasswordMode ? 'Sign In with Password' : 'Verify OTP & Sign In'}
+                    <ArrowRight size={15} />
                   </button>
-                </div>
-              </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                {loading ? 'Signing in...' : 'Sign In'}
-                <ArrowRight size={16} />
-              </button>
+                  <div className="text-center pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setPhonePasswordMode(!phonePasswordMode)}
+                      className="text-[11px] text-indigo-400 hover:text-indigo-300 transition-colors"
+                    >
+                      {phonePasswordMode ? '← Sign In with OTP instead' : 'Have a password? Sign In with Password'}
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* METHOD B: EMAIL + PASSWORD */}
+              {loginMethod === 'email' && (
+                <form onSubmit={handleEmailLogin} className="space-y-3.5">
+                  <div>
+                    <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                      Email Address
+                    </label>
+                    <div className="relative">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
+                        <Mail size={16} />
+                      </span>
+                      <input
+                        type="email"
+                        value={emailInput}
+                        onChange={(e) => setEmailInput(e.target.value)}
+                        placeholder="admin@jobscout.io or you@example.com"
+                        autoFocus
+                        required
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-10 pr-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                      Password
+                    </label>
+                    <div className="relative">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
+                        <Lock size={16} />
+                      </span>
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Enter your password"
+                        required
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-10 pr-10 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300"
+                      >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full py-2.5 px-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 active:from-indigo-700 active:to-violet-700 text-white font-bold rounded-xl text-xs transition shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    {loading ? 'Signing in...' : 'Sign In with Password'}
+                    <ArrowRight size={15} />
+                  </button>
+                </form>
+              )}
 
               {/* Quick Demo Logins */}
               <div className="pt-2 border-t border-slate-800/80">
@@ -366,7 +614,7 @@ export const AuthModal = ({
                   </button>
                 </div>
               </div>
-            </form>
+            </div>
           )}
 
           {/* ======================================================== */}
@@ -435,7 +683,7 @@ export const AuthModal = ({
                   </div>
                   <button
                     type="button"
-                    onClick={handleSendOtp}
+                    onClick={handleRegisterSendOtp}
                     disabled={sendingOtp || !identifier.trim()}
                     className="px-3.5 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition shadow disabled:opacity-50 shrink-0"
                   >

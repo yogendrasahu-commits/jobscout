@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Phone, Video, MessageSquare, MapPin, Briefcase, Award, Sparkles, User, ArrowLeft, Mail, Edit3, FileText } from 'lucide-react';
+import { X, Phone, Video, MessageSquare, MapPin, Briefcase, Award, Sparkles, User, ArrowLeft, Mail, Edit3, FileText, ShieldCheck } from 'lucide-react';
 import { useSocket } from '../context/SocketContext';
 import { useAuth } from '../context/AuthContext';
 import { ResumePreviewModal } from './ResumePreviewModal';
@@ -89,7 +89,7 @@ export const SeekerProfileModal = ({ seeker, isOpen, onClose }) => {
               <>
                 <span>•</span>
                 <span className="flex items-center gap-1 text-slate-600">
-                  <Phone className="w-3 h-3 text-emerald-600" />
+                  <Phone className="w-3.5 h-3.5 text-emerald-600" />
                   <span>+91 {seeker.phone}</span>
                 </span>
               </>
@@ -128,59 +128,83 @@ export const SeekerProfileModal = ({ seeker, isOpen, onClose }) => {
           </div>
         </div>
 
-        {/* Instant Connect Buttons (Instant Spot Calling) */}
-        <div className="space-y-2.5">
-          <div className="grid grid-cols-2 gap-2">
-            {/* Audio Call */}
-            <button
-              onClick={() => handleCall(false)}
-              className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all active:scale-95"
-            >
-              <Phone className="w-4 h-4" />
-              Voice Call
-            </button>
+        {/* Action Buttons: Admin Oversight vs Candidate/Employer Instant Connect */}
+        {user?.role === 'admin' ? (
+          <div className="p-4 bg-rose-50 border border-rose-200/90 rounded-2xl space-y-2.5 my-2">
+            <div className="flex items-center gap-2 text-rose-800 font-extrabold text-xs">
+              <ShieldCheck className="w-4 h-4 text-rose-600" />
+              <span>Platform Administrator Oversight</span>
+            </div>
+            <p className="text-[11px] text-slate-600 leading-relaxed">
+              You are inspecting this candidate account with Super Admin privileges. Candidate speed-calling and messaging are disabled for admin accounts.
+            </p>
+            <div className="pt-1 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  window.location.hash = '#/admin';
+                }}
+                className="w-full py-2.5 px-3 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition-all shadow-xs active:scale-95 text-center flex items-center justify-center gap-1.5"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                <span>Manage User in Admin Console</span>
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-2.5">
+            <div className="grid grid-cols-2 gap-2">
+              {/* Audio Call */}
+              <button
+                onClick={() => handleCall(false)}
+                className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all active:scale-95"
+              >
+                <Phone className="w-4 h-4" />
+                Voice Call
+              </button>
 
-            {/* Video Call */}
+              {/* Video Call */}
+              <button
+                onClick={() => handleCall(true)}
+                className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all active:scale-95"
+              >
+                <Video className="w-4 h-4" />
+                Video Call
+              </button>
+            </div>
+
+            {/* Send Message */}
             <button
-              onClick={() => handleCall(true)}
-              className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all active:scale-95"
+              onClick={handleChat}
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 font-semibold text-xs border border-slate-200 transition-colors shadow-xs"
             >
-              <Video className="w-4 h-4" />
-              Video Call
+              <MessageSquare className="w-4 h-4" />
+              Send Direct Message
             </button>
           </div>
+        )}
 
-          {/* Send Message */}
-          <button
-            onClick={handleChat}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 font-semibold text-xs border border-slate-200 transition-colors shadow-xs"
-          >
-            <MessageSquare className="w-4 h-4" />
-            Send Direct Message
-          </button>
+        {/* View & Download Professional CV Button */}
+        <button
+          type="button"
+          onClick={() => setIsResumeModalOpen(true)}
+          className="w-full mt-2.5 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-indigo-50 to-violet-50 hover:from-indigo-100 hover:to-violet-100 text-indigo-700 font-bold text-xs border border-indigo-200/90 transition-all shadow-xs active:scale-95"
+          title="View & Download Candidate Resume"
+        >
+          <FileText className="w-4 h-4 text-indigo-600" />
+          <span>View & Print Professional CV (बायोडाटा)</span>
+        </button>
 
-          {/* View & Download Professional CV Button */}
-          <button
-            type="button"
-            onClick={() => setIsResumeModalOpen(true)}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-indigo-50 to-violet-50 hover:from-indigo-100 hover:to-violet-100 text-indigo-700 font-bold text-xs border border-indigo-200/90 transition-all shadow-xs active:scale-95"
-            title="View & Download Candidate Resume"
-          >
-            <FileText className="w-4 h-4 text-indigo-600" />
-            <span>View & Print Professional CV (बायोडाटा)</span>
-          </button>
-
-          {/* Close Profile Button */}
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-full flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 text-xs font-semibold border border-transparent hover:border-slate-200 transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
-            <span>Close (प्रोफाइल बंद करें)</span>
-          </button>
-        </div>
-
+        {/* Close Profile Button */}
+        <button
+          type="button"
+          onClick={onClose}
+          className="w-full mt-2 flex items-center justify-center gap-1.5 py-2 px-4 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 text-xs font-semibold border border-transparent hover:border-slate-200 transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
+          <span>Close (प्रोफाइल बंद करें)</span>
+        </button>
 
         <ProfileEditModal
           isOpen={isProfileEditOpen}

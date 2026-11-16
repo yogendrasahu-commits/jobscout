@@ -1720,7 +1720,7 @@ export const UberJobMap = ({
                       }}
                       className="text-[10px] px-2 py-0.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-colors shadow-2xs"
                     >
-                      Apply
+                      {user?.role === 'admin' ? 'View' : 'Apply'}
                     </button>
                   </div>
                 </div>
@@ -1905,7 +1905,7 @@ export const UberJobMap = ({
                   }}
                   className="flex-1 py-2.5 px-3 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white rounded-2xl text-xs font-extrabold transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5"
                 >
-                  <span>Apply</span>
+                  <span>{user?.role === 'admin' ? 'Manage Job' : 'Apply'}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
                 <button
@@ -1989,25 +1989,31 @@ export const UberJobMap = ({
                 </div>
               )}
 
-              {/* Quick Communication Grid */}
-              <div className="grid grid-cols-2 gap-2 pt-0.5">
-                <button
-                  type="button"
-                  onClick={() => startCall(selectedPin.data, false)}
-                  className="py-2 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all active:scale-95"
-                >
-                  <Phone className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Voice Call</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => startCall(selectedPin.data, true)}
-                  className="py-2 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all active:scale-95"
-                >
-                  <Video className="w-3.5 h-3.5 text-indigo-600" />
-                  <span>Video Call</span>
-                </button>
-              </div>
+              {/* Quick Communication Grid (Seekers / Recruiters only; Admin oversees) */}
+              {user?.role !== 'admin' ? (
+                <div className="grid grid-cols-2 gap-2 pt-0.5">
+                  <button
+                    type="button"
+                    onClick={() => startCall(selectedPin.data, false)}
+                    className="py-2 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all active:scale-95"
+                  >
+                    <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Voice Call</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => startCall(selectedPin.data, true)}
+                    className="py-2 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all active:scale-95"
+                  >
+                    <Video className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Video Call</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-xl text-center text-[11px] font-bold text-slate-600">
+                  🛡️ Administrator Auditing Mode
+                </div>
+              )}
 
               {/* Full Profile button */}
               <button
