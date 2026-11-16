@@ -30,7 +30,8 @@ import {
   Mic,
   MicOff,
   ShieldAlert,
-  ShieldCheck
+  ShieldCheck,
+  LogIn
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
@@ -205,13 +206,25 @@ export const Navbar = ({
   useEffect(() => {
     if (mobileDrawerOpen) {
       document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
     } else {
       document.body.style.overflow = 'unset';
+      document.body.style.touchAction = 'unset';
     }
     return () => {
       document.body.style.overflow = 'unset';
+      document.body.style.touchAction = 'unset';
     };
   }, [mobileDrawerOpen]);
+
+  // Auto-close menus on tab change
+  useEffect(() => {
+    setMobileDrawerOpen(false);
+    setProfileMenuOpen(false);
+    setNotificationsOpen(false);
+    setMobileSearchOpen(false);
+    setSearchFocused(false);
+  }, [currentTab]);
 
   // Close with Escape key
   useEffect(() => {
@@ -631,24 +644,26 @@ export const Navbar = ({
                 )}
               </button>
 
-              {/* 5. Speed Connect Hub */}
-              <button
-                onClick={() => setCurrentTab('connect')}
-                className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
-                  currentTab === 'connect'
-                    ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
-                    : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
-                }`}
-                title="Speed Connect Hub (Audio & Video Calls)"
-              >
-                <NavConnectIcon active={currentTab === 'connect'} className="w-4 h-4 flex-shrink-0" />
-                <span className="font-bold tracking-tight">Connect</span>
-              </button>
+              {/* 5. Speed Connect Hub (Seeker & Employer only, hidden on tablet to avoid squishing) */}
+              {user?.role !== 'admin' && (
+                <button
+                  onClick={() => setCurrentTab('connect')}
+                  className={`hidden xl:flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                    currentTab === 'connect'
+                      ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
+                      : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
+                  }`}
+                  title="Speed Connect Hub (Audio & Video Calls)"
+                >
+                  <NavConnectIcon active={currentTab === 'connect'} className="w-4 h-4 flex-shrink-0" />
+                  <span className="font-bold tracking-tight">Connect</span>
+                </button>
+              )}
 
-              {/* 6. Anonymous Discussions */}
+              {/* 6. Anonymous Discussions (Desktop wide, hidden on tablet to avoid squishing) */}
               <button
                 onClick={() => setCurrentTab('anon')}
-                className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                className={`hidden 2xl:flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'anon'
                     ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
                     : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
@@ -901,7 +916,11 @@ export const Navbar = ({
                       className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-slate-200 object-cover bg-slate-100 ring-2 ring-indigo-500/15 flex-shrink-0"
                     />
                     <span className={`absolute bottom-0 right-0 w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full border-2 border-white ${
-                      isSeeker ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.7)]' : 'bg-indigo-500 shadow-[0_0_6px_rgba(99,102,241,0.7)]'
+                      user?.role === 'admin'
+                        ? 'bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.8)]'
+                        : isSeeker
+                        ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.7)]'
+                        : 'bg-indigo-500 shadow-[0_0_6px_rgba(99,102,241,0.7)]'
                     }`} />
                   </div>
 
@@ -913,8 +932,8 @@ export const Navbar = ({
                       {user.name?.trim().split(' ')[0] || user.name || 'User'}
                     </div>
                     <div className="hidden lg:flex text-[10px] text-slate-500 items-center gap-1 leading-tight mt-0.5">
-                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isEmployer ? 'bg-indigo-500' : 'bg-emerald-500'}`} />
-                      <span className="truncate">{isEmployer ? 'Recruiter' : 'Seeker'}</span>
+                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${user?.role === 'admin' ? 'bg-rose-500' : isEmployer ? 'bg-indigo-500' : 'bg-emerald-500'}`} />
+                      <span className="truncate">{user?.role === 'admin' ? 'Super Admin' : isEmployer ? 'Recruiter' : 'Seeker'}</span>
                     </div>
                   </div>
 
@@ -942,9 +961,26 @@ export const Navbar = ({
                       </div>
 
                       <div className="mt-2 inline-block text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
-                        {isEmployer ? '👔 Employer Account (#Hiring)' : '🔍 Seeker Account (#OpenToWork)'}
+                        {user?.role === 'admin' ? '🛡️ Super Administrator Account' : isEmployer ? '👔 Employer Account (#Hiring)' : '🔍 Seeker Account (#OpenToWork)'}
                       </div>
                     </div>
+
+                    {/* Master Admin Portal Access (Featured first for Admin) */}
+                    {user?.role === 'admin' && (
+                      <button
+                        onClick={() => {
+                          setCurrentTab('admin');
+                          setProfileMenuOpen(false);
+                        }}
+                        className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-rose-600 via-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 transition-all shadow-md shadow-rose-600/25 mb-2"
+                      >
+                        <span className="flex items-center gap-2">
+                          <ShieldAlert className="w-4 h-4 text-white" />
+                          <span>Master Admin Console</span>
+                        </span>
+                        <ArrowRight className="w-3.5 h-3.5 text-white" />
+                      </button>
+                    )}
 
                     {/* View Full Professional Profile Button */}
                     <button
@@ -961,20 +997,22 @@ export const Navbar = ({
                       <ExternalLink className="w-3.5 h-3.5" />
                     </button>
 
-                    {/* Direct Shortcut to My Applications / Candidate Resumes */}
-                    <button
-                      onClick={() => {
-                        setCurrentTab('applications');
-                        setProfileMenuOpen(false);
-                      }}
-                      className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100/80 transition-colors mb-2"
-                    >
-                      <span className="flex items-center gap-1.5">
-                        <FileText className="w-3.5 h-3.5 text-indigo-600" />
-                        <span>{isEmployer ? 'Candidate Applications' : 'My Job Applications'}</span>
-                      </span>
-                      <ArrowRight className="w-3 h-3 text-slate-400" />
-                    </button>
+                    {/* Direct Shortcut to My Applications / Candidate Resumes (Seeker & Employer only) */}
+                    {user?.role !== 'admin' && (
+                      <button
+                        onClick={() => {
+                          setCurrentTab('applications');
+                          setProfileMenuOpen(false);
+                        }}
+                        className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100/80 transition-colors mb-2"
+                      >
+                        <span className="flex items-center gap-1.5">
+                          <FileText className="w-3.5 h-3.5 text-indigo-600" />
+                          <span>{isEmployer ? 'Candidate Applications' : 'My Job Applications'}</span>
+                        </span>
+                        <ArrowRight className="w-3 h-3 text-slate-400" />
+                      </button>
+                    )}
 
                     {/* Instant WhatsApp & Telegram Alerts Modal Trigger */}
                     <button
@@ -993,22 +1031,24 @@ export const Navbar = ({
                       </span>
                     </button>
 
-                    {/* 1-Click ATS Harvard Resume Builder */}
-                    <button
-                      onClick={() => {
-                        setIsResumeBuilderOpen(true);
-                        setProfileMenuOpen(false);
-                      }}
-                      className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-indigo-700 bg-indigo-50/70 hover:bg-indigo-100/80 border border-indigo-200/80 transition-all mb-2"
-                    >
-                      <span className="flex items-center gap-1.5">
-                        <FileText className="w-3.5 h-3.5 text-indigo-600" />
-                        <span>ATS Harvard Resume Builder</span>
-                      </span>
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-600 text-white shadow-xs">
-                        PDF
-                      </span>
-                    </button>
+                    {/* 1-Click ATS Harvard Resume Builder (Seekers only) */}
+                    {isSeeker && user?.role !== 'admin' && (
+                      <button
+                        onClick={() => {
+                          setIsResumeBuilderOpen(true);
+                          setProfileMenuOpen(false);
+                        }}
+                        className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-indigo-700 bg-indigo-50/70 hover:bg-indigo-100/80 border border-indigo-200/80 transition-all mb-2"
+                      >
+                        <span className="flex items-center gap-1.5">
+                          <FileText className="w-3.5 h-3.5 text-indigo-600" />
+                          <span>ATS Harvard Resume Builder</span>
+                        </span>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-600 text-white shadow-xs">
+                          PDF
+                        </span>
+                      </button>
+                    )}
 
                     {/* Location Info */}
                     <div className="px-2 py-1 text-xs text-slate-500 flex items-center gap-1.5 mb-2">
@@ -1022,28 +1062,24 @@ export const Navbar = ({
                         Account Type (1 Number = 1 Role)
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className={`font-bold flex items-center gap-1.5 ${isEmployer ? 'text-indigo-600' : 'text-emerald-600'}`}>
-                          {isEmployer ? '👔 Registered Employer' : '🔍 Registered Job Seeker'}
+                        <span className={`font-bold flex items-center gap-1.5 ${
+                          user?.role === 'admin'
+                            ? 'text-rose-600'
+                            : isEmployer
+                            ? 'text-indigo-600'
+                            : 'text-emerald-600'
+                        }`}>
+                          {user?.role === 'admin'
+                            ? '🛡️ Enterprise Master Administrator'
+                            : isEmployer
+                            ? '👔 Registered Employer'
+                            : '🔍 Registered Job Seeker'}
                         </span>
                         <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded font-bold">
                           Active
                         </span>
                       </div>
                     </div>
-
-                    {/* Master Admin Portal Access */}
-                    {user?.role === 'admin' && (
-                      <button
-                        onClick={() => {
-                          setCurrentTab('admin');
-                          setProfileMenuOpen(false);
-                        }}
-                        className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 transition-colors border border-rose-200/60 mb-1"
-                      >
-                        <ShieldAlert className="w-4 h-4 text-rose-600" />
-                        <span>Master Admin Portal (एडमिन)</span>
-                      </button>
-                    )}
 
                     {/* Logout */}
                     <button
@@ -1074,12 +1110,12 @@ export const Navbar = ({
               </div>
             )}
 
-            {/* Hamburger Menu Button (Phone Only: md:hidden) */}
-            <div className="relative group md:hidden">
+            {/* Hamburger Menu Button (Mobile & Tablet: xl:hidden) */}
+            <div className="relative group xl:hidden flex-shrink-0">
               <button
                 type="button"
                 onClick={() => setMobileDrawerOpen(!mobileDrawerOpen)}
-                className={`p-1.5 sm:p-2 rounded-xl border transition-all active:scale-95 flex items-center justify-center ${
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl border transition-all active:scale-95 cursor-pointer ${
                   mobileDrawerOpen 
                     ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white border-indigo-500 shadow-md shadow-indigo-600/30' 
                     : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700 shadow-xs'
@@ -1087,12 +1123,19 @@ export const Navbar = ({
                 title="Navigation Menu & Options"
                 aria-label="Toggle navigation menu"
               >
-                {mobileDrawerOpen ? <X className="w-4 h-4 sm:w-5 sm:h-5 text-white" /> : <Menu className="w-4 h-4 sm:w-5 sm:h-5" />}
+                {mobileDrawerOpen ? (
+                  <X className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                ) : (
+                  <Menu className="w-4 h-4 sm:w-5 sm:h-5" />
+                )}
+                <span className="hidden sm:inline text-xs font-bold">
+                  {mobileDrawerOpen ? 'Close' : 'Menu'}
+                </span>
               </button>
 
               {/* Hover Tooltip */}
               <div className="absolute -bottom-8 right-0 px-2 py-0.5 bg-slate-900 border border-slate-800 text-white text-[10px] font-bold rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-                Menu & Options
+                Menu & More Options
               </div>
             </div>
 
@@ -1105,16 +1148,26 @@ export const Navbar = ({
       {/* 4. FIXED HAMBURGER MENU DRAWER (Teleported to document.body via Portal) */}
       {/* ========================================================== */}
       {mobileDrawerOpen && typeof document !== 'undefined' && createPortal(
-        <div className="fixed inset-0 z-[99999] md:hidden flex justify-end animate-in fade-in duration-200">
-          {/* Backdrop */}
+        <div className="fixed inset-0 z-[99999] xl:hidden flex justify-end animate-in fade-in duration-200 select-none">
+          {/* Backdrop with touch / click isolation */}
           <div 
-            className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity cursor-pointer"
             onClick={() => setMobileDrawerOpen(false)}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setMobileDrawerOpen(false);
+            }}
             aria-hidden="true"
           />
 
-          {/* Drawer Panel */}
-          <div className="relative w-[90vw] max-w-sm h-full max-h-[100dvh] bg-white border-l border-slate-200 shadow-2xl flex flex-col p-4 sm:p-5 overflow-y-auto z-10 animate-in slide-in-from-right duration-250 text-slate-900">
+          {/* Drawer Panel: stops propagation so inside taps never bubble to backdrop */}
+          <aside 
+            className="relative w-[88vw] sm:w-[380px] max-w-md h-full max-h-[100dvh] bg-white border-l border-slate-200 shadow-2xl flex flex-col p-4 sm:p-5 overflow-y-auto z-20 animate-in slide-in-from-right duration-250 text-slate-900 pb-[max(1.5rem,env(safe-area-inset-bottom,1.5rem))]"
+            onClick={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            aria-label="Mobile and tablet navigation drawer"
+          >
             
             {/* Drawer Header */}
             <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 flex-shrink-0">
@@ -1122,7 +1175,7 @@ export const Navbar = ({
                 <button
                   type="button"
                   onClick={() => setMobileDrawerOpen(false)}
-                  className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-all flex items-center gap-1 text-xs font-bold active:scale-95"
+                  className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-all flex items-center gap-1 text-xs font-bold active:scale-95 cursor-pointer"
                   title="Back"
                 >
                   <ArrowRight className="w-4 h-4 text-indigo-600 rotate-180" />
@@ -1137,8 +1190,9 @@ export const Navbar = ({
                 </div>
               </div>
               <button 
+                type="button"
                 onClick={() => setMobileDrawerOpen(false)}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 transition-colors active:scale-90"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 transition-colors active:scale-90 cursor-pointer"
                 title="Close Menu"
                 aria-label="Close navigation menu"
               >
@@ -1158,10 +1212,30 @@ export const Navbar = ({
                 </span>
               </div>
 
+              {/* Master Admin Console (Prominently pinned for Admin) */}
+              {user?.role === 'admin' && (
+                <button
+                  onClick={() => { setCurrentTab('admin'); setMobileDrawerOpen(false); }}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-extrabold transition-all active:scale-98 cursor-pointer ${
+                    currentTab === 'admin'
+                      ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30'
+                      : 'text-rose-600 bg-rose-50 border border-rose-200/80 hover:bg-rose-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <ShieldAlert className="w-4 h-4 flex-shrink-0 text-rose-500" />
+                    <span>Master Admin Console</span>
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500 text-white animate-pulse">
+                    Live
+                  </span>
+                </button>
+              )}
+
               {/* Feed (Home) */}
               <button
                 onClick={() => { setCurrentTab('feed'); setMobileDrawerOpen(false); }}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 cursor-pointer ${
                   currentTab === 'feed'
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                     : 'text-slate-700 hover:bg-slate-100'
@@ -1177,7 +1251,7 @@ export const Navbar = ({
               {/* Network */}
               <button
                 onClick={() => { setCurrentTab('network'); setMobileDrawerOpen(false); }}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 cursor-pointer ${
                   currentTab === 'network'
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                     : 'text-slate-700 hover:bg-slate-100'
@@ -1198,7 +1272,7 @@ export const Navbar = ({
                   setMobileDrawerOpen(false);
                   setCurrentTab('map');
                 }}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 cursor-pointer ${
                   currentTab === 'map'
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                     : 'text-slate-700 hover:bg-slate-100'
@@ -1217,7 +1291,7 @@ export const Navbar = ({
               {/* Job Board */}
               <button
                 onClick={() => { setCurrentTab('jobs'); setMobileDrawerOpen(false); }}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 cursor-pointer ${
                   currentTab === 'jobs'
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                     : 'text-slate-700 hover:bg-slate-100'
@@ -1234,57 +1308,61 @@ export const Navbar = ({
                 )}
               </button>
 
-              {/* Applied Jobs / Candidate Applications */}
-              <button
-                onClick={() => {
-                  setMobileDrawerOpen(false);
-                  if (!user) {
-                    onOpenAuth ? onOpenAuth() : setCurrentTab('applications');
-                  } else {
-                    setCurrentTab('applications');
-                  }
-                }}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
-                  currentTab === 'applications'
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'text-slate-700 hover:bg-slate-100'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <FileText className={`w-4 h-4 flex-shrink-0 ${currentTab === 'applications' ? 'text-white' : 'text-indigo-600'}`} />
-                  <span>{isEmployer ? 'Candidate Applications' : 'Applied Jobs'}</span>
-                </div>
-                {user ? (
-                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border ${currentTab === 'applications' ? 'bg-white/20 border-white/30 text-white' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
-                    Status & Review
-                  </span>
-                ) : (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                    Login
-                  </span>
-                )}
-              </button>
+              {/* Applied Jobs / Candidate Applications (Seeker & Employer only, NOT for Admin) */}
+              {user?.role !== 'admin' && (
+                <button
+                  onClick={() => {
+                    setMobileDrawerOpen(false);
+                    if (!user) {
+                      onOpenAuth ? onOpenAuth() : setCurrentTab('applications');
+                    } else {
+                      setCurrentTab('applications');
+                    }
+                  }}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 cursor-pointer ${
+                    currentTab === 'applications'
+                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                      : 'text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <FileText className={`w-4 h-4 flex-shrink-0 ${currentTab === 'applications' ? 'text-white' : 'text-indigo-600'}`} />
+                    <span>{isEmployer ? 'Candidate Applications' : 'Applied Jobs'}</span>
+                  </div>
+                  {user ? (
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border ${currentTab === 'applications' ? 'bg-white/20 border-white/30 text-white' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
+                      Review
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                      Login
+                    </span>
+                  )}
+                </button>
+              )}
 
-              {/* Speed Connect Hub */}
-              <button
-                onClick={() => {
-                  setMobileDrawerOpen(false);
-                  setCurrentTab('connect');
-                }}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
-                  currentTab === 'connect'
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'text-slate-700 hover:bg-slate-100'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <NavConnectIcon active={currentTab === 'connect'} className="w-4 h-4 flex-shrink-0" />
-                  <span>Speed Connect</span>
-                </div>
-                <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase border ${currentTab === 'connect' ? 'bg-white/20 border-white/30 text-white' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
-                  Calls
-                </span>
-              </button>
+              {/* Speed Connect Hub (Seeker & Employer only, NOT for Admin) */}
+              {user?.role !== 'admin' && (
+                <button
+                  onClick={() => {
+                    setMobileDrawerOpen(false);
+                    setCurrentTab('connect');
+                  }}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 cursor-pointer ${
+                    currentTab === 'connect'
+                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                      : 'text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <NavConnectIcon active={currentTab === 'connect'} className="w-4 h-4 flex-shrink-0" />
+                    <span>Speed Connect</span>
+                  </div>
+                  <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase border ${currentTab === 'connect' ? 'bg-white/20 border-white/30 text-white' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
+                    Calls
+                  </span>
+                </button>
+              )}
 
               {/* Anon Talk */}
               <button
@@ -1292,7 +1370,7 @@ export const Navbar = ({
                   setMobileDrawerOpen(false);
                   setCurrentTab('anon');
                 }}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 cursor-pointer ${
                   currentTab === 'anon'
                     ? 'bg-orange-600 text-white shadow-md shadow-orange-600/30'
                     : 'text-slate-700 hover:bg-slate-100'
@@ -1317,7 +1395,7 @@ export const Navbar = ({
                     setCurrentTab('messages');
                   }
                 }}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 cursor-pointer ${
                   currentTab === 'messages'
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                     : 'text-slate-700 hover:bg-slate-100'
@@ -1356,7 +1434,7 @@ export const Navbar = ({
                       <span className="truncate block max-w-[170px]">{user.email || 'No email set'}</span>
                     </div>
                     <span className="inline-block text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 mt-1">
-                      {isEmployer ? '👔 Employer (#Hiring)' : '🔍 Seeker (#OpenToWork)'}
+                      {user?.role === 'admin' ? '🛡️ Super Administrator' : isEmployer ? '👔 Employer (#Hiring)' : '🔍 Seeker (#OpenToWork)'}
                     </span>
                   </div>
                 </div>
@@ -1367,7 +1445,7 @@ export const Navbar = ({
                     if (onOpenProfile) onOpenProfile(user);
                     setMobileDrawerOpen(false);
                   }}
-                  className="w-full mt-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl border border-indigo-200 flex items-center justify-center gap-1.5 transition-colors"
+                  className="w-full mt-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl border border-indigo-200 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <User className="w-3.5 h-3.5" />
                   <span>View Full Profile</span>
@@ -1381,7 +1459,7 @@ export const Navbar = ({
                     onOpenAuth();
                     setMobileDrawerOpen(false);
                   }}
-                  className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all"
+                  className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all cursor-pointer"
                 >
                   Sign In to JobScout
                 </button>
@@ -1403,7 +1481,7 @@ export const Navbar = ({
                   <button
                     type="button"
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-700"
+                    className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-700 cursor-pointer"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -1420,7 +1498,7 @@ export const Navbar = ({
                       setCurrentTab('jobs');
                       setMobileDrawerOpen(false);
                     }}
-                    className="px-2 py-0.5 bg-slate-100 border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 rounded-lg text-[10px] font-semibold text-slate-700 hover:text-indigo-700 transition-colors"
+                    className="px-2 py-0.5 bg-slate-100 border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 rounded-lg text-[10px] font-semibold text-slate-700 hover:text-indigo-700 transition-colors cursor-pointer"
                   >
                     {tag}
                   </button>
@@ -1437,10 +1515,27 @@ export const Navbar = ({
                     onOpenPostJob();
                     setMobileDrawerOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-xs shadow-sm"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-xs shadow-sm cursor-pointer"
                 >
                   <PlusCircle className="w-4 h-4" />
                   <span>Post a New Job</span>
+                </button>
+              )}
+
+              {/* Seeker Resume Builder */}
+              {user && isSeeker && user?.role !== 'admin' && (
+                <button
+                  onClick={() => {
+                    setIsResumeBuilderOpen(true);
+                    setMobileDrawerOpen(false);
+                  }}
+                  className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 transition-colors cursor-pointer"
+                >
+                  <span className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-indigo-600" />
+                    <span>ATS Harvard Resume Builder</span>
+                  </span>
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-600 text-white">PDF</span>
                 </button>
               )}
 
@@ -1451,7 +1546,7 @@ export const Navbar = ({
                     onOpenAuth();
                     setMobileDrawerOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-xs font-bold shadow-sm"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-xs font-bold shadow-sm cursor-pointer"
                 >
                   <LogIn className="w-4 h-4" />
                   <span>Sign In / Create Account</span>
@@ -1465,7 +1560,7 @@ export const Navbar = ({
                     setCurrentTab('admin');
                     setMobileDrawerOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 text-white text-xs font-bold shadow-md shadow-rose-600/30"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 text-white text-xs font-bold shadow-md shadow-rose-600/30 cursor-pointer"
                 >
                   <ShieldAlert className="w-4 h-4" />
                   <span>Open Master Admin Portal</span>
@@ -1476,7 +1571,7 @@ export const Navbar = ({
                     if (onOpenAuth) onOpenAuth();
                     setMobileDrawerOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-rose-600 hover:bg-rose-50 text-xs font-semibold border border-rose-200 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-rose-600 hover:bg-rose-50 text-xs font-semibold border border-rose-200 transition-colors cursor-pointer"
                 >
                   <ShieldCheck className="w-3.5 h-3.5 text-rose-500" />
                   <span>Admin Access (सुपर एडमिन)</span>
@@ -1490,7 +1585,7 @@ export const Navbar = ({
                     setIsAlertSettingsOpen(true);
                     setMobileDrawerOpen(false);
                   }}
-                  className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 transition-colors"
+                  className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 transition-colors cursor-pointer"
                 >
                   <span className="flex items-center gap-2">
                     <span className="text-sm">💬</span>
@@ -1509,7 +1604,7 @@ export const Navbar = ({
                     setMobileDrawerOpen(false);
                     setCurrentTab('welcome');
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-rose-600 hover:bg-rose-50 text-xs font-bold transition-colors"
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-rose-600 hover:bg-rose-50 text-xs font-bold transition-colors cursor-pointer"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Sign Out</span>
@@ -1520,14 +1615,14 @@ export const Navbar = ({
               <button
                 type="button"
                 onClick={() => setMobileDrawerOpen(false)}
-                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-200 transition-colors active:scale-95"
+                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-200 transition-colors active:scale-95 cursor-pointer"
               >
                 <X className="w-4 h-4 text-slate-500" />
                 <span>Close Menu (मेनू बंद करें)</span>
               </button>
             </div>
 
-          </div>
+          </aside>
         </div>,
         document.body
       )}
