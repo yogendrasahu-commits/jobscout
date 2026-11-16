@@ -217,24 +217,13 @@ export const SmartCommuteModal = ({
             </div>
           </div>
 
-          {/* External Action Button */}
-          <div className="pt-2 flex items-center gap-3">
-            <a
-              href={profile.gmapsUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="flex-1 py-3 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 active:scale-98 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/25 transition-all"
-            >
-              <Navigation className="w-4 h-4" />
-              <span>Navigate Live on Google Maps</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
-
+          {/* Action Button */}
+          <div className="pt-2 flex items-center">
             <button
               onClick={onClose}
-              className="py-3 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors"
+              className="w-full py-3 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 active:scale-98 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/25 transition-all"
             >
-              Done
+              <span>Done</span>
             </button>
           </div>
 

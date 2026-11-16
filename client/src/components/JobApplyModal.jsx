@@ -301,18 +301,6 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
               <MessageSquare className="w-3.5 h-3.5 text-indigo-600" />
               <span>Chat</span>
             </button>
-
-            {job.lat && job.lng && (
-              <a
-                href={`https://www.google.com/maps/dir/?api=1&destination=${job.lat},${job.lng}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-all flex items-center justify-center active:scale-95 shadow-2xs"
-                title="Route in Google Maps"
-              >
-                <Navigation className="w-3.5 h-3.5 text-slate-600" />
-              </a>
-            )}
           </div>
         </div>
         )}

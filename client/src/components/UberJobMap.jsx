@@ -178,16 +178,20 @@ const POPULAR_LOCATIONS = [
 function MapResizer() {
   const map = useMap();
   useEffect(() => {
-    let rafId = requestAnimationFrame(() => {
-      map.invalidateSize();
-    });
+    // Invalidate immediately, and at staggered intervals to guarantee tiles fill 100% after CSS/layout transitions
+    map.invalidateSize();
+    const t1 = setTimeout(() => map.invalidateSize(), 100);
+    const t2 = setTimeout(() => map.invalidateSize(), 300);
+    const t3 = setTimeout(() => map.invalidateSize(), 600);
+
     const handleResize = () => {
-      cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(() => map.invalidateSize());
+      map.invalidateSize();
     };
     window.addEventListener('resize', handleResize, { passive: true });
     return () => {
-      cancelAnimationFrame(rafId);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
       window.removeEventListener('resize', handleResize);
     };
   }, [map]);
@@ -991,19 +995,28 @@ export const UberJobMap = ({
   }, [locateMe]);
 
   // Map Click Handler: relocate radar center dynamically for exploration without mutating saved user profile
-  const handleMapClick = (latlng) => {
+  const handleMapClick = async (latlng) => {
     if (!latlng) return;
     const [lat, lng] = clampToIndia(latlng.lat, latlng.lng);
     setTargetZoomLevel(null); // Keep user's current zoom level
     setCenterCoords([lat, lng]);
+    setSelectedPin(null); // Close active preview card on map click
     const clickedLabel = `Location [${lat.toFixed(3)}, ${lng.toFixed(3)}]`;
     setActiveLocationName(clickedLabel);
-    setSelectedPin(null); // Close active preview card on map click
+    try {
+      const detected = await reverseGeocode(lat, lng);
+      if (detected) {
+        setActiveLocationName(detected);
+        setSearchQuery(detected);
+      }
+    } catch {
+      // Keep clickedLabel fallback
+    }
   };
 
   return (
     <div 
-      className="relative w-full h-[calc(100dvh-60px-56px)] md:h-[calc(100vh-68px)] bg-slate-100 overflow-hidden select-none"
+      className="relative w-full h-[calc(100dvh-56px-56px)] sm:h-[calc(100dvh-60px-56px)] md:h-[calc(100vh-68px)] bg-slate-100 overflow-hidden select-none"
     >
       
       {/* ============================================================== */}
@@ -1911,22 +1924,12 @@ export const UberJobMap = ({
                 <button
                   type="button"
                   onClick={() => setCommuteModalJob(selectedPin.data)}
-                  className="py-2.5 px-3 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-all flex items-center justify-center gap-1 text-xs font-bold active:scale-95 shadow-xs"
+                  className="py-2.5 px-3.5 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-all flex items-center justify-center gap-1.5 text-xs font-bold active:scale-95 shadow-xs"
                   title="Calculate travel time via Metro, Bike, Cab & Walking"
                 >
-                  <span>🚇</span>
-                  <span>Commute</span>
+                  <Navigation className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Transit & Commute</span>
                 </button>
-                <a
-                  href={`https://www.google.com/maps/dir/?api=1&destination=${selectedPin.data.lat},${selectedPin.data.lng}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="py-2.5 px-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 transition-all flex items-center justify-center gap-1 text-xs font-bold active:scale-95"
-                  title="Turn-by-turn Navigation in Google Maps"
-                >
-                  <Navigation className="w-3.5 h-3.5 text-indigo-600" />
-                  <span>Route</span>
-                </a>
               </div>
             </div>
           ) : (
@@ -2041,6 +2044,7 @@ export const UberJobMap = ({
         preferCanvas={true}
         updateWhenIdle={true}
         updateWhenZooming={false}
+        attributionControl={false}
         zoomControl={false}
         scrollWheelZoom={true}
         dragging={true}
@@ -2064,12 +2068,12 @@ export const UberJobMap = ({
           onMapMoveEnd={handleMapMoveEnd} 
         />
 
-        {/* Keyless High-Resolution Google Map Tiles (Streets & Satellite Hybrid) */}
+        {/* Keyless High-Resolution Map Tiles (Streets & Satellite Hybrid) */}
         <TileLayer
           key={mapTheme}
           subdomains="abcd"
           maxZoom={19}
-          attribution='&copy; OpenStreetMap &copy; CARTO'
+          attribution=""
           url={
             mapTheme === 'dark'
               ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
@@ -2179,16 +2183,15 @@ export const UberJobMap = ({
                     >
                       View & Apply
                     </button>
-                    <a
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${job.lat},${job.lng}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 transition-colors flex items-center justify-center gap-1 text-[11px] font-semibold"
-                      title="Open Directions in Google Maps"
+                    <button
+                      type="button"
+                      onClick={() => setCommuteModalJob(job)}
+                      className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-colors flex items-center justify-center gap-1 text-[11px] font-semibold"
+                      title="View In-App Commute Times"
                     >
-                      <Navigation className="w-3.5 h-3.5 text-indigo-600" />
-                      <span>Route</span>
-                    </a>
+                      <Navigation className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Commute</span>
+                    </button>
                   </div>
                 </div>
               </Popup>
