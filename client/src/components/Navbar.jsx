@@ -31,7 +31,9 @@ import {
   MicOff,
   ShieldAlert,
   ShieldCheck,
-  LogIn
+  LogIn,
+  Smartphone,
+  Download
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
