@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">JobScout</string>
+    <string name="title_activity_main">JobScout</string>
+    <string name="package_name">com.jobscout.app</string>
+    <string name="custom_url_scheme">com.jobscout.app</string>
+</resources>

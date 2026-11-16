@@ -30,4 +30,6 @@ Thumbs.db
 *.tmp
 *.apk
 *.zip
-client/android/
+client/android/.gradle/
+client/android/app/build/
+client/android/build/
