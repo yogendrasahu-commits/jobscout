@@ -37,7 +37,10 @@ import {
   Mail,
   Eye,
   EyeOff,
-  Maximize2
+  Maximize2,
+  ChevronDown,
+  User,
+  ArrowLeft
 } from 'lucide-react';
 import { JobScoutLogo } from '../components/JobScoutLogo';
 import { useAuth } from '../context/AuthContext';
@@ -89,19 +92,36 @@ export const Welcome = ({
   const [simulatedOtp, setSimulatedOtp] = useState('');
   const [sendingOtp, setSendingOtp] = useState(false);
 
-  // Signup Fields (Simple: Identifier + OTP + Password)
+  // Signup Fields (Simple: Name + Identifier + OTP + Password + Confirm Password)
+  const [signupName, setSignupName] = useState('');
   const [signupIdentifier, setSignupIdentifier] = useState('');
   const [signupOtp, setSignupOtp] = useState('');
   const [signupOtpSent, setSignupOtpSent] = useState(false);
   const [signupSimulatedOtp, setSignupSimulatedOtp] = useState('');
   const [signupSendingOtp, setSignupSendingOtp] = useState(false);
   const [signupPassword, setSignupPassword] = useState('');
+  const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
   const [showSignupPassword, setShowSignupPassword] = useState(false);
 
   // Status
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+
+  // Real-time password validations matching uploaded design
+  const reqLength = signupPassword.length >= 8;
+  const reqNumberOrSymbol = /[0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(signupPassword);
+  const reqUpperLower = /[a-z]/.test(signupPassword) && /[A-Z]/.test(signupPassword);
+
+  const isSignupNameValid = signupName.trim().length >= 2;
+  const isSignupIdentifierValid = () => {
+    const val = signupIdentifier.trim();
+    if (!val) return false;
+    if (val.includes('@')) return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+    const cleanDigits = val.replace(/[^0-9]/g, '').slice(-10);
+    return /^[6-9]\d{9}$/.test(cleanDigits);
+  };
+  const isSignupConfirmValid = signupConfirmPassword.length > 0 && signupConfirmPassword === signupPassword;
 
   const toggleFaq = (idx) => {
     setActiveFaq(prev => prev === idx ? null : idx);
@@ -305,15 +325,19 @@ export const Welcome = ({
     e.preventDefault();
     const clean = signupIdentifier.trim();
     if (!clean) {
-      setError('कृपया मोबाइल नंबर या ईमेल पता दर्ज करें');
+      setError('Please enter mobile number or email');
       return;
     }
     if (!signupOtp || signupOtp.length < 4) {
-      setError('कृपया प्राप्त OTP कोड दर्ज करें');
+      setError('Please enter the 6-digit OTP passcode received');
       return;
     }
     if (!signupPassword || signupPassword.length < 6) {
-      setError('पासवर्ड कम से कम 6 अक्षरों का होना चाहिए');
+      setError('Password must be at least 6 characters long');
+      return;
+    }
+    if (signupConfirmPassword && signupConfirmPassword !== signupPassword) {
+      setError('Passwords do not match');
       return;
     }
 
@@ -322,7 +346,7 @@ export const Welcome = ({
     try {
       const isEmail = clean.includes('@');
       const payload = {
-        name: isEmail ? clean.split('@')[0] : `User ${clean.replace(/[^0-9]/g, '').slice(-4)}`,
+        name: signupName.trim() || (isEmail ? clean.split('@')[0] : `User ${clean.replace(/[^0-9]/g, '').slice(-4)}`),
         email: isEmail ? clean.toLowerCase() : '',
         phone: !isEmail ? clean.replace(/[^0-9]/g, '').slice(-10) : '',
         otp: signupOtp.trim(),
@@ -331,14 +355,14 @@ export const Welcome = ({
       };
 
       const newUser = await register(payload);
-      setSuccessMsg('खाता बन गया! अब अपनी प्रोफाइल पूर्ण करें।');
+      setSuccessMsg(`Account created! Let's complete your profile.`);
       if (onCompleteSignup) {
         onCompleteSignup(newUser);
       } else {
         onNavigateToFeed();
       }
     } catch (err) {
-      setError(err.message || 'साइनअप विफल। कृपया विवरण जांचें।');
+      setError(err.message || 'Signup failed. Please verify your OTP and details.');
     } finally {
       setLoading(false);
     }
@@ -556,132 +580,148 @@ export const Welcome = ({
 
           </div>
 
-          {/* Right Column: UPDATED UNIFIED AUTHENTICATION CARD */}
+          {/* Right Column: MODERN AUTHENTICATION CARD (Matches Uploaded Design) */}
           <div className="lg:col-span-5" ref={authCardRef} id="auth-card">
-            <div className="bg-white/95 backdrop-blur-2xl border-2 border-indigo-100/90 rounded-3xl p-6 sm:p-7 shadow-[0_20px_50px_-12px_rgba(79,70,229,0.18)] relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-indigo-500 via-cyan-400 to-emerald-400" />
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-indigo-500/10 to-transparent pointer-events-none rounded-bl-full" />
+            <div className="bg-white rounded-[32px] sm:rounded-[36px] p-6 sm:p-8 shadow-[0_20px_50px_-12px_rgba(79,70,229,0.18)] border border-slate-100 relative overflow-hidden text-slate-800">
               
-              {/* Header Row: Tabs & Full Modal Button */}
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4 gap-2">
-                <div className="flex bg-slate-100 p-1 rounded-2xl flex-1">
-                  <button
-                    type="button"
-                    onClick={() => { setAuthMode('login'); setError(''); setSuccessMsg(''); }}
-                    className={`flex-1 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
-                      authMode === 'login'
-                        ? 'bg-white text-indigo-700 shadow-sm'
-                        : 'text-slate-500 hover:text-slate-900'
-                    }`}
-                  >
-                    <LogIn className="w-3.5 h-3.5" />
-                    <span>Log In (लॉगिन)</span>
-                  </button>
+              {/* Top Navigation Row: Circular Back/Reset + Already Member Link */}
+              <div className="flex items-center justify-between pb-2">
+                <button
+                  type="button"
+                  onClick={() => { setError(''); setSuccessMsg(''); }}
+                  className="w-9 h-9 rounded-full border border-slate-200 hover:border-slate-400 hover:bg-slate-50 flex items-center justify-center text-slate-700 transition shadow-xs active:scale-95"
+                  title="Reset"
+                >
+                  <ArrowLeft size={16} />
+                </button>
 
-                  <button
-                    type="button"
-                    onClick={() => { setAuthMode('register'); setError(''); setSuccessMsg(''); }}
-                    className={`flex-1 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
-                      authMode === 'register'
-                        ? 'bg-white text-indigo-700 shadow-sm'
-                        : 'text-slate-500 hover:text-slate-900'
-                    }`}
-                  >
-                    <UserPlus className="w-3.5 h-3.5" />
-                    <span>Sign Up (नया खाता)</span>
-                  </button>
+                <div className="text-xs text-slate-500 font-medium">
+                  {authMode === 'register' ? (
+                    <>
+                      Already member?{' '}
+                      <button
+                        type="button"
+                        onClick={() => { setAuthMode('login'); setError(''); setSuccessMsg(''); }}
+                        className="text-indigo-600 hover:text-indigo-700 font-bold ml-1 transition hover:underline"
+                      >
+                        Sign in
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      Not a member?{' '}
+                      <button
+                        type="button"
+                        onClick={() => { setAuthMode('register'); setError(''); setSuccessMsg(''); }}
+                        className="text-indigo-600 hover:text-indigo-700 font-bold ml-1 transition hover:underline"
+                      >
+                        Sign Up
+                      </button>
+                    </>
+                  )}
                 </div>
+              </div>
 
-                {onOpenLogin && (
-                  <button
-                    type="button"
-                    onClick={() => authMode === 'login' ? onOpenLogin() : onOpenSignup(role)}
-                    className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 text-xs font-bold transition-colors flex items-center gap-1"
-                    title="Open Fullscreen Popup Modal"
+              {/* Header Title with Playful Curved Doodle Arrow */}
+              <div className="mt-3 mb-4">
+                <div className="flex items-center justify-between">
+                  <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                    {authMode === 'register' ? 'Sign Up' : 'Sign In'}
+                  </h1>
+                  {/* Playful curved doodle arrow pointing down towards input fields */}
+                  <svg 
+                    className="w-10 h-10 text-slate-800 -rotate-12 translate-y-1 shrink-0" 
+                    viewBox="0 0 48 48" 
+                    fill="none" 
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    <Maximize2 className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline text-[10px]">Popup</span>
-                  </button>
-                )}
+                    <path 
+                      d="M10 12 C 22 6, 38 8, 35 24 C 33 32, 28 35, 23 38" 
+                      stroke="currentColor" 
+                      strokeWidth="2.4" 
+                      strokeLinecap="round" 
+                    />
+                    <path 
+                      d="M20 32 L 23 38 L 29 35" 
+                      stroke="currentColor" 
+                      strokeWidth="2.4" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                    />
+                  </svg>
+                </div>
+                <p className="text-xs text-slate-400 mt-1">
+                  {authMode === 'register' 
+                    ? 'Secure Your Communications with JobScout' 
+                    : 'Secure Your Career & Hiring with JobScout'}
+                </p>
               </div>
 
               {/* Feedback Alerts */}
               {error && (
-                <div className="mb-3.5 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                <div className="mb-3 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-600" />
                   <span>{error}</span>
                 </div>
               )}
-
               {successMsg && (
-                <div className="mb-3.5 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
-                  <Check className="w-4 h-4 flex-shrink-0 text-emerald-600" />
+                <div className="mb-3 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-600" />
                   <span>{successMsg}</span>
                 </div>
               )}
 
-              {/* ============================================== */}
-              {/* TAB 1: UPDATED LOGIN FORM (DUAL METHOD) */}
-              {/* ============================================== */}
+              {/* TAB 1: LOGIN FORM */}
               {authMode === 'login' && (
                 <div className="space-y-3.5">
-                  {/* Login Method Toggle: Phone + OTP vs Email + Password */}
-                  <div className="grid grid-cols-2 p-1 bg-slate-100 rounded-xl border border-slate-200">
+                  {/* Method Switcher Pills */}
+                  <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-full w-fit">
                     <button
                       type="button"
                       onClick={() => { setLoginMethod('phone'); setError(''); setSuccessMsg(''); }}
-                      className={`py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                      className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1.5 ${
                         loginMethod === 'phone'
-                          ? 'bg-white text-indigo-700 shadow-xs'
-                          : 'text-slate-600 hover:text-slate-900'
+                          ? 'bg-white text-indigo-600 shadow-xs'
+                          : 'text-slate-500 hover:text-slate-800'
                       }`}
                     >
-                      <Phone size={13} />
-                      <span>Mobile + OTP</span>
+                      <Phone size={12} />
+                      <span>Mobile OTP</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => { setLoginMethod('email'); setError(''); setSuccessMsg(''); }}
-                      className={`py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                      className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1.5 ${
                         loginMethod === 'email'
-                          ? 'bg-white text-indigo-700 shadow-xs'
-                          : 'text-slate-600 hover:text-slate-900'
+                          ? 'bg-white text-indigo-600 shadow-xs'
+                          : 'text-slate-500 hover:text-slate-800'
                       }`}
                     >
-                      <Mail size={13} />
-                      <span>Email + Password</span>
+                      <Mail size={12} />
+                      <span>Email & Password</span>
                     </button>
                   </div>
 
-                  {/* METHOD A: PHONE + OTP */}
                   {loginMethod === 'phone' && (
-                    <form onSubmit={phonePasswordMode ? handlePhonePasswordLogin : handlePhoneOtpLogin} className="space-y-3">
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">
-                          10-Digit Mobile Number (मोबाइल नंबर) <span className="text-rose-500">*</span>
-                        </label>
-                        <div className="flex gap-2">
-                          <div className="relative flex-1">
-                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-xs font-bold pointer-events-none">
-                              +91
-                            </span>
-                            <input
-                              type="tel"
-                              maxLength={10}
-                              value={phoneInput}
-                              onChange={(e) => setPhoneInput(e.target.value.replace(/[^0-9]/g, '').slice(0, 10))}
-                              placeholder="98765 43210"
-                              required
-                              className="w-full pl-11 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm font-semibold focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                            />
-                          </div>
-
+                    <form onSubmit={phonePasswordMode ? handlePhonePasswordLogin : handlePhoneOtpLogin} className="space-y-3.5">
+                      <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-slate-500">+91</span>
+                          <input
+                            type="tel"
+                            maxLength={10}
+                            value={phoneInput}
+                            onChange={(e) => setPhoneInput(e.target.value.replace(/[^0-9]/g, ''))}
+                            placeholder="9876543210"
+                            required
+                            className="w-full bg-transparent text-sm font-mono tracking-wider text-slate-800 placeholder-slate-400 focus:outline-none py-2"
+                          />
                           {!phonePasswordMode && (
                             <button
                               type="button"
                               onClick={handlePhoneSendOtp}
                               disabled={sendingOtp || phoneInput.length < 10}
-                              className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-xs transition-all whitespace-nowrap active:scale-95 flex items-center gap-1"
+                              className="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-[11px] font-bold rounded-full transition whitespace-nowrap disabled:opacity-50 shrink-0"
                             >
                               {sendingOtp ? 'Sending...' : otpSent ? 'Resend' : 'Send OTP'}
                             </button>
@@ -689,344 +729,442 @@ export const Welcome = ({
                         </div>
                       </div>
 
-                      {/* OTP Passcode */}
                       {!phonePasswordMode && (
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <label className="block text-xs font-bold text-slate-700">
-                              6-Digit OTP Passcode <span className="text-rose-500">*</span>
-                            </label>
-                            {simulatedOtp && (
-                              <span className="text-[10px] text-emerald-600 font-mono font-bold">
-                                Demo: {simulatedOtp}
-                              </span>
-                            )}
-                          </div>
-                          <div className="relative">
-                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
-                              <KeyRound size={15} />
-                            </span>
+                        <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
+                          <div className="flex items-center gap-3">
+                            <KeyRound size={18} className="text-slate-400 shrink-0" />
                             <input
                               type="text"
                               maxLength={6}
                               value={otp}
-                              onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
-                              placeholder="123456"
+                              onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
+                              placeholder="6-Digit OTP Passcode"
                               required
-                              className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm tracking-widest font-mono font-bold focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                              className="w-full bg-transparent text-sm font-mono tracking-widest text-slate-800 placeholder-slate-400 focus:outline-none py-2"
                             />
+                            {otp.length === 6 && (
+                              <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+                            )}
+                            {simulatedOtp && (
+                              <span className="text-[10px] bg-emerald-50 text-emerald-600 font-mono font-bold px-2 py-0.5 rounded-full border border-emerald-200 shrink-0">
+                                Code: {simulatedOtp}
+                              </span>
+                            )}
                           </div>
                         </div>
                       )}
 
-                      {/* Phone Password fallback */}
                       {phonePasswordMode && (
-                        <div>
-                          <label className="block text-xs font-bold text-slate-700 mb-1">
-                            Account Password <span className="text-rose-500">*</span>
-                          </label>
-                          <div className="relative">
-                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
-                              <Lock size={15} />
-                            </span>
+                        <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
+                          <div className="flex items-center gap-3">
+                            <Lock size={18} className="text-slate-400 shrink-0" />
                             <input
                               type={showPassword ? 'text' : 'password'}
                               value={password}
                               onChange={(e) => setPassword(e.target.value)}
-                              placeholder="••••••••"
+                              placeholder="Account Password"
                               required
-                              className="w-full pl-9 pr-10 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                              className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2"
                             />
                             <button
                               type="button"
                               onClick={() => setShowPassword(!showPassword)}
-                              className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                              className="text-slate-400 hover:text-slate-600 transition"
                             >
-                              {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
                           </div>
                         </div>
                       )}
 
-                      <div className="flex items-center justify-between text-[11px] pt-0.5">
+                      <div className="flex items-center gap-3 sm:gap-4 pt-2">
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="px-7 sm:px-8 py-3 bg-[#4F46E5] hover:bg-[#4338CA] active:bg-[#3730A3] text-white font-bold rounded-full shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 text-sm transition-all active:scale-[0.98] disabled:opacity-50 shrink-0"
+                        >
+                          <span>{loading ? 'Verifying...' : 'Sign In'}</span>
+                          <ArrowRight size={16} />
+                        </button>
+
+                        <span className="text-xs text-slate-400 font-medium">Or</span>
+
                         <button
                           type="button"
-                          onClick={() => { setPhonePasswordMode(!phonePasswordMode); setError(''); }}
-                          className="text-indigo-600 font-semibold hover:underline"
+                          onClick={() => handleQuickDemo('9123456789', 'password123')}
+                          className="w-10 h-10 rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 flex items-center justify-center text-[#1877F2] transition shadow-xs active:scale-95 shrink-0"
+                          title="Sign in with Facebook"
                         >
-                          {phonePasswordMode ? 'Use OTP sign-in instead' : 'Use password instead'}
+                          <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                          </svg>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleQuickDemo('admin@jobscout.io', 'admin123')}
+                          className="w-10 h-10 rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 flex items-center justify-center transition shadow-xs active:scale-95 shrink-0"
+                          title="Sign in with Google"
+                        >
+                          <svg className="w-5 h-5" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                            <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                          </svg>
                         </button>
                       </div>
 
-                      <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
-                      >
-                        {loading ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <>
-                            <LogIn className="w-4 h-4" />
-                            <span>{phonePasswordMode ? 'Sign In with Password' : 'Verify OTP & Sign In'}</span>
-                          </>
-                        )}
-                      </button>
+                      <div className="pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setPhonePasswordMode(!phonePasswordMode)}
+                          className="text-xs text-indigo-600 hover:text-indigo-700 font-semibold"
+                        >
+                          {phonePasswordMode ? '← Sign In with OTP passcode' : 'Have a password? Sign in with password'}
+                        </button>
+                      </div>
                     </form>
                   )}
 
-                  {/* METHOD B: EMAIL + PASSWORD */}
                   {loginMethod === 'email' && (
-                    <form onSubmit={handleEmailLogin} className="space-y-3">
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">
-                          Email Address (ईमेल पता) <span className="text-rose-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
-                            <Mail size={15} />
-                          </span>
+                    <form onSubmit={handleEmailLogin} className="space-y-3.5">
+                      <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
+                        <div className="flex items-center gap-3">
+                          <Mail size={18} className="text-slate-400 shrink-0" />
                           <input
                             type="email"
                             value={emailInput}
                             onChange={(e) => setEmailInput(e.target.value)}
-                            placeholder="admin@jobscout.io"
+                            placeholder="admin@jobscout.io or user@example.com"
                             required
-                            className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                            className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2"
                           />
                         </div>
                       </div>
 
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">
-                          Password (पासवर्ड) <span className="text-rose-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
-                            <Lock size={15} />
-                          </span>
+                      <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
+                        <div className="flex items-center gap-3">
+                          <Lock size={18} className="text-slate-400 shrink-0" />
                           <input
                             type={showPassword ? 'text' : 'password'}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            placeholder="••••••••"
+                            placeholder="Enter your password"
                             required
-                            className="w-full pl-9 pr-10 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                            className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2"
                           />
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                            className="text-slate-400 hover:text-slate-600 transition"
                           >
-                            {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                           </button>
                         </div>
                       </div>
 
-                      <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
-                      >
-                        {loading ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <>
-                            <LogIn className="w-4 h-4" />
-                            <span>Sign In with Password</span>
-                          </>
-                        )}
-                      </button>
+                      <div className="flex items-center gap-3 sm:gap-4 pt-2">
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="px-7 sm:px-8 py-3 bg-[#4F46E5] hover:bg-[#4338CA] active:bg-[#3730A3] text-white font-bold rounded-full shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 text-sm transition-all active:scale-[0.98] disabled:opacity-50 shrink-0"
+                        >
+                          <span>{loading ? 'Signing in...' : 'Sign In'}</span>
+                          <ArrowRight size={16} />
+                        </button>
+
+                        <span className="text-xs text-slate-400 font-medium">Or</span>
+
+                        <button
+                          type="button"
+                          onClick={() => handleQuickDemo('admin@jobscout.io', 'admin123')}
+                          className="w-10 h-10 rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 flex items-center justify-center transition shadow-xs active:scale-95 shrink-0"
+                        >
+                          <svg className="w-5 h-5" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                            <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                          </svg>
+                        </button>
+                      </div>
                     </form>
                   )}
 
-                  {/* Fast 1-Click Demo Shortcut Pills */}
-                  <div className="pt-2 border-t border-slate-100">
-                    <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 text-center">
-                      ⚡ Quick 1-Click Fast Login
+                  {/* Quick 1-Click Fast Login Shortcuts */}
+                  <div className="pt-2.5 border-t border-slate-100">
+                    <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                      ⚡ 1-Click Demo Login
                     </span>
-                    <div className="grid grid-cols-3 gap-1.5">
+                    <div className="grid grid-cols-3 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleQuickDemo('9123456789', 'password123')}
+                        disabled={loading}
+                        className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left transition flex items-center gap-1.5"
+                      >
+                        <User size={14} className="text-emerald-500 shrink-0" />
+                        <div className="min-w-0">
+                          <span className="text-[11px] font-bold text-slate-700 block truncate">Seeker</span>
+                          <span className="text-[9px] text-slate-400 block truncate">Rahul S.</span>
+                        </div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleQuickDemo('9876543210', 'password123')}
+                        disabled={loading}
+                        className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left transition flex items-center gap-1.5"
+                      >
+                        <Building2 size={14} className="text-indigo-500 shrink-0" />
+                        <div className="min-w-0">
+                          <span className="text-[11px] font-bold text-slate-700 block truncate">Employer</span>
+                          <span className="text-[9px] text-slate-400 block truncate">TechPulse</span>
+                        </div>
+                      </button>
+
                       <button
                         type="button"
                         onClick={() => handleQuickDemo('admin@jobscout.io', 'admin123')}
-                        className="py-1.5 px-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-[10px] font-bold transition flex items-center justify-center gap-1 active:scale-95"
+                        disabled={loading}
+                        className="p-2 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl text-left transition flex items-center gap-1.5"
                       >
-                        <ShieldCheck size={11} className="text-rose-600" />
-                        <span>Admin</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleQuickDemo('zomato@jobscout.io', 'zomato123')}
-                        className="py-1.5 px-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-[10px] font-bold transition flex items-center justify-center gap-1 active:scale-95"
-                      >
-                        <Building2 size={11} className="text-emerald-600" />
-                        <span>Employer</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleQuickDemo('ananya@jobscout.io', 'seeker123')}
-                        className="py-1.5 px-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-[10px] font-bold transition flex items-center justify-center gap-1 active:scale-95"
-                      >
-                        <UserCheck size={11} className="text-indigo-600" />
-                        <span>Seeker</span>
+                        <ShieldCheck size={14} className="text-rose-500 shrink-0" />
+                        <div className="min-w-0">
+                          <span className="text-[11px] font-bold text-rose-700 block truncate">Admin</span>
+                          <span className="text-[9px] text-rose-400 block truncate">Portal</span>
+                        </div>
                       </button>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* ============================================== */}
-              {/* TAB 2: UPDATED SIMPLE SIGN UP FORM (MINIMAL) */}
-              {/* ============================================== */}
+              {/* TAB 2: SIGN UP FORM */}
               {authMode === 'register' && (
-                <form onSubmit={handleSignupSubmit} className="space-y-3">
-                  {/* Role Selector */}
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Account Type (खाता प्रकार) <span className="text-rose-500">*</span>
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setRole('seeker')}
-                        className={`p-2 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
-                          role === 'seeker'
-                            ? 'bg-indigo-50 border-indigo-500 text-indigo-700 shadow-xs ring-1 ring-indigo-500/20'
-                            : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                        }`}
-                      >
-                        <UserCheck className="w-4 h-4 text-indigo-600" />
-                        <span>Job Seeker</span>
-                      </button>
+                <form onSubmit={handleSignupSubmit} className="space-y-3.5">
+                  {/* Role Toggle Pill */}
+                  <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-full w-fit">
+                    <button
+                      type="button"
+                      onClick={() => setRole('seeker')}
+                      className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1.5 ${
+                        role === 'seeker'
+                          ? 'bg-white text-indigo-600 shadow-xs'
+                          : 'text-slate-500 hover:text-slate-800'
+                      }`}
+                    >
+                      <User size={12} />
+                      <span>Job Seeker</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRole('emp')}
+                      className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1.5 ${
+                        role === 'emp'
+                          ? 'bg-white text-indigo-600 shadow-xs'
+                          : 'text-slate-500 hover:text-slate-800'
+                      }`}
+                    >
+                      <Building2 size={12} />
+                      <span>Employer</span>
+                    </button>
+                  </div>
 
-                      <button
-                        type="button"
-                        onClick={() => setRole('emp')}
-                        className={`p-2 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
-                          role === 'emp'
-                            ? 'bg-emerald-50 border-emerald-500 text-emerald-800 shadow-xs ring-1 ring-emerald-500/20'
-                            : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                        }`}
-                      >
-                        <Building2 className="w-4 h-4 text-emerald-600" />
-                        <span>Employer</span>
-                      </button>
+                  {/* 1. Full Name Underline Field */}
+                  <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
+                    <div className="flex items-center gap-3">
+                      <User size={18} className="text-slate-400 shrink-0" />
+                      <input
+                        type="text"
+                        value={signupName}
+                        onChange={(e) => setSignupName(e.target.value)}
+                        placeholder="Daniel Ahmadi"
+                        className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2"
+                      />
+                      {isSignupNameValid && (
+                        <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+                      )}
                     </div>
                   </div>
 
-                  {/* Identifier: Mobile or Email */}
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Mobile Number or Email Address <span className="text-rose-500">*</span>
-                    </label>
-                    <div className="flex gap-2">
+                  {/* 2. Email or Mobile Underline Field */}
+                  <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
+                    <div className="flex items-center gap-3">
+                      <Mail size={18} className="text-slate-400 shrink-0" />
                       <input
                         type="text"
                         value={signupIdentifier}
-                        onChange={(e) => setSignupIdentifier(e.target.value)}
-                        placeholder="उदा. 9876543210 या name@work.com"
+                        onChange={(e) => {
+                          setSignupIdentifier(e.target.value);
+                          setSignupOtpSent(false);
+                        }}
+                        placeholder="11Danielahmadi@gmail.com"
                         required
-                        className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm font-semibold focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2"
                       />
+                      {isSignupIdentifierValid() && (
+                        <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+                      )}
                       <button
                         type="button"
                         onClick={handleSignupSendOtp}
                         disabled={signupSendingOtp || !signupIdentifier.trim()}
-                        className="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-xs transition-all whitespace-nowrap active:scale-95"
+                        className="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-[11px] font-bold rounded-full transition whitespace-nowrap disabled:opacity-50 shrink-0"
                       >
                         {signupSendingOtp ? 'Sending...' : signupOtpSent ? 'Resend' : 'Send OTP'}
                       </button>
                     </div>
                   </div>
 
-                  {/* OTP Passcode */}
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block text-xs font-bold text-slate-700">
-                        Enter OTP Passcode <span className="text-rose-500">*</span>
-                      </label>
-                      {signupSimulatedOtp && (
-                        <span className="text-[10px] text-emerald-600 font-mono font-bold">
-                          Demo: {signupSimulatedOtp}
-                        </span>
-                      )}
-                    </div>
-                    <div className="relative">
-                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
-                        <KeyRound size={15} />
-                      </span>
+                  {/* 3. OTP Passcode Underline Field */}
+                  <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
+                    <div className="flex items-center gap-3">
+                      <KeyRound size={18} className="text-slate-400 shrink-0" />
                       <input
                         type="text"
                         maxLength={6}
                         value={signupOtp}
-                        onChange={(e) => setSignupOtp(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
-                        placeholder="123456"
+                        onChange={(e) => setSignupOtp(e.target.value.replace(/[^0-9]/g, ''))}
+                        placeholder="6-Digit OTP Passcode"
                         required
-                        className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm tracking-widest font-mono font-bold focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        className="w-full bg-transparent text-sm font-mono tracking-widest text-slate-800 placeholder-slate-400 focus:outline-none py-2"
                       />
+                      {signupOtp.length === 6 && (
+                        <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+                      )}
+                      {signupSimulatedOtp && (
+                        <span className="text-[10px] bg-emerald-50 text-emerald-600 font-mono font-bold px-2 py-0.5 rounded-full border border-emerald-200 shrink-0">
+                          Code: {signupSimulatedOtp}
+                        </span>
+                      )}
                     </div>
                   </div>
 
-                  {/* Password */}
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Create Password <span className="text-rose-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
-                        <Lock size={15} />
-                      </span>
+                  {/* 4. Password Underline Field */}
+                  <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
+                    <div className="flex items-center gap-3">
+                      <Lock size={18} className="text-slate-400 shrink-0" />
                       <input
                         type={showSignupPassword ? 'text' : 'password'}
                         value={signupPassword}
                         onChange={(e) => setSignupPassword(e.target.value)}
-                        placeholder="कम से कम 6 अक्षर"
+                        placeholder="••••••"
                         required
-                        className="w-full pl-9 pr-10 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2 tracking-wider"
                       />
                       <button
                         type="button"
                         onClick={() => setShowSignupPassword(!showSignupPassword)}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                        className="text-slate-400 hover:text-slate-600 transition"
                       >
-                        {showSignupPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                        {showSignupPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
                     </div>
                   </div>
 
-                  {/* Notice about completing profile after signup */}
-                  <div className="p-2.5 bg-indigo-50/70 border border-indigo-100 rounded-xl text-[11px] text-indigo-900 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-indigo-600 flex-shrink-0" />
-                    <span>साइनअप के तुरंत बाद प्रोफ़ाइल पूर्ण करने का अलर्ट आएगा।</span>
+                  {/* Password Strength Checklist (Exactly as shown in reference image!) */}
+                  <div className="space-y-1 text-xs pt-1 pb-1">
+                    <div className={`flex items-center gap-2 transition-colors ${reqLength ? 'text-emerald-600 font-medium' : 'text-slate-400'}`}>
+                      {reqLength ? (
+                        <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
+                      ) : (
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-300 ml-1 mr-0.5 shrink-0" />
+                      )}
+                      <span>Least 8 characters</span>
+                    </div>
+                    <div className={`flex items-center gap-2 transition-colors ${reqNumberOrSymbol ? 'text-emerald-600 font-medium' : 'text-slate-400'}`}>
+                      {reqNumberOrSymbol ? (
+                        <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
+                      ) : (
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-300 ml-1 mr-0.5 shrink-0" />
+                      )}
+                      <span>Least one number (0-9) or a symbol</span>
+                    </div>
+                    <div className={`flex items-center gap-2 transition-colors ${reqUpperLower ? 'text-emerald-600 font-medium' : 'text-slate-400'}`}>
+                      {reqUpperLower ? (
+                        <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
+                      ) : (
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-300 ml-1 mr-0.5 shrink-0" />
+                      )}
+                      <span>Lowercase (a-z) and uppercase (A-Z)</span>
+                    </div>
                   </div>
 
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
-                  >
-                    {loading ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <>
-                        <UserPlus className="w-4 h-4" />
-                        <span>Create {role === 'seeker' ? 'Candidate' : 'Employer'} Account →</span>
-                      </>
-                    )}
-                  </button>
+                  {/* 5. Re-Type Password Underline Field */}
+                  <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
+                    <div className="flex items-center gap-3">
+                      <Lock size={18} className="text-slate-400 shrink-0" />
+                      <input
+                        type={showSignupPassword ? 'text' : 'password'}
+                        value={signupConfirmPassword}
+                        onChange={(e) => setSignupConfirmPassword(e.target.value)}
+                        placeholder="Re-Type Password"
+                        className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2 tracking-wider"
+                      />
+                      {isSignupConfirmValid && (
+                        <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Submit Row: Pill Button + Or + Facebook & Google Icons */}
+                  <div className="flex items-center gap-3 sm:gap-4 pt-3">
+                    <button
+                      type="submit"
+                      disabled={loading || !signupIdentifier.trim() || !signupOtp.trim() || !signupPassword}
+                      className="px-7 sm:px-8 py-3 bg-[#4F46E5] hover:bg-[#4338CA] active:bg-[#3730A3] text-white font-bold rounded-full shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 text-sm transition-all active:scale-[0.98] disabled:opacity-50 shrink-0"
+                    >
+                      <span>{loading ? 'Creating...' : 'Sign Up'}</span>
+                      <ArrowRight size={16} />
+                    </button>
+
+                    <span className="text-xs text-slate-400 font-medium">Or</span>
+
+                    <button
+                      type="button"
+                      onClick={() => handleQuickDemo('9123456789', 'password123')}
+                      className="w-10 h-10 rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 flex items-center justify-center text-[#1877F2] transition shadow-xs active:scale-95 shrink-0"
+                      title="Sign up with Facebook"
+                    >
+                      <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                      </svg>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleQuickDemo('admin@jobscout.io', 'admin123')}
+                      className="w-10 h-10 rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 flex items-center justify-center transition shadow-xs active:scale-95 shrink-0"
+                      title="Sign up with Google"
+                    >
+                      <svg className="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                        <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                      </svg>
+                    </button>
+                  </div>
                 </form>
               )}
 
-              {/* Master Admin Direct Quick Link */}
-              <div className="mt-4 pt-3.5 border-t border-slate-100">
+              {/* Bottom Language Selector Pill */}
+              <div className="pt-4 flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold cursor-pointer hover:text-slate-800 transition select-none">
+                  <span className="text-sm">🇬🇧</span>
+                  <span>ENG</span>
+                  <ChevronDown size={14} className="text-slate-400" />
+                </div>
+
                 <button
                   type="button"
                   onClick={() => onOpenLogin ? onOpenLogin() : null}
-                  className="w-full py-2 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 hover:text-rose-800 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors active:scale-98 shadow-xs"
+                  className="text-[11px] text-indigo-600 hover:text-indigo-700 font-bold hover:underline flex items-center gap-1"
                 >
-                  <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
-                  <span>Enterprise Control: <strong>Sign in as Admin Portal →</strong></span>
+                  <Maximize2 size={12} />
+                  <span>Open Full Screen View</span>
                 </button>
               </div>
 

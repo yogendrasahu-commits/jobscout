@@ -77,11 +77,10 @@ export const AuthModal = ({
 
   if (!isOpen) return null;
 
-  // Real-time password validations matching uploaded design
+  // Real-time password validations matching the uploaded design
   const reqLength = password.length >= 8;
   const reqNumberOrSymbol = /[0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password);
   const reqUpperLower = /[a-z]/.test(password) && /[A-Z]/.test(password);
-  const isPasswordValid = reqLength && reqNumberOrSymbol && reqUpperLower;
 
   // Field validation checks for green checkmarks
   const isNameValid = name.trim().length >= 2;
@@ -315,33 +314,32 @@ export const AuthModal = ({
   // Simulated Social Login
   const handleSocialLogin = (platform) => {
     setError('');
-    setSuccess(`Connecting via ${platform}... Redirecting securely`);
+    setSuccess(`Connecting with ${platform}... Authenticating`);
     setTimeout(() => {
-      // Demo seamless login for instant preview
       handleQuickDemo('9123456789', 'password123');
     }, 600);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/70 backdrop-blur-md animate-fadeIn overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-[#D8E2FB]/90 backdrop-blur-md animate-fadeIn overflow-y-auto">
       {/* Click outside to close */}
       <div className="fixed inset-0" onClick={onClose} />
 
       {/* Main Split Card Container */}
-      <div className="relative w-full max-w-4xl bg-white rounded-[28px] sm:rounded-[36px] shadow-2xl overflow-hidden my-auto grid grid-cols-1 lg:grid-cols-12 border border-slate-100 z-10">
+      <div className="relative w-full max-w-4xl bg-white rounded-[32px] sm:rounded-[40px] shadow-[0_25px_60px_-15px_rgba(59,102,245,0.25)] overflow-hidden my-auto grid grid-cols-1 md:grid-cols-12 border border-slate-100/80 z-10">
         
         {/* ======================================================== */}
         {/* LEFT COLUMN: Clean Minimalist Form                      */}
         {/* ======================================================== */}
-        <div className="lg:col-span-7 p-6 sm:p-10 flex flex-col justify-between bg-white text-slate-800">
+        <div className="md:col-span-7 p-6 sm:p-8 lg:p-10 flex flex-col justify-between bg-white text-slate-800">
           
           {/* Top Bar: Back Button & Already Member Link */}
           <div className="flex items-center justify-between pb-2">
             <button
               type="button"
               onClick={onClose}
-              className="w-9 h-9 rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 flex items-center justify-center text-slate-600 transition shadow-xs active:scale-95"
-              title="Close / Back"
+              className="w-9 h-9 rounded-full border border-slate-200 hover:border-slate-400 hover:bg-slate-50 flex items-center justify-center text-slate-700 transition shadow-xs active:scale-95"
+              title="Back"
             >
               <ArrowLeft size={16} />
             </button>
@@ -373,13 +371,13 @@ export const AuthModal = ({
             </div>
           </div>
 
-          {/* Header Title with Playful Curved Doodle Arrow */}
-          <div className="mt-4 mb-4">
+          {/* Header Title with Curved Doodle Arrow */}
+          <div className="mt-3 mb-4">
             <div className="flex items-center justify-between">
               <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
                 {mode === 'register' ? 'Sign Up' : 'Sign In'}
               </h1>
-              {/* Playful curved doodle arrow pointing towards the form */}
+              {/* Playful curved doodle arrow pointing down towards the input fields */}
               <svg 
                 className="w-10 h-10 text-slate-800 -rotate-12 translate-y-1 shrink-0" 
                 viewBox="0 0 48 48" 
@@ -397,26 +395,26 @@ export const AuthModal = ({
                   stroke="currentColor" 
                   strokeWidth="2.4" 
                   strokeLinecap="round" 
-                  strokeLinejoin="round"
+                  strokeLinejoin="round" 
                 />
               </svg>
             </div>
             <p className="text-xs text-slate-400 mt-1">
               {mode === 'register' 
-                ? 'Secure Your Career & Hiring with JobScout' 
-                : 'Secure Your Communications with JobScout'}
+                ? 'Secure Your Communications with JobScout' 
+                : 'Secure Your Career & Hiring with JobScout'}
             </p>
           </div>
 
           {/* Alerts */}
           {error && (
-            <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-600 flex items-start gap-2">
+            <div className="mb-3 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-600 flex items-start gap-2">
               <AlertCircle size={16} className="shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
           )}
           {success && (
-            <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-700 flex items-start gap-2">
+            <div className="mb-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-700 flex items-start gap-2">
               <CheckCircle2 size={16} className="shrink-0 mt-0.5" />
               <span>{success}</span>
             </div>
@@ -426,8 +424,8 @@ export const AuthModal = ({
           {/* SIGN UP FORM (Matches Uploaded Image Style)              */}
           {/* ======================================================== */}
           {mode === 'register' && (
-            <form onSubmit={handleSignup} className="space-y-4">
-              {/* Role Selector Pill */}
+            <form onSubmit={handleSignup} className="space-y-3.5">
+              {/* Role Toggle Pill */}
               <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-full w-fit">
                 <button
                   type="button"
@@ -456,14 +454,14 @@ export const AuthModal = ({
               </div>
 
               {/* 1. Full Name Underline Field */}
-              <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-1">
+              <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
                 <div className="flex items-center gap-3">
                   <User size={18} className="text-slate-400 shrink-0" />
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Full Name (e.g. Daniel Ahmadi)"
+                    placeholder="Daniel Ahmadi"
                     className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2"
                   />
                   {isNameValid && (
@@ -472,8 +470,8 @@ export const AuthModal = ({
                 </div>
               </div>
 
-              {/* 2. Email or Mobile Underline Field + Send OTP */}
-              <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-1">
+              {/* 2. Email or Mobile Underline Field */}
+              <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
                 <div className="flex items-center gap-3">
                   <Mail size={18} className="text-slate-400 shrink-0" />
                   <input
@@ -483,7 +481,7 @@ export const AuthModal = ({
                       setIdentifier(e.target.value);
                       setOtpSent(false);
                     }}
-                    placeholder="Email or Mobile (e.g. user@gmail.com)"
+                    placeholder="11Danielahmadi@gmail.com"
                     required
                     className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2"
                   />
@@ -502,7 +500,7 @@ export const AuthModal = ({
               </div>
 
               {/* 3. OTP Passcode Underline Field */}
-              <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-1">
+              <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
                 <div className="flex items-center gap-3">
                   <KeyRound size={18} className="text-slate-400 shrink-0" />
                   <input
@@ -526,14 +524,14 @@ export const AuthModal = ({
               </div>
 
               {/* 4. Password Underline Field */}
-              <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-1">
+              <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
                 <div className="flex items-center gap-3">
                   <Lock size={18} className="text-slate-400 shrink-0" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Create Password"
+                    placeholder="••••••"
                     required
                     className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2 tracking-wider"
                   />
@@ -548,7 +546,7 @@ export const AuthModal = ({
               </div>
 
               {/* Password Strength Checklist (Exactly as shown in reference image!) */}
-              <div className="space-y-1.5 text-xs pt-1 pb-1">
+              <div className="space-y-1 text-xs pt-1 pb-1">
                 <div className={`flex items-center gap-2 transition-colors ${reqLength ? 'text-emerald-600 font-medium' : 'text-slate-400'}`}>
                   {reqLength ? (
                     <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
@@ -576,7 +574,7 @@ export const AuthModal = ({
               </div>
 
               {/* 5. Re-Type Password Underline Field */}
-              <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-1">
+              <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
                 <div className="flex items-center gap-3">
                   <Lock size={18} className="text-slate-400 shrink-0" />
                   <input
@@ -592,12 +590,12 @@ export const AuthModal = ({
                 </div>
               </div>
 
-              {/* Submit Pill Button + Social Login Icons */}
-              <div className="flex items-center gap-4 pt-4">
+              {/* Submit Row: Pill Button + Or + Facebook & Google Icons */}
+              <div className="flex items-center gap-3 sm:gap-4 pt-3">
                 <button
                   type="submit"
                   disabled={loading || !identifier.trim() || !otp.trim() || !password}
-                  className="px-8 py-3 bg-[#4F46E5] hover:bg-[#4338CA] active:bg-[#3730A3] text-white font-bold rounded-full shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 text-sm transition-all active:scale-[0.98] disabled:opacity-50 shrink-0"
+                  className="px-7 sm:px-8 py-3 bg-[#4F46E5] hover:bg-[#4338CA] active:bg-[#3730A3] text-white font-bold rounded-full shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 text-sm transition-all active:scale-[0.98] disabled:opacity-50 shrink-0"
                 >
                   <span>{loading ? 'Creating...' : 'Sign Up'}</span>
                   <ArrowRight size={16} />
@@ -639,8 +637,8 @@ export const AuthModal = ({
           {/* SIGN IN FORM (Matches Uploaded Image Style)               */}
           {/* ======================================================== */}
           {mode === 'login' && (
-            <div className="space-y-4">
-              {/* Method Switcher Pills: Mobile + OTP vs Email + Password */}
+            <div className="space-y-3.5">
+              {/* Method Switcher Pills: Mobile OTP vs Email & Password */}
               <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-full w-fit">
                 <button
                   type="button"
@@ -670,9 +668,9 @@ export const AuthModal = ({
 
               {/* METHOD A: PHONE NUMBER + OTP */}
               {loginMethod === 'phone' && (
-                <form onSubmit={phonePasswordMode ? handlePhonePasswordLogin : handlePhoneOtpLogin} className="space-y-4">
+                <form onSubmit={phonePasswordMode ? handlePhonePasswordLogin : handlePhoneOtpLogin} className="space-y-3.5">
                   {/* Mobile Input */}
-                  <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-1">
+                  <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-bold text-slate-500">+91</span>
                       <input
@@ -700,7 +698,7 @@ export const AuthModal = ({
 
                   {/* OTP Input */}
                   {!phonePasswordMode && (
-                    <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-1">
+                    <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
                       <div className="flex items-center gap-3">
                         <KeyRound size={18} className="text-slate-400 shrink-0" />
                         <input
@@ -726,7 +724,7 @@ export const AuthModal = ({
 
                   {/* Password Input (if user toggled password mode) */}
                   {phonePasswordMode && (
-                    <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-1">
+                    <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
                       <div className="flex items-center gap-3">
                         <Lock size={18} className="text-slate-400 shrink-0" />
                         <input
@@ -749,13 +747,13 @@ export const AuthModal = ({
                   )}
 
                   {/* Submit Row */}
-                  <div className="flex items-center gap-4 pt-3">
+                  <div className="flex items-center gap-3 sm:gap-4 pt-2">
                     <button
                       type="submit"
                       disabled={loading}
-                      className="px-8 py-3 bg-[#4F46E5] hover:bg-[#4338CA] active:bg-[#3730A3] text-white font-bold rounded-full shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 text-sm transition-all active:scale-[0.98] disabled:opacity-50 shrink-0"
+                      className="px-7 sm:px-8 py-3 bg-[#4F46E5] hover:bg-[#4338CA] active:bg-[#3730A3] text-white font-bold rounded-full shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 text-sm transition-all active:scale-[0.98] disabled:opacity-50 shrink-0"
                     >
-                      <span>{loading ? 'Verifying...' : phonePasswordMode ? 'Sign In' : 'Sign In'}</span>
+                      <span>{loading ? 'Verifying...' : 'Sign In'}</span>
                       <ArrowRight size={16} />
                     </button>
 
@@ -801,9 +799,9 @@ export const AuthModal = ({
 
               {/* METHOD B: EMAIL + PASSWORD */}
               {loginMethod === 'email' && (
-                <form onSubmit={handleEmailLogin} className="space-y-4">
+                <form onSubmit={handleEmailLogin} className="space-y-3.5">
                   {/* Email Underline */}
-                  <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-1">
+                  <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
                     <div className="flex items-center gap-3">
                       <Mail size={18} className="text-slate-400 shrink-0" />
                       <input
@@ -819,7 +817,7 @@ export const AuthModal = ({
                   </div>
 
                   {/* Password Underline */}
-                  <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-1">
+                  <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
                     <div className="flex items-center gap-3">
                       <Lock size={18} className="text-slate-400 shrink-0" />
                       <input
@@ -841,11 +839,11 @@ export const AuthModal = ({
                   </div>
 
                   {/* Submit Row */}
-                  <div className="flex items-center gap-4 pt-3">
+                  <div className="flex items-center gap-3 sm:gap-4 pt-2">
                     <button
                       type="submit"
                       disabled={loading}
-                      className="px-8 py-3 bg-[#4F46E5] hover:bg-[#4338CA] active:bg-[#3730A3] text-white font-bold rounded-full shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 text-sm transition-all active:scale-[0.98] disabled:opacity-50 shrink-0"
+                      className="px-7 sm:px-8 py-3 bg-[#4F46E5] hover:bg-[#4338CA] active:bg-[#3730A3] text-white font-bold rounded-full shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 text-sm transition-all active:scale-[0.98] disabled:opacity-50 shrink-0"
                     >
                       <span>{loading ? 'Signing in...' : 'Sign In'}</span>
                       <ArrowRight size={16} />
@@ -880,7 +878,7 @@ export const AuthModal = ({
               )}
 
               {/* Fast 1-Click Demo Logins for Seeker, Employer & Admin */}
-              <div className="pt-3 border-t border-slate-100">
+              <div className="pt-2.5 border-t border-slate-100">
                 <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
                   ⚡ 1-Click Demo Login
                 </span>
@@ -929,7 +927,7 @@ export const AuthModal = ({
           )}
 
           {/* Bottom Language Selector Pill */}
-          <div className="pt-6 flex items-center justify-between">
+          <div className="pt-4 flex items-center justify-between">
             <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold cursor-pointer hover:text-slate-800 transition select-none">
               <span className="text-sm">🇬🇧</span>
               <span>ENG</span>
@@ -945,13 +943,13 @@ export const AuthModal = ({
         {/* ======================================================== */}
         {/* RIGHT COLUMN: Creative Visual Illustration Panel         */}
         {/* ======================================================== */}
-        <div className="hidden lg:flex lg:col-span-5 relative bg-gradient-to-br from-[#3B66F5] via-[#4361EE] to-[#2563EB] overflow-hidden p-8 flex-col justify-between text-white select-none min-h-[640px]">
+        <div className="hidden md:flex md:col-span-5 relative bg-gradient-to-br from-[#3B66F5] via-[#4361EE] to-[#2563EB] overflow-hidden p-6 sm:p-8 flex-col justify-between text-white select-none min-h-[560px]">
           
           {/* Layered Organic Wave Vectors in Background */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            {/* Top Organic Midnight Blue Curve */}
+            {/* Top Organic Midnight Blue Curve (protruding into the top dividing edge) */}
             <svg 
-              className="absolute -top-12 -left-12 w-96 h-96 text-[#1E3A8A]/40" 
+              className="absolute -top-10 -left-12 w-80 h-80 text-[#1E3A8A]/50" 
               viewBox="0 0 200 200" 
               fill="currentColor"
             >
@@ -990,11 +988,11 @@ export const AuthModal = ({
           </div>
 
           {/* Canvas Floating Elements */}
-          <div className="relative z-10 flex-1 flex flex-col justify-around py-4">
+          <div className="relative z-10 flex-1 flex flex-col justify-around py-2">
             
             {/* 1. Floating Inbox / Activity Metric Card (Upper Area) */}
-            <div className="relative self-start ml-2">
-              <div className="bg-white rounded-2xl p-4 shadow-2xl w-44 relative animate-bounce-subtle border border-white/60">
+            <div className="relative self-start ml-1 sm:ml-2">
+              <div className="bg-white rounded-2xl p-4 shadow-2xl w-44 relative border border-white/60">
                 <span className="text-[11px] font-bold text-orange-500 uppercase tracking-wider block">
                   Inbox
                 </span>
@@ -1030,7 +1028,7 @@ export const AuthModal = ({
               </div>
 
               {/* Floating Instagram Gradient Badge (Right of Inbox Card) */}
-              <div className="absolute -top-3 -right-24 w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] flex items-center justify-center shadow-xl border-2 border-white/80 animate-pulse">
+              <div className="absolute -top-3 -right-20 sm:-right-24 w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] flex items-center justify-center shadow-xl border-2 border-white/80 animate-pulse">
                 <svg className="w-6 h-6 text-white fill-none stroke-current stroke-2" viewBox="0 0 24 24">
                   <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
                   <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
@@ -1039,7 +1037,7 @@ export const AuthModal = ({
               </div>
 
               {/* Floating TikTok / Media Black Badge */}
-              <div className="absolute top-14 -right-16 w-10 h-10 rounded-full bg-slate-950 flex items-center justify-center shadow-xl border-2 border-white/80">
+              <div className="absolute top-14 -right-14 sm:-right-16 w-10 h-10 rounded-full bg-slate-950 flex items-center justify-center shadow-xl border-2 border-white/80">
                 <svg className="w-5 h-5 fill-white" viewBox="0 0 24 24">
                   <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-2.882 2.88 2.896 2.896 0 0 1-2.882-2.88 2.896 2.896 0 0 1 2.882-2.88c.328 0 .64.053.93.15V9.458a6.347 6.347 0 0 0-.93-.07 6.342 6.342 0 0 0-6.327 6.342 6.342 0 0 0 6.327 6.342 6.342 0 0 0 6.327-6.342V9.06a8.204 8.204 0 0 0 4.77 1.517V7.127a4.83 4.83 0 0 1-1-.441z"/>
                 </svg>
@@ -1048,7 +1046,7 @@ export const AuthModal = ({
 
             {/* 2. Floating Security & Privacy Card (Lower Area) */}
             <div className="relative self-end mr-1 mt-6">
-              <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-2xl w-64 sm:w-72 relative border border-white/60">
+              <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-2xl w-60 sm:w-72 relative border border-white/60">
                 <div className="flex items-start justify-between">
                   {/* Decorative Left Skeleton Bars */}
                   <div className="space-y-2 pt-1">
