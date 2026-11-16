@@ -368,8 +368,10 @@ async function runE2E() {
       headers: { Authorization: `Bearer ${seekerToken}` }
     });
     assert(aiMatchRes.status === 200, 'AI Match endpoint returns HTTP 200');
-    assert(aiMatchRes.data.aiMatch.score >= 0 && aiMatchRes.data.aiMatch.score <= 100, 'AI Match score calculated');
-    assert(Array.isArray(aiMatchRes.data.aiMatch.matchingSkills), 'Matching skills returned as array');
+    const matchObj = aiMatchRes.data.matchResult || aiMatchRes.data.aiMatch;
+    assert(Boolean(matchObj), 'AI Match object returned');
+    assert(matchObj.score >= 0 && matchObj.score <= 100, 'AI Match score calculated');
+    assert(Array.isArray(matchObj.matchedSkills || matchObj.matchingSkills), 'Matching skills returned as array');
   } catch (err) {
     console.error('Suite 5 failed:', err.message);
   }

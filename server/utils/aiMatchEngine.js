@@ -202,7 +202,7 @@ export function calculateAIMatch(candidate, job) {
     tier,
     badgeColor,
     label,
-    matchedSkills,
+    matchedSkills, matchingSkills: matchedSkills,
     missingSkills,
     recommendations,
     summary

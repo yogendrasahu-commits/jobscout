@@ -207,7 +207,7 @@ export const jobController = {
       }
 
       const matchResult = calculateAIMatch(user, job);
-      res.json({ job, matchResult });
+      res.json({ job, matchResult, aiMatch: matchResult });
     } catch (err) {
       next(err);
     }
