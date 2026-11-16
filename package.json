@@ -11,7 +11,8 @@
     "client": "npm --prefix client run dev",
     "test": "node tests/comprehensive-test.mjs",
     "test:e2e": "node tests/comprehensive-e2e-audit.mjs",
-    "test:all": "node tests/comprehensive-test.mjs && node tests/comprehensive-e2e-audit.mjs"
+    "test:advanced": "node tests/platform-advanced-features.test.mjs",
+    "test:all": "node tests/comprehensive-test.mjs && node tests/comprehensive-e2e-audit.mjs && node tests/platform-advanced-features.test.mjs"
   },
   "keywords": [
     "react",
