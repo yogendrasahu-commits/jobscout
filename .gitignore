@@ -29,4 +29,5 @@ Thumbs.db
 *.bak
 *.tmp
 *.apk
+*.zip
 client/android/

@@ -174,6 +174,31 @@ app.get('/downloads/jobscout-mobile.apk', handleApkDownload);
 app.get('/download/app', handleApkDownload);
 app.get('/api/download/jobscout-mobile.apk', handleApkDownload);
 
+// Android Studio Project ZIP Download Endpoints
+const serverZipPath = path.resolve(__dirname, 'public/downloads/jobscout-android-project.zip');
+const clientZipPath = path.resolve(__dirname, '../client/public/downloads/jobscout-android-project.zip');
+
+const handleProjectZipDownload = (req, res) => {
+  const filePath = fs.existsSync(serverZipPath) ? serverZipPath : clientZipPath;
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'JobScout Android Studio project ZIP not found.' });
+  }
+
+  const stat = fs.statSync(filePath);
+  res.writeHead(200, {
+    'Content-Type': 'application/zip',
+    'Content-Disposition': 'attachment; filename="jobscout-android-project.zip"',
+    'Content-Length': stat.size,
+    'Cache-Control': 'no-cache'
+  });
+  const readStream = fs.createReadStream(filePath);
+  readStream.pipe(res);
+};
+
+app.get('/download/jobscout-android-project.zip', handleProjectZipDownload);
+app.get('/downloads/jobscout-android-project.zip', handleProjectZipDownload);
+app.get('/api/download/jobscout-android-project.zip', handleProjectZipDownload);
+
 app.get('/api/app-info', (req, res) => {
   const filePath = fs.existsSync(serverApkPath) ? serverApkPath : clientApkPath;
   const sizeMb = fs.existsSync(filePath) ? (fs.statSync(filePath).size / (1024 * 1024)).toFixed(2) : '5.07';

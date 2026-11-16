@@ -3,11 +3,32 @@
  * Standardizes HTTP communication, headers, error parsing, and auth tokens.
  */
 
-const BASE_URL = import.meta.env.VITE_API_URL || '';
+const resolveBaseUrl = () => {
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  if (typeof window !== 'undefined') {
+    // Detect Capacitor native platform or file/capacitor scheme on Android/iOS
+    const isNative = Boolean(
+      (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) ||
+      window.location.protocol === 'capacitor:' ||
+      window.location.protocol === 'ionic:' ||
+      window.location.protocol === 'file:'
+    );
+
+    if (isNative) {
+      // Connect to configured server or live Render backend
+      return localStorage.getItem('jobscout_server_url') || 'https://jobscout.onrender.com';
+    }
+  }
+  return '';
+};
 
 class ApiClient {
-  constructor(baseURL = BASE_URL) {
-    this.baseURL = baseURL;
+  constructor(baseURL = '') {
+    this.customBaseURL = baseURL;
+  }
+
+  getBaseURL() {
+    return this.customBaseURL || resolveBaseUrl();
   }
 
   /**
@@ -25,7 +46,7 @@ class ApiClient {
    * Universal Request Method
    */
   async request(endpoint, options = {}) {
-    const url = `${this.baseURL}${endpoint}`;
+    const url = `${this.getBaseURL()}${endpoint}`;
     const token = this.getToken();
 
     const headers = {

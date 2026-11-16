@@ -164,7 +164,7 @@ export const MobileAppDownloadModal = ({ isOpen, onClose }) => {
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-black text-slate-900">Direct Android APK Package</span>
                       <span className="text-[10px] bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded-full">
-                        ~5.07 MB
+                        ~10.16 MB
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 leading-relaxed">
@@ -221,6 +221,33 @@ export const MobileAppDownloadModal = ({ isOpen, onClose }) => {
                       <span>{installing ? 'Installing...' : '1-Click Install App'}</span>
                     </button>
                   )}
+                </div>
+              </div>
+
+              {/* Android Studio Full Project ZIP Card */}
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 shadow-2xs">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Laptop size={16} className="text-indigo-600" />
+                      <span className="text-sm font-black text-slate-900">Android Studio Project Source (.zip)</span>
+                      <span className="text-[10px] bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded-full">
+                        ~8.62 MB
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500">
+                      Unzip and open directly in Android Studio on any PC to run or compile your own custom release APK.
+                    </p>
+                  </div>
+
+                  <a
+                    href="/download/jobscout-android-project.zip"
+                    download="jobscout-android-project.zip"
+                    className="w-full sm:w-auto px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs border border-slate-300 transition flex items-center justify-center gap-1.5 active:scale-95 shrink-0 shadow-2xs"
+                  >
+                    <Download size={14} className="text-indigo-600" />
+                    <span>Download Project ZIP</span>
+                  </a>
                 </div>
               </div>
 

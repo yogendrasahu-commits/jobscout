@@ -130,7 +130,22 @@ export const SocketProvider = ({ children }) => {
 
   // 1. Initialize Socket
   useEffect(() => {
-    const socketUrl = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL || window.location.origin;
+    const resolveSocketUrl = () => {
+      if (import.meta.env.VITE_SOCKET_URL) return import.meta.env.VITE_SOCKET_URL;
+      if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+      if (typeof window !== 'undefined') {
+        const isNative = Boolean(
+          (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) ||
+          window.location.protocol === 'capacitor:' ||
+          window.location.protocol === 'file:'
+        );
+        if (isNative) {
+          return localStorage.getItem('jobscout_server_url') || 'https://jobscout.onrender.com';
+        }
+      }
+      return window.location.origin;
+    };
+    const socketUrl = resolveSocketUrl();
     const s = io(socketUrl, {
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,

@@ -1,0 +1,103 @@
+name: Build JobScout Android APK
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'client/**'
+      - 'scripts/**'
+      - '.github/workflows/build-apk.yml'
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    name: Build Production Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-34 build-tools;34.0.0'
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: |
+          npm install
+          npm --prefix client install
+          npm --prefix server install
+
+      - name: Build Web Client Production Bundle
+        run: |
+          npm --prefix client run build
+
+      - name: Package Standalone Web APK
+        run: |
+          node scripts/generate-apk.cjs
+
+      - name: Sync Web Distribution to Native Android Project
+        run: |
+          cd client
+          npx cap sync android
+
+      - name: Make Gradlew Executable
+        run: |
+          chmod +x client/android/gradlew
+
+      - name: Compile Native Android APK (Gradle assembleDebug)
+        run: |
+          cd client/android
+          ./gradlew assembleDebug --stacktrace --no-daemon
+
+      - name: Locate and Stage Generated APK
+        run: |
+          mkdir -p output-apk
+          cp client/android/app/build/outputs/apk/debug/app-debug.apk output-apk/jobscout-mobile.apk || cp client/public/downloads/jobscout-mobile.apk output-apk/jobscout-mobile.apk
+          ls -la output-apk/
+
+      - name: Upload APK as Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jobscout-mobile-apk
+          path: output-apk/jobscout-mobile.apk
+          retention-days: 30
+
+      - name: Create GitHub Release (On Manual Dispatch or Main Tag)
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0-mobile
+          name: 'JobScout Mobile v1.0.0 (Android APK)'
+          body: |
+            ## 📱 JobScout Mobile App Release v1.0.0
+            
+            This is the official Android APK release for JobScout.
+            
+            ### ✨ Features Included:
+            * 🗺️ **Live Geospatial Radar Map**: GPS radius filtering and commute estimates.
+            * 📹 **WebRTC Speed Connect**: 1-Tap high-definition video and voice calling.
+            * 💬 **Real-Time In-App Messaging**: Instant messaging and WhatsApp alerts.
+            * 📄 **ATS Harvard Resume Builder**: Digital CV creation and appointment letters.
+            * 🔄 **100% Real-Time Cloud Sync**: Seamlessly connected with the web platform.
+            
+            ### 📲 Installation:
+            Download `jobscout-mobile.apk` to your Android device, tap to install, and enjoy JobScout anywhere!
+          files: output-apk/jobscout-mobile.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
