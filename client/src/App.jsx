@@ -18,6 +18,8 @@ import { VideoCallModal } from './components/VideoCallModal';
 import { IncomingCallBanner } from './components/IncomingCallBanner';
 import { AlertNotificationToast } from './components/AlertNotificationToast';
 import { AuthModal } from './pages/AuthModal';
+import { CompleteProfileModal } from './components/CompleteProfileModal';
+import { ProfileCompletionAlert } from './components/ProfileCompletionAlert';
 import { FullPageChat } from './pages/FullPageChat';
 import { AnonDiscuss } from './pages/AnonDiscuss';
 import { Welcome } from './pages/Welcome';
@@ -56,6 +58,7 @@ function MainApp() {
     mode: 'login',
     role: 'seeker'
   });
+  const [isCompleteProfileOpen, setIsCompleteProfileOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
   const [selectedSeeker, setSelectedSeeker] = useState(null);
   const [selectedProfileUser, setSelectedProfileUser] = useState(null);
@@ -363,8 +366,11 @@ function MainApp() {
             setAuthConfig(prev => ({ ...prev, isOpen: false }));
             setPendingTabAfterAuth(null);
           }}
-          onSuccess={() => {
+          onSuccess={(loggedUser, meta) => {
             setAuthConfig(prev => ({ ...prev, isOpen: false }));
+            if (meta?.isNewSignup) {
+              setIsCompleteProfileOpen(true);
+            }
             if (pendingTabAfterAuth) {
               handleNavigateTab(pendingTabAfterAuth);
               setPendingTabAfterAuth(null);
@@ -417,6 +423,9 @@ function MainApp() {
         employersCount={employers.length}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
       />
+
+      {/* Persistent Profile Incomplete Alert Banner */}
+      <ProfileCompletionAlert onOpenCompleteProfile={() => setIsCompleteProfileOpen(true)} />
 
       {/* Main Content Area */}
       <main className={`flex-1 w-full max-w-full relative ${currentTab === 'map' ? 'overflow-hidden' : 'pb-20 md:pb-0 overflow-x-clip'}`}>
@@ -571,14 +580,27 @@ function MainApp() {
           setAuthConfig(prev => ({ ...prev, isOpen: false }));
           setPendingTabAfterAuth(null);
         }}
-        onSuccess={() => {
+        onSuccess={(loggedUser, meta) => {
           setAuthConfig(prev => ({ ...prev, isOpen: false }));
+          if (meta?.isNewSignup) {
+            setIsCompleteProfileOpen(true);
+          }
           if (pendingTabAfterAuth) {
             handleNavigateTab(pendingTabAfterAuth);
             setPendingTabAfterAuth(null);
           } else if (currentTab === 'welcome') {
             handleNavigateTab('feed');
           }
+        }}
+      />
+
+      {/* Profile Completion Modal */}
+      <CompleteProfileModal
+        isOpen={isCompleteProfileOpen}
+        onClose={() => setIsCompleteProfileOpen(false)}
+        onCompleted={() => {
+          fetchSeekers();
+          fetchEmployers();
         }}
       />
 

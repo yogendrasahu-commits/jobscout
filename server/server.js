@@ -1,3 +1,4 @@
+import swaggerUi from 'swagger-ui-express';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -85,6 +86,43 @@ setupSocket(io);
 app.use((req, res, next) => {
   req.io = io;
   next();
+});
+
+// Swagger UI Interactive API Documentation
+const swaggerDocPath = path.join(__dirname, 'docs/swagger.json');
+if (fs.existsSync(swaggerDocPath)) {
+  const swaggerDocument = JSON.parse(fs.readFileSync(swaggerDocPath, 'utf8'));
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
+    customSiteTitle: 'JobScout & JobRadar API Explorer',
+    swaggerOptions: {
+      persistAuthorization: true,
+      displayRequestDuration: true
+    }
+  }));
+  app.get('/api/swagger.json', (req, res) => res.json(swaggerDocument));
+}
+
+// API Root overview
+app.get('/api', (req, res) => {
+  res.json({
+    name: 'JobScout Platform API',
+    status: 'online',
+    version: '1.0.0',
+    service: 'JobRadar Backend API',
+    documentation: '/api-docs',
+    swaggerSpec: '/api/swagger.json',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      jobs: '/api/jobs',
+      applications: '/api/applications',
+      messages: '/api/messages',
+      posts: '/api/posts',
+      network: '/api/network',
+      anon: '/api/anon',
+      alerts: '/api/alerts'
+    }
+  });
 });
 
 // Health check endpoint
@@ -181,6 +219,7 @@ server.listen(PORT, () => {
   console.log(`🚀 JobRadar Server listening on port ${PORT}`);
   console.log(`📡 WebSocket & WebRTC Signaling active`);
   console.log(`🌐 Base API: http://localhost:${PORT}/api`);
+  console.log(`📑 Swagger UI: http://localhost:${PORT}/api-docs`);
   console.log(`=============================================`);
 });
 

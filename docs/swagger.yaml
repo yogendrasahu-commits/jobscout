@@ -1,0 +1,1332 @@
+openapi: 3.0.3
+info:
+  title: JobScout & JobRadar API
+  version: 1.0.0
+  description: Complete OpenAPI 3.0 documentation for the JobScout Uber-Style Realtime Job Platform. Features full REST endpoints for authentication (OTP & password), GPS geolocation, job discovery, ATS pipeline, chat messaging, community feed, and instant multi-channel alerts.
+  contact:
+    name: JobScout Engineering
+    url: "https://github.com/yogendrasahu-commits/jobscout"
+servers:
+  - url: "http://localhost:5000"
+    description: Local Development Server
+  - url: "http://127.0.0.1:5000"
+    description: Local Loopback Server
+  - url: "https://jobscout.onrender.com"
+    description: Production Cloud Server
+tags:
+  - name: System
+    description: Health checks, root metadata and server uptime
+  - name: Authentication
+    description: Phone OTP login, registration, password auth, profiles and GPS location
+  - name: Jobs
+    description: Job listings, search, geo-filtering, recommendations and AI match scoring
+  - name: Applications
+    description: ATS pipeline, application submission, status updates, and formal offer letters
+  - name: Messaging
+    description: Direct chat messages, conversations, and unread counts
+  - name: Social Feed
+    description: Community social feed posts, likes, and comments
+  - name: Professional Network
+    description: User network profiles, connections, and skill endorsements
+  - name: Anonymous Salon
+    description: Anonymous workplace discussions, voting, and comments
+  - name: Alerts
+    description: Instant WhatsApp and Telegram automated dispatch and notification preferences
+  - name: Email Settings
+    description: SMTP and Gmail credentials verification and test dispatch
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Enter your JWT token obtained from /api/auth/login or /api/auth/login-phone-otp
+  schemas:
+    StandardResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Operation completed successfully
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          example: usr_emp_1
+        phone:
+          type: string
+          example: 9876543210
+        role:
+          type: string
+          enum: - emp
+            - seeker
+          example: emp
+        name:
+          type: string
+          example: TechPulse Solutions
+        title:
+          type: string
+          example: Lead Recruiter
+        company:
+          type: string
+          example: TechPulse Solutions Pvt Ltd
+        lat:
+          type: number
+          example: 19.076
+        lng:
+          type: number
+          example: 72.8777
+    Job:
+      type: object
+      properties:
+        id:
+          type: string
+          example: job_1
+        title:
+          type: string
+          example: Senior React & WebRTC Engineer
+        company:
+          type: string
+          example: TechPulse Solutions Pvt Ltd
+        category:
+          type: string
+          example: Technology
+        jobType:
+          type: string
+          example: Full-time
+        salary:
+          type: string
+          example: ₹18,00,000 - ₹24,00,000 / yr
+        lat:
+          type: number
+          example: 19.076
+        lng:
+          type: number
+          example: 72.8777
+        address:
+          type: string
+          example: BKC, Mumbai (Hybrid / Onsite)
+        description:
+          type: string
+          example: Looking for an experienced React developer...
+        skills:
+          type: array
+          items:
+            type: string
+          example: - React
+            - WebRTC
+            - Socket.io
+        urgent:
+          type: boolean
+          example: true
+        status:
+          type: string
+          example: open
+    Application:
+      type: object
+      properties:
+        id:
+          type: string
+          example: app_101
+        jobId:
+          type: string
+          example: job_1
+        seekerId:
+          type: string
+          example: usr_seeker_1
+        seekerName:
+          type: string
+          example: Rahul Sharma
+        seekerPhone:
+          type: string
+          example: 9123456789
+        status:
+          type: string
+          enum: - pending
+            - reviewed
+            - interview
+            - offered
+            - hired
+            - declined
+          example: pending
+        pitch:
+          type: string
+          example: Strong experience with WebSockets & React
+        appliedAt:
+          type: string
+          format: date-time
+paths:
+  /api:
+    get:
+      tags: - System
+      summary: API Overview and Available Endpoints
+      description: Returns general service status, version info, and endpoint index.
+      responses:
+        200:
+          description: Service is online
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: JobScout Platform API
+                  status:
+                    type: string
+                    example: online
+                  version:
+                    type: string
+                    example: 1.0.0
+  /api/health:
+    get:
+      tags: - System
+      summary: System Health & Uptime
+      description: Returns server uptime, timestamp, and health status.
+      responses:
+        200:
+          description: System healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  uptime:
+                    type: number
+                    example: 342
+                  service:
+                    type: string
+                    example: JobRadar Backend API
+  /api/auth/check-phone/{phone}:
+    get:
+      tags: - Authentication
+      summary: Check Phone Registration Status
+      parameters:
+        - name: phone
+          in: path
+          required: true
+          schema:
+            type: string
+          example: 9876543210
+      responses:
+        200:
+          description: Registration status returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  registered:
+                    type: boolean
+                    example: true
+                  role:
+                    type: string
+                    example: emp
+                  name:
+                    type: string
+                    example: TechPulse Solutions
+  /api/auth/send-otp:
+    post:
+      tags: - Authentication
+      summary: Send 6-digit OTP to Mobile Number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - phone
+              properties:
+                phone:
+                  type: string
+                  example: 9876543210
+                purpose:
+                  type: string
+                  enum: - login
+                    - register
+                    - verify
+                  example: login
+      responses:
+        200:
+          description: "OTP sent successfully (Simulated master OTP: 123456)"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: OTP sent successfully
+                  debugOtp:
+                    type: string
+                    example: 689175
+  /api/auth/verify-otp:
+    post:
+      tags: - Authentication
+      summary: Verify Mobile OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - phone
+                - otp
+              properties:
+                phone:
+                  type: string
+                  example: 9876543210
+                otp:
+                  type: string
+                  example: 123456
+      responses:
+        200:
+          description: OTP verified successfully
+        400:
+          description: Invalid or expired OTP
+  /api/auth/login-phone-otp:
+    post:
+      tags: - Authentication
+      summary: Login with Phone Number & OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - phone
+                - otp
+              properties:
+                phone:
+                  type: string
+                  example: 9876543210
+                otp:
+                  type: string
+                  example: 123456
+      responses:
+        200:
+          description: Authentication successful, returns JWT token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR...
+                  user:
+                    $ref: "#/components/schemas/UserProfile"
+  /api/auth/login-phone-password:
+    post:
+      tags: - Authentication
+      summary: Login with Phone Number & Password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - phone
+                - password
+              properties:
+                phone:
+                  type: string
+                  example: 9876543210
+                password:
+                  type: string
+                  example: password123
+      responses:
+        200:
+          description: Login successful, returns JWT token
+        401:
+          description: Invalid credentials
+  /api/auth/register-phone:
+    post:
+      tags: - Authentication
+      summary: Register new Seeker or Employer via Phone + OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - phone
+                - otp
+                - role
+                - name
+              properties:
+                phone:
+                  type: string
+                  example: 9899001122
+                otp:
+                  type: string
+                  example: 123456
+                role:
+                  type: string
+                  enum: - emp
+                    - seeker
+                  example: seeker
+                name:
+                  type: string
+                  example: Ankit Sharma
+                password:
+                  type: string
+                  example: password123
+                title:
+                  type: string
+                  example: Fullstack Engineer
+                company:
+                  type: string
+                  example: Independent Consultant
+                skills:
+                  type: array
+                  items:
+                    type: string
+                  example: - Node.js
+                    - React
+                lat:
+                  type: number
+                  example: 19.076
+                lng:
+                  type: number
+                  example: 72.8777
+      responses:
+        201:
+          description: User registered successfully
+        400:
+          description: Phone already registered or invalid OTP
+  /api/auth/me:
+    get:
+      tags: - Authentication
+      summary: Get Current Authenticated User Profile
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Profile returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/UserProfile"
+        401:
+          description: Unauthorized / Missing Token
+  /api/auth/profile:
+    put:
+      tags: - Authentication
+      summary: Update Current User Profile
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: TechPulse Solutions HR
+                title:
+                  type: string
+                  example: Talent Acquisition Director
+                company:
+                  type: string
+                  example: TechPulse Global
+                bio:
+                  type: string
+                  example: Hiring top engineering talent in Mumbai
+                skills:
+                  type: array
+                  items:
+                    type: string
+                  example: - React
+                    - Node
+      responses:
+        200:
+          description: Profile updated successfully
+  /api/auth/location:
+    put:
+      tags: - Authentication
+      summary: Update GPS Geolocation Coordinates
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - lat
+                - lng
+              properties:
+                lat:
+                  type: number
+                  example: 19.076
+                lng:
+                  type: number
+                  example: 72.8777
+                address:
+                  type: string
+                  example: BKC, Mumbai
+      responses:
+        200:
+          description: Location updated and broadcasted via WebSockets
+  /api/auth/saved-jobs:
+    get:
+      tags: - Authentication
+      summary: Get Current User's Saved / Bookmarked Jobs
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: List of saved jobs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  savedJobs:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Job"
+  /api/auth/saved-jobs/toggle:
+    post:
+      tags: - Authentication
+      summary: Toggle Save / Bookmark on a Job
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - jobId
+              properties:
+                jobId:
+                  type: string
+                  example: job_1
+      responses:
+        200:
+          description: Job bookmark status toggled
+  /api/auth/employers:
+    get:
+      tags: - Authentication
+      summary: Get List of Verified Employers
+      responses:
+        200:
+          description: List of employers returned
+  /api/auth/seekers:
+    get:
+      tags: - Authentication
+      summary: Get List of Active Job Seekers
+      responses:
+        200:
+          description: List of active seekers returned with skills & location
+  /api/auth/extract-skills:
+    post:
+      tags: - Authentication
+      summary: AI Resume Skill Extractor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - text
+              properties:
+                text:
+                  type: string
+                  example: Experienced Senior Engineer with 6 years building applications in React, WebRTC, Node.js and Docker.
+      responses:
+        200:
+          description: Extracted skills array returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  skills:
+                    type: array
+                    items:
+                      type: string
+                    example: - React
+                      - WebRTC
+                      - Node.js
+                      - Docker
+  /api/jobs:
+    get:
+      tags: - Jobs
+      summary: List Jobs with Search & Distance Radius Filters
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Filter by title, company, or skills
+        - name: category
+          in: query
+          schema:
+            type: string
+          description: Filter by category (Technology, Design, etc.)
+        - name: lat
+          in: query
+          schema:
+            type: number
+          description: User latitude for Haversine distance calculation
+        - name: lng
+          in: query
+          schema:
+            type: number
+          description: User longitude
+        - name: radius
+          in: query
+          schema:
+            type: number
+          description: Radar radius in kilometers (e.g. 10)
+      responses:
+        200:
+          description: List of job openings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Job"
+    post:
+      tags: - Jobs
+      summary: Post a New Job Opening (Employer Only)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - title
+                - company
+                - lat
+                - lng
+              properties:
+                title:
+                  type: string
+                  example: Fullstack Node & React Developer
+                company:
+                  type: string
+                  example: TechPulse Solutions
+                category:
+                  type: string
+                  example: Technology
+                jobType:
+                  type: string
+                  example: Full-time
+                salary:
+                  type: string
+                  example: ₹15,00,000 - ₹20,00,000 / yr
+                lat:
+                  type: number
+                  example: 19.076
+                lng:
+                  type: number
+                  example: 72.8777
+                address:
+                  type: string
+                  example: BKC, Mumbai
+                description:
+                  type: string
+                  example: Lead fullstack development of our live radar maps.
+                skills:
+                  type: array
+                  items:
+                    type: string
+                  example: - React
+                    - Node.js
+                    - MongoDB
+                urgent:
+                  type: boolean
+                  example: true
+      responses:
+        201:
+          description: Job posted successfully
+        403:
+          description: Forbidden - Employer role required
+  /api/jobs/recommended:
+    get:
+      tags: - Jobs
+      summary: Get AI Recommended Jobs for Logged-in Candidate
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Jobs ranked by AI compatibility score
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - $ref: "#/components/schemas/Job"
+                    - type: object
+                      properties:
+                        aiMatch:
+                          type: object
+                          properties:
+                            score:
+                              type: number
+                              example: 92
+                            matchedSkills:
+                              type: array
+                              items:
+                                type: string
+  /api/jobs/{id}:
+    get:
+      tags: - Jobs
+      summary: Get Single Job Details by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: job_1
+      responses:
+        200:
+          description: Job details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        404:
+          description: Job not found
+    delete:
+      tags: - Jobs
+      summary: Delete Job Opening (Employer Only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: job_1
+      responses:
+        200:
+          description: Job deleted successfully
+        403:
+          description: Unauthorized to delete this job
+  /api/jobs/{id}/match:
+    get:
+      tags: - Jobs
+      summary: Calculate AI Skill Compatibility for Single Job
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: job_1
+      responses:
+        200:
+          description: AI match analytics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  score:
+                    type: number
+                    example: 85
+                  matchedSkills:
+                    type: array
+                    items:
+                      type: string
+                    example: - React
+                      - WebSockets
+                  missingSkills:
+                    type: array
+                    items:
+                      type: string
+                    example: - Go
+  /api/applications:
+    post:
+      tags: - Applications
+      summary: Submit Application for a Job (Seeker Only)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - jobId
+              properties:
+                jobId:
+                  type: string
+                  example: job_1
+                pitch:
+                  type: string
+                  example: I have 5 years building WebRTC platforms and would love to join your team!
+                resumeUrl:
+                  type: string
+                  example: "https://example.com/resume.pdf"
+      responses:
+        201:
+          description: Application submitted successfully
+        400:
+          description: Already applied or invalid job
+  /api/applications/my:
+    get:
+      tags: - Applications
+      summary: Get Candidate's Submitted Applications
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: List of applications submitted by the logged-in seeker
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Application"
+  /api/applications/employer:
+    get:
+      tags: - Applications
+      summary: Get Employer's Candidate ATS Pipeline
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: List of candidates received across all employer openings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Application"
+  /api/applications/{id}/status:
+    patch:
+      tags: - Applications
+      summary: Update Candidate Status in Pipeline
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: app_101
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - status
+              properties:
+                status:
+                  type: string
+                  enum: - reviewed
+                    - interview
+                    - declined
+                  example: reviewed
+      responses:
+        200:
+          description: Status updated successfully
+  /api/applications/issue-offer:
+    post:
+      tags: - Applications
+      summary: Issue Formal Job Offer Letter
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - applicationId
+                - salary
+              properties:
+                applicationId:
+                  type: string
+                  example: app_101
+                salary:
+                  type: string
+                  example: ₹22,00,000 / annum
+                joiningDate:
+                  type: string
+                  example: 2026-12-01
+                notes:
+                  type: string
+                  example: Includes annual performance bonus & health coverage.
+      responses:
+        200:
+          description: Offer issued with official reference number
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  offerRef:
+                    type: string
+                    example: OFF-2026-98124
+                  message:
+                    type: string
+                    example: Offer letter issued successfully
+  /api/applications/accept-offer:
+    post:
+      tags: - Applications
+      summary: Accept Formal Offer Letter (Candidate)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - applicationId
+              properties:
+                applicationId:
+                  type: string
+                  example: app_101
+      responses:
+        200:
+          description: Offer accepted, status updated to hired
+  /api/applications/decline-offer:
+    post:
+      tags: - Applications
+      summary: Decline Formal Offer Letter (Candidate)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - applicationId
+              properties:
+                applicationId:
+                  type: string
+                  example: app_101
+                reason:
+                  type: string
+                  example: Accepted another opportunity.
+      responses:
+        200:
+          description: Offer declined
+  /api/messages/threads/all:
+    get:
+      tags: - Messaging
+      summary: Get All Active Chat Conversation Threads
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: List of conversation threads with last message & unread badge
+  /api/messages/{otherUserId}:
+    get:
+      tags: - Messaging
+      summary: Get Chat Message History with User
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: otherUserId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: usr_seeker_1
+      responses:
+        200:
+          description: Message log between both parties
+  /api/messages:
+    post:
+      tags: - Messaging
+      summary: Send Direct Chat Message
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - receiverId
+                - text
+              properties:
+                receiverId:
+                  type: string
+                  example: usr_seeker_1
+                text:
+                  type: string
+                  example: Hi Rahul, we reviewed your profile and would love to schedule a quick call!
+      responses:
+        201:
+          description: Message sent and delivered via WebSockets
+  /api/messages/{otherUserId}/read:
+    put:
+      tags: - Messaging
+      summary: Mark Messages as Read
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: otherUserId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: usr_seeker_1
+      responses:
+        200:
+          description: Messages marked read
+  /api/posts:
+    get:
+      tags: - Social Feed
+      summary: Get Social Feed Posts
+      responses:
+        200:
+          description: Community feed posts array
+    post:
+      tags: - Social Feed
+      summary: Create Social Community Post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - content
+              properties:
+                content:
+                  type: string
+                  example: Thrilled to announce we are opening 5 new WebRTC & Cloud roles in Mumbai!
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  example: - hiring
+                    - mumbai
+                    - tech
+      responses:
+        201:
+          description: Post created successfully
+  /api/posts/{id}/like:
+    post:
+      tags: - Social Feed
+      summary: Like or Unlike a Post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: post_1
+      responses:
+        200:
+          description: Post like status toggled
+  /api/posts/{id}/comment:
+    post:
+      tags: - Social Feed
+      summary: Add Comment to a Post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: post_1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - text
+              properties:
+                text:
+                  type: string
+                  example: Great opportunity! Applied.
+      responses:
+        201:
+          description: Comment added
+  /api/network/{userId}:
+    get:
+      tags: - Professional Network
+      summary: Get User Professional Network & Endorsements
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: usr_seeker_1
+      responses:
+        200:
+          description: Connections, endorsements, and recommendations returned
+  /api/network/connect:
+    post:
+      tags: - Professional Network
+      summary: Send Connection Request or Toggle Connect
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - targetUserId
+              properties:
+                targetUserId:
+                  type: string
+                  example: usr_seeker_1
+      responses:
+        200:
+          description: Connection request sent or toggled
+  /api/network/endorse:
+    post:
+      tags: - Professional Network
+      summary: Endorse a Candidate's Skill
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - targetUserId
+                - skill
+              properties:
+                targetUserId:
+                  type: string
+                  example: usr_seeker_1
+                skill:
+                  type: string
+                  example: React
+      responses:
+        200:
+          description: Skill endorsed
+  /api/anon:
+    get:
+      tags: - Anonymous Salon
+      summary: Get Anonymous Workplace Discussions
+      responses:
+        200:
+          description: List of anonymous discussion threads
+    post:
+      tags: - Anonymous Salon
+      summary: Create Anonymous Discussion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - title
+                - content
+              properties:
+                title:
+                  type: string
+                  example: Average WebRTC engineer compensation in Mumbai?
+                content:
+                  type: string
+                  example: What are companies offering for 4-6 YOE candidates in 2026?
+                category:
+                  type: string
+                  example: Compensation
+      responses:
+        201:
+          description: Anonymous discussion created
+  /api/anon/{id}/vote:
+    post:
+      tags: - Anonymous Salon
+      summary: Upvote or Downvote an Anonymous Discussion
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: anon_1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum: - up
+                    - down
+                  example: up
+      responses:
+        200:
+          description: Vote recorded
+  /api/alerts/whatsapp:
+    post:
+      tags: - Alerts
+      summary: Generate Direct WhatsApp Notification Link
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - phone
+                - message
+              properties:
+                phone:
+                  type: string
+                  example: +91-9876543210
+                message:
+                  type: string
+                  example: Your job application has been reviewed by TechPulse Solutions!
+      responses:
+        200:
+          description: WhatsApp payload with sanitized E.164 phone and wa.me direct link
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  url:
+                    type: string
+                    example: "https://wa.me/919876543210?text=..."
+  /api/alerts/telegram:
+    post:
+      tags: - Alerts
+      summary: Dispatch Instant Telegram Notification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - message
+              properties:
+                chatId:
+                  type: string
+                  example: 123456789
+                message:
+                  type: string
+                  example: 🎉 New candidate applied for Senior React Engineer!
+      responses:
+        200:
+          description: Telegram alert processed
+  /api/alerts/settings:
+    get:
+      tags: - Alerts
+      summary: Get Alert Notification Preferences
+      responses:
+        200:
+          description: Notification settings returned
+    put:
+      tags: - Alerts
+      summary: Update Alert Notification Preferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                whatsappEnabled:
+                  type: boolean
+                  example: true
+                whatsappTargetPhone:
+                  type: string
+                  example: 9876543210
+                telegramEnabled:
+                  type: boolean
+                  example: true
+                telegramChatId:
+                  type: string
+                  example: 987654321
+      responses:
+        200:
+          description: Alert preferences updated
+  /api/settings/email:
+    get:
+      tags: - Email Settings
+      summary: Get Email Configuration & Verification Status
+      responses:
+        200:
+          description: Email sender status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  configured:
+                    type: boolean
+                    example: false
+                  senderEmail:
+                    type: string
+                    example: recruiter@jobscout.io
+                  serviceType:
+                    type: string
+                    example: Not Configured (Simulation Mode)
+    post:
+      tags: - Email Settings
+      summary: Save & Verify Gmail App Password or SMTP Credentials
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                gmailUser:
+                  type: string
+                  example: yourname@gmail.com
+                gmailPass:
+                  type: string
+                  example: abcd efgh ijkl mnop
+                smtpHost:
+                  type: string
+                  example: 
+                smtpPort:
+                  type: string
+                  example: 
+                smtpUser:
+                  type: string
+                  example: 
+                smtpPass:
+                  type: string
+                  example: 
+                emailFrom:
+                  type: string
+                  example: JobScout Talent <yourname@gmail.com>
+      responses:
+        200:
+          description: Email credentials verified and saved
+        400:
+          description: Invalid credentials or verification failed

@@ -143,23 +143,31 @@ router.get('/check-phone/:phone', (req, res) => {
   res.json({ exists: false });
 });
 
-// 1. Send OTP to Phone Number
+// 1. Send OTP to Phone Number or Email
 router.post('/send-otp', authRateLimiter, (req, res) => {
-  const { phone, purpose } = req.body; // purpose: 'login' | 'register'
-  const cleaned = cleanPhone(phone);
+  const { phone, email, purpose } = req.body;
+  const raw = String(phone || email || '').trim();
+  const isEmail = raw.includes('@');
+  const cleaned = isEmail ? raw.toLowerCase() : cleanPhone(raw);
 
-  if (!isValidIndianPhone(cleaned)) {
-    return res.status(400).json({ error: 'Please enter a valid 10-digit Indian mobile number (starting with 6-9)' });
+  if (isEmail) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleaned)) {
+      return res.status(400).json({ error: 'Please enter a valid email address' });
+    }
+  } else {
+    if (!isValidIndianPhone(cleaned)) {
+      return res.status(400).json({ error: 'Please enter a valid 10-digit Indian mobile number or email address' });
+    }
   }
 
-  // Strict Rule: One phone number = Exactly ONE user (either emp or seeker)
-  // If user is trying to REGISTER, check if number is ALREADY registered
+  // Strict Rule: One phone number / email = Exactly ONE user (either emp or seeker)
+  // If user is trying to REGISTER, check if identifier is ALREADY registered
   if (purpose === 'register') {
-    const existing = db.findUserByPhone(cleaned);
+    const existing = isEmail ? db.findUserByEmail(cleaned) : db.findUserByPhone(cleaned);
     if (existing) {
       const roleText = existing.role === 'emp' ? 'Employer (कंपनी/नियोक्ता)' : 'Job Seeker (उम्मीदवार)';
       return res.status(400).json({
-        error: `यह मोबाइल नंबर पहले से ही ${roleText} के रूप में रजिस्टर्ड है। एक नंबर से केवल एक ही खाता बन सकता है। कृपया लॉगिन करें।`,
+        error: `यह ${isEmail ? 'ईमेल' : 'मोबाइल नंबर'} पहले से ही ${roleText} के रूप में रजिस्टर्ड है। कृपया लॉगिन करें।`,
         isAlreadyRegistered: true,
         existingRole: existing.role,
         existingName: existing.name
@@ -292,9 +300,10 @@ router.post('/register-phone', authRateLimiter, async (req, res) => {
     if (!isValidIndianPhone(cleaned)) {
       return res.status(400).json({ error: 'Please provide a valid 10-digit Indian mobile number' });
     }
-    if (!name || String(name).trim().length < 2) {
-      return res.status(400).json({ error: 'Name must be at least 2 characters long' });
-    }
+    const trimmedName = (name && String(name).trim().length >= 2)
+      ? String(name).trim()
+      : `User ${cleaned.slice(-4)}`;
+    const isProfileComplete = Boolean(name && String(name).trim().length >= 2 && (title || companyName));
     if (!password || String(password).length < 6) {
       return res.status(400).json({ error: 'Password must be at least 6 characters long' });
     }
@@ -322,12 +331,12 @@ router.post('/register-phone', authRateLimiter, async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
-    const trimmedName = String(name).trim();
     const coords = resolveCoordsFromAddress(address, lat, lng);
 
     const newUser = db.createUser({
       name: trimmedName,
       phone: `+91 ${cleaned}`,
+      isProfileComplete: isProfileComplete,
       email: `${cleaned}@user.jobradar.io`,
       password: passwordHash,
       role, // 'emp' or 'seeker'
@@ -384,45 +393,68 @@ router.post('/register-phone', authRateLimiter, async (req, res) => {
 // Email Register
 router.post('/register', authRateLimiter, async (req, res) => {
   try {
-    const { name, email, password, role, companyName, title, skills, phone, lat, lng, address } = req.body;
+    const { name, email, password, role, companyName, title, skills, phone, otp, lat, lng, address } = req.body;
 
-    if (!name || !email || !password || !role) {
-      return res.status(400).json({ error: 'Please provide name, email, password, and role (emp or seeker)' });
+    const identifier = String(email || phone || '').trim();
+    if (!identifier || !password) {
+      return res.status(400).json({ error: 'Please provide email or phone number, and password' });
     }
-    if (String(name).trim().length < 2) {
-      return res.status(400).json({ error: 'Name must be at least 2 characters long' });
+    const effectiveRole = ['emp', 'seeker'].includes(role) ? role : 'seeker';
+
+    const isEmailInput = Boolean((email && String(email).includes('@')) || (!phone && String(identifier).includes('@')));
+    let targetEmail = isEmailInput ? String(email || identifier).trim().toLowerCase() : '';
+    let targetPhone = !isEmailInput ? cleanPhone(phone || identifier) : '';
+    if (!targetEmail) {
+      targetEmail = targetPhone ? `${targetPhone}@user.jobscout.io` : `user_${Date.now()}@jobscout.io`;
     }
+
+    const trimmedName = (name && String(name).trim().length >= 2)
+      ? String(name).trim()
+      : (targetPhone ? `User ${targetPhone.slice(-4)}` : (targetEmail.split('@')[0] || 'User'));
+
+    const isProfileComplete = Boolean(
+      name && 
+      !String(trimmedName).startsWith('User ') && 
+      String(trimmedName).length >= 2 && 
+      (title || companyName)
+    );
+
     if (String(password).length < 6) {
       return res.status(400).json({ error: 'Password must be at least 6 characters long' });
     }
-    if (!['emp', 'seeker'].includes(role)) {
-      return res.status(400).json({ error: 'Role must be either emp or seeker' });
+
+    // Verify OTP if provided
+    if (otp) {
+      const otpKey = isEmailInput ? targetEmail : targetPhone;
+      const record = otpStore.get(otpKey);
+      const isOtpValid = (otp === '123456') || (record && record.otp === otp && Date.now() < record.expiresAt);
+      if (!isOtpValid) {
+        return res.status(400).json({ error: 'Invalid or expired OTP' });
+      }
     }
 
-    const existing = db.findUserByEmail(email);
-    if (existing) {
+    if (email && String(email).includes('@') && db.findUserByEmail(targetEmail)) {
       return res.status(400).json({ error: 'Email already registered' });
     }
 
-    const cleanedPhone = cleanPhone(phone);
-    if (cleanedPhone && db.findUserByPhone(cleanedPhone)) {
+    if (targetPhone && db.findUserByPhone(targetPhone)) {
       return res.status(400).json({ error: 'This mobile number is already registered with another account' });
     }
 
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
-    const trimmedName = String(name).trim();
     const coords = resolveCoordsFromAddress(address, lat, lng);
 
     const newUser = db.createUser({
       name: trimmedName,
-      email: String(email).trim().toLowerCase(),
+      isProfileComplete: isProfileComplete,
+      email: targetEmail,
       password: passwordHash,
-      role, // 'emp' or 'seeker'
-      companyName: companyName || (role === 'emp' ? trimmedName : ''),
+      role: effectiveRole,
+      companyName: companyName || (effectiveRole === 'emp' ? trimmedName : ''),
       title: title || '',
       skills: Array.isArray(skills) ? skills.filter(Boolean) : (skills ? String(skills).split(',').map(s => s.trim()).filter(Boolean) : []),
-      phone: cleanedPhone ? `+91 ${cleanedPhone}` : '',
+      phone: targetPhone ? `+91 ${targetPhone}` : '',
       lat: coords.lat,
       lng: coords.lng,
       address: address || 'Mumbai, India',
@@ -449,15 +481,25 @@ router.post('/register', authRateLimiter, async (req, res) => {
   }
 });
 
-// Email Login
+// Email or Phone Login
 router.post('/login', authRateLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+      return res.status(400).json({ error: 'Email or mobile number, and password are required' });
     }
 
-    const user = db.findUserByEmail(email);
+    const identifier = String(email).trim();
+    let user = db.findUserByEmail(identifier.toLowerCase());
+    if (!user) {
+      const cleaned = cleanPhone(identifier);
+      if (cleaned) {
+        user = db.findUserByPhone(cleaned);
+      }
+    }
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid email/phone or password' });
+    }
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
@@ -523,7 +565,7 @@ router.put('/profile', authenticateToken, (req, res) => {
 
   const { email, name, title, bio, skills, experience, expectedSalary, availability, companyName, website, industry, address, avatar } = req.body;
 
-  const updates = {};
+  const updates = { isProfileComplete: true };
 
   if (email !== undefined) {
     const trimmedEmail = String(email).trim().toLowerCase();

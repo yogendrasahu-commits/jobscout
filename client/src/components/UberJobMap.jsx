@@ -178,19 +178,17 @@ const POPULAR_LOCATIONS = [
 function MapResizer() {
   const map = useMap();
   useEffect(() => {
-    map.invalidateSize();
-    const t1 = setTimeout(() => map.invalidateSize(), 80);
-    const t2 = setTimeout(() => map.invalidateSize(), 300);
-    const t3 = setTimeout(() => map.invalidateSize(), 700);
-    const handleResize = () => map.invalidateSize();
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('orientationchange', handleResize);
+    let rafId = requestAnimationFrame(() => {
+      map.invalidateSize();
+    });
+    const handleResize = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => map.invalidateSize());
+    };
+    window.addEventListener('resize', handleResize, { passive: true });
     return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
+      cancelAnimationFrame(rafId);
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('orientationchange', handleResize);
     };
   }, [map]);
   return null;
@@ -199,29 +197,16 @@ function MapResizer() {
 // Smoothly pan & fly the map when center coordinates change, honoring preset zooms and search zooms
 function MapRecenter({ coords, flyTrigger, targetZoom }) {
   const map = useMap();
-  const prevCoordsRef = useRef(coords);
   const prevTriggerRef = useRef(flyTrigger);
 
   useEffect(() => {
-    if (coords && coords[0] && coords[1]) {
-      const prev = prevCoordsRef.current;
-      const changed = !prev || prev[0] !== coords[0] || prev[1] !== coords[1];
-      const triggerChanged = flyTrigger !== prevTriggerRef.current;
-
-      if (changed || triggerChanged) {
-        prevCoordsRef.current = coords;
-        prevTriggerRef.current = flyTrigger;
-
-        let desiredZoom = map.getZoom();
-        if (typeof targetZoom === 'number') {
-          desiredZoom = targetZoom;
-        } else if (triggerChanged && flyTrigger > 0) {
-          desiredZoom = 17;
-        }
-        map.flyTo(coords, desiredZoom, { animate: true, duration: 1.0 });
-      }
+    // Only fly when flyTrigger is explicitly bumped (user clicked GPS, search, preset)
+    if (flyTrigger !== prevTriggerRef.current && coords && coords[0] && coords[1]) {
+      prevTriggerRef.current = flyTrigger;
+      let desiredZoom = typeof targetZoom === 'number' ? targetZoom : (flyTrigger > 0 ? 15 : map.getZoom());
+      map.flyTo(coords, desiredZoom, { animate: true, duration: 0.6 });
     }
-  }, [coords, flyTrigger, targetZoom, map]);
+  }, [flyTrigger, coords, targetZoom, map]);
   return null;
 }
 
@@ -490,6 +475,8 @@ const createUserLocationIcon = (isDragging = false) => {
         <div style="
           background: rgba(15, 23, 42, 0.92);
           color: ${isDragging ? '#a5b4fc' : '#818cf8'};
+
+
           padding: 2px 7px;
           border-radius: 9999px;
           font-size: 9px;
@@ -527,6 +514,38 @@ const createUserLocationIcon = (isDragging = false) => {
     iconSize: [110, 60],
     iconAnchor: [55, 42]
   });
+};
+
+
+// High-performance Leaflet icon cache to prevent DOM thrashing
+const jobIconCache = new Map();
+const getJobIcon = (job, isSelected) => {
+  const isUrgent = Boolean(job.urgent || job.isUrgent);
+  const key = String(job.id) + '_' + (isSelected ? '1' : '0') + '_' + (job.isInsideRadar ? '1' : '0') + '_' + (isUrgent ? '1' : '0') + '_' + String(job.distanceKm);
+  if (!jobIconCache.has(key)) {
+    jobIconCache.set(key, createJobIcon(job, isSelected));
+  }
+  return jobIconCache.get(key);
+};
+
+const seekerIconCache = new Map();
+const getSeekerIcon = (seeker, isSelected) => {
+  const key = String(seeker.id) + '_' + (isSelected ? '1' : '0') + '_' + (seeker.isInsideRadar ? '1' : '0') + '_' + String(seeker.distanceKm);
+  if (!seekerIconCache.has(key)) {
+    seekerIconCache.set(key, createSeekerIcon(seeker, isSelected));
+  }
+  return seekerIconCache.get(key);
+};
+
+let cachedUserIconDrag = null;
+let cachedUserIconStatic = null;
+const getUserLocationIcon = (isDragging) => {
+  if (isDragging) {
+    if (!cachedUserIconDrag) cachedUserIconDrag = createUserLocationIcon(true);
+    return cachedUserIconDrag;
+  }
+  if (!cachedUserIconStatic) cachedUserIconStatic = createUserLocationIcon(false);
+  return cachedUserIconStatic;
 };
 
 export const UberJobMap = ({ 
@@ -1948,6 +1967,9 @@ export const UberJobMap = ({
         maxZoom={19}
         maxBounds={INDIA_BOUNDS}
         maxBoundsViscosity={1.0}
+        preferCanvas={true}
+        updateWhenIdle={true}
+        updateWhenZooming={false}
         zoomControl={false}
         scrollWheelZoom={true}
         dragging={true}
@@ -1974,13 +1996,13 @@ export const UberJobMap = ({
         {/* Keyless High-Resolution Google Map Tiles (Streets & Satellite Hybrid) */}
         <TileLayer
           key={mapTheme}
-          subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
-          maxZoom={20}
-          attribution='&copy; Google Maps'
+          subdomains="abcd"
+          maxZoom={19}
+          attribution='&copy; OpenStreetMap &copy; CARTO'
           url={
             mapTheme === 'dark'
-              ? 'https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}'
-              : 'https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'
+              ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+              : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
           }
         />
 
@@ -2025,7 +2047,7 @@ export const UberJobMap = ({
               }
             }
           }}
-          icon={createUserLocationIcon(isDraggingBeacon)}
+          icon={getUserLocationIcon(isDraggingBeacon)}
         >
           <Popup>
             <div className="p-1 text-center min-w-[170px]">
@@ -2050,7 +2072,7 @@ export const UberJobMap = ({
             <Marker
               key={job.id}
               position={[job.lat, job.lng]}
-              icon={createJobIcon(job, isSelected)}
+              icon={getJobIcon(job, isSelected)}
               eventHandlers={{
                 click: () => {
                   setSelectedPin({ type: 'job', data: job });
@@ -2110,7 +2132,7 @@ export const UberJobMap = ({
             <Marker
               key={seeker.id}
               position={[seeker.lat, seeker.lng]}
-              icon={createSeekerIcon(seeker, isSelected)}
+              icon={getSeekerIcon(seeker, isSelected)}
               eventHandlers={{
                 click: () => {
                   setSelectedPin({ type: 'seeker', data: seeker });
