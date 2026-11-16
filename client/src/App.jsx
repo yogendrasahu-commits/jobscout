@@ -50,10 +50,15 @@ function MainApp() {
   // Modals state
   const [isPostJobOpen, setIsPostJobOpen] = useState(false);
   const [postJobCoords, setPostJobCoords] = useState(null);
-  const [authConfig, setAuthConfig] = useState({
-    isOpen: false,
-    mode: 'login',
-    role: 'seeker'
+  const [authConfig, setAuthConfig] = useState(() => {
+    const hash = typeof window !== 'undefined' ? window.location.hash.replace(/^#\/?/, '').toLowerCase().trim() : '';
+    if (['login', 'signin'].includes(hash)) {
+      return { isOpen: true, mode: 'login', role: 'seeker' };
+    }
+    if (['signup', 'register'].includes(hash)) {
+      return { isOpen: true, mode: 'register', role: 'seeker' };
+    }
+    return { isOpen: false, mode: 'login', role: 'seeker' };
   });
   const [isCompleteProfileOpen, setIsCompleteProfileOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
@@ -273,6 +278,15 @@ function MainApp() {
 
   // Centralized tab navigation with Admin privilege enforcement
   const handleNavigateTab = (tab) => {
+    if (tab === 'login' || tab === 'signin') {
+      setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' });
+      return;
+    }
+    if (tab === 'signup' || tab === 'register') {
+      setAuthConfig({ isOpen: true, mode: 'register', role: 'seeker' });
+      return;
+    }
+
     const publicTabs = ['welcome', 'feed', 'network', 'jobs', 'map', 'connect', 'anon'];
     if (tab === 'admin') {
       if (!user || user.role !== 'admin') {
@@ -302,6 +316,15 @@ function MainApp() {
   useEffect(() => {
     const handlePopState = () => {
       const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase().trim();
+      if (['login', 'signin'].includes(hash)) {
+        setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' });
+        return;
+      }
+      if (['signup', 'register'].includes(hash)) {
+        setAuthConfig({ isOpen: true, mode: 'register', role: 'seeker' });
+        return;
+      }
+
       const validTabs = ['welcome', 'feed', 'network', 'map', 'jobs', 'connect', 'anon', 'applications', 'messages', 'admin'];
       if (validTabs.includes(hash)) {
         const publicTabs = ['welcome', 'feed', 'network', 'jobs', 'map', 'connect', 'anon'];
