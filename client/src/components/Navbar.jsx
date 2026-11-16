@@ -31,9 +31,7 @@ import {
   MicOff,
   ShieldAlert,
   ShieldCheck,
-  LogIn,
-  Smartphone,
-  Download
+  LogIn
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
@@ -69,8 +67,7 @@ export const Navbar = ({
   jobsCount = 0,
   seekersCount = 0,
   employersCount = 0,
-  onOpenCommandPalette,
-  onOpenMobileAppModal
+  onOpenCommandPalette
 }) => {
   const { user, isEmployer, isSeeker, logout } = useAuth();
   const { setActiveChatUser, socket } = useSocket();
@@ -817,17 +814,6 @@ export const Navbar = ({
               </button>
             )}
 
-            {/* Mobile App Download Button */}
-            <button
-              onClick={() => onOpenMobileAppModal && onOpenMobileAppModal()}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-indigo-50 to-cyan-50 hover:from-indigo-100 hover:to-cyan-100 text-indigo-700 text-xs font-bold border border-indigo-200/80 transition-all active:scale-95 shadow-2xs flex-shrink-0"
-              title="Download JobScout Mobile App (APK & WebAPK)"
-            >
-              <Smartphone className="w-3.5 h-3.5 text-indigo-600 animate-pulse" />
-              <span className="hidden xl:inline">📱 Mobile App</span>
-              <span className="xl:hidden">📱 App</span>
-            </button>
-
             {/* Notifications Bell Dropdown - Premium Warm Amber Sheen */}
             <div className="relative" ref={notifRef}>
               <button
@@ -1245,21 +1231,6 @@ export const Navbar = ({
                   </span>
                 </button>
               )}
-
-              {/* Download Mobile App Button */}
-              <button
-                onClick={() => {
-                  if (onOpenMobileAppModal) onOpenMobileAppModal();
-                  setMobileDrawerOpen(false);
-                }}
-                className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-50 to-cyan-50 border border-indigo-200 text-indigo-900 transition-all active:scale-98 cursor-pointer shadow-xs"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Smartphone className="w-4 h-4 text-indigo-600 animate-pulse" />
-                  <span>📱 Download Mobile App (APK)</span>
-                </div>
-                <Download className="w-3.5 h-3.5 text-indigo-600" />
-              </button>
 
               {/* Feed (Home) */}
               <button

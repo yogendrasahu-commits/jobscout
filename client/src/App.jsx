@@ -470,7 +470,6 @@ function MainApp() {
         seekersCount={seekers.length}
         employersCount={employers.length}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-        onOpenMobileAppModal={() => setIsMobileAppModalOpen(true)}
       />
 
       {/* Persistent Profile Incomplete Alert Banner */}
