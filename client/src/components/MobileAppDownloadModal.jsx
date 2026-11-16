@@ -66,7 +66,12 @@ export const MobileAppDownloadModal = ({ isOpen, onClose }) => {
   const handleInstallClick = async () => {
     setInstalling(true);
     try {
-      await promptInstall();
+      const installed = await promptInstall();
+      if (!installed && !isInstalled) {
+        alert(
+          "📱 ध्यान दें:\n\nलोकल वाई-फाई नेटवर्क (HTTP) पर मोबाइल ब्राउज़र 'Not Secure' दिखाता है और ऑटोमैटिक PWA प्रॉम्प्ट को रोकता है।\n\n1. सबसे आसान रास्ता: ऊपर दिए गए 'Download APK' बटन पर क्लिक करके सीधे 5MB APK फोन में इंस्टॉल करें।\n2. या अपने मोबाइल ब्राउज़र के ऊपरी 3-डॉट्स मेनू (⋮) पर टैप करके 'Add to Home screen' (होम स्क्रीन में जोड़ें) चुनें।"
+        );
+      }
     } finally {
       setInstalling(false);
     }
@@ -203,6 +208,9 @@ export const MobileAppDownloadModal = ({ isOpen, onClose }) => {
                     <p className="text-xs text-slate-500">
                       Add JobScout as a native app directly from your browser. Automatically updates with the latest version.
                     </p>
+                    <div className="text-[11px] text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/60 inline-flex items-center gap-1 mt-1">
+                      <span>💡 <strong>टिप:</strong> लोकल वाई-फाई (HTTP) पर PWA न चले तो ऊपर दिया गया <strong>Download APK</strong> इस्तेमाल करें या ब्राउज़र मेनू (⋮) से "Add to Home screen" चुनें।</span>
+                    </div>
                   </div>
 
                   {isInstalled ? (
