@@ -27,7 +27,8 @@ export const AuthPage = ({ initialTab = 'login', onComplete, onBack }) => {
 
   // Fields
   const [name, setName] = useState('');
-  const [identifier, setIdentifier] = useState('');
+  const [signupPhone, setSignupPhone] = useState('');
+  const [signupEmail, setSignupEmail] = useState('');
   const [phoneInput, setPhoneInput] = useState('');
   const [emailInput, setEmailInput] = useState('');
   const [password, setPassword] = useState('');
@@ -51,13 +52,9 @@ export const AuthPage = ({ initialTab = 'login', onComplete, onBack }) => {
   const reqUpperLower = /[a-z]/.test(password) && /[A-Z]/.test(password);
 
   const isNameValid = name.trim().length >= 2;
-  const isEmailOrPhoneValid = () => {
-    const val = identifier.trim();
-    if (!val) return false;
-    if (val.includes('@')) return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
-    const cleanDigits = val.replace(/[^0-9]/g, '').slice(-10);
-    return /^[6-9]\d{9}$/.test(cleanDigits);
-  };
+  const cleanSignupPhoneDigits = signupPhone.replace(/[^0-9]/g, '').slice(-10);
+  const isSignupPhoneValid = /^[6-9]\d{9}$/.test(cleanSignupPhoneDigits);
+  const isSignupEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupEmail.trim());
   const isConfirmPasswordValid = confirmPassword.length > 0 && confirmPassword === password;
 
   // Send OTP for Phone Login
@@ -102,7 +99,7 @@ export const AuthPage = ({ initialTab = 'login', onComplete, onBack }) => {
       const res = await loginWithPhoneOtp(cleanPhone, otp.trim());
       if (res?.isNewUser) {
         setSuccess('Mobile verified! Complete your signup details.');
-        setIdentifier(cleanPhone);
+        setSignupPhone(cleanPhone);
         setMode('register');
         return;
       }
@@ -175,29 +172,28 @@ export const AuthPage = ({ initialTab = 'login', onComplete, onBack }) => {
 
   // Send OTP for Register
   const handleRegisterSendOtp = async () => {
-    const cleanId = identifier.trim();
-    if (!cleanId) {
-      setError('Please enter your mobile number or email address');
+    const cleanPhone = signupPhone.replace(/[^0-9]/g, '').slice(-10);
+    const cleanEmail = signupEmail.trim().toLowerCase();
+
+    const target = cleanPhone && /^[6-9]\d{9}$/.test(cleanPhone)
+      ? cleanPhone 
+      : (cleanEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail) ? cleanEmail : '');
+
+    if (!target) {
+      setError('Please enter your 10-digit mobile number to receive OTP');
       return;
-    }
-    const isEmail = cleanId.includes('@');
-    if (!isEmail) {
-      const cleanPhone = cleanId.replace(/[^0-9]/g, '').slice(-10);
-      if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
-        setError('Please enter a valid 10-digit mobile number');
-        return;
-      }
     }
 
     setError('');
     setSendingOtp(true);
     try {
-      const res = await sendOtp(cleanId, 'register');
+      const res = await sendOtp(target, 'register');
       setOtpSent(true);
       const code = res.otp || '123456';
       setSimulatedOtp(code);
       setOtp(code);
-      setSuccess(`OTP sent to ${cleanId} (Passcode: ${code})`);
+      const targetLabel = target.includes('@') ? target : `+91 ${target}`;
+      setSuccess(`OTP sent to ${targetLabel} (Passcode: ${code})`);
     } catch (err) {
       setError(err.message || 'Failed to send OTP');
     } finally {
@@ -205,13 +201,22 @@ export const AuthPage = ({ initialTab = 'login', onComplete, onBack }) => {
     }
   };
 
-  // Handle Signup
+  // Handle Signup (Requires Name, Mobile Number, Email, OTP, and Password)
   const handleSignup = async (e) => {
     e.preventDefault();
-    const cleanId = identifier.trim();
+    const cleanPhone = signupPhone.replace(/[^0-9]/g, '').slice(-10);
+    const cleanEmail = signupEmail.trim().toLowerCase();
 
-    if (!cleanId) {
-      setError('Please enter your mobile number or email');
+    if (!name.trim() || name.trim().length < 2) {
+      setError('Please enter your full name (minimum 2 characters)');
+      return;
+    }
+    if (!cleanPhone || !/^[6-9]\d{9}$/.test(cleanPhone)) {
+      setError('Please enter a valid 10-digit Indian mobile number');
+      return;
+    }
+    if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      setError('Please enter a valid email address');
       return;
     }
     if (!otp || otp.length < 4) {
@@ -230,11 +235,10 @@ export const AuthPage = ({ initialTab = 'login', onComplete, onBack }) => {
     setError('');
     setLoading(true);
     try {
-      const isEmail = cleanId.includes('@');
       const payload = {
-        name: name.trim() || (isEmail ? cleanId.split('@')[0] : `User ${cleanId.replace(/[^0-9]/g, '').slice(-4)}`),
-        email: isEmail ? cleanId.toLowerCase() : '',
-        phone: !isEmail ? cleanId.replace(/[^0-9]/g, '').slice(-10) : '',
+        name: name.trim(),
+        email: cleanEmail,
+        phone: cleanPhone,
         otp: otp.trim(),
         password,
         role
@@ -394,7 +398,7 @@ export const AuthPage = ({ initialTab = 'login', onComplete, onBack }) => {
                 </button>
               </div>
 
-              {/* Full Name */}
+              {/* 1. Full Name Underline Field */}
               <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-1">
                 <div className="flex items-center gap-3">
                   <User size={18} className="text-slate-400 shrink-0" />
@@ -403,32 +407,35 @@ export const AuthPage = ({ initialTab = 'login', onComplete, onBack }) => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Full Name (e.g. Daniel Ahmadi)"
+                    required
                     className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2"
                   />
                   {isNameValid && <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />}
                 </div>
               </div>
 
-              {/* Identifier + OTP */}
+              {/* 2. Mobile Number Underline Field */}
               <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-1">
-                <div className="flex items-center gap-3">
-                  <Mail size={18} className="text-slate-400 shrink-0" />
+                <div className="flex items-center gap-2.5">
+                  <Phone size={18} className="text-slate-400 shrink-0" />
+                  <span className="text-xs font-bold text-slate-500 shrink-0">+91</span>
                   <input
-                    type="text"
-                    value={identifier}
+                    type="tel"
+                    maxLength={10}
+                    value={signupPhone}
                     onChange={(e) => {
-                      setIdentifier(e.target.value);
+                      setSignupPhone(e.target.value.replace(/[^0-9]/g, ''));
                       setOtpSent(false);
                     }}
-                    placeholder="Email or Mobile (e.g. user@gmail.com)"
+                    placeholder="9876543210"
                     required
-                    className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2"
+                    className="w-full bg-transparent text-sm font-mono tracking-wider text-slate-800 placeholder-slate-400 focus:outline-none py-2"
                   />
-                  {isEmailOrPhoneValid() && <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />}
+                  {isSignupPhoneValid && <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />}
                   <button
                     type="button"
                     onClick={handleRegisterSendOtp}
-                    disabled={sendingOtp || !identifier.trim()}
+                    disabled={sendingOtp || signupPhone.length < 10}
                     className="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-[11px] font-bold rounded-full transition whitespace-nowrap disabled:opacity-50 shrink-0"
                   >
                     {sendingOtp ? 'Sending...' : otpSent ? 'Resend' : 'Send OTP'}
@@ -436,7 +443,23 @@ export const AuthPage = ({ initialTab = 'login', onComplete, onBack }) => {
                 </div>
               </div>
 
-              {/* OTP Passcode */}
+              {/* 3. Email Address Underline Field */}
+              <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-1">
+                <div className="flex items-center gap-3">
+                  <Mail size={18} className="text-slate-400 shrink-0" />
+                  <input
+                    type="email"
+                    value={signupEmail}
+                    onChange={(e) => setSignupEmail(e.target.value)}
+                    placeholder="11Danielahmadi@gmail.com"
+                    required
+                    className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2"
+                  />
+                  {isSignupEmailValid && <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />}
+                </div>
+              </div>
+
+              {/* 4. OTP Passcode Underline Field */}
               <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-1">
                 <div className="flex items-center gap-3">
                   <KeyRound size={18} className="text-slate-400 shrink-0" />
@@ -458,7 +481,7 @@ export const AuthPage = ({ initialTab = 'login', onComplete, onBack }) => {
                 </div>
               </div>
 
-              {/* Password */}
+              {/* 5. Password Underline Field */}
               <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-1">
                 <div className="flex items-center gap-3">
                   <Lock size={18} className="text-slate-400 shrink-0" />
@@ -473,7 +496,7 @@ export const AuthPage = ({ initialTab = 'login', onComplete, onBack }) => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="text-slate-400 hover:text-slate-600 transition"
+                    className="text-slate-400 hover:text-slate-600 transition shrink-0"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -496,7 +519,7 @@ export const AuthPage = ({ initialTab = 'login', onComplete, onBack }) => {
                 </div>
               </div>
 
-              {/* Confirm Password */}
+              {/* 6. Confirm Password Underline Field */}
               <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-1">
                 <div className="flex items-center gap-3">
                   <Lock size={18} className="text-slate-400 shrink-0" />
@@ -505,6 +528,7 @@ export const AuthPage = ({ initialTab = 'login', onComplete, onBack }) => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Re-Type Password"
+                    required
                     className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2 tracking-wider"
                   />
                   {isConfirmPasswordValid && <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />}
@@ -515,7 +539,7 @@ export const AuthPage = ({ initialTab = 'login', onComplete, onBack }) => {
               <div className="pt-4">
                 <button
                   type="submit"
-                  disabled={loading || !identifier.trim() || !otp.trim() || !password}
+                  disabled={loading || !signupPhone.trim() || !signupEmail.trim() || !otp.trim() || !password}
                   className="w-full sm:w-auto px-8 py-3.5 bg-[#4F46E5] hover:bg-[#4338CA] text-white font-bold rounded-full shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 text-sm transition-all active:scale-[0.98] disabled:opacity-50"
                 >
                   <span>{loading ? 'Creating...' : 'Sign Up'}</span>

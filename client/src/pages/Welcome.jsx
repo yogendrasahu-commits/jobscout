@@ -92,9 +92,10 @@ export const Welcome = ({
   const [simulatedOtp, setSimulatedOtp] = useState('');
   const [sendingOtp, setSendingOtp] = useState(false);
 
-  // Signup Fields (Simple: Name + Identifier + OTP + Password + Confirm Password)
+  // Signup Fields (Both Phone and Email required)
   const [signupName, setSignupName] = useState('');
-  const [signupIdentifier, setSignupIdentifier] = useState('');
+  const [signupPhone, setSignupPhone] = useState('');
+  const [signupEmail, setSignupEmail] = useState('');
   const [signupOtp, setSignupOtp] = useState('');
   const [signupOtpSent, setSignupOtpSent] = useState(false);
   const [signupSimulatedOtp, setSignupSimulatedOtp] = useState('');
@@ -114,13 +115,9 @@ export const Welcome = ({
   const reqUpperLower = /[a-z]/.test(signupPassword) && /[A-Z]/.test(signupPassword);
 
   const isSignupNameValid = signupName.trim().length >= 2;
-  const isSignupIdentifierValid = () => {
-    const val = signupIdentifier.trim();
-    if (!val) return false;
-    if (val.includes('@')) return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
-    const cleanDigits = val.replace(/[^0-9]/g, '').slice(-10);
-    return /^[6-9]\d{9}$/.test(cleanDigits);
-  };
+  const cleanSignupPhoneDigits = signupPhone.replace(/[^0-9]/g, '').slice(-10);
+  const isSignupPhoneValid = /^[6-9]\d{9}$/.test(cleanSignupPhoneDigits);
+  const isSignupEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupEmail.trim());
   const isSignupConfirmValid = signupConfirmPassword.length > 0 && signupConfirmPassword === signupPassword;
 
   const toggleFaq = (idx) => {
@@ -189,7 +186,7 @@ export const Welcome = ({
       const res = await loginWithPhoneOtp(cleanPhone, otp.trim());
       if (res?.isNewUser) {
         setSuccessMsg('मोबाइल सत्यापित! कृपया अपना खाता पूर्ण करें।');
-        setSignupIdentifier(cleanPhone);
+        setSignupPhone(cleanPhone);
         setAuthMode('register');
         setSignupOtp(otp);
         return;
@@ -286,46 +283,51 @@ export const Welcome = ({
 
   // Signup Send OTP
   const handleSignupSendOtp = async () => {
-    const clean = signupIdentifier.trim();
-    if (!clean) {
-      setError('कृपया OTP प्राप्त करने के लिए मोबाइल नंबर या ईमेल दर्ज करें');
-      return;
-    }
-    const isEmail = clean.includes('@');
-    if (!isEmail) {
-      const digits = clean.replace(/[^0-9]/g, '').slice(-10);
-      if (!/^[6-9]\d{9}$/.test(digits)) {
-        setError('कृपया एक मान्य 10-अंकों का भारतीय मोबाइल नंबर दर्ज करें (6-9 से शुरू)');
-        return;
-      }
-    } else if (!clean.includes('.') || clean.length < 5) {
-      setError('कृपया एक मान्य ईमेल पता दर्ज करें');
+    const cleanPhone = signupPhone.replace(/[^0-9]/g, '').slice(-10);
+    const cleanEmail = signupEmail.trim().toLowerCase();
+
+    const target = cleanPhone && /^[6-9]\d{9}$/.test(cleanPhone)
+      ? cleanPhone 
+      : (cleanEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail) ? cleanEmail : '');
+
+    if (!target) {
+      setError('Please enter your 10-digit mobile number to receive OTP');
       return;
     }
 
     setError('');
     setSignupSendingOtp(true);
     try {
-      const cleanPhone = !isEmail ? clean.replace(/[^0-9]/g, '').slice(-10) : '';
-      const res = await sendOtp(cleanPhone || clean, 'register');
+      const res = await sendOtp(target, 'register');
       setSignupOtpSent(true);
       const code = res?.otp || '123456';
       setSignupSimulatedOtp(code);
       setSignupOtp(code);
-      setSuccessMsg(`सत्यापन कोड भेजा गया: ${clean} (डेमो कोड: ${code})`);
+      const targetLabel = target.includes('@') ? target : `+91 ${target}`;
+      setSuccessMsg(`OTP sent to ${targetLabel} (Passcode: ${code})`);
     } catch (err) {
-      setError(err.message || 'OTP भेजने में विफल');
+      setError(err.message || 'Failed to send OTP');
     } finally {
       setSignupSendingOtp(false);
     }
   };
 
-  // Minimal Fast Signup (Phone/Email + OTP + Password)
+  // Sign Up Handler (Requires Name, Mobile Number, Email, OTP, and Password)
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
-    const clean = signupIdentifier.trim();
-    if (!clean) {
-      setError('Please enter mobile number or email');
+    const cleanPhone = signupPhone.replace(/[^0-9]/g, '').slice(-10);
+    const cleanEmail = signupEmail.trim().toLowerCase();
+
+    if (!signupName.trim() || signupName.trim().length < 2) {
+      setError('Please enter your full name (minimum 2 characters)');
+      return;
+    }
+    if (!cleanPhone || !/^[6-9]\d{9}$/.test(cleanPhone)) {
+      setError('Please enter a valid 10-digit Indian mobile number');
+      return;
+    }
+    if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      setError('Please enter a valid email address');
       return;
     }
     if (!signupOtp || signupOtp.length < 4) {
@@ -344,11 +346,10 @@ export const Welcome = ({
     setError('');
     setLoading(true);
     try {
-      const isEmail = clean.includes('@');
       const payload = {
-        name: signupName.trim() || (isEmail ? clean.split('@')[0] : `User ${clean.replace(/[^0-9]/g, '').slice(-4)}`),
-        email: isEmail ? clean.toLowerCase() : '',
-        phone: !isEmail ? clean.replace(/[^0-9]/g, '').slice(-10) : '',
+        name: signupName.trim(),
+        email: cleanEmail,
+        phone: cleanPhone,
         otp: signupOtp.trim(),
         password: signupPassword,
         role
@@ -941,6 +942,7 @@ export const Welcome = ({
                         value={signupName}
                         onChange={(e) => setSignupName(e.target.value)}
                         placeholder="Daniel Ahmadi"
+                        required
                         className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2"
                       />
                       {isSignupNameValid && (
@@ -949,28 +951,30 @@ export const Welcome = ({
                     </div>
                   </div>
 
-                  {/* 2. Email or Mobile Underline Field */}
+                  {/* 2. Mobile Number Underline Field */}
                   <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
-                    <div className="flex items-center gap-3">
-                      <Mail size={18} className="text-slate-400 shrink-0" />
+                    <div className="flex items-center gap-2.5">
+                      <Phone size={18} className="text-slate-400 shrink-0" />
+                      <span className="text-xs font-bold text-slate-500 shrink-0">+91</span>
                       <input
-                        type="text"
-                        value={signupIdentifier}
+                        type="tel"
+                        maxLength={10}
+                        value={signupPhone}
                         onChange={(e) => {
-                          setSignupIdentifier(e.target.value);
+                          setSignupPhone(e.target.value.replace(/[^0-9]/g, ''));
                           setSignupOtpSent(false);
                         }}
-                        placeholder="11Danielahmadi@gmail.com"
+                        placeholder="9876543210"
                         required
-                        className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2"
+                        className="w-full bg-transparent text-sm font-mono tracking-wider text-slate-800 placeholder-slate-400 focus:outline-none py-2"
                       />
-                      {isSignupIdentifierValid() && (
+                      {isSignupPhoneValid && (
                         <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
                       )}
                       <button
                         type="button"
                         onClick={handleSignupSendOtp}
-                        disabled={signupSendingOtp || !signupIdentifier.trim()}
+                        disabled={signupSendingOtp || signupPhone.length < 10}
                         className="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-[11px] font-bold rounded-full transition whitespace-nowrap disabled:opacity-50 shrink-0"
                       >
                         {signupSendingOtp ? 'Sending...' : signupOtpSent ? 'Resend' : 'Send OTP'}
@@ -978,7 +982,25 @@ export const Welcome = ({
                     </div>
                   </div>
 
-                  {/* 3. OTP Passcode Underline Field */}
+                  {/* 3. Email Address Underline Field */}
+                  <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
+                    <div className="flex items-center gap-3">
+                      <Mail size={18} className="text-slate-400 shrink-0" />
+                      <input
+                        type="email"
+                        value={signupEmail}
+                        onChange={(e) => setSignupEmail(e.target.value)}
+                        placeholder="11Danielahmadi@gmail.com"
+                        required
+                        className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2"
+                      />
+                      {isSignupEmailValid && (
+                        <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 4. OTP Passcode Underline Field */}
                   <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
                     <div className="flex items-center gap-3">
                       <KeyRound size={18} className="text-slate-400 shrink-0" />
@@ -1002,7 +1024,7 @@ export const Welcome = ({
                     </div>
                   </div>
 
-                  {/* 4. Password Underline Field */}
+                  {/* 5. Password Underline Field */}
                   <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
                     <div className="flex items-center gap-3">
                       <Lock size={18} className="text-slate-400 shrink-0" />
@@ -1052,7 +1074,7 @@ export const Welcome = ({
                     </div>
                   </div>
 
-                  {/* 5. Re-Type Password Underline Field */}
+                  {/* 6. Re-Type Password Underline Field */}
                   <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
                     <div className="flex items-center gap-3">
                       <Lock size={18} className="text-slate-400 shrink-0" />
@@ -1061,6 +1083,7 @@ export const Welcome = ({
                         value={signupConfirmPassword}
                         onChange={(e) => setSignupConfirmPassword(e.target.value)}
                         placeholder="Re-Type Password"
+                        required
                         className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2 tracking-wider"
                       />
                       {isSignupConfirmValid && (
@@ -1073,7 +1096,7 @@ export const Welcome = ({
                   <div className="pt-3">
                     <button
                       type="submit"
-                      disabled={loading || !signupIdentifier.trim() || !signupOtp.trim() || !signupPassword}
+                      disabled={loading || !signupPhone.trim() || !signupEmail.trim() || !signupOtp.trim() || !signupPassword}
                       className="w-full sm:w-auto px-8 py-3.5 bg-[#4F46E5] hover:bg-[#4338CA] active:bg-[#3730A3] text-white font-bold rounded-full shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 text-sm transition-all active:scale-[0.98] disabled:opacity-50"
                     >
                       <span>{loading ? 'Creating...' : 'Sign Up'}</span>

@@ -444,8 +444,7 @@ router.post('/register', authRateLimiter, async (req, res) => {
 
     // Verify OTP if provided
     if (otp) {
-      const otpKey = isEmailInput ? targetEmail : targetPhone;
-      const record = otpStore.get(otpKey);
+      const record = (targetPhone && otpStore.get(targetPhone)) || (targetEmail && otpStore.get(targetEmail)) || otpStore.get(identifier);
       const isOtpValid = (otp === '123456') || (record && record.otp === otp && Date.now() < record.expiresAt);
       if (!isOtpValid) {
         return res.status(400).json({ error: 'Invalid or expired OTP' });
