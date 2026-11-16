@@ -92,7 +92,9 @@ export const Welcome = ({
   const [simulatedOtp, setSimulatedOtp] = useState('');
   const [sendingOtp, setSendingOtp] = useState(false);
 
-  // Signup Fields (Both Phone and Email required)
+  // Signup Fields (Dual method via switching)
+  const [signupMethod, setSignupMethod] = useState('phone'); // 'phone' | 'email'
+  const [showSecondarySignupField, setShowSecondarySignupField] = useState(false);
   const [signupName, setSignupName] = useState('');
   const [signupPhone, setSignupPhone] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
@@ -281,55 +283,82 @@ export const Welcome = ({
     }
   };
 
-  // Signup Send OTP
+  // Signup Send OTP (Phone or Email switching)
   const handleSignupSendOtp = async () => {
-    const cleanPhone = signupPhone.replace(/[^0-9]/g, '').slice(-10);
-    const cleanEmail = signupEmail.trim().toLowerCase();
-
-    const target = cleanPhone && /^[6-9]\d{9}$/.test(cleanPhone)
-      ? cleanPhone 
-      : (cleanEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail) ? cleanEmail : '');
-
-    if (!target) {
-      setError('Please enter your 10-digit mobile number to receive OTP');
-      return;
-    }
-
-    setError('');
-    setSignupSendingOtp(true);
-    try {
-      const res = await sendOtp(target, 'register');
-      setSignupOtpSent(true);
-      const code = res?.otp || '123456';
-      setSignupSimulatedOtp(code);
-      setSignupOtp(code);
-      const targetLabel = target.includes('@') ? target : `+91 ${target}`;
-      setSuccessMsg(`OTP sent to ${targetLabel} (Passcode: ${code})`);
-    } catch (err) {
-      setError(err.message || 'Failed to send OTP');
-    } finally {
-      setSignupSendingOtp(false);
+    if (signupMethod === 'phone') {
+      const cleanPhone = signupPhone.replace(/[^0-9]/g, '').slice(-10);
+      if (!cleanPhone || !/^[6-9]\d{9}$/.test(cleanPhone)) {
+        setError('कृपया एक मान्य 10-अंकों का भारतीय मोबाइल नंबर दर्ज करें (6-9 से शुरू)');
+        return;
+      }
+      setError('');
+      setSignupSendingOtp(true);
+      try {
+        const res = await sendOtp(cleanPhone, 'register');
+        setSignupOtpSent(true);
+        const code = res?.otp || '123456';
+        setSignupSimulatedOtp(code);
+        setSignupOtp(code);
+        setSuccessMsg(`OTP भेजा गया: +91 ${cleanPhone} (डेमो कोड: ${code})`);
+      } catch (err) {
+        setError(err.message || 'OTP भेजने में विफल');
+      } finally {
+        setSignupSendingOtp(false);
+      }
+    } else {
+      const cleanEmail = signupEmail.trim().toLowerCase();
+      if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+        setError('कृपया एक मान्य ईमेल पता दर्ज करें');
+        return;
+      }
+      setError('');
+      setSignupSendingOtp(true);
+      try {
+        const res = await sendOtp(cleanEmail, 'register');
+        setSignupOtpSent(true);
+        const code = res?.otp || '123456';
+        setSignupSimulatedOtp(code);
+        setSignupOtp(code);
+        setSuccessMsg(`OTP भेजा गया: ${cleanEmail} (डेमो कोड: ${code})`);
+      } catch (err) {
+        setError(err.message || 'OTP भेजने में विफल');
+      } finally {
+        setSignupSendingOtp(false);
+      }
     }
   };
 
-  // Sign Up Handler (Requires Name, Mobile Number, Email, OTP, and Password)
+  // Sign Up Handler (Validates Primary Method Selected via Switcher)
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
-    const cleanPhone = signupPhone.replace(/[^0-9]/g, '').slice(-10);
-    const cleanEmail = signupEmail.trim().toLowerCase();
-
     if (!signupName.trim() || signupName.trim().length < 2) {
       setError('Please enter your full name (minimum 2 characters)');
       return;
     }
-    if (!cleanPhone || !/^[6-9]\d{9}$/.test(cleanPhone)) {
-      setError('Please enter a valid 10-digit Indian mobile number');
-      return;
+
+    const cleanPhone = signupPhone.replace(/[^0-9]/g, '').slice(-10);
+    const cleanEmail = signupEmail.trim().toLowerCase();
+
+    if (signupMethod === 'phone') {
+      if (!cleanPhone || !/^[6-9]\d{9}$/.test(cleanPhone)) {
+        setError('Please enter a valid 10-digit Indian mobile number');
+        return;
+      }
+      if (cleanEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+        setError('Please enter a valid email address');
+        return;
+      }
+    } else {
+      if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+        setError('Please enter a valid email address');
+        return;
+      }
+      if (cleanPhone && !/^[6-9]\d{9}$/.test(cleanPhone)) {
+        setError('Please enter a valid 10-digit Indian mobile number');
+        return;
+      }
     }
-    if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
-      setError('Please enter a valid email address');
-      return;
-    }
+
     if (!signupOtp || signupOtp.length < 4) {
       setError('Please enter the 6-digit OTP passcode received');
       return;
@@ -902,35 +931,78 @@ export const Welcome = ({
                 </div>
               )}
 
-              {/* TAB 2: SIGN UP FORM */}
+              {/* TAB 2: SIGN UP FORM (With Method Switching) */}
               {authMode === 'register' && (
                 <form onSubmit={handleSignupSubmit} className="space-y-3.5">
-                  {/* Role Toggle Pill */}
-                  <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-full w-fit">
-                    <button
-                      type="button"
-                      onClick={() => setRole('seeker')}
-                      className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1.5 ${
-                        role === 'seeker'
-                          ? 'bg-white text-indigo-600 shadow-xs'
-                          : 'text-slate-500 hover:text-slate-800'
-                      }`}
-                    >
-                      <User size={12} />
-                      <span>Job Seeker</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setRole('emp')}
-                      className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1.5 ${
-                        role === 'emp'
-                          ? 'bg-white text-indigo-600 shadow-xs'
-                          : 'text-slate-500 hover:text-slate-800'
-                      }`}
-                    >
-                      <Building2 size={12} />
-                      <span>Employer</span>
-                    </button>
+                  {/* Top Controls: Role Toggle Pill & Method Switcher Pill */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 pb-1">
+                    {/* Role Toggle Pill */}
+                    <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-full w-fit">
+                      <button
+                        type="button"
+                        onClick={() => setRole('seeker')}
+                        className={`px-3 py-1 rounded-full text-xs font-bold transition flex items-center gap-1.5 ${
+                          role === 'seeker'
+                            ? 'bg-white text-indigo-600 shadow-xs'
+                            : 'text-slate-500 hover:text-slate-800'
+                        }`}
+                      >
+                        <User size={12} />
+                        <span>Job Seeker</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setRole('emp')}
+                        className={`px-3 py-1 rounded-full text-xs font-bold transition flex items-center gap-1.5 ${
+                          role === 'emp'
+                            ? 'bg-white text-indigo-600 shadow-xs'
+                            : 'text-slate-500 hover:text-slate-800'
+                        }`}
+                      >
+                        <Building2 size={12} />
+                        <span>Employer</span>
+                      </button>
+                    </div>
+
+                    {/* Method Switcher Pill: Phone vs Email */}
+                    <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-full w-fit">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSignupMethod('phone');
+                          setError('');
+                          setSuccessMsg('');
+                          setSignupOtpSent(false);
+                          setSignupOtp('');
+                        }}
+                        className={`px-3 py-1 rounded-full text-xs font-bold transition flex items-center gap-1.5 ${
+                          signupMethod === 'phone'
+                            ? 'bg-white text-indigo-600 shadow-xs'
+                            : 'text-slate-500 hover:text-slate-800'
+                        }`}
+                      >
+                        <Phone size={12} />
+                        <span>Phone</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSignupMethod('email');
+                          setError('');
+                          setSuccessMsg('');
+                          setSignupOtpSent(false);
+                          setSignupOtp('');
+                        }}
+                        className={`px-3 py-1 rounded-full text-xs font-bold transition flex items-center gap-1.5 ${
+                          signupMethod === 'email'
+                            ? 'bg-white text-indigo-600 shadow-xs'
+                            : 'text-slate-500 hover:text-slate-800'
+                        }`}
+                      >
+                        <Mail size={12} />
+                        <span>Email</span>
+                      </button>
+                    </div>
                   </div>
 
                   {/* 1. Full Name Underline Field */}
@@ -951,56 +1023,70 @@ export const Welcome = ({
                     </div>
                   </div>
 
-                  {/* 2. Mobile Number Underline Field */}
-                  <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
-                    <div className="flex items-center gap-2.5">
-                      <Phone size={18} className="text-slate-400 shrink-0" />
-                      <span className="text-xs font-bold text-slate-500 shrink-0">+91</span>
-                      <input
-                        type="tel"
-                        maxLength={10}
-                        value={signupPhone}
-                        onChange={(e) => {
-                          setSignupPhone(e.target.value.replace(/[^0-9]/g, ''));
-                          setSignupOtpSent(false);
-                        }}
-                        placeholder="9876543210"
-                        required
-                        className="w-full bg-transparent text-sm font-mono tracking-wider text-slate-800 placeholder-slate-400 focus:outline-none py-2"
-                      />
-                      {isSignupPhoneValid && (
-                        <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
-                      )}
-                      <button
-                        type="button"
-                        onClick={handleSignupSendOtp}
-                        disabled={signupSendingOtp || signupPhone.length < 10}
-                        className="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-[11px] font-bold rounded-full transition whitespace-nowrap disabled:opacity-50 shrink-0"
-                      >
-                        {signupSendingOtp ? 'Sending...' : signupOtpSent ? 'Resend' : 'Send OTP'}
-                      </button>
+                  {/* 2. PRIMARY CONTACT FIELD (SWITCHING BASED ON METHOD) */}
+                  {signupMethod === 'phone' ? (
+                    /* Mobile Number Field */
+                    <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
+                      <div className="flex items-center gap-2.5">
+                        <Phone size={18} className="text-slate-400 shrink-0" />
+                        <span className="text-xs font-bold text-slate-500 shrink-0">+91</span>
+                        <input
+                          type="tel"
+                          maxLength={10}
+                          value={signupPhone}
+                          onChange={(e) => {
+                            setSignupPhone(e.target.value.replace(/[^0-9]/g, ''));
+                            setSignupOtpSent(false);
+                          }}
+                          placeholder="9876543210"
+                          required
+                          className="w-full bg-transparent text-sm font-mono tracking-wider text-slate-800 placeholder-slate-400 focus:outline-none py-2"
+                        />
+                        {isSignupPhoneValid && (
+                          <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+                        )}
+                        <button
+                          type="button"
+                          onClick={handleSignupSendOtp}
+                          disabled={signupSendingOtp || signupPhone.length < 10}
+                          className="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-[11px] font-bold rounded-full transition whitespace-nowrap disabled:opacity-50 shrink-0"
+                        >
+                          {signupSendingOtp ? 'Sending...' : signupOtpSent ? 'Resend' : 'Send OTP'}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-
-                  {/* 3. Email Address Underline Field */}
-                  <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
-                    <div className="flex items-center gap-3">
-                      <Mail size={18} className="text-slate-400 shrink-0" />
-                      <input
-                        type="email"
-                        value={signupEmail}
-                        onChange={(e) => setSignupEmail(e.target.value)}
-                        placeholder="11Danielahmadi@gmail.com"
-                        required
-                        className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2"
-                      />
-                      {isSignupEmailValid && (
-                        <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
-                      )}
+                  ) : (
+                    /* Email Address Field */
+                    <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
+                      <div className="flex items-center gap-3">
+                        <Mail size={18} className="text-slate-400 shrink-0" />
+                        <input
+                          type="email"
+                          value={signupEmail}
+                          onChange={(e) => {
+                            setSignupEmail(e.target.value);
+                            setSignupOtpSent(false);
+                          }}
+                          placeholder="11Danielahmadi@gmail.com"
+                          required
+                          className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2"
+                        />
+                        {isSignupEmailValid && (
+                          <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+                        )}
+                        <button
+                          type="button"
+                          onClick={handleSignupSendOtp}
+                          disabled={signupSendingOtp || !signupEmail.trim()}
+                          className="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-[11px] font-bold rounded-full transition whitespace-nowrap disabled:opacity-50 shrink-0"
+                        >
+                          {signupSendingOtp ? 'Sending...' : signupOtpSent ? 'Resend' : 'Send OTP'}
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  {/* 4. OTP Passcode Underline Field */}
+                  {/* 3. OTP Passcode Underline Field */}
                   <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
                     <div className="flex items-center gap-3">
                       <KeyRound size={18} className="text-slate-400 shrink-0" />
@@ -1024,7 +1110,54 @@ export const Welcome = ({
                     </div>
                   </div>
 
-                  {/* 5. Password Underline Field */}
+                  {/* Optional Secondary Field Toggle (+ Add Email or + Add Phone) */}
+                  {!showSecondarySignupField ? (
+                    <div className="pt-0.5">
+                      <button
+                        type="button"
+                        onClick={() => setShowSecondarySignupField(true)}
+                        className="text-[11px] text-indigo-600 hover:text-indigo-700 font-semibold hover:underline"
+                      >
+                        {signupMethod === 'phone' ? '+ Also add email address (Optional)' : '+ Also add mobile number (Optional)'}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5 animate-fadeIn">
+                      {signupMethod === 'phone' ? (
+                        <div className="flex items-center gap-3">
+                          <Mail size={18} className="text-slate-400 shrink-0" />
+                          <input
+                            type="email"
+                            value={signupEmail}
+                            onChange={(e) => setSignupEmail(e.target.value)}
+                            placeholder="Email Address (Optional)"
+                            className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none py-2"
+                          />
+                          {isSignupEmailValid && (
+                            <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+                          )}
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2.5">
+                          <Phone size={18} className="text-slate-400 shrink-0" />
+                          <span className="text-xs font-bold text-slate-500 shrink-0">+91</span>
+                          <input
+                            type="tel"
+                            maxLength={10}
+                            value={signupPhone}
+                            onChange={(e) => setSignupPhone(e.target.value.replace(/[^0-9]/g, ''))}
+                            placeholder="Mobile Number (Optional)"
+                            className="w-full bg-transparent text-sm font-mono tracking-wider text-slate-800 placeholder-slate-400 focus:outline-none py-2"
+                          />
+                          {isSignupPhoneValid && (
+                            <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* 4. Password Underline Field */}
                   <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
                     <div className="flex items-center gap-3">
                       <Lock size={18} className="text-slate-400 shrink-0" />
@@ -1074,7 +1207,7 @@ export const Welcome = ({
                     </div>
                   </div>
 
-                  {/* 6. Re-Type Password Underline Field */}
+                  {/* 5. Re-Type Password Underline Field */}
                   <div className="relative border-b border-slate-200 focus-within:border-indigo-600 transition-colors pb-0.5">
                     <div className="flex items-center gap-3">
                       <Lock size={18} className="text-slate-400 shrink-0" />
@@ -1096,7 +1229,13 @@ export const Welcome = ({
                   <div className="pt-3">
                     <button
                       type="submit"
-                      disabled={loading || !signupPhone.trim() || !signupEmail.trim() || !signupOtp.trim() || !signupPassword}
+                      disabled={
+                        loading ||
+                        !signupName.trim() ||
+                        (signupMethod === 'phone' ? !isSignupPhoneValid : !isSignupEmailValid) ||
+                        !signupOtp.trim() ||
+                        !signupPassword
+                      }
                       className="w-full sm:w-auto px-8 py-3.5 bg-[#4F46E5] hover:bg-[#4338CA] active:bg-[#3730A3] text-white font-bold rounded-full shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 text-sm transition-all active:scale-[0.98] disabled:opacity-50"
                     >
                       <span>{loading ? 'Creating...' : 'Sign Up'}</span>

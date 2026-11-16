@@ -4620,9 +4620,192 @@
       "lng": 72.8777,
       "address": "Mumbai, India",
       "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Rohan%20Mehra"
+    },
+    {
+      "id": "usr_1794823457491_p57a",
+      "createdAt": "2026-11-16T10:04:17.491Z",
+      "isOnline": false,
+      "name": "Automated Test Seeker",
+      "phone": "+91 9845728411",
+      "isProfileComplete": true,
+      "email": "9845728411@user.jobradar.io",
+      "password": "$2a$10$6.B.Umpu7mE0bc4kX0iHdOZ.O16U2tm/eZWLgizS9AABPt338gaOy",
+      "role": "seeker",
+      "companyName": "",
+      "industry": "",
+      "companySize": "",
+      "website": "",
+      "hiringType": "",
+      "title": "Senior Lead QA Architect",
+      "skills": [
+        "React",
+        "Node.js",
+        "Jest",
+        "Automation"
+      ],
+      "experience": "Fresher",
+      "expectedSalary": "Negotiable",
+      "availability": "Immediate",
+      "vehicle": false,
+      "bio": "Passionate about bulletproof reliable software and WebRTC.",
+      "lat": 19.076,
+      "lng": 72.8777,
+      "address": "BKC, Mumbai",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Automated%20Test%20Seeker",
+      "savedJobs": []
+    },
+    {
+      "id": "usr_1794823457658_kwpn",
+      "createdAt": "2026-11-16T10:04:17.658Z",
+      "isOnline": true,
+      "name": "Automated Test Employer",
+      "phone": "+91 9945728422",
+      "isProfileComplete": true,
+      "email": "9945728422@user.jobradar.io",
+      "password": "$2a$10$I/OLgy8bwNS.ZLiQubpYQuempkDh4.FguIotd0FCRdWANyUYXIZYq",
+      "role": "emp",
+      "companyName": "Apex HyperTech Labs",
+      "industry": "Software & Cloud Solutions",
+      "companySize": "1-10 Employees",
+      "website": "",
+      "hiringType": "Full-time",
+      "title": "",
+      "skills": [],
+      "experience": "",
+      "expectedSalary": "",
+      "availability": "",
+      "vehicle": false,
+      "bio": "",
+      "lat": 19.1136,
+      "lng": 72.8697,
+      "address": "Andheri East, Mumbai",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Automated%20Test%20Employer"
+    },
+    {
+      "id": "usr_1794823462590_cegs",
+      "createdAt": "2026-11-16T10:04:22.590Z",
+      "isOnline": false,
+      "name": "Test Seeker 462466",
+      "isProfileComplete": true,
+      "email": "seeker_462466@test.jobscout.com",
+      "password": "$2a$10$jfcNaDjuK5pjd/V7HGimt.cZZJCDH05yY7DBsx0dy81nxddhQtSEW",
+      "role": "seeker",
+      "companyName": "",
+      "title": "Full Stack React & Node Engineer",
+      "skills": [
+        "React",
+        "Node.js",
+        "WebRTC",
+        "TailwindCSS",
+        "Socket.IO"
+      ],
+      "phone": "+91 9146246611",
+      "lat": 19.076,
+      "lng": 72.8777,
+      "address": "Bandra Kurla Complex, Mumbai",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Test%20Seeker%20462466",
+      "bio": "Passionate developer building high-performance real-time applications.",
+      "experience": "4 years",
+      "savedJobs": [
+        "job_1794823463138_uzus"
+      ],
+      "notificationPrefs": {
+        "whatsappEnabled": true,
+        "telegramEnabled": true,
+        "whatsappPhone": "919876543210",
+        "phone": "919876543210",
+        "telegramChatId": "jobscout_dev_channel",
+        "notifyOnOffer": true,
+        "notifyOnInterview": true,
+        "notifyOnApplication": true
+      }
+    },
+    {
+      "id": "usr_1794823462959_9hth",
+      "createdAt": "2026-11-16T10:04:22.959Z",
+      "isOnline": false,
+      "name": "Tech Innovations Corp HR",
+      "isProfileComplete": true,
+      "email": "emp_462466@test.jobscout.com",
+      "password": "$2a$10$JIkqQgIKHBk/UypzxhBHBOAANXobmXbdyMQCQKl2cpQigyGTUqzSu",
+      "role": "emp",
+      "companyName": "Tech Innovations Corp",
+      "title": "",
+      "skills": [],
+      "phone": "+91 9246246622",
+      "lat": 19.1136,
+      "lng": 72.8697,
+      "address": "Andheri East, Mumbai",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Tech%20Innovations%20Corp%20HR",
+      "website": "https://techinnovations.example.com",
+      "industry": "Information Technology & Cloud Services"
+    },
+    {
+      "id": "usr_1794823463305_ia3x",
+      "createdAt": "2026-11-16T10:04:23.305Z",
+      "isOnline": true,
+      "name": "Admin Seeded Seeker 462466",
+      "email": "admin_seeded_462466@jobscout.com",
+      "phone": "+91 9346246633",
+      "password": "$2a$10$38.jOmEHHZMq7ck1ByF4lO/8EEuxKpRwyimv5J5itMGXt7rxyj7U2",
+      "role": "seeker",
+      "title": "Cloud DevOps Specialist",
+      "companyName": "",
+      "skills": [],
+      "address": "Bandra, Mumbai",
+      "lat": 19.076,
+      "lng": 72.8777,
+      "isProfileComplete": true,
+      "isVerified": true
     }
   ],
   "jobs": [
+    {
+      "id": "job_1794823463138_uzus",
+      "createdAt": "2026-11-16T10:04:23.138Z",
+      "status": "open",
+      "employerId": "usr_1794823462959_9hth",
+      "employerName": "Tech Innovations Corp HR",
+      "company": "Tech Innovations Corp",
+      "title": "Senior Full Stack Developer (462466)",
+      "description": "We are seeking a seasoned Full Stack Engineer with strong React, Node.js and WebRTC skills.",
+      "category": "Technology",
+      "jobType": "Full-time",
+      "salary": "₹18,00,000 - ₹24,00,000 P.A.",
+      "lat": 19.1136,
+      "lng": 72.8697,
+      "address": "Andheri East, Mumbai, Maharashtra",
+      "skills": [
+        "React",
+        "Node.js",
+        "WebRTC",
+        "Socket.IO"
+      ],
+      "urgent": true
+    },
+    {
+      "id": "job_1794823457853_p1xz",
+      "createdAt": "2026-11-16T10:04:17.853Z",
+      "status": "open",
+      "employerId": "usr_1794823457658_kwpn",
+      "employerName": "Automated Test Employer",
+      "company": "Automated Test Employer",
+      "title": "Principal Cloud Platform Engineer",
+      "description": "Lead our next-generation cloud architecture and real-time streaming services.",
+      "category": "Technology",
+      "jobType": "Full-time",
+      "salary": "₹28,00,000 - ₹36,00,000 / yr",
+      "lat": 19.1136,
+      "lng": 72.8697,
+      "address": "Andheri East, Mumbai",
+      "skills": [
+        "Node.js",
+        "React",
+        "AWS",
+        "Docker"
+      ],
+      "urgent": true
+    },
     {
       "id": "job_1794823003126_p5zv",
       "createdAt": "2026-11-16T09:56:43.126Z",
@@ -7026,6 +7209,74 @@
     }
   ],
   "applications": [
+    {
+      "id": "app_1794823463399_gnpp",
+      "status": "hired",
+      "createdAt": "2026-11-16T10:04:23.399Z",
+      "jobId": "job_1794823463138_uzus",
+      "jobTitle": "Senior Full Stack Developer (462466)",
+      "employerId": "usr_1794823462959_9hth",
+      "employerName": "Tech Innovations Corp HR",
+      "seekerId": "usr_1794823462590_cegs",
+      "seekerName": "Test Seeker 462466",
+      "seekerEmail": "seeker_462466@test.jobscout.com",
+      "seekerPhone": "+91 9146246611",
+      "seekerAvatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Test%20Seeker%20462466",
+      "coverNote": "I am excited about this Full Stack role and have extensive experience in WebRTC and real-time systems.",
+      "offerLetter": {
+        "refNo": "JS-OFFER-463441",
+        "letterNumber": "JS-OFFER-463441",
+        "candidateName": "Test Seeker 462466",
+        "candidateEmail": "seeker_462466@test.jobscout.com",
+        "candidatePhone": "+91 9146246611",
+        "designation": "Senior Full Stack Engineer",
+        "salary": "₹22,00,000 P.A.",
+        "joiningDate": "2026-12-01",
+        "location": "Bandra Kurla Complex (BKC), Mumbai",
+        "terms": "Standard company employment policies, 3 months probation period, 30 days notice period.",
+        "customNote": "",
+        "issuedAt": "2026-11-16T10:04:23.441Z",
+        "employerName": "Tech Innovations Corp HR",
+        "companyName": "Tech Innovations Corp HR",
+        "status": "offered",
+        "acceptedAt": "2026-11-16T10:04:23.474Z"
+      },
+      "updatedAt": "2026-11-16T10:04:23.474Z"
+    },
+    {
+      "id": "app_1794823457932_kzo8",
+      "status": "hired",
+      "createdAt": "2026-11-16T10:04:17.932Z",
+      "jobId": "job_1794823457853_p1xz",
+      "jobTitle": "Principal Cloud Platform Engineer",
+      "employerId": "usr_1794823457658_kwpn",
+      "employerName": "Automated Test Employer",
+      "seekerId": "usr_1794823457491_p57a",
+      "seekerName": "Automated Test Seeker",
+      "seekerEmail": "9845728411@user.jobradar.io",
+      "seekerPhone": "+91 9845728411",
+      "seekerAvatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Automated%20Test%20Seeker",
+      "coverNote": "Excited about the Principal Cloud Platform position at Apex Labs!",
+      "offerLetter": {
+        "refNo": "JS-OFFER-458055",
+        "letterNumber": "JS-OFFER-458055",
+        "candidateName": "Automated Test Seeker",
+        "candidateEmail": "9845728411@user.jobradar.io",
+        "candidatePhone": "+91 9845728411",
+        "designation": "Principal Cloud Platform Engineer",
+        "salary": "₹32,00,000 / annum CTC",
+        "joiningDate": "2026-11-15",
+        "location": "Bandra Kurla Complex (BKC), Mumbai",
+        "terms": "Standard probation 3 months with health insurance.",
+        "customNote": "",
+        "issuedAt": "2026-11-16T10:04:18.055Z",
+        "employerName": "Automated Test Employer",
+        "companyName": "Automated Test Employer",
+        "status": "offered",
+        "acceptedAt": "2026-11-16T10:04:18.084Z"
+      },
+      "updatedAt": "2026-11-16T10:04:18.084Z"
+    },
     {
       "id": "app_1794823003303_jrsm",
       "status": "hired",
@@ -11430,9 +11681,104 @@
       "senderName": "Test Seeker",
       "message": "Hello, thank you for the job offer!",
       "content": "Hello, thank you for the job offer!"
+    },
+    {
+      "id": "msg_1794823458069_4maw",
+      "timestamp": "2026-11-16T10:04:18.069Z",
+      "createdAt": "2026-11-16T10:04:18.069Z",
+      "read": true,
+      "senderId": "usr_1794823457658_kwpn",
+      "receiverId": "usr_1794823457491_p57a",
+      "senderName": "Automated Test Employer",
+      "message": "🎉 Congratulations Automated Test Seeker! We have issued your formal Job Offer Letter for \"Principal Cloud Platform Engineer\" at Automated Test Employer with compensation of ₹32,00,000 / annum CTC. An official copy has been dispatched to your email (9845728411@user.jobradar.io). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!",
+      "content": "🎉 Congratulations Automated Test Seeker! We have issued your formal Job Offer Letter for \"Principal Cloud Platform Engineer\" at Automated Test Employer with compensation of ₹32,00,000 / annum CTC. An official copy has been dispatched to your email (9845728411@user.jobradar.io). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!"
+    },
+    {
+      "id": "msg_1794823458096_u63j",
+      "timestamp": "2026-11-16T10:04:18.096Z",
+      "createdAt": "2026-11-16T10:04:18.096Z",
+      "read": false,
+      "senderId": "usr_1794823457491_p57a",
+      "receiverId": "usr_1794823457658_kwpn",
+      "senderName": "Automated Test Seeker",
+      "message": "🤝 I am thrilled to formally accept your Job Offer Letter for \"Principal Cloud Platform Engineer\"! Looking forward to joining Automated Test Employer on 2026-11-15.",
+      "content": "🤝 I am thrilled to formally accept your Job Offer Letter for \"Principal Cloud Platform Engineer\"! Looking forward to joining Automated Test Employer on 2026-11-15."
+    },
+    {
+      "id": "msg_1794823458161_r9jb",
+      "timestamp": "2026-11-16T10:04:18.161Z",
+      "createdAt": "2026-11-16T10:04:18.161Z",
+      "read": true,
+      "senderId": "usr_1794823457658_kwpn",
+      "receiverId": "usr_1794823457491_p57a",
+      "senderName": "Automated Test Employer",
+      "message": "Hello! We reviewed your profile and wanted to connect.",
+      "content": "Hello! We reviewed your profile and wanted to connect."
+    },
+    {
+      "id": "msg_1794823463453_mnhb",
+      "timestamp": "2026-11-16T10:04:23.453Z",
+      "createdAt": "2026-11-16T10:04:23.453Z",
+      "read": false,
+      "senderId": "usr_1794823462959_9hth",
+      "receiverId": "usr_1794823462590_cegs",
+      "senderName": "Tech Innovations Corp HR",
+      "message": "🎉 Congratulations Test Seeker 462466! We have issued your formal Job Offer Letter for \"Senior Full Stack Engineer\" at Tech Innovations Corp HR with compensation of ₹22,00,000 P.A.. An official copy has been dispatched to your email (seeker_462466@test.jobscout.com). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!",
+      "content": "🎉 Congratulations Test Seeker 462466! We have issued your formal Job Offer Letter for \"Senior Full Stack Engineer\" at Tech Innovations Corp HR with compensation of ₹22,00,000 P.A.. An official copy has been dispatched to your email (seeker_462466@test.jobscout.com). You can also review, download, and accept the offer directly from your Applied Jobs dashboard!"
+    },
+    {
+      "id": "msg_1794823463486_e9va",
+      "timestamp": "2026-11-16T10:04:23.486Z",
+      "createdAt": "2026-11-16T10:04:23.486Z",
+      "read": false,
+      "senderId": "usr_1794823462590_cegs",
+      "receiverId": "usr_1794823462959_9hth",
+      "senderName": "Test Seeker 462466",
+      "message": "🤝 I am thrilled to formally accept your Job Offer Letter for \"Senior Full Stack Engineer\"! Looking forward to joining Tech Innovations Corp HR on 2026-12-01.",
+      "content": "🤝 I am thrilled to formally accept your Job Offer Letter for \"Senior Full Stack Engineer\"! Looking forward to joining Tech Innovations Corp HR on 2026-12-01."
+    },
+    {
+      "id": "msg_1794823463833_cza9",
+      "timestamp": "2026-11-16T10:04:23.833Z",
+      "createdAt": "2026-11-16T10:04:23.833Z",
+      "read": false,
+      "senderId": "usr_1794823462590_cegs",
+      "receiverId": "usr_1794823462959_9hth",
+      "senderName": "Test Seeker",
+      "message": "Hello, thank you for the job offer!",
+      "content": "Hello, thank you for the job offer!"
     }
   ],
   "posts": [
+    {
+      "id": "post_1794823458113_8hg0",
+      "createdAt": "2026-11-16T10:04:18.113Z",
+      "likes": 1,
+      "likedBy": [
+        "usr_1794823457491_p57a"
+      ],
+      "comments": [
+        {
+          "id": "c_1794823458140_jaxf",
+          "createdAt": "2026-11-16T10:04:18.140Z",
+          "authorName": "Automated Test Seeker",
+          "authorAvatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Automated%20Test%20Seeker",
+          "text": "Exciting news! Great team to join."
+        }
+      ],
+      "authorId": "usr_1794823457658_kwpn",
+      "authorName": "Automated Test Employer",
+      "authorRole": "emp",
+      "authorTitle": "Hiring Manager",
+      "authorAvatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Automated%20Test%20Employer",
+      "content": "🎉 Apex Labs is officially expanding Mumbai engineering! Hiring cloud engineers.",
+      "image": null,
+      "tags": [
+        "#Hiring",
+        "#MumbaiTech",
+        "#CloudEngineering"
+      ]
+    },
     {
       "id": "post_1794822997561_t3lv",
       "createdAt": "2026-11-16T09:56:37.561Z",
@@ -13304,6 +13650,62 @@
     }
   ],
   "anonDiscussions": [
+    {
+      "id": "anon_1794823464212_xg6n",
+      "title": "Compensation for Remote Full Stack Roles in 2026 (462466)",
+      "content": "What is the standard base compensation for a senior React & Node developer in Mumbai / Remote?",
+      "channel": "r/ChaiCharcha",
+      "authorAlias": "Anonymous Fox",
+      "authorAvatarSeed": "fox",
+      "authorBadge": "Verified Community Member",
+      "score": 2,
+      "upvotes": 2,
+      "downvotes": 0,
+      "upvotedBy": [
+        "anon_creator",
+        "anon_voter"
+      ],
+      "downvotedBy": [],
+      "commentsCount": 1,
+      "comments": [
+        {
+          "id": "ac_1794823464240_mn93",
+          "authorAlias": "Anonymous Contributor",
+          "authorAvatarSeed": "ninja",
+          "authorBadge": "Verified Contributor",
+          "content": "Typical range is ₹20L - ₹32L depending on production experience.",
+          "upvotes": 1,
+          "upvotedBy": [],
+          "reactions": {
+            "🔥": 1
+          },
+          "createdAt": "2026-11-16T10:04:24.240Z"
+        }
+      ],
+      "views": 1,
+      "createdAt": "2026-11-16T10:04:24.212Z"
+    },
+    {
+      "id": "anon_1794823458202_54ji",
+      "title": "Mumbai Tech Salary Benchmarking 2026: BKC vs CyberCity Gurgaon",
+      "content": "Comparing fixed CTC and in-hand deductions between Mumbai and Gurgaon tech hubs.",
+      "channel": "r/SalaryTalk",
+      "authorAlias": "Anonymous Fox",
+      "authorAvatarSeed": "fox",
+      "authorBadge": "Verified Community Member",
+      "score": 2,
+      "upvotes": 2,
+      "downvotes": 0,
+      "upvotedBy": [
+        "anon_creator",
+        "usr_1794823457658_kwpn"
+      ],
+      "downvotedBy": [],
+      "commentsCount": 0,
+      "comments": [],
+      "views": 1,
+      "createdAt": "2026-11-16T10:04:18.202Z"
+    },
     {
       "id": "anon_1794823004101_0wuc",
       "title": "Compensation for Remote Full Stack Roles in 2026 (002568)",
