@@ -257,14 +257,13 @@ const clampToIndia = (lat, lng) => {
   return [clampedLat, clampedLng];
 };
 
-// Auto-fits map bounds to include all jobs, seekers, and the current center
+// Fits map bounds to include nearby jobs and seekers ONLY when explicitly requested by user
 function MapBoundsFitter({ boundsTrigger, jobs, seekers, centerCoords }) {
   const map = useMap();
-  const initialFitDone = useRef(false);
 
   useEffect(() => {
-    // Run on manual trigger OR once on initial load when data is available
-    if (!boundsTrigger && initialFitDone.current) return;
+    // Only run on manual trigger (boundsTrigger > 0)
+    if (!boundsTrigger || boundsTrigger <= 0) return;
 
     const points = [];
     if (centerCoords && centerCoords[0] && centerCoords[1]) {
@@ -281,11 +280,10 @@ function MapBoundsFitter({ boundsTrigger, jobs, seekers, centerCoords }) {
       }
     });
 
-    if (points.length > 1 || (points.length === 1 && boundsTrigger > 0)) {
+    if (points.length > 0) {
       try {
         const bounds = L.latLngBounds(points);
-        map.fitBounds(bounds, { padding: [60, 60], maxZoom: 14 });
-        initialFitDone.current = true;
+        map.fitBounds(bounds, { padding: [60, 60], maxZoom: 15 });
       } catch (err) {
         console.warn('Map fitBounds error:', err);
       }
@@ -406,12 +404,12 @@ const createSeekerIcon = (seeker, isSelected = false) => {
     className: 'custom-seeker-icon',
     html: `
       <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform 0.25s cubic-bezier(0.16,1,0.3,1); transform: ${isSelected ? 'scale(1.15) translateY(-4px)' : 'scale(1)'};">
-        ${(isAvailable || isSelected) ? `
+        ${isSelected ? `
           <div style="
             position: absolute;
             top: 20px;
-            width: ${isSelected ? '52px' : '44px'};
-            height: ${isSelected ? '52px' : '44px'};
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
             background: rgba(16, 185, 129, 0.4);
             animation: pulseRadar 2s infinite;
@@ -559,26 +557,31 @@ export const UberJobMap = ({
   const { user, isEmployer, updateLocation } = useAuth();
   const { otherUserLocations, broadcastLocation, startCall, setActiveChatUser } = useSocket();
 
-  const initialLat = isWithinIndia(user?.lat, user?.lng) ? Number(user.lat) : INDIA_CENTER[0];
-  const initialLng = isWithinIndia(user?.lat, user?.lng) ? Number(user.lng) : INDIA_CENTER[1];
+  // Default primary hub with rich seed data: Mumbai BKC
+  const DEFAULT_PRIMARY_HUB = [19.0760, 72.8777];
+  const initialLat = isWithinIndia(user?.lat, user?.lng) ? Number(user.lat) : DEFAULT_PRIMARY_HUB[0];
+  const initialLng = isWithinIndia(user?.lat, user?.lng) ? Number(user.lng) : DEFAULT_PRIMARY_HUB[1];
 
-  // Radar center coordinates (Defaults to user coordinates or All India National Center)
+  // Radar center coordinates (Defaults to user coordinates or local BKC hub)
   const [centerCoords, setCenterCoords] = useState([initialLat, initialLng]);
   const [activeLocationName, setActiveLocationName] = useState(
-    user?.address || 'India (National Live Map)'
+    user?.address || 'Detecting Location...'
   );
 
-  const [radiusKm, setRadiusKm] = useState(25);
+  const [radiusKm, setRadiusKm] = useState(20);
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [strictRadar, setStrictRadar] = useState(false); // Default false: show all pins across nation, highlight inside radar
+  const [strictRadar, setStrictRadar] = useState(true); // Default true: strictly show only nearby local jobs & seekers within radius
   const [fitBoundsTrigger, setFitBoundsTrigger] = useState(0);
   const [showJobsLayer, setShowJobsLayer] = useState(true);
   const [showSeekersLayer, setShowSeekersLayer] = useState(true);
   const [mapTheme, setMapTheme] = useState('voyager'); // 'voyager' | 'dark'
   
-  // Drawer & Mobile Modals
+  // Drawer & Mobile Modals (with Pagination & Marker Capping)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeTabDrawer, setActiveTabDrawer] = useState('jobs'); // 'jobs' | 'seekers'
+  const [drawerPage, setDrawerPage] = useState(1);
+  const DRAWER_PAGE_SIZE = 6;
+  const MAX_CANVAS_MARKERS = 25;
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [selectedPin, setSelectedPin] = useState(null); // { type: 'job' | 'seeker', data: Object }
   const [commuteModalJob, setCommuteModalJob] = useState(null);
@@ -825,7 +828,8 @@ export const UberJobMap = ({
       setCenterCoords([center.lat, center.lng]);
       setActiveLocationName(`Area [${center.lat.toFixed(3)}, ${center.lng.toFixed(3)}]`);
       setShowSearchThisArea(false);
-    } else if (dist > 0.45) {
+    } else if (dist > 5.0) {
+      // Only show "Search This Area" if user deliberately moved 5+ km away from active radar
       setShowSearchThisArea(true);
     } else {
       setShowSearchThisArea(false);
@@ -906,27 +910,50 @@ export const UberJobMap = ({
       .sort((a, b) => a.distanceKm - b.distanceKm);
   }, [processedSeekers, strictRadar, showSeekersLayer]);
 
+  // Cap rendered pins on canvas to eliminate Leaflet Object Manager DOM thrashing & lag
+  const renderedJobs = useMemo(() => visibleJobs.slice(0, MAX_CANVAS_MARKERS), [visibleJobs]);
+  const renderedSeekers = useMemo(() => visibleSeekers.slice(0, MAX_CANVAS_MARKERS), [visibleSeekers]);
+
+  // Reset drawer pagination whenever filtering criteria change
+  useEffect(() => {
+    setDrawerPage(1);
+  }, [selectedCategory, radiusKm, activeTabDrawer, centerCoords, strictRadar]);
+
+  const currentDrawerList = activeTabDrawer === 'jobs' ? visibleJobs : visibleSeekers;
+  const totalDrawerPages = Math.max(1, Math.ceil(currentDrawerList.length / DRAWER_PAGE_SIZE));
+  const pagedItems = useMemo(() => {
+    const start = (drawerPage - 1) * DRAWER_PAGE_SIZE;
+    return currentDrawerList.slice(start, start + DRAWER_PAGE_SIZE);
+  }, [currentDrawerList, drawerPage]);
+
   // Handle HTML5 GPS Geolocation (with Chrome Windows fallback)
-  const locateMe = () => {
+  const locateMe = useCallback((options = {}) => {
+    const isAuto = Boolean(options?.isAuto);
     if (typeof navigator !== 'undefined' && navigator.geolocation) {
       setGpsLoading(true);
 
-      const onGpsSuccess = (pos) => {
+      const onGpsSuccess = async (pos) => {
         let lat = pos.coords.latitude;
         let lng = pos.coords.longitude;
         if (!isWithinIndia(lat, lng)) {
           [lat, lng] = clampToIndia(lat, lng);
         }
-        setTargetZoomLevel(17);
+        setTargetZoomLevel(15);
         setCenterCoords([lat, lng]);
-        const gpsLabel = 'My GPS Location';
-        setActiveLocationName(gpsLabel);
-        setSearchQuery(gpsLabel);
-        updateLocation(lat, lng, gpsLabel);
-        broadcastLocation(lat, lng, gpsLabel);
+        
+        let detectedName = 'Near Your Location';
+        try {
+          const rev = await reverseGeocode(lat, lng);
+          if (rev) detectedName = rev;
+        } catch (_) {}
+
+        setActiveLocationName(detectedName);
+        setSearchQuery(detectedName);
+        updateLocation(lat, lng, detectedName);
+        broadcastLocation(lat, lng, detectedName);
         setFlyTrigger((prev) => prev + 1);
         if (mapInstance) {
-          mapInstance.flyTo([lat, lng], 17, { animate: true, duration: 1.0 });
+          mapInstance.flyTo([lat, lng], 15, { animate: true, duration: 1.0 });
         }
         setGpsLoading(false);
       };
@@ -934,21 +961,34 @@ export const UberJobMap = ({
       navigator.geolocation.getCurrentPosition(
         onGpsSuccess,
         (err) => {
-          console.warn('High-accuracy GPS timeout/denied in Chrome, retrying with network positioning:', err.message);
+          console.warn('High-accuracy GPS timeout/denied, retrying with standard accuracy:', err.message);
           // Chrome Desktop Fallback: retry with standard accuracy (Wi-Fi/IP location)
           navigator.geolocation.getCurrentPosition(
             onGpsSuccess,
             (err2) => {
-              console.warn('Geolocation fallback also failed:', err2.message);
+              console.warn('Geolocation fallback failed or permission denied:', err2.message);
               setGpsLoading(false);
+              if (isAuto && !user?.lat) {
+                // Friendly label for default hub
+                setActiveLocationName('Bandra Kurla Complex (BKC), Mumbai');
+              }
             },
-            { enableHighAccuracy: false, timeout: 8000, maximumAge: 120000 }
+            { enableHighAccuracy: false, timeout: 7000, maximumAge: 120000 }
           );
         },
         { enableHighAccuracy: true, timeout: 5000 }
       );
     }
-  };
+  }, [mapInstance, user?.lat, user?.address, updateLocation, broadcastLocation]);
+
+  // Auto-request location permission & center on mount
+  const hasAutoLocatedRef = useRef(false);
+  useEffect(() => {
+    if (!hasAutoLocatedRef.current) {
+      hasAutoLocatedRef.current = true;
+      locateMe({ isAuto: true });
+    }
+  }, [locateMe]);
 
   // Map Click Handler: relocate radar center dynamically for exploration without mutating saved user profile
   const handleMapClick = (latlng) => {
@@ -1077,12 +1117,30 @@ export const UberJobMap = ({
             <span className="text-xs font-bold hidden md:inline">{mapTheme === 'voyager' ? 'Satellite' : 'Streets'}</span>
           </button>
 
-          {/* Mobile Filter Sheet Trigger Button */}
+          {/* Mobile & Desktop Filter Sheet Trigger Button */}
+          <button
+            onClick={() => setIsFilterModalOpen(true)}
+            title="Distance & Map Filters"
+            className="flex-shrink-0 px-2.5 py-2.5 sm:py-2 bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-2xl shadow-lg hover:bg-slate-50 hover:border-slate-300 text-slate-700 transition-all flex items-center gap-1.5 active:scale-95"
+          >
+            <Sliders className="w-4 h-4 text-indigo-600" />
+            <span className="text-xs font-bold hidden md:inline">Filters</span>
+          </button>
         </div>
 
         {/* Quick Indian Cities & National Hubs Selector Strip */}
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar touch-pan-x pointer-events-auto py-0.5 max-w-full">
-          {INDIA_CITY_PRESETS.map((city) => {
+          <button
+            type="button"
+            onClick={() => locateMe()}
+            className="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shadow-xs transition-all active:scale-95 flex items-center gap-1.5 border bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-indigo-200"
+            title="Locate around my current position"
+          >
+            {gpsLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Crosshair className="w-3.5 h-3.5" />}
+            <span>Near Me</span>
+          </button>
+
+          {INDIA_CITY_PRESETS.slice(0, 8).map((city) => {
             const isCurrent = 
               Math.abs(safeCoords[0] - city.lat) < 0.15 && 
               Math.abs(safeCoords[1] - city.lng) < 0.15;
@@ -1473,106 +1531,57 @@ export const UberJobMap = ({
       {/* ============================================================== */}
       {/* FLOATING ACTION BUTTONS (Bottom Right) */}
       {/* ============================================================== */}
-      {/* ============================================================== */}
-      {/* FLOATING ACTION BUTTONS (Bottom Right) */}
-      {/* ============================================================== */}
-      <div className="absolute bottom-20 md:bottom-6 right-3 sm:right-6 z-[500] flex flex-col gap-2.5 items-end pointer-events-auto">
+      <div className="absolute bottom-20 md:bottom-6 right-3 sm:right-6 z-[500] flex flex-col gap-2 items-end pointer-events-auto">
         
-        {/* Google Maps Style Move & Zoom Navigation Controller (Transparent Glassmorphic) */}
-        <div className="flex flex-col items-center bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-2xl shadow-lg p-1.5 gap-1 transition-all duration-200">
-          <div className="flex items-center gap-1 text-[9px] font-extrabold text-slate-500 uppercase tracking-wider px-1">
-            <Move className="w-2.5 h-2.5 text-indigo-600" />
-            <span>Move</span>
-          </div>
+        {/* Sleek Minimalist Zoom & Location Widget */}
+        <div className="flex flex-col items-center bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-2xl shadow-lg p-1 gap-1">
+          <button
+            type="button"
+            onClick={handleZoomIn}
+            title="Zoom In"
+            className="p-2 hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 rounded-xl transition-all active:scale-95"
+            aria-label="Zoom In"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
 
-          {/* D-Pad Pan Directional Controls */}
-          <div className="grid grid-cols-3 gap-1">
-            <div></div>
-            <button
-              type="button"
-              onClick={() => handlePan(0, -180)}
-              title="Move Map North / Up"
-              className="p-1.5 bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-700 rounded-lg transition-all active:scale-90 border border-slate-200"
-              aria-label="Move Up"
-            >
-              <ChevronUp className="w-3.5 h-3.5" />
-            </button>
-            <div></div>
-            
-            <button
-              type="button"
-              onClick={() => handlePan(-180, 0)}
-              title="Move Map West / Left"
-              className="p-1.5 bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-700 rounded-lg transition-all active:scale-90 border border-slate-200"
-              aria-label="Move Left"
-            >
-              <ChevronLeft className="w-3.5 h-3.5" />
-            </button>
-            <button
-              type="button"
-              onClick={handleMoveRadarToMapCenter}
-              title="Center Map at Current View (Search here)"
-              className="p-1.5 bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 rounded-lg transition-all active:scale-90 border border-indigo-200"
-              aria-label="Center Map at Current View"
-            >
-              <Crosshair className="w-3.5 h-3.5" />
-            </button>
-            <button
-              type="button"
-              onClick={() => handlePan(180, 0)}
-              title="Move Map East / Right"
-              className="p-1.5 bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-700 rounded-lg transition-all active:scale-90 border border-slate-200"
-              aria-label="Move Right"
-            >
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
+          <div className="w-4 h-px bg-slate-200" />
 
-            <div></div>
-            <button
-              type="button"
-              onClick={() => handlePan(0, 180)}
-              title="Move Map South / Down"
-              className="p-1.5 bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-700 rounded-lg transition-all active:scale-90 border border-slate-200"
-              aria-label="Move Down"
-            >
-              <ChevronDown className="w-3.5 h-3.5" />
-            </button>
-            <div></div>
-          </div>
-          
-          <div className="w-full border-t border-slate-200 my-0.5" />
+          <button
+            type="button"
+            onClick={handleZoomOut}
+            title="Zoom Out"
+            className="p-2 hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 rounded-xl transition-all active:scale-95"
+            aria-label="Zoom Out"
+          >
+            <Minus className="w-4 h-4" />
+          </button>
 
-          {/* Zoom Controls (+ / -) */}
-          <div className="flex w-full justify-between gap-1">
-            <button
-              type="button"
-              onClick={handleZoomIn}
-              title="Zoom In (+)"
-              className="flex-1 py-1 bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-700 rounded-lg transition-all flex items-center justify-center active:scale-90 border border-slate-200"
-              aria-label="Zoom In"
-            >
-              <Plus className="w-3.5 h-3.5" />
-            </button>
-            <button
-              type="button"
-              onClick={handleZoomOut}
-              title="Zoom Out (-)"
-              className="flex-1 py-1 bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-700 rounded-lg transition-all flex items-center justify-center active:scale-90 border border-slate-200"
-              aria-label="Zoom Out"
-            >
-              <Minus className="w-3.5 h-3.5" />
-            </button>
-          </div>
+          <div className="w-4 h-px bg-slate-200" />
+
+          <button
+            type="button"
+            onClick={() => locateMe()}
+            title="Locate Me (Current GPS)"
+            className="p-2 hover:bg-indigo-50 text-indigo-600 rounded-xl transition-all active:scale-95"
+            aria-label="Current Location"
+          >
+            {gpsLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin text-indigo-600" />
+            ) : (
+              <Crosshair className="w-4 h-4" />
+            )}
+          </button>
         </div>
 
-        {/* Fit All Markers in View button */}
+        {/* Fit Bounds in View button */}
         <button
           onClick={() => setFitBoundsTrigger((prev) => prev + 1)}
-          title="Fit all active jobs and candidates into view"
+          title="Fit nearby markers into view"
           className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-white/95 hover:bg-white backdrop-blur-2xl text-indigo-700 hover:text-indigo-900 border border-slate-200/90 shadow-lg text-xs font-bold transition-all active:scale-95"
         >
           <Compass className="w-4 h-4 text-indigo-600" />
-          <span>Fit All Pins</span>
+          <span className="hidden sm:inline">Fit Nearby</span>
         </button>
 
         {/* Toggle Results List Drawer */}
@@ -1580,7 +1589,7 @@ export const UberJobMap = ({
           onClick={() => setIsDrawerOpen(!isDrawerOpen)}
           className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-white/95 hover:bg-white backdrop-blur-2xl text-slate-900 border border-slate-200/90 shadow-lg text-xs font-bold transition-all active:scale-95"
         >
-          {isDrawerOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4 text-emerald-600" />}
+          {isDrawerOpen ? <ChevronDown className="w-4 h-4 text-slate-500" /> : <ChevronUp className="w-4 h-4 text-indigo-600" />}
           <span>{isDrawerOpen ? 'Close List' : `Matches (${visibleJobs.length + visibleSeekers.length})`}</span>
         </button>
 
@@ -1602,21 +1611,21 @@ export const UberJobMap = ({
       <div className="absolute bottom-4 left-4 z-[500] pointer-events-none hidden lg:block">
         <div className="bg-white/95 backdrop-blur-2xl px-3.5 py-1.5 rounded-xl border border-slate-200/90 text-[11px] text-slate-600 flex items-center gap-2 shadow-md">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
-          <span>Active Hub: <strong className="text-slate-900">{activeLocationName}</strong> • {visibleJobs.length} jobs & {visibleSeekers.length} seekers in range</span>
+          <span>Local Radar: <strong className="text-slate-900">{activeLocationName}</strong> • {visibleJobs.length} jobs & {visibleSeekers.length} seekers within {radiusKm} km</span>
         </div>
       </div>
 
       {/* ============================================================== */}
-      {/* BOTTOM COLLAPSIBLE DISCOVERY DRAWER */}
+      {/* BOTTOM COLLAPSIBLE DISCOVERY DRAWER (PAGINATED) */}
       {/* ============================================================== */}
       {isDrawerOpen && (
-        <div className="absolute bottom-20 md:bottom-6 left-2 right-2 sm:bottom-6 sm:left-6 sm:right-auto sm:w-[480px] lg:w-[540px] max-w-[calc(100vw-1.5rem)] max-h-64 sm:max-h-72 z-[520] bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-3xl p-3 sm:p-4 shadow-2xl flex flex-col gap-2.5 animate-in slide-in-from-bottom duration-200 pointer-events-auto text-slate-900">
+        <div className="absolute bottom-20 md:bottom-6 left-2 right-2 sm:bottom-6 sm:left-6 sm:right-auto sm:w-[490px] lg:w-[540px] max-w-[calc(100vw-1.5rem)] z-[520] bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-3xl p-3 sm:p-4 shadow-2xl flex flex-col gap-2.5 animate-in slide-in-from-bottom duration-200 pointer-events-auto text-slate-900">
           
           {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-100 pb-2">
             <div className="flex items-center gap-2 sm:gap-3">
               <span className="text-[11px] sm:text-xs font-bold text-slate-900 uppercase tracking-wider truncate">
-                Matches ({radiusKm} km)
+                Nearby ({radiusKm} km)
               </span>
               <div className="flex gap-1">
                 <button
@@ -1653,38 +1662,56 @@ export const UberJobMap = ({
             </button>
           </div>
 
-          {/* Horizontal Card List */}
-          <div className="flex items-center gap-2.5 overflow-x-auto pb-1 pt-0.5">
-            {activeTabDrawer === 'jobs' && visibleJobs.length === 0 && (
-              <p className="text-xs text-slate-500 py-3 px-2">No jobs within this {radiusKm} km search radius. Try increasing the radius slider.</p>
-            )}
-
-            {activeTabDrawer === 'jobs' && visibleJobs.map((job) => (
-              <div
-                key={job.id}
-                onClick={() => {
-                  setSelectedPin({ type: 'job', data: job });
-                  if (job.lat && job.lng && mapInstance) {
-                    mapInstance.flyTo([job.lat, job.lng], 16, { animate: true });
-                  }
-                }}
-                className={`min-w-[210px] sm:min-w-[230px] max-w-[230px] p-3 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between flex-shrink-0 shadow-xs ${
-                  selectedPin?.type === 'job' && selectedPin.data?.id === job.id
-                    ? 'bg-indigo-50/90 border-indigo-500 ring-2 ring-indigo-500/20'
-                    : 'bg-slate-50 hover:bg-slate-100/90 border-slate-200/90 hover:border-indigo-400'
-                }`}
-              >
-                <div>
-                  <div className="flex items-center justify-between text-[10px] text-indigo-600 font-bold mb-1">
-                    <span>{job.jobType}</span>
-                    <span className="text-slate-500 font-semibold">{job.distanceKm} km away</span>
-                  </div>
-                  <h4 className="text-xs font-bold text-slate-900 truncate">{job.title}</h4>
-                  <p className="text-[11px] text-slate-500 truncate">{job.company}</p>
+          {/* Cards List (Paginated) */}
+          <div className="flex items-center gap-2.5 overflow-x-auto pb-1 pt-0.5 min-h-[105px]">
+            {currentDrawerList.length === 0 ? (
+              <div className="flex flex-col items-center justify-center w-full py-4 text-center">
+                <p className="text-xs text-slate-500">
+                  No {activeTabDrawer} found within {radiusKm} km of this location.
+                </p>
+                <div className="flex items-center gap-2 mt-2">
+                  <button
+                    type="button"
+                    onClick={() => setRadiusKm(35)}
+                    className="px-3 py-1 rounded-xl text-[11px] font-bold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition-colors"
+                  >
+                    Expand to 35 km
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStrictRadar(false)}
+                    className="px-3 py-1 rounded-xl text-[11px] font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 transition-colors"
+                  >
+                    Show All
+                  </button>
                 </div>
-                <div className="mt-2 pt-2 border-t border-slate-200 flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold text-emerald-700">{job.salary ? String(job.salary).split('-')[0].trim() : 'Active'}</span>
-                  <div className="flex items-center gap-1.5">
+              </div>
+            ) : activeTabDrawer === 'jobs' ? (
+              pagedItems.map((job) => (
+                <div
+                  key={job.id}
+                  onClick={() => {
+                    setSelectedPin({ type: 'job', data: job });
+                    if (job.lat && job.lng && mapInstance) {
+                      mapInstance.flyTo([job.lat, job.lng], 16, { animate: true });
+                    }
+                  }}
+                  className={`min-w-[210px] sm:min-w-[230px] max-w-[230px] p-3 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between flex-shrink-0 shadow-xs ${
+                    selectedPin?.type === 'job' && selectedPin.data?.id === job.id
+                      ? 'bg-indigo-50/90 border-indigo-500 ring-2 ring-indigo-500/20'
+                      : 'bg-slate-50 hover:bg-slate-100/90 border-slate-200/90 hover:border-indigo-400'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between text-[10px] text-indigo-600 font-bold mb-1">
+                      <span>{job.jobType}</span>
+                      <span className="text-slate-500 font-semibold">{job.distanceKm} km away</span>
+                    </div>
+                    <h4 className="text-xs font-bold text-slate-900 truncate">{job.title}</h4>
+                    <p className="text-[11px] text-slate-500 truncate">{job.company}</p>
+                  </div>
+                  <div className="mt-2 pt-2 border-t border-slate-200 flex items-center justify-between">
+                    <span className="text-xs font-mono font-bold text-emerald-700">{job.salary ? String(job.salary).split('-')[0].trim() : 'Active'}</span>
                     <button
                       type="button"
                       onClick={(e) => {
@@ -1697,55 +1724,93 @@ export const UberJobMap = ({
                     </button>
                   </div>
                 </div>
-              </div>
-            ))}
-
-            {activeTabDrawer === 'seekers' && visibleSeekers.length === 0 && (
-              <p className="text-xs text-slate-500 py-3 px-2">No active seekers within this {radiusKm} km search radius. Try increasing the radius slider.</p>
-            )}
-
-            {activeTabDrawer === 'seekers' && visibleSeekers.map((seeker) => (
-              <div
-                key={seeker.id}
-                onClick={() => {
-                  setSelectedPin({ type: 'seeker', data: seeker });
-                  if (seeker.lat && seeker.lng && mapInstance) {
-                    mapInstance.flyTo([seeker.lat, seeker.lng], 16, { animate: true });
-                  }
-                }}
-                className={`min-w-[210px] sm:min-w-[230px] max-w-[230px] p-3 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between flex-shrink-0 shadow-xs ${
-                  selectedPin?.type === 'seeker' && selectedPin.data?.id === seeker.id
-                    ? 'bg-emerald-50/90 border-emerald-500 ring-2 ring-emerald-500/20'
-                    : 'bg-slate-50 hover:bg-slate-100/90 border-slate-200/90 hover:border-emerald-400'
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <img
-                    src={seeker.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${seeker.name}`}
-                    alt={seeker.name}
-                    className="w-8 h-8 rounded-full border border-emerald-400 object-cover"
-                  />
-                  <div className="truncate">
-                    <h4 className="text-xs font-bold text-slate-900 truncate">{seeker.name}</h4>
-                    <p className="text-[10px] text-emerald-700 truncate">{seeker.title || 'Job Seeker'}</p>
+              ))
+            ) : (
+              pagedItems.map((seeker) => (
+                <div
+                  key={seeker.id}
+                  onClick={() => {
+                    setSelectedPin({ type: 'seeker', data: seeker });
+                    if (seeker.lat && seeker.lng && mapInstance) {
+                      mapInstance.flyTo([seeker.lat, seeker.lng], 16, { animate: true });
+                    }
+                  }}
+                  className={`min-w-[210px] sm:min-w-[230px] max-w-[230px] p-3 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between flex-shrink-0 shadow-xs ${
+                    selectedPin?.type === 'seeker' && selectedPin.data?.id === seeker.id
+                      ? 'bg-emerald-50/90 border-emerald-500 ring-2 ring-emerald-500/20'
+                      : 'bg-slate-50 hover:bg-slate-100/90 border-slate-200/90 hover:border-emerald-400'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <img
+                      src={seeker.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${seeker.name}`}
+                      alt={seeker.name}
+                      className="w-8 h-8 rounded-full border border-emerald-400 object-cover"
+                    />
+                    <div className="truncate">
+                      <h4 className="text-xs font-bold text-slate-900 truncate">{seeker.name}</h4>
+                      <p className="text-[10px] text-emerald-700 truncate">{seeker.title || 'Job Seeker'}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-200">
+                    <span className="text-slate-500 text-[10px]">{seeker.distanceKm} km away</span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectSeeker(seeker);
+                      }}
+                      className="text-[10px] px-2 py-0.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-colors shadow-2xs"
+                    >
+                      View
+                    </button>
                   </div>
                 </div>
-                <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-200">
-                  <span className="text-slate-500 text-[10px]">{seeker.distanceKm} km away</span>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSelectSeeker(seeker);
-                    }}
-                    className="text-[10px] px-2 py-0.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-colors shadow-2xs"
-                  >
-                    View
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
+
+          {/* Drawer Pagination Navigation Bar */}
+          {totalDrawerPages > 1 && (
+            <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+              <div className="text-[11px] font-semibold text-slate-500">
+                <span>
+                  Page {drawerPage} of {totalDrawerPages} ({currentDrawerList.length} nearby)
+                </span>
+                {currentDrawerList.length > MAX_CANVAS_MARKERS && (
+                  <span className="hidden sm:inline text-slate-400 ml-1">
+                    • Top {MAX_CANVAS_MARKERS} on map
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  disabled={drawerPage <= 1}
+                  onClick={() => setDrawerPage((prev) => Math.max(1, prev - 1))}
+                  className="px-2.5 py-1 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 transition-all flex items-center gap-1"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  <span>Prev</span>
+                </button>
+
+                <span className="px-2 py-0.5 rounded-lg bg-indigo-50 text-indigo-700 font-extrabold text-[11px] border border-indigo-200">
+                  {drawerPage} / {totalDrawerPages}
+                </span>
+
+                <button
+                  type="button"
+                  disabled={drawerPage >= totalDrawerPages}
+                  onClick={() => setDrawerPage((prev) => Math.min(totalDrawerPages, prev + 1))}
+                  className="px-2.5 py-1 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 transition-all flex items-center gap-1"
+                >
+                  <span>Next</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
 
         </div>
       )}
@@ -1962,7 +2027,7 @@ export const UberJobMap = ({
       {/* ============================================================== */}
       <MapContainer
         center={safeCoords}
-        zoom={user?.lat && isWithinIndia(user.lat, user.lng) ? 13 : 5}
+        zoom={user?.lat && isWithinIndia(user.lat, user.lng) ? 14 : 14}
         minZoom={4}
         maxZoom={19}
         maxBounds={INDIA_BOUNDS}
@@ -2065,8 +2130,8 @@ export const UberJobMap = ({
           </Popup>
         </Marker>
 
-        {/* Job Markers */}
-        {visibleJobs.map((job) => {
+        {/* Job Markers (Capped to MAX_CANVAS_MARKERS to guarantee 60fps performance) */}
+        {renderedJobs.map((job) => {
           const isSelected = selectedPin?.type === 'job' && selectedPin.data?.id === job.id;
           return (
             <Marker
@@ -2125,8 +2190,8 @@ export const UberJobMap = ({
           );
         })}
 
-        {/* Seeker Markers */}
-        {visibleSeekers.map((seeker) => {
+        {/* Seeker Markers (Capped to MAX_CANVAS_MARKERS to guarantee 60fps performance) */}
+        {renderedSeekers.map((seeker) => {
           const isSelected = selectedPin?.type === 'seeker' && selectedPin.data?.id === seeker.id;
           return (
             <Marker
