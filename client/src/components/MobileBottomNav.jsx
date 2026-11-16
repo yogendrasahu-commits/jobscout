@@ -1,6 +1,7 @@
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { JobScoutLogo } from './JobScoutLogo';
+import { ShieldAlert } from 'lucide-react';
 import { 
   NavFeedIcon, 
   NavNetworkIcon, 
@@ -117,37 +118,59 @@ export const MobileBottomNav = ({
           )}
         </button>
 
-        {/* 5. Messages (Full-Page Chat) */}
-        <button
-          onClick={() => {
-            if (!user) {
-              onOpenAuth ? onOpenAuth() : setCurrentTab('messages');
-            } else {
-              setCurrentTab('messages');
-            }
-          }}
-          className={`col-span-1 flex flex-col items-center justify-center py-1 px-0.5 rounded-xl transition-all relative ${
-            currentTab === 'messages'
-              ? 'text-indigo-600 font-extrabold scale-105'
-              : 'text-slate-500 hover:text-slate-800'
-          }`}
-        >
-          <div className="relative">
-            <NavMessagesIcon active={currentTab === 'messages'} className="w-5 h-5 flex-shrink-0" />
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-500 rounded-full shadow-xs border border-white" />
-          </div>
-          <div className="flex items-center gap-0.5 mt-0.5">
-            <span className={`text-[10px] tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'messages' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>Chat</span>
-            {!user && (
-              <span className="text-[8px] font-extrabold px-1 rounded bg-amber-100 text-amber-800 leading-none">
-                Login
-              </span>
+        {/* 5. Messages or Master Admin Portal */}
+        {user?.role === 'admin' ? (
+          <button
+            onClick={() => setCurrentTab('admin')}
+            className={`col-span-1 flex flex-col items-center justify-center py-1 px-0.5 rounded-xl transition-all relative ${
+              currentTab === 'admin'
+                ? 'text-rose-600 font-extrabold scale-105'
+                : 'text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <div className="relative">
+              <ShieldAlert className="w-5 h-5 flex-shrink-0 text-rose-500" />
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-rose-500 rounded-full animate-ping" />
+            </div>
+            <div className="flex items-center gap-0.5 mt-0.5">
+              <span className={`text-[10px] tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'admin' ? 'text-rose-600 font-extrabold' : 'text-slate-600'}`}>Admin</span>
+            </div>
+            {currentTab === 'admin' && (
+              <span className="w-1.5 h-1 rounded-full bg-rose-500 mt-0.5 shadow-xs" />
             )}
-          </div>
-          {currentTab === 'messages' && (
-            <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
-          )}
-        </button>
+          </button>
+        ) : (
+          <button
+            onClick={() => {
+              if (!user) {
+                onOpenAuth ? onOpenAuth() : setCurrentTab('messages');
+              } else {
+                setCurrentTab('messages');
+              }
+            }}
+            className={`col-span-1 flex flex-col items-center justify-center py-1 px-0.5 rounded-xl transition-all relative ${
+              currentTab === 'messages'
+                ? 'text-indigo-600 font-extrabold scale-105'
+                : 'text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <div className="relative">
+              <NavMessagesIcon active={currentTab === 'messages'} className="w-5 h-5 flex-shrink-0" />
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-500 rounded-full shadow-xs border border-white" />
+            </div>
+            <div className="flex items-center gap-0.5 mt-0.5">
+              <span className={`text-[10px] tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'messages' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>Chat</span>
+              {!user && (
+                <span className="text-[8px] font-extrabold px-1 rounded bg-amber-100 text-amber-800 leading-none">
+                  Login
+                </span>
+              )}
+            </div>
+            {currentTab === 'messages' && (
+              <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
+            )}
+          </button>
+        )}
 
       </div>
     </nav>

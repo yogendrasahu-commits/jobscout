@@ -150,10 +150,10 @@ export const Feed = ({
       if (selectedTag) tags.push(selectedTag);
 
       const created = await postService.createPost({
-        authorId: user?.id || 'guest',
-        authorName: user?.name || (isEmployer ? 'Tech Recruiter' : 'Software Candidate'),
+        authorId: user?.id || 'usr_anonymous',
+        authorName: user?.name || (user?.role === 'admin' ? 'System Administrator' : isEmployer ? 'Tech Recruiter' : 'Software Candidate'),
         authorRole: user?.role || 'seeker',
-        authorTitle: user?.title || user?.companyName || (isEmployer ? 'Talent Acquisition' : 'Full-Stack Developer'),
+        authorTitle: user?.title || user?.companyName || (user?.role === 'admin' ? 'Platform Administrator' : isEmployer ? 'Talent Acquisition' : 'Full-Stack Developer'),
         authorAvatar: user?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(user?.name || 'user')}`,
         content: trimmedContent,
         image: cleanedImage,
@@ -282,7 +282,7 @@ export const Feed = ({
                 onClick={() => onOpenProfile && onOpenProfile(user)}
                 className="font-extrabold text-sm text-slate-900 hover:text-indigo-600 cursor-pointer transition-colors flex items-center gap-1"
               >
-                <span>{user?.name || 'Guest Professional'}</span>
+                <span>{user?.name || (user?.role === 'admin' ? 'System Administrator' : 'Platform Member')}</span>
                 {user && <ShieldCheck className="w-3.5 h-3.5 text-indigo-600 inline" />}
               </h3>
               <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">

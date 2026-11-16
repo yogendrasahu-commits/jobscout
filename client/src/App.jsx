@@ -23,6 +23,7 @@ import { ProfileCompletionAlert } from './components/ProfileCompletionAlert';
 import { FullPageChat } from './pages/FullPageChat';
 import { AnonDiscuss } from './pages/AnonDiscuss';
 import { Welcome } from './pages/Welcome';
+import { AdminDashboard } from './pages/AdminDashboard';
 import { CommandPalette } from './components/CommandPalette';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { jobService } from './services/jobService';
@@ -31,17 +32,13 @@ import { userService } from './services/userService';
 function MainApp() {
   const { user, isEmployer } = useAuth();
   const { socket } = useSocket();
-  const [isGuestMode, setIsGuestMode] = useState(() => {
-    return localStorage.getItem('jobradar_guest_mode') === 'true';
-  });
   const [currentTab, setCurrentTab] = useState(() => {
     const hash = typeof window !== 'undefined' ? window.location.hash.replace(/^#\/?/, '').toLowerCase().trim() : '';
-    const validTabs = ['welcome', 'feed', 'network', 'map', 'jobs', 'connect', 'anon', 'applications', 'messages'];
+    const validTabs = ['welcome', 'feed', 'network', 'map', 'jobs', 'connect', 'anon', 'applications', 'messages', 'admin'];
     if (validTabs.includes(hash)) return hash;
     if (localStorage.getItem('jobradar_token')) return 'feed';
-    if (localStorage.getItem('jobradar_guest_mode') === 'true') return 'feed';
     return 'welcome';
-  }); // 'welcome' | 'feed' | 'network' | 'map' | 'jobs' | 'connect' | 'anon' | 'applications' | 'messages'
+  }); // 'welcome' | 'feed' | 'network' | 'map' | 'jobs' | 'connect' | 'anon' | 'applications' | 'messages' | 'admin'
   const [pendingTabAfterAuth, setPendingTabAfterAuth] = useState(null);
   const [jobsSubTab, setJobsSubTab] = useState('browse'); // 'browse' | 'applied'
 
@@ -124,16 +121,22 @@ function MainApp() {
       fetchEmployers();
     };
 
+    const handleSystemBroadcast = (payload) => {
+      alert(`📢 [SYSTEM BROADCAST from ${payload.sender || 'Administrator'}]\n\n${payload.title || 'Platform Notice'}\n${payload.message}`);
+    };
+
     socket.on('job:created', handleJobCreatedEvent);
     socket.on('job:deleted', handleJobDeletedEvent);
     socket.on('user:registered', handleUserRegisteredEvent);
     socket.on('user:updated', handleUserUpdatedEvent);
+    socket.on('system:broadcast', handleSystemBroadcast);
 
     return () => {
       socket.off('job:created', handleJobCreatedEvent);
       socket.off('job:deleted', handleJobDeletedEvent);
       socket.off('user:registered', handleUserRegisteredEvent);
       socket.off('user:updated', handleUserUpdatedEvent);
+      socket.off('system:broadcast', handleSystemBroadcast);
     };
   }, [socket]);
 
@@ -255,38 +258,34 @@ function MainApp() {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [currentTab]);
 
-  const handleExploreAsGuest = (targetTab = 'feed') => {
-    localStorage.setItem('jobradar_guest_mode', 'true');
-    setIsGuestMode(true);
-    setCurrentTab(targetTab);
-    if (targetTab !== 'welcome') {
-      window.history.pushState(null, '', `#/${targetTab}`);
-    }
-  };
-
-  const handleExitGuest = () => {
-    localStorage.removeItem('jobradar_guest_mode');
-    setIsGuestMode(false);
-    setCurrentTab('welcome');
-    window.history.pushState(null, '', window.location.pathname);
-  };
-
-  // Once logged in or exploring as guest, completely bypass and remove the welcome page
+  // Once logged in, bypass the welcome onboarding view
   useEffect(() => {
-    if ((user || isGuestMode) && currentTab === 'welcome') {
-      setCurrentTab('feed');
-      window.history.replaceState(null, '', '#/feed');
+    if (user && currentTab === 'welcome') {
+      if (user.role === 'admin') {
+        setCurrentTab('admin');
+        window.history.replaceState(null, '', '#/admin');
+      } else {
+        setCurrentTab('feed');
+        window.history.replaceState(null, '', '#/feed');
+      }
     }
-  }, [user, isGuestMode, currentTab]);
+  }, [user, currentTab]);
 
-  // Centralized tab navigation: public tabs accessible to guests, protected tabs require login
+  // Centralized tab navigation with Admin privilege enforcement
   const handleNavigateTab = (tab) => {
     const publicTabs = ['welcome', 'feed', 'network', 'jobs', 'map', 'connect', 'anon'];
-    if (!user && !publicTabs.includes(tab)) {
+    if (tab === 'admin') {
+      if (!user || user.role !== 'admin') {
+        setPendingTabAfterAuth('admin');
+        setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' });
+        return;
+      }
+    } else if (!user && !publicTabs.includes(tab)) {
       setPendingTabAfterAuth(tab);
       setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' });
       return;
     }
+
     setCurrentTab(tab);
     if (tab && tab !== 'welcome') {
       if (window.location.hash.replace(/^#\/?/, '') !== tab) {
@@ -303,55 +302,55 @@ function MainApp() {
   useEffect(() => {
     const handlePopState = () => {
       const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase().trim();
-      const validTabs = ['welcome', 'feed', 'network', 'map', 'jobs', 'connect', 'anon', 'applications', 'messages'];
+      const validTabs = ['welcome', 'feed', 'network', 'map', 'jobs', 'connect', 'anon', 'applications', 'messages', 'admin'];
       if (validTabs.includes(hash)) {
         const publicTabs = ['welcome', 'feed', 'network', 'jobs', 'map', 'connect', 'anon'];
-        if (!user && !publicTabs.includes(hash)) {
+        if (hash === 'admin' && (!user || user.role !== 'admin')) {
+          setCurrentTab('feed');
+        } else if (!user && !publicTabs.includes(hash)) {
           setCurrentTab('feed');
         } else {
           setCurrentTab(hash);
         }
       } else if (!hash) {
-        if (!user && !isGuestMode) {
+        if (!user) {
           setCurrentTab('welcome');
         } else {
-          setCurrentTab('feed');
+          setCurrentTab(user.role === 'admin' ? 'admin' : 'feed');
         }
       }
     };
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, [user, isGuestMode]);
+  }, [user]);
 
   // Route guard: without login allow public exploratory tabs (Feed, Network, Jobs, Map, Connect, Anon)
   useEffect(() => {
     const publicTabs = ['welcome', 'feed', 'network', 'jobs', 'map', 'connect', 'anon'];
     if (!user && !publicTabs.includes(currentTab)) {
-      setCurrentTab('feed');
+      setCurrentTab('welcome');
       setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' });
+    } else if (currentTab === 'admin' && user && user.role !== 'admin') {
+      setCurrentTab('feed');
     }
   }, [user, currentTab]);
 
-  // STANDALONE WELCOME / ONBOARDING LANDING VIEW (Unauthenticated / Non-guest only)
-  if (currentTab === 'welcome' && !user && !isGuestMode) {
+  // STANDALONE WELCOME / ONBOARDING LANDING VIEW (Unauthenticated only)
+  if (currentTab === 'welcome' && !user) {
     return (
       <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 text-slate-900 flex flex-col font-sans antialiased">
         <Welcome
-          onNavigateToMap={() => handleExploreAsGuest('map')}
-          onNavigateToJobs={() => handleExploreAsGuest('jobs')}
-          onNavigateToNetwork={() => handleExploreAsGuest('network')}
-          onNavigateToFeed={() => handleExploreAsGuest('feed')}
-          onNavigateToConnect={() => handleExploreAsGuest('connect')}
-          onNavigateToAnon={() => handleExploreAsGuest('anon')}
-          onExploreAsGuest={(tab) => {
-            const allowed = ['welcome', 'feed', 'network', 'jobs', 'map', 'connect', 'anon'];
-            handleExploreAsGuest(allowed.includes(tab) ? tab : 'feed');
-          }}
-          onOpenLogin={(phone) => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
-          onOpenSignup={(role, phone) => setAuthConfig({ isOpen: true, mode: 'register', role: role || 'seeker' })}
-          onSelectJob={(job) => { setSelectedJob(job); handleExploreAsGuest('jobs'); }}
-          onSelectSeeker={(seeker) => { handleOpenProfile(seeker); handleExploreAsGuest('feed'); }}
+          onNavigateToMap={() => handleNavigateTab('map')}
+          onNavigateToJobs={() => handleNavigateTab('jobs')}
+          onNavigateToNetwork={() => handleNavigateTab('network')}
+          onNavigateToFeed={() => handleNavigateTab('feed')}
+          onNavigateToConnect={() => handleNavigateTab('connect')}
+          onNavigateToAnon={() => handleNavigateTab('anon')}
+          onOpenLogin={() => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
+          onOpenSignup={(role) => setAuthConfig({ isOpen: true, mode: 'register', role: role || 'seeker' })}
+          onSelectJob={(job) => { setSelectedJob(job); handleNavigateTab('jobs'); }}
+          onSelectSeeker={(seeker) => { handleOpenProfile(seeker); handleNavigateTab('feed'); }}
           jobs={jobs}
           seekers={seekers}
           employers={employers}
@@ -368,10 +367,17 @@ function MainApp() {
           }}
           onSuccess={(loggedUser, meta) => {
             setAuthConfig(prev => ({ ...prev, isOpen: false }));
-            if (meta?.isNewSignup) {
+            if (loggedUser?.role === 'admin') {
+              handleNavigateTab('admin');
+            } else if (meta?.isNewSignup) {
               setIsCompleteProfileOpen(true);
-            }
-            if (pendingTabAfterAuth) {
+              if (pendingTabAfterAuth) {
+                handleNavigateTab(pendingTabAfterAuth);
+                setPendingTabAfterAuth(null);
+              } else {
+                handleNavigateTab('feed');
+              }
+            } else if (pendingTabAfterAuth) {
               handleNavigateTab(pendingTabAfterAuth);
               setPendingTabAfterAuth(null);
             } else {
@@ -416,8 +422,6 @@ function MainApp() {
         }}
         onOpenAuth={() => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
         onOpenProfile={handleOpenProfile}
-        isGuestMode={isGuestMode}
-        onExitGuest={handleExitGuest}
         jobsCount={jobs.length}
         seekersCount={seekers.length}
         employersCount={employers.length}
@@ -520,6 +524,10 @@ function MainApp() {
         {currentTab === 'messages' && (
           <FullPageChat onOpenProfile={handleOpenProfile} />
         )}
+
+        {currentTab === 'admin' && (
+          <AdminDashboard onNavigateTab={handleNavigateTab} />
+        )}
       </main>
 
       {/* Native App-Style Mobile Bottom Navigation Bar */}
@@ -582,10 +590,17 @@ function MainApp() {
         }}
         onSuccess={(loggedUser, meta) => {
           setAuthConfig(prev => ({ ...prev, isOpen: false }));
-          if (meta?.isNewSignup) {
+          if (loggedUser?.role === 'admin') {
+            handleNavigateTab('admin');
+          } else if (meta?.isNewSignup) {
             setIsCompleteProfileOpen(true);
-          }
-          if (pendingTabAfterAuth) {
+            if (pendingTabAfterAuth) {
+              handleNavigateTab(pendingTabAfterAuth);
+              setPendingTabAfterAuth(null);
+            } else {
+              handleNavigateTab('feed');
+            }
+          } else if (pendingTabAfterAuth) {
             handleNavigateTab(pendingTabAfterAuth);
             setPendingTabAfterAuth(null);
           } else if (currentTab === 'welcome') {

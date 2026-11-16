@@ -116,6 +116,16 @@ export const authenticateToken = (req, res, next) => {
   });
 };
 
+// Middleware to strictly enforce Administrator privileges
+export const requireAdmin = (req, res, next) => {
+  authenticateToken(req, res, () => {
+    if (!req.user || req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Access denied: Administrator privileges required' });
+    }
+    next();
+  });
+};
+
 // -------------------------------------------------------------
 // OTP ROUTES (Phone Number Login & Signup)
 // -------------------------------------------------------------

@@ -245,7 +245,7 @@ export const AuthPage = ({ initialTab = 'login', onComplete, onBack }) => {
             <span className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
               ⚡ Instant Demo Profiles
             </span>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => handleQuickDemo('9876543210', 'password123')}
@@ -262,7 +262,16 @@ export const AuthPage = ({ initialTab = 'login', onComplete, onBack }) => {
                 className="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-left transition"
               >
                 <span className="text-xs font-semibold text-white block truncate">Rahul S.</span>
-                <span className="text-[10px] text-slate-400 block truncate">🔍 Seeker</span>
+                <span className="text-[10px] text-slate-400 block truncate">🔍 Candidate</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickDemo('admin@jobscout.io', 'admin123')}
+                disabled={loading}
+                className="p-2 bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/30 rounded-xl text-left transition"
+              >
+                <span className="text-xs font-semibold text-rose-300 block truncate">Admin</span>
+                <span className="text-[10px] text-rose-400 block truncate">🛡️ Super Admin</span>
               </button>
             </div>
           </div>

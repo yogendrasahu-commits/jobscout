@@ -32,7 +32,8 @@ import {
   Smartphone,
   KeyRound,
   AlertCircle,
-  Loader2
+  Loader2,
+  ShieldAlert
 } from 'lucide-react';
 import { JobScoutLogo } from '../components/JobScoutLogo';
 import { useAuth } from '../context/AuthContext';
@@ -325,11 +326,12 @@ export const Welcome = ({
             ) : (
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => onExploreAsGuest ? onExploreAsGuest('feed') : onNavigateToFeed()}
-                  className="hidden sm:flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 text-xs font-bold transition-all active:scale-95"
-                  title="Browse without logging in"
+                  onClick={() => onOpenLogin ? onOpenLogin() : null}
+                  className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold border border-rose-200/80 transition-all active:scale-95 shadow-xs"
+                  title="Master Admin Portal"
                 >
-                  <span>Explore as Guest</span>
+                  <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
+                  <span>Admin Portal (एडमिन)</span>
                 </button>
 
                 <button
@@ -406,10 +408,11 @@ export const Welcome = ({
               </button>
 
               <button
-                onClick={() => onExploreAsGuest ? onExploreAsGuest('feed') : onNavigateToFeed()}
-                className="px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs sm:text-sm transition-all flex items-center gap-1.5 active:scale-95"
+                onClick={() => onOpenLogin ? onOpenLogin() : null}
+                className="px-4 py-3 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs sm:text-sm border border-rose-200 transition-all flex items-center gap-2 active:scale-95"
               >
-                <span>Guest Preview (बिना लॉगिन देखें)</span>
+                <ShieldAlert className="w-4 h-4 text-rose-600" />
+                <span>Admin Access (एडमिन लॉगिन)</span>
               </button>
             </div>
 
@@ -742,14 +745,15 @@ export const Welcome = ({
                 </form>
               )}
 
-              {/* Continue as Guest Button */}
+              {/* Admin Access Quick Trigger */}
               <div className="mt-4 pt-3.5 border-t border-slate-100">
                 <button
                   type="button"
-                  onClick={() => onExploreAsGuest ? onExploreAsGuest('feed') : onNavigateToFeed()}
-                  className="w-full py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 hover:text-indigo-600 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors active:scale-98 shadow-xs"
+                  onClick={() => onOpenLogin ? onOpenLogin() : null}
+                  className="w-full py-2.5 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 hover:text-rose-800 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors active:scale-98 shadow-xs"
                 >
-                  <span>Continue without account: <strong>Explore as Guest →</strong></span>
+                  <ShieldAlert className="w-4 h-4 text-rose-600" />
+                  <span>Enterprise Control: <strong>Sign in as Admin Portal →</strong></span>
                 </button>
               </div>
 
@@ -1109,10 +1113,11 @@ export const Welcome = ({
               </button>
 
               <button
-                onClick={() => onExploreAsGuest ? onExploreAsGuest('feed') : onNavigateToFeed()}
-                className="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm border border-white/20 transition-all flex items-center gap-1.5 active:scale-95"
+                onClick={() => onOpenLogin ? onOpenLogin() : null}
+                className="px-5 py-3 rounded-2xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 font-bold text-xs sm:text-sm border border-rose-400/30 transition-all flex items-center gap-1.5 active:scale-95"
               >
-                <span>Explore as Guest</span>
+                <ShieldAlert className="w-4 h-4 text-rose-400" />
+                <span>Admin Portal</span>
               </button>
             </div>
           </div>

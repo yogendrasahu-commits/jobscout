@@ -13,7 +13,8 @@ import {
   CheckCircle2, 
   AlertCircle,
   KeyRound,
-  Sparkles
+  Sparkles,
+  ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { JobScoutLogo } from '../components/JobScoutLogo';
@@ -324,31 +325,43 @@ export const AuthModal = ({
               {/* Quick Demo Logins */}
               <div className="pt-2 border-t border-slate-800/80">
                 <span className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2 text-center">
-                  ⚡ 1-Click Demo Login
+                  ⚡ 1-Click Fast Login
                 </span>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   <button
                     type="button"
                     onClick={() => handleQuickDemo('9876543210', 'password123')}
                     disabled={loading}
-                    className="p-2 bg-slate-950 hover:bg-slate-800/80 border border-slate-800 rounded-xl text-left transition flex items-center gap-2"
+                    className="p-2 bg-slate-950 hover:bg-slate-800/80 border border-slate-800 rounded-xl text-left transition flex items-center gap-1.5"
                   >
-                    <Building2 size={16} className="text-indigo-400 shrink-0" />
+                    <Building2 size={15} className="text-indigo-400 shrink-0" />
                     <div className="min-w-0">
-                      <span className="text-xs font-semibold text-slate-200 block truncate">TechPulse</span>
-                      <span className="text-[10px] text-slate-400 block truncate">👔 Employer</span>
+                      <span className="text-[11px] font-semibold text-slate-200 block truncate">Employer</span>
+                      <span className="text-[9px] text-slate-400 block truncate">TechPulse</span>
                     </div>
                   </button>
                   <button
                     type="button"
                     onClick={() => handleQuickDemo('9123456789', 'password123')}
                     disabled={loading}
-                    className="p-2 bg-slate-950 hover:bg-slate-800/80 border border-slate-800 rounded-xl text-left transition flex items-center gap-2"
+                    className="p-2 bg-slate-950 hover:bg-slate-800/80 border border-slate-800 rounded-xl text-left transition flex items-center gap-1.5"
                   >
-                    <User size={16} className="text-emerald-400 shrink-0" />
+                    <User size={15} className="text-emerald-400 shrink-0" />
                     <div className="min-w-0">
-                      <span className="text-xs font-semibold text-slate-200 block truncate">Rahul S.</span>
-                      <span className="text-[10px] text-slate-400 block truncate">🔍 Seeker</span>
+                      <span className="text-[11px] font-semibold text-slate-200 block truncate">Candidate</span>
+                      <span className="text-[9px] text-slate-400 block truncate">Rahul S.</span>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleQuickDemo('admin@jobscout.io', 'admin123')}
+                    disabled={loading}
+                    className="p-2 bg-rose-950/30 hover:bg-rose-900/40 border border-rose-500/30 rounded-xl text-left transition flex items-center gap-1.5"
+                  >
+                    <ShieldCheck size={15} className="text-rose-400 shrink-0" />
+                    <div className="min-w-0">
+                      <span className="text-[11px] font-semibold text-rose-200 block truncate">Admin</span>
+                      <span className="text-[9px] text-rose-300/80 block truncate">Master Portal</span>
                     </div>
                   </button>
                 </div>

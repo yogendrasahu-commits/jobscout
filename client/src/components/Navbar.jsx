@@ -28,7 +28,9 @@ import {
   Edit3,
   Settings,
   Mic,
-  MicOff
+  MicOff,
+  ShieldAlert,
+  ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
@@ -683,6 +685,23 @@ export const Navbar = ({
                 <span className="font-bold tracking-tight">Chat</span>
               </button>
 
+              {/* 8. Admin Portal (Exclusive to Admin Role) */}
+              {user?.role === 'admin' && (
+                <button
+                  onClick={() => setCurrentTab('admin')}
+                  className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                    currentTab === 'admin'
+                      ? 'bg-rose-600 text-white shadow-[0_2px_12px_rgba(225,29,72,0.4)] font-extrabold ring-1 ring-rose-400'
+                      : 'text-rose-600 hover:text-rose-700 hover:bg-rose-50 font-bold bg-rose-50/70 border border-rose-200/80'
+                  }`}
+                  title="JobScout Enterprise Master Admin Console"
+                >
+                  <ShieldAlert className="w-4 h-4 flex-shrink-0 text-rose-500" />
+                  <span className="font-extrabold tracking-tight">Admin</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping ml-0.5" />
+                </button>
+              )}
+
             </nav>
           </div>
 
@@ -1011,6 +1030,20 @@ export const Navbar = ({
                         </span>
                       </div>
                     </div>
+
+                    {/* Master Admin Portal Access */}
+                    {user?.role === 'admin' && (
+                      <button
+                        onClick={() => {
+                          setCurrentTab('admin');
+                          setProfileMenuOpen(false);
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 transition-colors border border-rose-200/60 mb-1"
+                      >
+                        <ShieldAlert className="w-4 h-4 text-rose-600" />
+                        <span>Master Admin Portal (एडमिन)</span>
+                      </button>
+                    )}
 
                     {/* Logout */}
                     <button
@@ -1425,19 +1458,30 @@ export const Navbar = ({
                 </button>
               )}
 
-              {/* Exit Guest Mode / Back to Welcome */}
-              {!user && isGuestMode && (
+              {/* Admin Portal / Console Quick Trigger */}
+              {user?.role === 'admin' ? (
                 <button
                   onClick={() => {
-                    if (onExitGuest) onExitGuest();
+                    setCurrentTab('admin');
                     setMobileDrawerOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-semibold border border-slate-200 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 text-white text-xs font-bold shadow-md shadow-rose-600/30"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                  <span>Exit Guest (Back to Welcome Screen)</span>
+                  <ShieldAlert className="w-4 h-4" />
+                  <span>Open Master Admin Portal</span>
                 </button>
-              )}
+              ) : !user ? (
+                <button
+                  onClick={() => {
+                    if (onOpenAuth) onOpenAuth();
+                    setMobileDrawerOpen(false);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-rose-600 hover:bg-rose-50 text-xs font-semibold border border-rose-200 transition-colors"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-rose-500" />
+                  <span>Admin Access (सुपर एडमिन)</span>
+                </button>
+              ) : null}
 
               {/* Instant WhatsApp & Telegram Alerts for mobile */}
               {user && (

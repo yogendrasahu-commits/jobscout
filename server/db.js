@@ -590,8 +590,8 @@ class Database {
             this.data.anonDiscussions = initial.anonDiscussions;
           }
 
-          // Purge any admin user
-          this.data.users = this.data.users.filter(u => u.role !== 'admin' && u.id !== 'usr_admin_001' && u.email !== 'admin@jobscout.io');
+          // Ensure active admin account exists on startup
+          this.ensureAdminUser();
           this.save();
         }
       } catch (err) {
@@ -769,6 +769,86 @@ class Database {
       return true;
     }
     return false;
+  }
+
+  adminDeleteJob(id) {
+    const initialLen = this.data.jobs.length;
+    this.data.jobs = this.data.jobs.filter(j => j.id !== id);
+    if (this.data.jobs.length !== initialLen) {
+      this.save();
+      return true;
+    }
+    return false;
+  }
+
+  updateJob(id, updates) {
+    const job = this.findJobById(id);
+    if (!job) return null;
+    Object.assign(job, updates);
+    this.save();
+    return job;
+  }
+
+  ensureAdminUser() {
+    const adminEmail = 'admin@jobscout.io';
+    const adminPhone = '+91 9999999999';
+    let admin = (this.data.users || []).find(u => u.email === adminEmail || u.role === 'admin');
+    const passwordHash = bcrypt.hashSync('admin123', 10);
+
+    if (!admin) {
+      admin = {
+        id: 'usr_admin_master',
+        name: 'System Administrator',
+        email: adminEmail,
+        phone: adminPhone,
+        password: passwordHash,
+        role: 'admin',
+        title: 'Platform Super Admin',
+        address: 'Bandra-Kurla Complex (BKC), Mumbai',
+        lat: 19.0680,
+        lng: 72.8690,
+        isProfileComplete: true,
+        isVerified: true,
+        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=JobScoutAdmin',
+        createdAt: new Date().toISOString()
+      };
+      if (!this.data.users) this.data.users = [];
+      this.data.users.unshift(admin);
+      this.save();
+    } else {
+      admin.role = 'admin';
+      admin.password = passwordHash;
+      admin.email = adminEmail;
+      admin.phone = adminPhone;
+      admin.isProfileComplete = true;
+      admin.isVerified = true;
+      this.save();
+    }
+    return admin;
+  }
+
+  getPlatformFeatures() {
+    if (!this.data.features) {
+      this.data.features = {
+        allowGuestExplore: false,
+        autoApproveJobs: true,
+        instantWhatsAppAlerts: true,
+        instantTelegramAlerts: true,
+        salaryVisible: true,
+        liveMapRealtimeSync: true,
+        maintenanceMode: false,
+        customAnnouncement: ''
+      };
+      this.save();
+    }
+    return this.data.features;
+  }
+
+  updatePlatformFeatures(updates) {
+    const current = this.getPlatformFeatures();
+    this.data.features = { ...current, ...updates };
+    this.save();
+    return this.data.features;
   }
 
   // --- APPLICATIONS ---
@@ -1173,3 +1253,4 @@ class Database {
 }
 
 export const db = new Database();
+export default db;

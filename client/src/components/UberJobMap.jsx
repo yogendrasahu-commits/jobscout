@@ -2053,7 +2053,7 @@ export const UberJobMap = ({
             <div className="p-1 text-center min-w-[170px]">
               <span className="text-xs font-bold text-indigo-600 block">Map Center Pin</span>
               <p className="text-[10px] text-slate-600 mt-0.5">
-                {user ? user.name : 'Guest Location'} ({user?.role === 'emp' ? 'Employer' : 'Job Seeker'})
+                {user ? user.name : 'Radar Explorer'} ({user?.role === 'admin' ? 'Super Admin' : user?.role === 'emp' ? 'Employer' : 'Job Seeker'})
               </p>
               <p className="text-[9px] text-indigo-700 font-semibold mt-1 bg-indigo-50 py-0.5 rounded border border-indigo-200">
                 🖐️ Drag pin to explore any area

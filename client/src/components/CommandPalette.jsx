@@ -16,7 +16,8 @@ import {
   CornerDownLeft, 
   X,
   Sliders,
-  Navigation
+  Navigation,
+  ShieldAlert
 } from 'lucide-react';
 
 export const CommandPalette = ({
@@ -105,6 +106,14 @@ export const CommandPalette = ({
       icon: Zap,
       badge: 'Hiring',
       action: () => { onOpenPostJob(); onClose(); }
+    },
+    {
+      id: 'nav_admin',
+      title: 'Master Enterprise Admin Portal',
+      subtitle: 'Manage all platform users, jobs, locations & system features',
+      icon: ShieldAlert,
+      badge: 'Super Admin',
+      action: () => { onNavigateTab('admin'); onClose(); }
     }
   ];
 

@@ -32,6 +32,8 @@ tags:
     description: Anonymous workplace discussions, voting, and comments
   - name: Alerts
     description: Instant WhatsApp and Telegram automated dispatch and notification preferences
+  - name: Administration
+    description: Master super admin controls for users, jobs, locations, and system configuration
   - name: Email Settings
     description: SMTP and Gmail credentials verification and test dispatch
 components:
@@ -1330,3 +1332,382 @@ paths:
           description: Email credentials verified and saved
         400:
           description: Invalid credentials or verification failed
+  /api/admin/stats:
+    get:
+      tags: - Administration
+      summary: Platform Master Metrics & System Health
+      description: Returns full system stats including user counts, jobs, ATS pipeline, memory heap, and uptime.
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Platform metrics returned successfully
+        403:
+          description: Admin privileges required
+  /api/admin/users:
+    get:
+      tags: - Administration
+      summary: List All Users with Filter & Search
+      description: Returns all registered users with role and status filtering.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by name, email, phone, company
+        - name: role
+          in: query
+          schema:
+            type: string
+            enum: - all
+              - seeker
+              - emp
+              - admin
+          description: Filter by role
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: - all
+              - verified
+              - blocked
+              - incomplete
+          description: Filter by status
+      responses:
+        200:
+          description: Users list returned successfully
+        403:
+          description: Admin privileges required
+    post:
+      tags: - Administration
+      summary: Create New User Directly (Admin)
+      description: Admin can create any user account with role, password, and coordinates.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - name
+                - password
+              properties:
+                name:
+                  type: string
+                  example: John Doe
+                email:
+                  type: string
+                  example: john@example.com
+                phone:
+                  type: string
+                  example: 9876543210
+                password:
+                  type: string
+                  example: password123
+                role:
+                  type: string
+                  enum: - seeker
+                    - emp
+                    - admin
+                  example: seeker
+                title:
+                  type: string
+                  example: Frontend Developer
+                companyName:
+                  type: string
+                  example: 
+      responses:
+        201:
+          description: User created successfully
+        400:
+          description: Validation error
+  /api/admin/users/{id}:
+    get:
+      tags: - Administration
+      summary: Get Detailed User Profile & Activity
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: User details returned
+        404:
+          description: User not found
+    put:
+      tags: - Administration
+      summary: Update Any User Profile Fields
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                phone:
+                  type: string
+                role:
+                  type: string
+                title:
+                  type: string
+                companyName:
+                  type: string
+                address:
+                  type: string
+                lat:
+                  type: number
+                lng:
+                  type: number
+                isVerified:
+                  type: boolean
+                isBlocked:
+                  type: boolean
+      responses:
+        200:
+          description: User updated successfully
+    delete:
+      tags: - Administration
+      summary: Delete User & Associated Records
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: User deleted successfully
+  /api/admin/users/{id}/toggle-block:
+    put:
+      tags: - Administration
+      summary: Block or Unblock User Access
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Block status toggled
+  /api/admin/users/{id}/toggle-verify:
+    put:
+      tags: - Administration
+      summary: Grant or Revoke Verified Badge
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Verification badge toggled
+  /api/admin/jobs:
+    get:
+      tags: - Administration
+      summary: List All Jobs (Admin View)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: - all
+              - open
+              - closed
+      responses:
+        200:
+          description: Jobs returned
+    post:
+      tags: - Administration
+      summary: Post New Job via Admin Console
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - title
+              properties:
+                title:
+                  type: string
+                  example: DevOps Engineer
+                company:
+                  type: string
+                  example: Acme Cloud
+                category:
+                  type: string
+                  example: Technology
+                salary:
+                  type: string
+                  example: ₹20,00,000 / yr
+                lat:
+                  type: number
+                  example: 19.076
+                lng:
+                  type: number
+                  example: 72.8777
+                address:
+                  type: string
+                  example: BKC, Mumbai
+      responses:
+        201:
+          description: Job created
+  /api/admin/jobs/{id}:
+    put:
+      tags: - Administration
+      summary: Update Any Job Fields
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Job updated
+    delete:
+      tags: - Administration
+      summary: Delete Job Listing
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Job deleted
+  /api/admin/locations:
+    get:
+      tags: - Administration
+      summary: Get All Geocoded Map Pins (Jobs & Users)
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Locations list returned
+  /api/admin/locations/{type}/{id}:
+    put:
+      tags: - Administration
+      summary: Update GPS Coordinates for Job or User Pin
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: - job
+              - user
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - lat
+                - lng
+              properties:
+                lat:
+                  type: number
+                  example: 19.076
+                lng:
+                  type: number
+                  example: 72.8777
+                address:
+                  type: string
+                  example: BKC, Mumbai
+      responses:
+        200:
+          description: Coordinates updated
+  /api/admin/features:
+    get:
+      tags: - Administration
+      summary: Get Platform Dynamic Configuration Toggles
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Features configuration returned
+    put:
+      tags: - Administration
+      summary: Update Platform Dynamic Configuration Toggles
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Features updated
+  /api/admin/broadcast:
+    post:
+      tags: - Administration
+      summary: Broadcast WebSocket Realtime Alert
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: - message
+              properties:
+                title:
+                  type: string
+                  example: Grid Update
+                message:
+                  type: string
+                  example: Real-time updates scheduled tonight.
+                type:
+                  type: string
+                  enum: - info
+                    - success
+                    - warning
+                    - urgent
+                  example: info
+      responses:
+        200:
+          description: Broadcast dispatched to all connected clients

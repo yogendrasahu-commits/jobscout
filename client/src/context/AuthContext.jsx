@@ -236,7 +236,8 @@ export const AuthProvider = ({ children }) => {
         updateProfile,
         logout,
         isEmployer: user?.role === 'emp',
-        isSeeker: user?.role === 'seeker'
+        isSeeker: user?.role === 'seeker',
+        isAdmin: user?.role === 'admin'
       }}
     >
       {children}

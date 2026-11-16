@@ -16,6 +16,7 @@ import postsRoutes from './routes/posts.js';
 import networkRoutes from './routes/network.js';
 import anonRoutes from './routes/anon.js';
 import alertsRoutes from './routes/alerts.js';
+import adminRoutes from './routes/admin.js';
 import { setupSocket } from './socket.js';
 import { db } from './db.js';
 import { verifyEmailConfig } from './email.js';
@@ -120,7 +121,8 @@ app.get('/api', (req, res) => {
       posts: '/api/posts',
       network: '/api/network',
       anon: '/api/anon',
-      alerts: '/api/alerts'
+      alerts: '/api/alerts',
+      admin: '/api/admin'
     }
   });
 });
@@ -144,6 +146,7 @@ app.use('/api/posts', postsRoutes);
 app.use('/api/network', networkRoutes);
 app.use('/api/anon', anonRoutes);
 app.use('/api/alerts', alertsRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Email Sender Settings Endpoints
 app.get('/api/settings/email', (req, res) => {
