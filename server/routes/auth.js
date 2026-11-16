@@ -205,11 +205,13 @@ router.post('/send-otp', authRateLimiter, (req, res) => {
 
 // 2. Verify OTP
 router.post('/verify-otp', (req, res) => {
-  const { phone, otp } = req.body;
-  const cleaned = cleanPhone(phone);
+  const { phone, email, identifier, otp } = req.body;
+  const raw = String(identifier || phone || email || '').trim();
+  const isEmail = raw.includes('@');
+  const cleaned = isEmail ? raw.toLowerCase() : cleanPhone(raw);
 
   if (!cleaned || !otp) {
-    return res.status(400).json({ error: 'Phone and OTP are required' });
+    return res.status(400).json({ error: 'Phone or email, and OTP are required' });
   }
 
   // Allow fixed master test OTP '123456' or generated OTP

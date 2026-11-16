@@ -60,6 +60,17 @@ function MainApp() {
     }
     return { isOpen: false, mode: 'login', role: 'seeker' };
   });
+
+  const handleCloseAuthModal = () => {
+    setAuthConfig(prev => ({ ...prev, isOpen: false }));
+    setPendingTabAfterAuth(null);
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase().trim();
+      if (['login', 'signin', 'signup', 'register'].includes(hash)) {
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    }
+  };
   const [isCompleteProfileOpen, setIsCompleteProfileOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
   const [selectedSeeker, setSelectedSeeker] = useState(null);
@@ -388,10 +399,7 @@ function MainApp() {
           isOpen={authConfig.isOpen}
           initialMode={authConfig.mode}
           initialRole={authConfig.role}
-          onClose={() => {
-            setAuthConfig(prev => ({ ...prev, isOpen: false }));
-            setPendingTabAfterAuth(null);
-          }}
+          onClose={handleCloseAuthModal}
           onSuccess={(loggedUser, meta) => {
             setAuthConfig(prev => ({ ...prev, isOpen: false }));
             if (loggedUser?.role === 'admin') {
@@ -611,10 +619,7 @@ function MainApp() {
         isOpen={authConfig.isOpen}
         initialMode={authConfig.mode}
         initialRole={authConfig.role}
-        onClose={() => {
-          setAuthConfig(prev => ({ ...prev, isOpen: false }));
-          setPendingTabAfterAuth(null);
-        }}
+        onClose={handleCloseAuthModal}
         onSuccess={(loggedUser, meta) => {
           setAuthConfig(prev => ({ ...prev, isOpen: false }));
           if (loggedUser?.role === 'admin') {
