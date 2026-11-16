@@ -644,11 +644,11 @@ export const Navbar = ({
                 )}
               </button>
 
-              {/* 5. Speed Connect Hub (Seeker & Employer only, hidden on tablet to avoid squishing) */}
+              {/* 5. Speed Connect Hub (Seeker, Employer & Guests - Visible across all browsers) */}
               {user?.role !== 'admin' && (
                 <button
                   onClick={() => setCurrentTab('connect')}
-                  className={`hidden xl:flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                  className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                     currentTab === 'connect'
                       ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
                       : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
