@@ -638,20 +638,22 @@ export const AuthPage = ({ initialTab = 'login', onComplete, onBack }) => {
                 </div>
               </div>
 
-              {/* Password Strength Checklist */}
-              <div className="space-y-1.5 text-xs pt-1 pb-1">
-                <div className={`flex items-center gap-2 ${reqLength ? 'text-emerald-600 font-medium' : 'text-slate-400'}`}>
-                  {reqLength ? <CheckCircle2 size={13} className="text-emerald-500 shrink-0" /> : <span className="w-1.5 h-1.5 rounded-full bg-slate-300 ml-1 mr-0.5 shrink-0" />}
+              {/* Password Strength Checklist (Single Line) */}
+              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] pt-1 pb-0.5">
+                <span className={`inline-flex items-center gap-1 transition-colors ${reqLength ? 'text-emerald-600 font-semibold' : 'text-slate-400'}`}>
+                  {reqLength ? <CheckCircle2 size={12} className="text-emerald-500 shrink-0" /> : <span className="w-1.5 h-1.5 rounded-full bg-slate-300 shrink-0" />}
                   <span>Least 8 characters</span>
-                </div>
-                <div className={`flex items-center gap-2 ${reqNumberOrSymbol ? 'text-emerald-600 font-medium' : 'text-slate-400'}`}>
-                  {reqNumberOrSymbol ? <CheckCircle2 size={13} className="text-emerald-500 shrink-0" /> : <span className="w-1.5 h-1.5 rounded-full bg-slate-300 ml-1 mr-0.5 shrink-0" />}
-                  <span>Least one number (0-9) or a symbol</span>
-                </div>
-                <div className={`flex items-center gap-2 ${reqUpperLower ? 'text-emerald-600 font-medium' : 'text-slate-400'}`}>
-                  {reqUpperLower ? <CheckCircle2 size={13} className="text-emerald-500 shrink-0" /> : <span className="w-1.5 h-1.5 rounded-full bg-slate-300 ml-1 mr-0.5 shrink-0" />}
-                  <span>Lowercase (a-z) and uppercase (A-Z)</span>
-                </div>
+                </span>
+                <span className="text-slate-300 select-none">•</span>
+                <span className={`inline-flex items-center gap-1 transition-colors ${reqNumberOrSymbol ? 'text-emerald-600 font-semibold' : 'text-slate-400'}`}>
+                  {reqNumberOrSymbol ? <CheckCircle2 size={12} className="text-emerald-500 shrink-0" /> : <span className="w-1.5 h-1.5 rounded-full bg-slate-300 shrink-0" />}
+                  <span>Number or symbol</span>
+                </span>
+                <span className="text-slate-300 select-none">•</span>
+                <span className={`inline-flex items-center gap-1 transition-colors ${reqUpperLower ? 'text-emerald-600 font-semibold' : 'text-slate-400'}`}>
+                  {reqUpperLower ? <CheckCircle2 size={12} className="text-emerald-500 shrink-0" /> : <span className="w-1.5 h-1.5 rounded-full bg-slate-300 shrink-0" />}
+                  <span>a-z & A-Z</span>
+                </span>
               </div>
 
               {/* 5. Confirm Password Underline Field */}
