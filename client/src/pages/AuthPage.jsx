@@ -13,7 +13,13 @@ import {
   AlertCircle,
   KeyRound,
   ShieldCheck,
-  ChevronDown
+  ChevronDown,
+  MapPin,
+  Briefcase,
+  Sparkles,
+  Video,
+  Zap,
+  Navigation
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -942,75 +948,93 @@ export const AuthPage = ({ initialTab = 'login', onComplete, onBack }) => {
           </div>
 
           <div className="relative z-10 flex-1 flex flex-col justify-around py-4">
-            {/* Floating Inbox Card */}
+            {/* 1. JobScout Live Radar Metric Card */}
             <div className="relative self-start ml-2">
-              <div className="bg-white rounded-2xl p-4 shadow-2xl w-44 relative border border-white/60">
-                <span className="text-[11px] font-bold text-orange-500 uppercase tracking-wider block">
-                  Inbox
-                </span>
-                <div className="text-2xl font-black text-slate-900 tracking-tight mt-0.5">
-                  176,18
+              <div className="bg-white rounded-2xl p-4 shadow-2xl w-48 relative border border-white/60">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    Live Jobs Radar
+                  </span>
+                  <span className="text-[9px] font-bold text-slate-400 flex items-center gap-0.5">
+                    <MapPin size={10} className="text-rose-500" />
+                    5km
+                  </span>
                 </div>
+
+                <div className="text-2xl font-black text-slate-900 tracking-tight mt-1">
+                  2,840+
+                </div>
+                <div className="text-[10px] text-slate-400 font-medium -mt-0.5">
+                  Open Roles in Mumbai
+                </div>
+
                 <div className="relative mt-2 h-10 w-full">
                   <svg className="w-full h-full overflow-visible" viewBox="0 0 140 40" fill="none">
                     <path
                       d="M 5 28 C 20 8, 35 34, 50 20 C 65 6, 80 34, 95 18 C 110 2, 125 32, 135 22"
-                      stroke="#F97316"
+                      stroke="#10B981"
                       strokeWidth="3.2"
                       strokeLinecap="round"
                     />
                     <path
                       d="M 5 22 C 20 32, 35 12, 55 24 C 70 32, 85 10, 105 26 C 120 36, 130 16, 135 20"
-                      stroke="#6366F1"
+                      stroke="#4F46E5"
                       strokeWidth="2.8"
                       strokeLinecap="round"
                       opacity="0.8"
                     />
                   </svg>
-                  <div className="absolute top-1 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-slate-900 text-white text-[10px] font-bold flex items-center justify-center shadow-lg border-2 border-white">
-                    45
+
+                  {/* AI Match Score Badge */}
+                  <div className="absolute top-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-slate-900 text-white text-[10px] font-extrabold flex items-center gap-1 shadow-lg border-2 border-white">
+                    <Sparkles size={9} className="text-amber-400 fill-amber-400" />
+                    <span>98%</span>
                   </div>
                 </div>
               </div>
 
-              {/* Instagram Badge */}
-              <div className="absolute -top-3 -right-24 w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] flex items-center justify-center shadow-xl border-2 border-white/80 animate-pulse">
-                <svg className="w-6 h-6 text-white fill-none stroke-current stroke-2" viewBox="0 0 24 24">
-                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
-                </svg>
+              {/* Floating Badge 1: Hyperlocal Map Radar Pin (Replaces Instagram badge) */}
+              <div className="absolute -top-3 -right-20 w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-500 flex items-center justify-center shadow-xl border-2 border-white/80 animate-pulse">
+                <MapPin size={22} className="text-white stroke-[2.5]" />
               </div>
 
-              {/* TikTok Badge */}
-              <div className="absolute top-14 -right-16 w-10 h-10 rounded-full bg-slate-950 flex items-center justify-center shadow-xl border-2 border-white/80">
-                <svg className="w-5 h-5 fill-white" viewBox="0 0 24 24">
-                  <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-2.882 2.88 2.896 2.896 0 0 1-2.882-2.88 2.896 2.896 0 0 1 2.882-2.88c.328 0 .64.053.93.15V9.458a6.347 6.347 0 0 0-.93-.07 6.342 6.342 0 0 0-6.327 6.342 6.342 0 0 0 6.327 6.342 6.342 0 0 0 6.327-6.342V9.06a8.204 8.204 0 0 0 4.77 1.517V7.127a4.83 4.83 0 0 1-1-.441z"/>
-                </svg>
+              {/* Floating Badge 2: WebRTC Speed Interview (Replaces TikTok badge) */}
+              <div className="absolute top-14 -right-14 w-10 h-10 rounded-full bg-slate-950 flex items-center justify-center shadow-xl border-2 border-white/80">
+                <Video size={18} className="text-cyan-400 stroke-[2.5]" />
               </div>
             </div>
 
-            {/* Floating Security Card */}
+            {/* 2. Floating JobScout Verified Match Card */}
             <div className="relative self-end mr-1 mt-6">
               <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-2xl w-64 sm:w-72 relative border border-white/60">
                 <div className="flex items-start justify-between">
-                  <div className="space-y-2 pt-1">
-                    <div className="h-2 w-12 bg-indigo-600 rounded-full" />
-                    <div className="h-1.5 w-16 bg-slate-200 rounded-full" />
-                    <div className="h-1.5 w-10 bg-slate-100 rounded-full" />
-                    <div className="h-1.5 w-14 bg-slate-200 rounded-full" />
+                  <div className="space-y-1 pt-0.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                      <span className="text-[11px] font-bold text-slate-800 tracking-tight">Full-Stack Engineer</span>
+                    </div>
+                    <span className="text-[10px] font-medium text-slate-500 block">TechPulse • ₹12-18 LPA</span>
+                    <span className="inline-flex items-center gap-1 text-[9px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100">
+                      <Navigation size={9} /> 2.4 km away • BKC
+                    </span>
                   </div>
-                  <div className="p-2 rounded-xl bg-amber-50 text-amber-500">
-                    <KeyRound size={22} className="stroke-[2.5]" />
+
+                  <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600 shrink-0">
+                    <Briefcase size={20} className="stroke-[2.5]" />
                   </div>
                 </div>
 
-                <div className="mt-3">
-                  <h4 className="text-slate-900 font-bold text-xs sm:text-sm tracking-tight">
-                    Your data, your rules
+                <div className="mt-3 pt-2.5 border-t border-slate-100">
+                  <h4 className="text-slate-900 font-bold text-xs sm:text-sm tracking-tight flex items-center gap-1.5">
+                    <span>Hyperlocal Career Radar</span>
+                    <ShieldCheck size={14} className="text-emerald-500 shrink-0" />
                   </h4>
-                  <p className="text-slate-400 text-[10px] sm:text-[11px] leading-relaxed mt-1">
-                    Your data belongs to you, and our encryption ensures that your career privacy remains secure.
+                  <p className="text-slate-500 text-[10px] sm:text-[11px] leading-relaxed mt-1">
+                    Connect directly with verified local hiring managers with real-time video calls & instant WhatsApp alerts.
                   </p>
                 </div>
               </div>
@@ -1018,8 +1042,11 @@ export const AuthPage = ({ initialTab = 'login', onComplete, onBack }) => {
           </div>
 
           <div className="relative z-10 flex items-center justify-between text-xs text-white/80 border-t border-white/10 pt-4">
-            <span className="font-semibold tracking-wide">JobScout Platform</span>
-            <span className="text-white/60">© 2026</span>
+            <span className="font-semibold tracking-wide flex items-center gap-1.5">
+              <Zap size={14} className="text-amber-300 fill-amber-300" />
+              JobScout Radar v2.4
+            </span>
+            <span className="text-white/60 font-medium">Hyperlocal Hiring</span>
           </div>
         </div>
 
