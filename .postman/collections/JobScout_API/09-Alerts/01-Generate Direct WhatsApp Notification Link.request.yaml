@@ -1,0 +1,39 @@
+$kind: request
+name: Generate Direct WhatsApp Notification Link
+description: Generate Direct WhatsApp Notification Link
+method: POST
+url: '{{baseUrl}}/api/alerts/whatsapp'
+header:
+  - key: Content-Type
+    value: application/json
+    type: text
+    disabled: false
+body:
+  mode: raw
+  raw: |-
+    {
+      "phone": "+91-9876543210",
+      "message": "Your job application has been reviewed by TechPulse Solutions!"
+    }
+  options:
+    raw:
+      language: json
+event:
+  - listen: test
+    script:
+      type: text/javascript
+      exec:
+        - pm.test('Response time is acceptable (< 1500ms)', function () {
+        - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+        - '});'
+        - pm.test('Status code is successful', function () {
+        - '    pm.expect(pm.response.code).to.be.below(400);'
+        - '});'
+scripts:
+  test: |-
+    pm.test('Response time is acceptable (< 1500ms)', function () {
+        pm.expect(pm.response.responseTime).to.be.below(1500);
+    });
+    pm.test('Status code is successful', function () {
+        pm.expect(pm.response.code).to.be.below(400);
+    });

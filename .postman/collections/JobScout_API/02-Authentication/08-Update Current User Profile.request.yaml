@@ -1,0 +1,49 @@
+$kind: request
+name: Update Current User Profile
+description: Update Current User Profile
+method: PUT
+url: '{{baseUrl}}/api/auth/profile'
+header:
+  - key: Content-Type
+    value: application/json
+    type: text
+    disabled: false
+  - key: Authorization
+    value: Bearer {{token}}
+    type: text
+    disabled: false
+body:
+  mode: raw
+  raw: |-
+    {
+      "name": "TechPulse Solutions HR",
+      "title": "Talent Acquisition Director",
+      "company": "TechPulse Global",
+      "bio": "Hiring top engineering talent in Mumbai",
+      "skills": [
+        "React",
+        "Node"
+      ]
+    }
+  options:
+    raw:
+      language: json
+event:
+  - listen: test
+    script:
+      type: text/javascript
+      exec:
+        - pm.test('Response time is acceptable (< 1500ms)', function () {
+        - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+        - '});'
+        - pm.test('Status code is successful', function () {
+        - '    pm.expect(pm.response.code).to.be.below(400);'
+        - '});'
+scripts:
+  test: |-
+    pm.test('Response time is acceptable (< 1500ms)', function () {
+        pm.expect(pm.response.responseTime).to.be.below(1500);
+    });
+    pm.test('Status code is successful', function () {
+        pm.expect(pm.response.code).to.be.below(400);
+    });

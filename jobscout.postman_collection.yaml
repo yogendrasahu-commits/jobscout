@@ -1,0 +1,2455 @@
+$kind: collection
+info:
+  _postman_id: c210718e-b54c-42c3-94eb-jobscout-api
+  name: JobScout & JobRadar API Testing Collection
+  description: Complete automated Postman collection for testing all endpoints in JobScout with environment variable support (`{{baseUrl}}`, `{{token}}`), pre-request scripts, and automatic JWT token extraction.
+  schema: https://schema.getpostman.com/json/collection/v2.1.0/collection.json
+variable:
+  - key: baseUrl
+    value: http://localhost:5000
+    type: string
+  - key: token
+    value: ''
+    type: string
+  - key: testPhone
+    value: '9876543210'
+    type: string
+  - key: testOtp
+    value: '123456'
+    type: string
+  - key: testPassword
+    value: password123
+    type: string
+item:
+  - name: System
+    description: Health checks, root metadata and server uptime
+    item:
+      - name: API Overview and Available Endpoints
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+          description: Returns general service status, version info, and endpoint index.
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: System Health & Uptime
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/health'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - health
+          description: Returns server uptime, timestamp, and health status.
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+  - name: Authentication
+    description: Phone OTP login, registration, password auth, profiles and GPS location
+    item:
+      - name: Check Phone Registration Status
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/auth/check-phone/:phone'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - auth
+              - check-phone
+              - :phone
+            variable:
+              - key: phone
+                value: '9876543210'
+                description: ''
+          description: Check Phone Registration Status
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Send 6-digit OTP to Mobile Number
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/auth/send-otp'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - auth
+              - send-otp
+          description: Send 6-digit OTP to Mobile Number
+          body:
+            mode: raw
+            raw: |-
+              {
+                "phone": "9876543210",
+                "purpose": "login"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Verify Mobile OTP
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/auth/verify-otp'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - auth
+              - verify-otp
+          description: Verify Mobile OTP
+          body:
+            mode: raw
+            raw: |-
+              {
+                "phone": "9876543210",
+                "otp": "123456"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Login with Phone Number & OTP
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/auth/login-phone-otp'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - auth
+              - login-phone-otp
+          description: Login with Phone Number & OTP
+          body:
+            mode: raw
+            raw: |-
+              {
+                "phone": "9876543210",
+                "otp": "123456"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - if (pm.response.code === 200 || pm.response.code === 201) {
+                - '    var jsonData = pm.response.json();'
+                - '    if (jsonData.token) {'
+                - '        pm.collectionVariables.set(''token'', jsonData.token);'
+                - '        console.log(''✅ JWT Token automatically saved to collection variable {{token}}'');'
+                - '    }'
+                - '}'
+                - pm.test('Status code is 200 or 201', function () {
+                - '    pm.expect(pm.response.code).to.be.oneOf([200, 201]);'
+                - '});'
+      - name: Login with Phone Number & Password
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/auth/login-phone-password'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - auth
+              - login-phone-password
+          description: Login with Phone Number & Password
+          body:
+            mode: raw
+            raw: |-
+              {
+                "phone": "9876543210",
+                "password": "password123"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - if (pm.response.code === 200 || pm.response.code === 201) {
+                - '    var jsonData = pm.response.json();'
+                - '    if (jsonData.token) {'
+                - '        pm.collectionVariables.set(''token'', jsonData.token);'
+                - '        console.log(''✅ JWT Token automatically saved to collection variable {{token}}'');'
+                - '    }'
+                - '}'
+                - pm.test('Status code is 200 or 201', function () {
+                - '    pm.expect(pm.response.code).to.be.oneOf([200, 201]);'
+                - '});'
+      - name: Register new Seeker or Employer via Phone + OTP
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/auth/register-phone'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - auth
+              - register-phone
+          description: Register new Seeker or Employer via Phone + OTP
+          body:
+            mode: raw
+            raw: |-
+              {
+                "phone": "9899001122",
+                "otp": "123456",
+                "role": "seeker",
+                "name": "Ankit Sharma",
+                "password": "password123",
+                "title": "Fullstack Engineer",
+                "company": "Independent Consultant",
+                "skills": [
+                  "Node.js",
+                  "React"
+                ],
+                "lat": 19.076,
+                "lng": 72.8777
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - if (pm.response.code === 200 || pm.response.code === 201) {
+                - '    var jsonData = pm.response.json();'
+                - '    if (jsonData.token) {'
+                - '        pm.collectionVariables.set(''token'', jsonData.token);'
+                - '        console.log(''✅ JWT Token automatically saved to collection variable {{token}}'');'
+                - '    }'
+                - '}'
+                - pm.test('Status code is 200 or 201', function () {
+                - '    pm.expect(pm.response.code).to.be.oneOf([200, 201]);'
+                - '});'
+      - name: Get Current Authenticated User Profile
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/auth/me'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - auth
+              - me
+          description: Get Current Authenticated User Profile
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Update Current User Profile
+        request:
+          method: PUT
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/auth/profile'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - auth
+              - profile
+          description: Update Current User Profile
+          body:
+            mode: raw
+            raw: |-
+              {
+                "name": "TechPulse Solutions HR",
+                "title": "Talent Acquisition Director",
+                "company": "TechPulse Global",
+                "bio": "Hiring top engineering talent in Mumbai",
+                "skills": [
+                  "React",
+                  "Node"
+                ]
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Update GPS Geolocation Coordinates
+        request:
+          method: PUT
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/auth/location'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - auth
+              - location
+          description: Update GPS Geolocation Coordinates
+          body:
+            mode: raw
+            raw: |-
+              {
+                "lat": 19.076,
+                "lng": 72.8777,
+                "address": "BKC, Mumbai"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Get Current User's Saved / Bookmarked Jobs
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/auth/saved-jobs'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - auth
+              - saved-jobs
+          description: Get Current User's Saved / Bookmarked Jobs
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Toggle Save / Bookmark on a Job
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/auth/saved-jobs/toggle'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - auth
+              - saved-jobs
+              - toggle
+          description: Toggle Save / Bookmark on a Job
+          body:
+            mode: raw
+            raw: |-
+              {
+                "jobId": "job_1"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Get List of Verified Employers
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/auth/employers'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - auth
+              - employers
+          description: Get List of Verified Employers
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Get List of Active Job Seekers
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/auth/seekers'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - auth
+              - seekers
+          description: Get List of Active Job Seekers
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: AI Resume Skill Extractor
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/auth/extract-skills'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - auth
+              - extract-skills
+          description: AI Resume Skill Extractor
+          body:
+            mode: raw
+            raw: |-
+              {
+                "text": "Experienced Senior Engineer with 6 years building applications in React, WebRTC, Node.js and Docker."
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+  - name: Jobs
+    description: Job listings, search, geo-filtering, recommendations and AI match scoring
+    item:
+      - name: List Jobs with Search & Distance Radius Filters
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/jobs'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - jobs
+            query:
+              - key: search
+                value: ''
+                description: Filter by title, company, or skills
+              - key: category
+                value: ''
+                description: Filter by category (Technology, Design, etc.)
+              - key: lat
+                value: ''
+                description: User latitude for Haversine distance calculation
+              - key: lng
+                value: ''
+                description: User longitude
+              - key: radius
+                value: ''
+                description: Radar radius in kilometers (e.g. 10)
+          description: List Jobs with Search & Distance Radius Filters
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Post a New Job Opening (Employer Only)
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/jobs'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - jobs
+          description: Post a New Job Opening (Employer Only)
+          body:
+            mode: raw
+            raw: |-
+              {
+                "title": "Fullstack Node & React Developer",
+                "company": "TechPulse Solutions",
+                "category": "Technology",
+                "jobType": "Full-time",
+                "salary": "₹15,00,000 - ₹20,00,000 / yr",
+                "lat": 19.076,
+                "lng": 72.8777,
+                "address": "BKC, Mumbai",
+                "description": "Lead fullstack development of our live radar maps.",
+                "skills": [
+                  "React",
+                  "Node.js",
+                  "MongoDB"
+                ],
+                "urgent": true
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Get AI Recommended Jobs for Logged-in Candidate
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/jobs/recommended'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - jobs
+              - recommended
+          description: Get AI Recommended Jobs for Logged-in Candidate
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Get Single Job Details by ID
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/jobs/:id'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - jobs
+              - :id
+            variable:
+              - key: id
+                value: job_1
+                description: ''
+          description: Get Single Job Details by ID
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Delete Job Opening (Employer Only)
+        request:
+          method: DELETE
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/jobs/:id'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - jobs
+              - :id
+            variable:
+              - key: id
+                value: job_1
+                description: ''
+          description: Delete Job Opening (Employer Only)
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Calculate AI Skill Compatibility for Single Job
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/jobs/:id/match'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - jobs
+              - :id
+              - match
+            variable:
+              - key: id
+                value: job_1
+                description: ''
+          description: Calculate AI Skill Compatibility for Single Job
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+  - name: Applications
+    description: ATS pipeline, application submission, status updates, and formal offer letters
+    item:
+      - name: Submit Application for a Job (Seeker Only)
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/applications'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - applications
+          description: Submit Application for a Job (Seeker Only)
+          body:
+            mode: raw
+            raw: |-
+              {
+                "jobId": "job_1",
+                "pitch": "I have 5 years building WebRTC platforms and would love to join your team!",
+                "resumeUrl": "https://example.com/resume.pdf"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Get Candidate's Submitted Applications
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/applications/my'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - applications
+              - my
+          description: Get Candidate's Submitted Applications
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Get Employer's Candidate ATS Pipeline
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/applications/employer'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - applications
+              - employer
+          description: Get Employer's Candidate ATS Pipeline
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Update Candidate Status in Pipeline
+        request:
+          method: PATCH
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/applications/:id/status'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - applications
+              - :id
+              - status
+            variable:
+              - key: id
+                value: app_101
+                description: ''
+          description: Update Candidate Status in Pipeline
+          body:
+            mode: raw
+            raw: |-
+              {
+                "status": "reviewed"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Issue Formal Job Offer Letter
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/applications/issue-offer'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - applications
+              - issue-offer
+          description: Issue Formal Job Offer Letter
+          body:
+            mode: raw
+            raw: |-
+              {
+                "applicationId": "app_101",
+                "salary": "₹22,00,000 / annum",
+                "joiningDate": "2026-12-01",
+                "notes": "Includes annual performance bonus & health coverage."
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Accept Formal Offer Letter (Candidate)
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/applications/accept-offer'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - applications
+              - accept-offer
+          description: Accept Formal Offer Letter (Candidate)
+          body:
+            mode: raw
+            raw: |-
+              {
+                "applicationId": "app_101"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Decline Formal Offer Letter (Candidate)
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/applications/decline-offer'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - applications
+              - decline-offer
+          description: Decline Formal Offer Letter (Candidate)
+          body:
+            mode: raw
+            raw: |-
+              {
+                "applicationId": "app_101",
+                "reason": "Accepted another opportunity."
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+  - name: Messaging
+    description: Direct chat messages, conversations, and unread counts
+    item:
+      - name: Get All Active Chat Conversation Threads
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/messages/threads/all'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - messages
+              - threads
+              - all
+          description: Get All Active Chat Conversation Threads
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Get Chat Message History with User
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/messages/:otherUserId'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - messages
+              - :otherUserId
+            variable:
+              - key: otherUserId
+                value: usr_seeker_1
+                description: ''
+          description: Get Chat Message History with User
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Send Direct Chat Message
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/messages'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - messages
+          description: Send Direct Chat Message
+          body:
+            mode: raw
+            raw: |-
+              {
+                "receiverId": "usr_seeker_1",
+                "text": "Hi Rahul, we reviewed your profile and would love to schedule a quick call!"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Mark Messages as Read
+        request:
+          method: PUT
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/messages/:otherUserId/read'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - messages
+              - :otherUserId
+              - read
+            variable:
+              - key: otherUserId
+                value: usr_seeker_1
+                description: ''
+          description: Mark Messages as Read
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+  - name: Social Feed
+    description: Community social feed posts, likes, and comments
+    item:
+      - name: Get Social Feed Posts
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/posts'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - posts
+          description: Get Social Feed Posts
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Create Social Community Post
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/posts'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - posts
+          description: Create Social Community Post
+          body:
+            mode: raw
+            raw: |-
+              {
+                "content": "Thrilled to announce we are opening 5 new WebRTC & Cloud roles in Mumbai!",
+                "tags": [
+                  "hiring",
+                  "mumbai",
+                  "tech"
+                ]
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Like or Unlike a Post
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/posts/:id/like'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - posts
+              - :id
+              - like
+            variable:
+              - key: id
+                value: post_1
+                description: ''
+          description: Like or Unlike a Post
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Add Comment to a Post
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/posts/:id/comment'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - posts
+              - :id
+              - comment
+            variable:
+              - key: id
+                value: post_1
+                description: ''
+          description: Add Comment to a Post
+          body:
+            mode: raw
+            raw: |-
+              {
+                "text": "Great opportunity! Applied."
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+  - name: Professional Network
+    description: User network profiles, connections, and skill endorsements
+    item:
+      - name: Get User Professional Network & Endorsements
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/network/:userId'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - network
+              - :userId
+            variable:
+              - key: userId
+                value: usr_seeker_1
+                description: ''
+          description: Get User Professional Network & Endorsements
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Send Connection Request or Toggle Connect
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/network/connect'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - network
+              - connect
+          description: Send Connection Request or Toggle Connect
+          body:
+            mode: raw
+            raw: |-
+              {
+                "targetUserId": "usr_seeker_1"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Endorse a Candidate's Skill
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/network/endorse'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - network
+              - endorse
+          description: Endorse a Candidate's Skill
+          body:
+            mode: raw
+            raw: |-
+              {
+                "targetUserId": "usr_seeker_1",
+                "skill": "React"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+  - name: Anonymous Salon
+    description: Anonymous workplace discussions, voting, and comments
+    item:
+      - name: Get Anonymous Workplace Discussions
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/anon'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - anon
+          description: Get Anonymous Workplace Discussions
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Create Anonymous Discussion
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/anon'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - anon
+          description: Create Anonymous Discussion
+          body:
+            mode: raw
+            raw: |-
+              {
+                "title": "Average WebRTC engineer compensation in Mumbai?",
+                "content": "What are companies offering for 4-6 YOE candidates in 2026?",
+                "category": "Compensation"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Upvote or Downvote an Anonymous Discussion
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/anon/:id/vote'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - anon
+              - :id
+              - vote
+            variable:
+              - key: id
+                value: anon_1
+                description: ''
+          description: Upvote or Downvote an Anonymous Discussion
+          body:
+            mode: raw
+            raw: |-
+              {
+                "type": "up"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+  - name: Alerts
+    description: Instant WhatsApp and Telegram automated dispatch and notification preferences
+    item:
+      - name: Generate Direct WhatsApp Notification Link
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/alerts/whatsapp'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - alerts
+              - whatsapp
+          description: Generate Direct WhatsApp Notification Link
+          body:
+            mode: raw
+            raw: |-
+              {
+                "phone": "+91-9876543210",
+                "message": "Your job application has been reviewed by TechPulse Solutions!"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Dispatch Instant Telegram Notification
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/alerts/telegram'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - alerts
+              - telegram
+          description: Dispatch Instant Telegram Notification
+          body:
+            mode: raw
+            raw: |-
+              {
+                "chatId": "123456789",
+                "message": "🎉 New candidate applied for Senior React Engineer!"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Get Alert Notification Preferences
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/alerts/settings'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - alerts
+              - settings
+          description: Get Alert Notification Preferences
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Update Alert Notification Preferences
+        request:
+          method: PUT
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/alerts/settings'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - alerts
+              - settings
+          description: Update Alert Notification Preferences
+          body:
+            mode: raw
+            raw: |-
+              {
+                "whatsappEnabled": true,
+                "whatsappTargetPhone": "9876543210",
+                "telegramEnabled": true,
+                "telegramChatId": "987654321"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+  - name: Administration
+    description: Master super admin controls for users, jobs, locations, and system configuration
+    item:
+      - name: Platform Master Metrics & System Health
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/admin/stats'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - admin
+              - stats
+          description: Returns full system stats including user counts, jobs, ATS pipeline, memory heap, and uptime.
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: List All Users with Filter & Search
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/admin/users'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - admin
+              - users
+            query:
+              - key: search
+                value: ''
+                description: Search by name, email, phone, company
+              - key: role
+                value: ''
+                description: Filter by role
+              - key: status
+                value: ''
+                description: Filter by status
+          description: Returns all registered users with role and status filtering.
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Create New User Directly (Admin)
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/admin/users'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - admin
+              - users
+          description: Admin can create any user account with role, password, and coordinates.
+          body:
+            mode: raw
+            raw: |-
+              {
+                "name": "John Doe",
+                "email": "john@example.com",
+                "phone": "9876543210",
+                "password": "password123",
+                "role": "seeker",
+                "title": "Frontend Developer",
+                "companyName": ""
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Get Detailed User Profile & Activity
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/admin/users/:id'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - admin
+              - users
+              - :id
+            variable:
+              - key: id
+                value: '1'
+                description: ''
+          description: Get Detailed User Profile & Activity
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Update Any User Profile Fields
+        request:
+          method: PUT
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/admin/users/:id'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - admin
+              - users
+              - :id
+            variable:
+              - key: id
+                value: '1'
+                description: ''
+          description: Update Any User Profile Fields
+          body:
+            mode: raw
+            raw: |-
+              {
+                "name": "sample",
+                "email": "sample",
+                "phone": "sample",
+                "role": "sample",
+                "title": "sample",
+                "companyName": "sample",
+                "address": "sample",
+                "lat": 10,
+                "lng": 10,
+                "isVerified": true,
+                "isBlocked": true
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Delete User & Associated Records
+        request:
+          method: DELETE
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/admin/users/:id'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - admin
+              - users
+              - :id
+            variable:
+              - key: id
+                value: '1'
+                description: ''
+          description: Delete User & Associated Records
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Block or Unblock User Access
+        request:
+          method: PUT
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/admin/users/:id/toggle-block'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - admin
+              - users
+              - :id
+              - toggle-block
+            variable:
+              - key: id
+                value: '1'
+                description: ''
+          description: Block or Unblock User Access
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Grant or Revoke Verified Badge
+        request:
+          method: PUT
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/admin/users/:id/toggle-verify'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - admin
+              - users
+              - :id
+              - toggle-verify
+            variable:
+              - key: id
+                value: '1'
+                description: ''
+          description: Grant or Revoke Verified Badge
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: List All Jobs (Admin View)
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/admin/jobs'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - admin
+              - jobs
+            query:
+              - key: search
+                value: ''
+                description: ''
+              - key: status
+                value: ''
+                description: ''
+          description: List All Jobs (Admin View)
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Post New Job via Admin Console
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/admin/jobs'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - admin
+              - jobs
+          description: Post New Job via Admin Console
+          body:
+            mode: raw
+            raw: |-
+              {
+                "title": "DevOps Engineer",
+                "company": "Acme Cloud",
+                "category": "Technology",
+                "salary": "₹20,00,000 / yr",
+                "lat": 19.076,
+                "lng": 72.8777,
+                "address": "BKC, Mumbai"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Update Any Job Fields
+        request:
+          method: PUT
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/admin/jobs/:id'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - admin
+              - jobs
+              - :id
+            variable:
+              - key: id
+                value: '1'
+                description: ''
+          description: Update Any Job Fields
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Delete Job Listing
+        request:
+          method: DELETE
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/admin/jobs/:id'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - admin
+              - jobs
+              - :id
+            variable:
+              - key: id
+                value: '1'
+                description: ''
+          description: Delete Job Listing
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Get All Geocoded Map Pins (Jobs & Users)
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/admin/locations'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - admin
+              - locations
+          description: Get All Geocoded Map Pins (Jobs & Users)
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Update GPS Coordinates for Job or User Pin
+        request:
+          method: PUT
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/admin/locations/:type/:id'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - admin
+              - locations
+              - :type
+              - :id
+            variable:
+              - key: type
+                value: '1'
+                description: ''
+              - key: id
+                value: '1'
+                description: ''
+          description: Update GPS Coordinates for Job or User Pin
+          body:
+            mode: raw
+            raw: |-
+              {
+                "lat": 19.076,
+                "lng": 72.8777,
+                "address": "BKC, Mumbai"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Get Platform Dynamic Configuration Toggles
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/admin/features'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - admin
+              - features
+          description: Get Platform Dynamic Configuration Toggles
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Update Platform Dynamic Configuration Toggles
+        request:
+          method: PUT
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/admin/features'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - admin
+              - features
+          description: Update Platform Dynamic Configuration Toggles
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Broadcast WebSocket Realtime Alert
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/admin/broadcast'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - admin
+              - broadcast
+          description: Broadcast WebSocket Realtime Alert
+          body:
+            mode: raw
+            raw: |-
+              {
+                "title": "Grid Update",
+                "message": "Real-time updates scheduled tonight.",
+                "type": "info"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+  - name: Email Settings
+    description: SMTP and Gmail credentials verification and test dispatch
+    item:
+      - name: Get Email Configuration & Verification Status
+        request:
+          method: GET
+          header:
+            - key: Content-Type
+              value: application/json
+          url:
+            raw: '{{baseUrl}}/api/settings/email'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - settings
+              - email
+          description: Get Email Configuration & Verification Status
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'
+      - name: Save & Verify Gmail App Password or SMTP Credentials
+        request:
+          method: POST
+          header:
+            - key: Content-Type
+              value: application/json
+            - key: Authorization
+              value: Bearer {{token}}
+              type: text
+          url:
+            raw: '{{baseUrl}}/api/settings/email'
+            host:
+              - '{{baseUrl}}'
+            path:
+              - api
+              - settings
+              - email
+          description: Save & Verify Gmail App Password or SMTP Credentials
+          body:
+            mode: raw
+            raw: |-
+              {
+                "gmailUser": "yourname@gmail.com",
+                "gmailPass": "abcd efgh ijkl mnop",
+                "smtpHost": "",
+                "smtpPort": "",
+                "smtpUser": "",
+                "smtpPass": "",
+                "emailFrom": "JobScout Talent <yourname@gmail.com>"
+              }
+            options:
+              raw:
+                language: json
+        response: []
+        event:
+          - listen: test
+            script:
+              type: text/javascript
+              exec:
+                - pm.test('Response time is acceptable (< 1500ms)', function () {
+                - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+                - '});'
+                - pm.test('Status code is successful', function () {
+                - '    pm.expect(pm.response.code).to.be.below(400);'
+                - '});'

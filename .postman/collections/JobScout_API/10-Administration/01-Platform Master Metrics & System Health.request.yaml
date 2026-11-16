@@ -1,0 +1,33 @@
+$kind: request
+name: Platform Master Metrics & System Health
+description: Returns full system stats including user counts, jobs, ATS pipeline, memory heap, and uptime.
+method: GET
+url: '{{baseUrl}}/api/admin/stats'
+header:
+  - key: Content-Type
+    value: application/json
+    type: text
+    disabled: false
+  - key: Authorization
+    value: Bearer {{token}}
+    type: text
+    disabled: false
+event:
+  - listen: test
+    script:
+      type: text/javascript
+      exec:
+        - pm.test('Response time is acceptable (< 1500ms)', function () {
+        - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+        - '});'
+        - pm.test('Status code is successful', function () {
+        - '    pm.expect(pm.response.code).to.be.below(400);'
+        - '});'
+scripts:
+  test: |-
+    pm.test('Response time is acceptable (< 1500ms)', function () {
+        pm.expect(pm.response.responseTime).to.be.below(1500);
+    });
+    pm.test('Status code is successful', function () {
+        pm.expect(pm.response.code).to.be.below(400);
+    });

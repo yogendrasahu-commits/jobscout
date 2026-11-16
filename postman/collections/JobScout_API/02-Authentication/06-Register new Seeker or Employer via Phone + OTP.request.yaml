@@ -1,0 +1,58 @@
+$kind: request
+name: Register new Seeker or Employer via Phone + OTP
+description: Register new Seeker or Employer via Phone + OTP
+method: POST
+url: '{{baseUrl}}/api/auth/register-phone'
+header:
+  - key: Content-Type
+    value: application/json
+    type: text
+    disabled: false
+body:
+  mode: raw
+  raw: |-
+    {
+      "phone": "9899001122",
+      "otp": "123456",
+      "role": "seeker",
+      "name": "Ankit Sharma",
+      "password": "password123",
+      "title": "Fullstack Engineer",
+      "company": "Independent Consultant",
+      "skills": [
+        "Node.js",
+        "React"
+      ],
+      "lat": 19.076,
+      "lng": 72.8777
+    }
+  options:
+    raw:
+      language: json
+event:
+  - listen: test
+    script:
+      type: text/javascript
+      exec:
+        - if (pm.response.code === 200 || pm.response.code === 201) {
+        - '    var jsonData = pm.response.json();'
+        - '    if (jsonData.token) {'
+        - '        pm.collectionVariables.set(''token'', jsonData.token);'
+        - '        console.log(''✅ JWT Token automatically saved to collection variable {{token}}'');'
+        - '    }'
+        - '}'
+        - pm.test('Status code is 200 or 201', function () {
+        - '    pm.expect(pm.response.code).to.be.oneOf([200, 201]);'
+        - '});'
+scripts:
+  test: |-
+    if (pm.response.code === 200 || pm.response.code === 201) {
+        var jsonData = pm.response.json();
+        if (jsonData.token) {
+            pm.collectionVariables.set('token', jsonData.token);
+            console.log('✅ JWT Token automatically saved to collection variable {{token}}');
+        }
+    }
+    pm.test('Status code is 200 or 201', function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 201]);
+    });

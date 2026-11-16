@@ -1,0 +1,52 @@
+$kind: request
+name: Update Any User Profile Fields
+description: Update Any User Profile Fields
+method: PUT
+url: '{{baseUrl}}/api/admin/users/:id'
+header:
+  - key: Content-Type
+    value: application/json
+    type: text
+    disabled: false
+  - key: Authorization
+    value: Bearer {{token}}
+    type: text
+    disabled: false
+body:
+  mode: raw
+  raw: |-
+    {
+      "name": "sample",
+      "email": "sample",
+      "phone": "sample",
+      "role": "sample",
+      "title": "sample",
+      "companyName": "sample",
+      "address": "sample",
+      "lat": 10,
+      "lng": 10,
+      "isVerified": true,
+      "isBlocked": true
+    }
+  options:
+    raw:
+      language: json
+event:
+  - listen: test
+    script:
+      type: text/javascript
+      exec:
+        - pm.test('Response time is acceptable (< 1500ms)', function () {
+        - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+        - '});'
+        - pm.test('Status code is successful', function () {
+        - '    pm.expect(pm.response.code).to.be.below(400);'
+        - '});'
+scripts:
+  test: |-
+    pm.test('Response time is acceptable (< 1500ms)', function () {
+        pm.expect(pm.response.responseTime).to.be.below(1500);
+    });
+    pm.test('Status code is successful', function () {
+        pm.expect(pm.response.code).to.be.below(400);
+    });

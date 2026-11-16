@@ -1,0 +1,39 @@
+$kind: request
+name: Send 6-digit OTP to Mobile Number
+description: Send 6-digit OTP to Mobile Number
+method: POST
+url: '{{baseUrl}}/api/auth/send-otp'
+header:
+  - key: Content-Type
+    value: application/json
+    type: text
+    disabled: false
+body:
+  mode: raw
+  raw: |-
+    {
+      "phone": "9876543210",
+      "purpose": "login"
+    }
+  options:
+    raw:
+      language: json
+event:
+  - listen: test
+    script:
+      type: text/javascript
+      exec:
+        - pm.test('Response time is acceptable (< 1500ms)', function () {
+        - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+        - '});'
+        - pm.test('Status code is successful', function () {
+        - '    pm.expect(pm.response.code).to.be.below(400);'
+        - '});'
+scripts:
+  test: |-
+    pm.test('Response time is acceptable (< 1500ms)', function () {
+        pm.expect(pm.response.responseTime).to.be.below(1500);
+    });
+    pm.test('Status code is successful', function () {
+        pm.expect(pm.response.code).to.be.below(400);
+    });

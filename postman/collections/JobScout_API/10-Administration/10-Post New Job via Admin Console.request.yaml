@@ -1,0 +1,48 @@
+$kind: request
+name: Post New Job via Admin Console
+description: Post New Job via Admin Console
+method: POST
+url: '{{baseUrl}}/api/admin/jobs'
+header:
+  - key: Content-Type
+    value: application/json
+    type: text
+    disabled: false
+  - key: Authorization
+    value: Bearer {{token}}
+    type: text
+    disabled: false
+body:
+  mode: raw
+  raw: |-
+    {
+      "title": "DevOps Engineer",
+      "company": "Acme Cloud",
+      "category": "Technology",
+      "salary": "₹20,00,000 / yr",
+      "lat": 19.076,
+      "lng": 72.8777,
+      "address": "BKC, Mumbai"
+    }
+  options:
+    raw:
+      language: json
+event:
+  - listen: test
+    script:
+      type: text/javascript
+      exec:
+        - pm.test('Response time is acceptable (< 1500ms)', function () {
+        - '    pm.expect(pm.response.responseTime).to.be.below(1500);'
+        - '});'
+        - pm.test('Status code is successful', function () {
+        - '    pm.expect(pm.response.code).to.be.below(400);'
+        - '});'
+scripts:
+  test: |-
+    pm.test('Response time is acceptable (< 1500ms)', function () {
+        pm.expect(pm.response.responseTime).to.be.below(1500);
+    });
+    pm.test('Status code is successful', function () {
+        pm.expect(pm.response.code).to.be.below(400);
+    });

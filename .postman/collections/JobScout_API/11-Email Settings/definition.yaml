@@ -1,0 +1,3 @@
+$kind: folder
+name: Email Settings
+description: SMTP and Gmail credentials verification and test dispatch
