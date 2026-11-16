@@ -349,6 +349,10 @@ function MainApp() {
           onNavigateToAnon={() => handleNavigateTab('anon')}
           onOpenLogin={() => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
           onOpenSignup={(role) => setAuthConfig({ isOpen: true, mode: 'register', role: role || 'seeker' })}
+          onCompleteSignup={(loggedUser) => {
+            setIsCompleteProfileOpen(true);
+            handleNavigateTab('feed');
+          }}
           onSelectJob={(job) => { setSelectedJob(job); handleNavigateTab('jobs'); }}
           onSelectSeeker={(seeker) => { handleOpenProfile(seeker); handleNavigateTab('feed'); }}
           jobs={jobs}

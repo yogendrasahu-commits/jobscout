@@ -33,11 +33,14 @@ import {
   KeyRound,
   AlertCircle,
   Loader2,
-  ShieldAlert
+  ShieldAlert,
+  Mail,
+  Eye,
+  EyeOff,
+  Maximize2
 } from 'lucide-react';
 import { JobScoutLogo } from '../components/JobScoutLogo';
 import { useAuth } from '../context/AuthContext';
-import { LocationPickerInput } from '../components/LocationPickerInput';
 
 export const Welcome = ({
   onNavigateToMap,
@@ -46,6 +49,9 @@ export const Welcome = ({
   onNavigateToFeed,
   onNavigateToConnect,
   onNavigateToAnon,
+  onOpenLogin,
+  onOpenSignup,
+  onCompleteSignup,
   onSelectJob,
   onSelectSeeker,
   onExploreAsGuest,
@@ -56,10 +62,12 @@ export const Welcome = ({
   const { 
     user, 
     logout, 
+    login,
     loginWithPhonePassword, 
     loginWithPhoneOtp, 
     sendOtp, 
-    registerWithPhone 
+    registerWithPhone,
+    register
   } = useAuth();
 
   const [activeFaq, setActiveFaq] = useState(null);
@@ -67,23 +75,29 @@ export const Welcome = ({
 
   // Unified Auth State
   const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
-  const [loginMethod, setLoginMethod] = useState('password'); // 'password' | 'otp'
+  const [loginMethod, setLoginMethod] = useState('phone'); // 'phone' | 'email'
   const [role, setRole] = useState('seeker'); // 'seeker' | 'emp'
   
-  // Fields
-  const [phone, setPhone] = useState('');
+  // Login Fields
+  const [phoneInput, setPhoneInput] = useState('');
+  const [emailInput, setEmailInput] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [title, setTitle] = useState('');
-  const [skills, setSkills] = useState('');
-  const [companyName, setCompanyName] = useState('');
-  const [industry, setIndustry] = useState('Technology & IT');
-  const [locationAddress, setLocationAddress] = useState('Bandra Kurla Complex (BKC), Mumbai');
-  const [locationLat, setLocationLat] = useState(19.0760);
-  const [locationLng, setLocationLng] = useState(72.8777);
+  const [showPassword, setShowPassword] = useState(false);
+  const [phonePasswordMode, setPhonePasswordMode] = useState(false);
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
-  
+  const [simulatedOtp, setSimulatedOtp] = useState('');
+  const [sendingOtp, setSendingOtp] = useState(false);
+
+  // Signup Fields (Simple: Identifier + OTP + Password)
+  const [signupIdentifier, setSignupIdentifier] = useState('');
+  const [signupOtp, setSignupOtp] = useState('');
+  const [signupOtpSent, setSignupOtpSent] = useState(false);
+  const [signupSimulatedOtp, setSignupSimulatedOtp] = useState('');
+  const [signupSendingOtp, setSignupSendingOtp] = useState(false);
+  const [signupPassword, setSignupPassword] = useState('');
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
+
   // Status
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -93,134 +107,238 @@ export const Welcome = ({
     setActiveFaq(prev => prev === idx ? null : idx);
   };
 
+  // Trigger Auth: Prefer opening the updated popup modal directly!
   const scrollToAuth = (mode = 'login', chosenRole = 'seeker') => {
+    if (mode === 'login' && onOpenLogin) {
+      onOpenLogin();
+      return;
+    }
+    if (mode === 'register' && onOpenSignup) {
+      onOpenSignup(chosenRole);
+      return;
+    }
     setAuthMode(mode);
     if (chosenRole) setRole(chosenRole);
     setError('');
     setSuccessMsg('');
     if (authCardRef.current) {
       authCardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      const input = authCardRef.current.querySelector('input[type="tel"]');
+      const input = authCardRef.current.querySelector('input');
       if (input) input.focus();
     }
   };
 
-
-  // Send OTP
-  const handleSendOtp = async () => {
-    if (!/^[6-9]\d{9}$/.test(phone)) {
-      setError('कृपया एक मान्य 10-अंकों का भारतीय मोबाइल नंबर दर्ज करें (6-9 से शुरू)');
+  // Phone Send OTP for Login
+  const handlePhoneSendOtp = async () => {
+    const cleanPhone = phoneInput.replace(/[^0-9]/g, '').slice(-10);
+    if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+      setError('कृपया एक मान्य 10-अंकों का मोबाइल नंबर दर्ज करें (6-9 से शुरू)');
       return;
     }
-    setLoading(true);
     setError('');
-    setSuccessMsg('');
+    setSendingOtp(true);
     try {
-      await sendOtp(phone);
+      const res = await sendOtp(cleanPhone, 'login');
       setOtpSent(true);
-      setSuccessMsg('OTP भेज दिया गया है! टेस्टिंग के लिए 123456 दर्ज करें।');
+      const code = res?.otp || '123456';
+      setSimulatedOtp(code);
+      setOtp(code);
+      setSuccessMsg(`OTP भेज दिया गया है! (+91 ${cleanPhone}) डेमो कोड: ${code}`);
     } catch (err) {
       setError(err.message || 'OTP भेजने में विफल');
+    } finally {
+      setSendingOtp(false);
+    }
+  };
+
+  // Phone + OTP Login
+  const handlePhoneOtpLogin = async (e) => {
+    e.preventDefault();
+    const cleanPhone = phoneInput.replace(/[^0-9]/g, '').slice(-10);
+    if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+      setError('कृपया एक मान्य 10-अंकों का मोबाइल नंबर दर्ज करें');
+      return;
+    }
+    if (!otp || otp.trim().length < 4) {
+      setError('कृपया 6-अंकों का OTP कोड दर्ज करें');
+      return;
+    }
+    setError('');
+    setLoading(true);
+    try {
+      const res = await loginWithPhoneOtp(cleanPhone, otp.trim());
+      if (res?.isNewUser) {
+        setSuccessMsg('मोबाइल सत्यापित! कृपया अपना खाता पूर्ण करें।');
+        setSignupIdentifier(cleanPhone);
+        setAuthMode('register');
+        setSignupOtp(otp);
+        return;
+      }
+      setSuccessMsg(`स्वागत है, ${res.name || 'User'}!`);
+      if (res.role === 'admin') {
+        window.location.hash = '#/admin';
+      } else {
+        onNavigateToFeed();
+      }
+    } catch (err) {
+      setError(err.message || 'OTP सत्यापन विफल। कृपया पुनः प्रयास करें।');
     } finally {
       setLoading(false);
     }
   };
 
-  // Submit Unified Auth Form
-  const handleAuthSubmit = async (e) => {
+  // Phone + Password Login
+  const handlePhonePasswordLogin = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccessMsg('');
-
-    const cleanPhone = phone.replace(/[^0-9]/g, '').slice(-10);
+    const cleanPhone = phoneInput.replace(/[^0-9]/g, '').slice(-10);
     if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
-      setError('कृपया एक मान्य 10-अंकों का भारतीय मोबाइल नंबर दर्ज करें (6-9 से शुरू)');
+      setError('कृपया एक मान्य 10-अंकों का मोबाइल नंबर दर्ज करें');
       return;
     }
-
+    if (!password) {
+      setError('कृपया अपना पासवर्ड दर्ज करें');
+      return;
+    }
+    setError('');
     setLoading(true);
     try {
-      if (authMode === 'login') {
-        // LOGIN FLOW
-        if (loginMethod === 'otp') {
-          if (!otp || otp.length < 6) {
-            setError('कृपया 6-अंकों का OTP दर्ज करें (डिफ़ॉल्ट: 123456)');
-            setLoading(false);
-            return;
-          }
-          await loginWithPhoneOtp(cleanPhone, otp);
-        } else {
-          if (!password) {
-            setError('कृपया अपना पासवर्ड दर्ज करें');
-            setLoading(false);
-            return;
-          }
-          await loginWithPhonePassword(cleanPhone, password);
-        }
-        // Success -> Enter Dashboard
-        onNavigateToFeed();
+      const res = await loginWithPhonePassword(cleanPhone, password);
+      setSuccessMsg(`स्वागत है, ${res.name || 'User'}!`);
+      if (res.role === 'admin') {
+        window.location.hash = '#/admin';
       } else {
-        // REGISTRATION FLOW
-        if (!name.trim() || name.trim().length < 2) {
-          setError('कृपया अपना पूरा नाम दर्ज करें (कम से कम 2 अक्षर)');
-          setLoading(false);
-          return;
-        }
-        if (!password || password.length < 6) {
-          setError('पासवर्ड कम से कम 6 अक्षरों का होना चाहिए');
-          setLoading(false);
-          return;
-        }
-
-        if (role === 'seeker') {
-          if (!title.trim()) {
-            setError('कृपया अपनी जॉब प्रोफाइल / पद दर्ज करें (उदा. React Developer)');
-            setLoading(false);
-            return;
-          }
-        } else {
-          if (!companyName.trim()) {
-            setError('कृपया अपनी कंपनी या संस्थान का नाम दर्ज करें');
-            setLoading(false);
-            return;
-          }
-        }
-
-        if (!locationAddress.trim()) {
-          setError('कृपया अपना शहर या इलाका (Location) चुनें या दर्ज करें');
-          setLoading(false);
-          return;
-        }
-
-        const payload = {
-          phone: cleanPhone,
-          otp: '123456',
-          password,
-          name: name.trim(),
-          role,
-          address: locationAddress.trim(),
-          lat: locationLat || 19.0760,
-          lng: locationLng || 72.8777,
-          ...(role === 'emp' ? {
-            companyName: companyName.trim(),
-            industry: industry || 'Technology & IT',
-            companySize: '1-10 Employees',
-            hiringType: 'Full-time'
-          } : {
-            title: title.trim(),
-            experience: '1 - 3 Years',
-            skills: skills ? skills.split(',').map(s => s.trim()).filter(Boolean) : ['JavaScript', 'React'],
-            expectedSalary: 'Competitive',
-            availability: 'Immediate (Ready Today)'
-          })
-        };
-
-        await registerWithPhone(payload);
-        // Success -> Enter Dashboard
         onNavigateToFeed();
       }
     } catch (err) {
-      setError(err.message || 'प्रमाणीकरण विफल। कृपया पुनः प्रयास करें।');
+      setError(err.message || 'अमान्य मोबाइल या पासवर्ड');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Email + Password Login
+  const handleEmailLogin = async (e) => {
+    e.preventDefault();
+    const cleanEmail = emailInput.trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes('@')) {
+      setError('कृपया एक मान्य ईमेल पता दर्ज करें');
+      return;
+    }
+    if (!password) {
+      setError('कृपया अपना पासवर्ड दर्ज करें');
+      return;
+    }
+    setError('');
+    setLoading(true);
+    try {
+      const res = await login(cleanEmail, password);
+      setSuccessMsg(`स्वागत है, ${res.name || 'User'}!`);
+      if (res.role === 'admin') {
+        window.location.hash = '#/admin';
+      } else {
+        onNavigateToFeed();
+      }
+    } catch (err) {
+      setError(err.message || 'अमान्य ईमेल या पासवर्ड');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fast 1-Click Demo Login
+  const handleQuickDemo = async (demoId, demoPass) => {
+    setError('');
+    setLoading(true);
+    try {
+      const res = await login(demoId, demoPass);
+      setSuccessMsg(`लॉगिन सफल: ${res.name}`);
+      if (res.role === 'admin') {
+        window.location.hash = '#/admin';
+      } else {
+        onNavigateToFeed();
+      }
+    } catch (err) {
+      setError(err.message || 'डेमो लॉगिन विफल');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Signup Send OTP
+  const handleSignupSendOtp = async () => {
+    const clean = signupIdentifier.trim();
+    if (!clean) {
+      setError('कृपया OTP प्राप्त करने के लिए मोबाइल नंबर या ईमेल दर्ज करें');
+      return;
+    }
+    const isEmail = clean.includes('@');
+    if (!isEmail) {
+      const digits = clean.replace(/[^0-9]/g, '').slice(-10);
+      if (!/^[6-9]\d{9}$/.test(digits)) {
+        setError('कृपया एक मान्य 10-अंकों का भारतीय मोबाइल नंबर दर्ज करें (6-9 से शुरू)');
+        return;
+      }
+    } else if (!clean.includes('.') || clean.length < 5) {
+      setError('कृपया एक मान्य ईमेल पता दर्ज करें');
+      return;
+    }
+
+    setError('');
+    setSignupSendingOtp(true);
+    try {
+      const cleanPhone = !isEmail ? clean.replace(/[^0-9]/g, '').slice(-10) : '';
+      const res = await sendOtp(cleanPhone || clean, 'register');
+      setSignupOtpSent(true);
+      const code = res?.otp || '123456';
+      setSignupSimulatedOtp(code);
+      setSignupOtp(code);
+      setSuccessMsg(`सत्यापन कोड भेजा गया: ${clean} (डेमो कोड: ${code})`);
+    } catch (err) {
+      setError(err.message || 'OTP भेजने में विफल');
+    } finally {
+      setSignupSendingOtp(false);
+    }
+  };
+
+  // Minimal Fast Signup (Phone/Email + OTP + Password)
+  const handleSignupSubmit = async (e) => {
+    e.preventDefault();
+    const clean = signupIdentifier.trim();
+    if (!clean) {
+      setError('कृपया मोबाइल नंबर या ईमेल पता दर्ज करें');
+      return;
+    }
+    if (!signupOtp || signupOtp.length < 4) {
+      setError('कृपया प्राप्त OTP कोड दर्ज करें');
+      return;
+    }
+    if (!signupPassword || signupPassword.length < 6) {
+      setError('पासवर्ड कम से कम 6 अक्षरों का होना चाहिए');
+      return;
+    }
+
+    setError('');
+    setLoading(true);
+    try {
+      const isEmail = clean.includes('@');
+      const payload = {
+        name: isEmail ? clean.split('@')[0] : `User ${clean.replace(/[^0-9]/g, '').slice(-4)}`,
+        email: isEmail ? clean.toLowerCase() : '',
+        phone: !isEmail ? clean.replace(/[^0-9]/g, '').slice(-10) : '',
+        otp: signupOtp.trim(),
+        password: signupPassword,
+        role
+      };
+
+      const newUser = await register(payload);
+      setSuccessMsg('खाता बन गया! अब अपनी प्रोफाइल पूर्ण करें।');
+      if (onCompleteSignup) {
+        onCompleteSignup(newUser);
+      } else {
+        onNavigateToFeed();
+      }
+    } catch (err) {
+      setError(err.message || 'साइनअप विफल। कृपया विवरण जांचें।');
     } finally {
       setLoading(false);
     }
@@ -326,7 +444,7 @@ export const Welcome = ({
             ) : (
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => onOpenLogin ? onOpenLogin() : null}
+                  onClick={() => onOpenLogin ? onOpenLogin() : (window.location.hash = '#/admin')}
                   className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold border border-rose-200/80 transition-all active:scale-95 shadow-xs"
                   title="Master Admin Portal"
                 >
@@ -335,7 +453,7 @@ export const Welcome = ({
                 </button>
 
                 <button
-                  onClick={() => scrollToAuth('login')}
+                  onClick={() => onOpenLogin ? onOpenLogin() : scrollToAuth('login')}
                   className="px-4 py-2 rounded-full bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold border border-slate-200/80 shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-all flex items-center gap-1.5 active:scale-95"
                 >
                   <LogIn className="w-3.5 h-3.5 text-indigo-600" />
@@ -343,7 +461,7 @@ export const Welcome = ({
                 </button>
 
                 <button
-                  onClick={() => scrollToAuth('register', 'seeker')}
+                  onClick={() => onOpenSignup ? onOpenSignup('seeker') : scrollToAuth('register', 'seeker')}
                   className="px-4 py-2 rounded-full bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold shadow-md shadow-indigo-600/20 border border-indigo-400/30 transition-all flex items-center gap-1.5 active:scale-95"
                 >
                   <UserPlus className="w-3.5 h-3.5" />
@@ -438,15 +556,15 @@ export const Welcome = ({
 
           </div>
 
-          {/* Right Column: THE ONE UNIFIED AUTHENTICATION CARD */}
+          {/* Right Column: UPDATED UNIFIED AUTHENTICATION CARD */}
           <div className="lg:col-span-5" ref={authCardRef} id="auth-card">
             <div className="bg-white/95 backdrop-blur-2xl border-2 border-indigo-100/90 rounded-3xl p-6 sm:p-7 shadow-[0_20px_50px_-12px_rgba(79,70,229,0.18)] relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-indigo-500 via-cyan-400 to-emerald-400" />
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-indigo-500/10 to-transparent pointer-events-none rounded-bl-full" />
               
-              {/* Tabs: Log In vs Sign Up */}
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-                <div className="flex bg-slate-100 p-1 rounded-2xl w-full">
+              {/* Header Row: Tabs & Full Modal Button */}
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4 gap-2">
+                <div className="flex bg-slate-100 p-1 rounded-2xl flex-1">
                   <button
                     type="button"
                     onClick={() => { setAuthMode('login'); setError(''); setSuccessMsg(''); }}
@@ -473,6 +591,18 @@ export const Welcome = ({
                     <span>Sign Up (नया खाता)</span>
                   </button>
                 </div>
+
+                {onOpenLogin && (
+                  <button
+                    type="button"
+                    onClick={() => authMode === 'login' ? onOpenLogin() : onOpenSignup(role)}
+                    className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 text-xs font-bold transition-colors flex items-center gap-1"
+                    title="Open Fullscreen Popup Modal"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline text-[10px]">Popup</span>
+                  </button>
+                )}
               </div>
 
               {/* Feedback Alerts */}
@@ -491,120 +621,275 @@ export const Welcome = ({
               )}
 
               {/* ============================================== */}
-              {/* TAB 1: UNIFIED LOGIN FORM */}
+              {/* TAB 1: UPDATED LOGIN FORM (DUAL METHOD) */}
               {/* ============================================== */}
               {authMode === 'login' && (
-                <form onSubmit={handleAuthSubmit} className="space-y-3.5">
-                  
-                  {/* Phone Input */}
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Mobile Number (मोबाइल नंबर) <span className="text-rose-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
-                        +91
-                      </span>
-                      <input
-                        type="tel"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, '').slice(0, 10))}
-                        placeholder="98765 43210"
-                        required
-                        className="w-full pl-12 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm font-semibold focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Login Method Toggle: Password vs OTP */}
-                  <div className="flex items-center justify-between text-xs pt-0.5">
-                    <span className="text-slate-500 font-medium">लॉगिन विधि (Method):</span>
+                <div className="space-y-3.5">
+                  {/* Login Method Toggle: Phone + OTP vs Email + Password */}
+                  <div className="grid grid-cols-2 p-1 bg-slate-100 rounded-xl border border-slate-200">
                     <button
                       type="button"
-                      onClick={() => setLoginMethod(prev => prev === 'password' ? 'otp' : 'password')}
-                      className="text-indigo-600 font-bold hover:underline"
+                      onClick={() => { setLoginMethod('phone'); setError(''); setSuccessMsg(''); }}
+                      className={`py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                        loginMethod === 'phone'
+                          ? 'bg-white text-indigo-700 shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
                     >
-                      {loginMethod === 'password' ? 'Log in with OTP instead' : 'Log in with Password instead'}
+                      <Phone size={13} />
+                      <span>Mobile + OTP</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setLoginMethod('email'); setError(''); setSuccessMsg(''); }}
+                      className={`py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                        loginMethod === 'email'
+                          ? 'bg-white text-indigo-700 shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <Mail size={13} />
+                      <span>Email + Password</span>
                     </button>
                   </div>
 
-                  {/* Password Field */}
-                  {loginMethod === 'password' ? (
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Password (पासवर्ड) <span className="text-rose-500">*</span>
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder="••••••••"
-                          required
-                          className="w-full pl-3 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="block text-xs font-bold text-slate-700">
-                          Enter 6-Digit OTP <span className="text-rose-500">*</span>
+                  {/* METHOD A: PHONE + OTP */}
+                  {loginMethod === 'phone' && (
+                    <form onSubmit={phonePasswordMode ? handlePhonePasswordLogin : handlePhoneOtpLogin} className="space-y-3">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          10-Digit Mobile Number (मोबाइल नंबर) <span className="text-rose-500">*</span>
                         </label>
+                        <div className="flex gap-2">
+                          <div className="relative flex-1">
+                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-xs font-bold pointer-events-none">
+                              +91
+                            </span>
+                            <input
+                              type="tel"
+                              maxLength={10}
+                              value={phoneInput}
+                              onChange={(e) => setPhoneInput(e.target.value.replace(/[^0-9]/g, '').slice(0, 10))}
+                              placeholder="98765 43210"
+                              required
+                              className="w-full pl-11 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm font-semibold focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                            />
+                          </div>
+
+                          {!phonePasswordMode && (
+                            <button
+                              type="button"
+                              onClick={handlePhoneSendOtp}
+                              disabled={sendingOtp || phoneInput.length < 10}
+                              className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-xs transition-all whitespace-nowrap active:scale-95 flex items-center gap-1"
+                            >
+                              {sendingOtp ? 'Sending...' : otpSent ? 'Resend' : 'Send OTP'}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* OTP Passcode */}
+                      {!phonePasswordMode && (
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="block text-xs font-bold text-slate-700">
+                              6-Digit OTP Passcode <span className="text-rose-500">*</span>
+                            </label>
+                            {simulatedOtp && (
+                              <span className="text-[10px] text-emerald-600 font-mono font-bold">
+                                Demo: {simulatedOtp}
+                              </span>
+                            )}
+                          </div>
+                          <div className="relative">
+                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
+                              <KeyRound size={15} />
+                            </span>
+                            <input
+                              type="text"
+                              maxLength={6}
+                              value={otp}
+                              onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
+                              placeholder="123456"
+                              required
+                              className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm tracking-widest font-mono font-bold focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Phone Password fallback */}
+                      {phonePasswordMode && (
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">
+                            Account Password <span className="text-rose-500">*</span>
+                          </label>
+                          <div className="relative">
+                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
+                              <Lock size={15} />
+                            </span>
+                            <input
+                              type={showPassword ? 'text' : 'password'}
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              placeholder="••••••••"
+                              required
+                              className="w-full pl-9 pr-10 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                            >
+                              {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between text-[11px] pt-0.5">
                         <button
                           type="button"
-                          onClick={handleSendOtp}
-                          disabled={loading}
-                          className="text-xs font-bold text-indigo-600 hover:underline"
+                          onClick={() => { setPhonePasswordMode(!phonePasswordMode); setError(''); }}
+                          className="text-indigo-600 font-semibold hover:underline"
                         >
-                          {otpSent ? 'Resend OTP' : 'Get OTP'}
+                          {phonePasswordMode ? 'Use OTP sign-in instead' : 'Use password instead'}
                         </button>
                       </div>
-                      <input
-                        type="text"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
-                        placeholder="123456"
-                        required
-                        className="w-full px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm tracking-widest font-mono font-bold focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
-                      />
-                    </div>
+
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                      >
+                        {loading ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <>
+                            <LogIn className="w-4 h-4" />
+                            <span>{phonePasswordMode ? 'Sign In with Password' : 'Verify OTP & Sign In'}</span>
+                          </>
+                        )}
+                      </button>
+                    </form>
                   )}
 
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-sm shadow-md shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
-                  >
-                    {loading ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <>
-                        <LogIn className="w-4 h-4" />
-                        <span>Log In to JobScout (लॉगिन करें)</span>
-                      </>
-                    )}
-                  </button>
-                </form>
+                  {/* METHOD B: EMAIL + PASSWORD */}
+                  {loginMethod === 'email' && (
+                    <form onSubmit={handleEmailLogin} className="space-y-3">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          Email Address (ईमेल पता) <span className="text-rose-500">*</span>
+                        </label>
+                        <div className="relative">
+                          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
+                            <Mail size={15} />
+                          </span>
+                          <input
+                            type="email"
+                            value={emailInput}
+                            onChange={(e) => setEmailInput(e.target.value)}
+                            placeholder="admin@jobscout.io"
+                            required
+                            className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          Password (पासवर्ड) <span className="text-rose-500">*</span>
+                        </label>
+                        <div className="relative">
+                          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
+                            <Lock size={15} />
+                          </span>
+                          <input
+                            type={showPassword ? 'text' : 'password'}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="••••••••"
+                            required
+                            className="w-full pl-9 pr-10 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                          >
+                            {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                          </button>
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                      >
+                        {loading ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <>
+                            <LogIn className="w-4 h-4" />
+                            <span>Sign In with Password</span>
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  )}
+
+                  {/* Fast 1-Click Demo Shortcut Pills */}
+                  <div className="pt-2 border-t border-slate-100">
+                    <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 text-center">
+                      ⚡ Quick 1-Click Fast Login
+                    </span>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleQuickDemo('admin@jobscout.io', 'admin123')}
+                        className="py-1.5 px-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-[10px] font-bold transition flex items-center justify-center gap-1 active:scale-95"
+                      >
+                        <ShieldCheck size={11} className="text-rose-600" />
+                        <span>Admin</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleQuickDemo('zomato@jobscout.io', 'zomato123')}
+                        className="py-1.5 px-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-[10px] font-bold transition flex items-center justify-center gap-1 active:scale-95"
+                      >
+                        <Building2 size={11} className="text-emerald-600" />
+                        <span>Employer</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleQuickDemo('ananya@jobscout.io', 'seeker123')}
+                        className="py-1.5 px-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-[10px] font-bold transition flex items-center justify-center gap-1 active:scale-95"
+                      >
+                        <UserCheck size={11} className="text-indigo-600" />
+                        <span>Seeker</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               )}
 
               {/* ============================================== */}
-              {/* TAB 2: UNIFIED SIGN UP FORM */}
+              {/* TAB 2: UPDATED SIMPLE SIGN UP FORM (MINIMAL) */}
               {/* ============================================== */}
               {authMode === 'register' && (
-                <form onSubmit={handleAuthSubmit} className="space-y-3">
-                  
+                <form onSubmit={handleSignupSubmit} className="space-y-3">
                   {/* Role Selector */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Select Your Profile Type (खाता प्रकार) <span className="text-rose-500">*</span>
+                      Account Type (खाता प्रकार) <span className="text-rose-500">*</span>
                     </label>
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         type="button"
                         onClick={() => setRole('seeker')}
-                        className={`p-2.5 rounded-xl border text-xs font-bold flex flex-col items-center gap-0.5 transition-all ${
+                        className={`p-2 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
                           role === 'seeker'
                             ? 'bg-indigo-50 border-indigo-500 text-indigo-700 shadow-xs ring-1 ring-indigo-500/20'
                             : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
@@ -612,13 +897,12 @@ export const Welcome = ({
                       >
                         <UserCheck className="w-4 h-4 text-indigo-600" />
                         <span>Job Seeker</span>
-                        <span className="text-[9px] font-normal text-slate-500">(#OpenToWork)</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => setRole('emp')}
-                        className={`p-2.5 rounded-xl border text-xs font-bold flex flex-col items-center gap-0.5 transition-all ${
+                        className={`p-2 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
                           role === 'emp'
                             ? 'bg-emerald-50 border-emerald-500 text-emerald-800 shadow-xs ring-1 ring-emerald-500/20'
                             : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
@@ -626,133 +910,122 @@ export const Welcome = ({
                       >
                         <Building2 className="w-4 h-4 text-emerald-600" />
                         <span>Employer</span>
-                        <span className="text-[9px] font-normal text-slate-500">(#Hiring Talent)</span>
                       </button>
                     </div>
                   </div>
 
-                  {/* Name Input */}
+                  {/* Identifier: Mobile or Email */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Full Name (आपका पूरा नाम) <span className="text-rose-500">*</span>
+                      Mobile Number or Email Address <span className="text-rose-500">*</span>
                     </label>
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="उदा. अमित कुमार / Priya Sharma"
-                      required
-                      className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm font-semibold focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                    />
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={signupIdentifier}
+                        onChange={(e) => setSignupIdentifier(e.target.value)}
+                        placeholder="उदा. 9876543210 या name@work.com"
+                        required
+                        className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm font-semibold focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleSignupSendOtp}
+                        disabled={signupSendingOtp || !signupIdentifier.trim()}
+                        className="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-xs transition-all whitespace-nowrap active:scale-95"
+                      >
+                        {signupSendingOtp ? 'Sending...' : signupOtpSent ? 'Resend' : 'Send OTP'}
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Phone Input */}
+                  {/* OTP Passcode */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Mobile Number (मोबाइल नंबर) <span className="text-rose-500">*</span>
-                    </label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-xs font-bold text-slate-700">
+                        Enter OTP Passcode <span className="text-rose-500">*</span>
+                      </label>
+                      {signupSimulatedOtp && (
+                        <span className="text-[10px] text-emerald-600 font-mono font-bold">
+                          Demo: {signupSimulatedOtp}
+                        </span>
+                      )}
+                    </div>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
-                        +91
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
+                        <KeyRound size={15} />
                       </span>
                       <input
-                        type="tel"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, '').slice(0, 10))}
-                        placeholder="98765 43210"
+                        type="text"
+                        maxLength={6}
+                        value={signupOtp}
+                        onChange={(e) => setSignupOtp(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
+                        placeholder="123456"
                         required
-                        className="w-full pl-12 pr-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm font-semibold focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm tracking-widest font-mono font-bold focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       />
                     </div>
                   </div>
 
-                  {/* Password Input */}
+                  {/* Password */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Create Password (पासवर्ड) <span className="text-rose-500">*</span>
+                      Create Password <span className="text-rose-500">*</span>
                     </label>
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="कम से कम 6 अक्षर"
-                      required
-                      className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                    />
+                    <div className="relative">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
+                        <Lock size={15} />
+                      </span>
+                      <input
+                        type={showSignupPassword ? 'text' : 'password'}
+                        value={signupPassword}
+                        onChange={(e) => setSignupPassword(e.target.value)}
+                        placeholder="कम से कम 6 अक्षर"
+                        required
+                        className="w-full pl-9 pr-10 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowSignupPassword(!showSignupPassword)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                      >
+                        {showSignupPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Role Specific Fields */}
-                  {role === 'seeker' ? (
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Job Role / Profession (पद) <span className="text-rose-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder="उदा. Senior React Developer / UI Designer"
-                        required
-                        className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                      />
-                    </div>
-                  ) : (
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Company Name (कंपनी का नाम) <span className="text-rose-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={companyName}
-                        onChange={(e) => setCompanyName(e.target.value)}
-                        placeholder="उदा. TechPulse India / Apex Cloud Labs"
-                        required
-                        className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                      />
-                    </div>
-                  )}
+                  {/* Notice about completing profile after signup */}
+                  <div className="p-2.5 bg-indigo-50/70 border border-indigo-100 rounded-xl text-[11px] text-indigo-900 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-indigo-600 flex-shrink-0" />
+                    <span>साइनअप के तुरंत बाद प्रोफ़ाइल पूर्ण करने का अलर्ट आएगा।</span>
+                  </div>
 
-                  {/* Location Field with GPS detection & Indian Hubs */}
-                  <LocationPickerInput
-                    value={locationAddress}
-                    onChange={(addr, lat, lng) => {
-                      setLocationAddress(addr);
-                      if (lat && lng) {
-                        setLocationLat(lat);
-                        setLocationLng(lng);
-                      }
-                    }}
-                    theme={role === 'seeker' ? 'indigo' : 'emerald'}
-                    label={role === 'seeker' ? 'Preferred Job Location / City (स्थान / शहर)' : 'Office / Hiring Location (कंपनी का स्थान / शहर)'}
-                    placeholder="उदा. BKC, Mumbai या Koramangala, Bengaluru"
-                  />
-
-                  {/* Submit Register Button */}
+                  {/* Submit Button */}
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-md shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 mt-1"
+                    className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
                   >
                     {loading ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
                       <>
                         <UserPlus className="w-4 h-4" />
-                        <span>Create {role === 'seeker' ? 'Candidate' : 'Employer'} Account (रजिस्टर करें)</span>
+                        <span>Create {role === 'seeker' ? 'Candidate' : 'Employer'} Account →</span>
                       </>
                     )}
                   </button>
                 </form>
               )}
 
-              {/* Admin Access Quick Trigger */}
+              {/* Master Admin Direct Quick Link */}
               <div className="mt-4 pt-3.5 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => onOpenLogin ? onOpenLogin() : null}
-                  className="w-full py-2.5 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 hover:text-rose-800 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors active:scale-98 shadow-xs"
+                  className="w-full py-2 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 hover:text-rose-800 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors active:scale-98 shadow-xs"
                 >
-                  <ShieldAlert className="w-4 h-4 text-rose-600" />
+                  <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
                   <span>Enterprise Control: <strong>Sign in as Admin Portal →</strong></span>
                 </button>
               </div>
