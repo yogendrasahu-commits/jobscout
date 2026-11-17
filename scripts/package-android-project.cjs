@@ -14,8 +14,8 @@ const serverDownloadsDir = path.join(rootDir, 'server', 'public', 'downloads');
 console.log('📦 Bundling Android Studio Project into ZIP archive...');
 
 if (!fs.existsSync(androidDir)) {
-  console.error('❌ client/android directory does not exist!');
-  process.exit(1);
+  console.warn('⚠️ client/android directory not found, skipping Android Studio project ZIP packaging.');
+  process.exit(0);
 }
 
 const zip = new AdmZip();

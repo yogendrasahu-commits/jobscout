@@ -12,6 +12,16 @@ const serverPublicDownloads = path.join(rootDir, 'server', 'public', 'downloads'
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 });
 
+const outApkClient = path.join(clientPublicDownloads, 'jobscout-mobile.apk');
+const outApkServer = path.join(serverPublicDownloads, 'jobscout-mobile.apk');
+
+// If a genuine binary-compiled APK already exists (e.g. from GitHub Actions / Gradle), preserve it!
+if (fs.existsSync(outApkClient) && fs.statSync(outApkClient).size > 6 * 1024 * 1024) {
+  console.log(`✅ Genuine compiled Android APK already present (${(fs.statSync(outApkClient).size / (1024*1024)).toFixed(2)} MB). Preserving.`);
+  fs.copyFileSync(outApkClient, outApkServer);
+  process.exit(0);
+}
+
 console.log('🚀 Building JobScout Mobile Android Package (.apk)...');
 
 const zip = new AdmZip();
