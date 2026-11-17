@@ -112,9 +112,6 @@ Built-By: JobScout Build System
 `;
 zip.addFile('META-INF/MANIFEST.MF', Buffer.from(manifestMf, 'utf8'));
 
-const outApkClient = path.join(clientPublicDownloads, 'jobscout-mobile.apk');
-const outApkServer = path.join(serverPublicDownloads, 'jobscout-mobile.apk');
-
 zip.writeZip(outApkClient);
 fs.copyFileSync(outApkClient, outApkServer);
 

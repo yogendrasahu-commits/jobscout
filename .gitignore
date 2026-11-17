@@ -29,6 +29,8 @@ Thumbs.db
 *.bak
 *.tmp
 *.apk
+!client/public/downloads/jobscout-mobile.apk
+!server/public/downloads/jobscout-mobile.apk
 *.zip
 client/android/.gradle/
 client/android/app/build/
