@@ -4,19 +4,23 @@
  */
 
 const resolveBaseUrl = () => {
-  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL.replace(/\/+$/, '');
   if (typeof window !== 'undefined') {
+    const savedServer = localStorage.getItem('jobscout_server_url');
+    if (savedServer) return savedServer.replace(/\/+$/, '');
+
     // Detect Capacitor native platform or file/capacitor scheme on Android/iOS
     const isNative = Boolean(
       (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) ||
       window.location.protocol === 'capacitor:' ||
       window.location.protocol === 'ionic:' ||
-      window.location.protocol === 'file:'
+      window.location.protocol === 'file:' ||
+      (window.location.hostname === 'localhost' && (!window.location.port || window.location.port === '80' || window.location.port === '443'))
     );
 
     if (isNative) {
-      // Connect to configured server or live Render backend
-      return localStorage.getItem('jobscout_server_url') || 'https://jobscout.onrender.com';
+      // Connect to local LAN Wi-Fi backend on port 5000
+      return 'http://192.168.11.22:5000';
     }
   }
   return '';

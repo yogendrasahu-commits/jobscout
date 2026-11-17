@@ -131,16 +131,21 @@ export const SocketProvider = ({ children }) => {
   // 1. Initialize Socket
   useEffect(() => {
     const resolveSocketUrl = () => {
-      if (import.meta.env.VITE_SOCKET_URL) return import.meta.env.VITE_SOCKET_URL;
-      if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+      if (import.meta.env.VITE_SOCKET_URL) return import.meta.env.VITE_SOCKET_URL.replace(/\/+$/, '');
+      if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL.replace(/\/+$/, '');
       if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem('jobscout_server_url');
+        if (saved) return saved.replace(/\/+$/, '');
+
         const isNative = Boolean(
           (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) ||
           window.location.protocol === 'capacitor:' ||
-          window.location.protocol === 'file:'
+          window.location.protocol === 'ionic:' ||
+          window.location.protocol === 'file:' ||
+          (window.location.hostname === 'localhost' && (!window.location.port || window.location.port === '80' || window.location.port === '443'))
         );
         if (isNative) {
-          return localStorage.getItem('jobscout_server_url') || 'https://jobscout.onrender.com';
+          return 'http://192.168.11.22:5000';
         }
       }
       return window.location.origin;

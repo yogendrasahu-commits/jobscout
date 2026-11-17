@@ -5,17 +5,76 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import 'leaflet/dist/leaflet.css';
 import './index.css';
 
-// Automatically route API requests to remote backend if VITE_API_URL is configured (e.g. for decoupled deployments)
-if (import.meta.env.VITE_API_URL) {
-  const backendBase = import.meta.env.VITE_API_URL.replace(/\/+$/, '');
-  const originalFetch = window.fetch;
-  window.fetch = (url, options) => {
-    if (typeof url === 'string' && url.startsWith('/api')) {
-      return originalFetch(`${backendBase}${url}`, options);
+// Universal Dynamic API Backend Base URL Resolver
+const getDynamicApiBase = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL.replace(/\/+$/, '');
+  }
+  if (typeof window !== 'undefined') {
+    const savedServer = localStorage.getItem('jobscout_server_url');
+    if (savedServer) return savedServer.replace(/\/+$/, '');
+
+    const isNativeCapacitor = Boolean(
+      (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) ||
+      window.location.protocol === 'capacitor:' ||
+      window.location.protocol === 'ionic:' ||
+      window.location.protocol === 'file:' ||
+      (window.location.hostname === 'localhost' && (!window.location.port || window.location.port === '80' || window.location.port === '443'))
+    );
+
+    if (isNativeCapacitor) {
+      // Connect to local development machine on LAN Wi-Fi
+      return 'http://192.168.11.22:5000';
     }
-    return originalFetch(url, options);
-  };
-}
+  }
+  return '';
+};
+
+// Global Fetch Interceptor: Routes /api and /download to correct backend base URL
+const originalFetch = window.fetch;
+window.fetch = (input, init) => {
+  const apiBase = getDynamicApiBase();
+  if (apiBase) {
+    if (typeof input === 'string') {
+      if (input.startsWith('/api') || input.startsWith('/download') || input.startsWith('/socket.io')) {
+        return originalFetch(`${apiBase}${input}`, init);
+      }
+    } else if (input instanceof Request && typeof input.url === 'string') {
+      try {
+        const parsed = new URL(input.url);
+        if (parsed.pathname.startsWith('/api') || parsed.pathname.startsWith('/download')) {
+          const newUrl = `${apiBase}${parsed.pathname}${parsed.search}`;
+          return originalFetch(new Request(newUrl, input), init);
+        }
+      } catch {}
+    }
+  }
+  return originalFetch(input, init);
+};
+
+// Bulletproof Safe Response.json Guard: Prevents HTML 404/500/offline pages from crashing the app with raw SyntaxError
+const originalResponseJson = Response.prototype.json;
+Response.prototype.json = async function () {
+  try {
+    const contentType = this.headers.get('content-type') || '';
+    if (contentType.includes('text/html')) {
+      console.warn(`[JSON-Shield] Non-JSON HTML response received from ${this.url || 'endpoint'} (Status: ${this.status})`);
+      return {
+        error: `Server responded with ${this.status} ${this.statusText || 'Error'} (non-JSON)`,
+        isHtmlResponse: true,
+        status: this.status
+      };
+    }
+    return await originalResponseJson.call(this);
+  } catch (err) {
+    console.warn(`[JSON-Shield] Caught JSON parse exception from ${this.url || 'endpoint'}:`, err.message);
+    return {
+      error: err.message || 'Failed to parse JSON response',
+      isParseError: true,
+      status: this.status
+    };
+  }
+};
 
 // Register Service Worker for Native Mobile App & Offline PWA
 if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {

@@ -579,7 +579,7 @@ router.put('/location', authenticateToken, (req, res) => {
 });
 
 // Update User Profile (Email, Name, Title, Skills, Bio, etc.)
-router.put('/profile', authenticateToken, (req, res) => {
+router.put(['/profile', '/profile/:id'], authenticateToken, (req, res) => {
   const user = db.findUserById(req.user.id);
   if (!user) return res.status(404).json({ error: 'User not found' });
 
