@@ -175,7 +175,7 @@ export const CommandPalette = ({
 
   return (
     <div 
-      className="fixed inset-0 z-[1000] flex items-start justify-center pt-16 sm:pt-24 p-3 bg-slate-950/65 backdrop-blur-xl animate-in fade-in duration-150"
+      className="fixed inset-0 z-[9999] flex items-start justify-center pt-16 sm:pt-24 p-3 bg-slate-950/65 backdrop-blur-xl animate-in fade-in duration-150"
       onClick={onClose}
     >
       <div 

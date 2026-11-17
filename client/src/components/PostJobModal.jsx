@@ -100,7 +100,7 @@ export const PostJobModal = ({ isOpen, onClose, onJobCreated, defaultCoords }) =
   };
 
   return (
-    <div className="fixed inset-0 z-[950] flex items-center justify-center bg-slate-950/65 backdrop-blur-xl p-3 sm:p-4 overflow-y-auto">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/65 backdrop-blur-xl p-3 sm:p-4 overflow-y-auto">
       <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-2xl border border-white/90 rounded-3xl p-5 sm:p-6 shadow-[0_30px_90px_-15px_rgba(15,23,42,0.35)] animate-in zoom-in-95 duration-200 max-h-[92dvh] overflow-y-auto my-auto text-slate-900 relative">
         <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-indigo-500 via-cyan-400 to-emerald-400" />
         

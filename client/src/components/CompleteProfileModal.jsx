@@ -121,19 +121,19 @@ export const CompleteProfileModal = ({ isOpen, onClose, onCompleted }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-slate-950/65 backdrop-blur-md animate-fadeIn">
+      <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] text-slate-800">
         {/* Header */}
-        <div className="p-6 pb-4 border-b border-slate-800 bg-gradient-to-r from-indigo-950/80 via-slate-900 to-slate-900 flex items-start justify-between">
+        <div className="p-6 pb-4 border-b border-slate-100 bg-gradient-to-r from-indigo-50/70 via-white to-cyan-50/40 flex items-start justify-between">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-bold mb-1.5">
-              <Sparkles size={12} />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-200/80 text-indigo-700 text-[11px] font-bold mb-1.5 shadow-2xs">
+              <Sparkles size={12} className="text-indigo-600 animate-pulse" />
               Step 2 of 2: Profile Details
             </div>
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
               Complete Your Profile
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               {isEmp 
                 ? 'Add your company info to begin posting jobs and hiring talent' 
                 : 'Add your title and skills so recruiters can discover and spot-hire you'}
@@ -141,7 +141,7 @@ export const CompleteProfileModal = ({ isOpen, onClose, onCompleted }) => {
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
             title="Skip for now"
           >
             <X size={20} />
@@ -149,32 +149,32 @@ export const CompleteProfileModal = ({ isOpen, onClose, onCompleted }) => {
         </div>
 
         {/* Progress Bar */}
-        <div className="w-full bg-slate-800 h-1">
-          <div className="bg-gradient-to-r from-amber-400 via-indigo-500 to-cyan-400 h-1 w-3/4 transition-all" />
+        <div className="w-full bg-slate-100 h-1">
+          <div className="bg-gradient-to-r from-indigo-500 via-cyan-400 to-emerald-400 h-1 w-3/4 transition-all" />
         </div>
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4">
           {error && (
-            <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-400 flex items-start gap-2">
-              <AlertCircle size={16} className="shrink-0 mt-0.5" />
+            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-start gap-2">
+              <AlertCircle size={16} className="shrink-0 mt-0.5 text-rose-600" />
               <span>{error}</span>
             </div>
           )}
           {success && (
-            <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-400 flex items-start gap-2">
-              <CheckCircle2 size={16} className="shrink-0 mt-0.5" />
+            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-start gap-2">
+              <CheckCircle2 size={16} className="shrink-0 mt-0.5 text-emerald-600" />
               <span>{success}</span>
             </div>
           )}
 
           {/* Full Name */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Full Name <span className="text-rose-400">*</span>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+              Full Name <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
                 <User size={16} />
               </span>
               <input
@@ -184,7 +184,7 @@ export const CompleteProfileModal = ({ isOpen, onClose, onCompleted }) => {
                 placeholder="e.g. Rahul Sharma"
                 required
                 autoFocus
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-10 pr-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 transition"
               />
             </div>
           </div>
@@ -193,11 +193,11 @@ export const CompleteProfileModal = ({ isOpen, onClose, onCompleted }) => {
           {isEmp && (
             <>
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Company Name <span className="text-rose-400">*</span>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Company Name <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
                     <Building2 size={16} />
                   </span>
                   <input
@@ -206,19 +206,19 @@ export const CompleteProfileModal = ({ isOpen, onClose, onCompleted }) => {
                     onChange={(e) => setCompanyName(e.target.value)}
                     placeholder="e.g. TechPulse Solutions Pvt Ltd"
                     required
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-10 pr-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 transition"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
                   Industry / Category
                 </label>
                 <select
                   value={industry}
                   onChange={(e) => setIndustry(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-sm text-slate-800 focus:outline-none focus:bg-white focus:border-indigo-500 transition font-medium"
                 >
                   <option value="Technology & IT">Technology & IT</option>
                   <option value="Cloud Infrastructure">Cloud Infrastructure</option>
@@ -231,11 +231,11 @@ export const CompleteProfileModal = ({ isOpen, onClose, onCompleted }) => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
                   Company Website / Link (Optional)
                 </label>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
                     <Globe size={16} />
                   </span>
                   <input
@@ -243,7 +243,7 @@ export const CompleteProfileModal = ({ isOpen, onClose, onCompleted }) => {
                     value={website}
                     onChange={(e) => setWebsite(e.target.value)}
                     placeholder="e.g. https://techpulse.io"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-10 pr-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 transition"
                   />
                 </div>
               </div>
@@ -254,11 +254,11 @@ export const CompleteProfileModal = ({ isOpen, onClose, onCompleted }) => {
           {!isEmp && (
             <>
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Professional Title / Role <span className="text-rose-400">*</span>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Professional Title / Role <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
                     <Briefcase size={16} />
                   </span>
                   <input
@@ -267,17 +267,17 @@ export const CompleteProfileModal = ({ isOpen, onClose, onCompleted }) => {
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="e.g. Senior React & WebRTC Engineer"
                     required
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-10 pr-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 transition"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
                   Core Skills (Comma separated)
                 </label>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
                     <Tag size={16} />
                   </span>
                   <input
@@ -285,18 +285,18 @@ export const CompleteProfileModal = ({ isOpen, onClose, onCompleted }) => {
                     value={skills}
                     onChange={(e) => setSkills(e.target.value)}
                     placeholder="e.g. React, Node.js, WebSockets, Tailwind"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-10 pr-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 transition"
                   />
                 </div>
                 {/* Popular Skill Badges */}
                 <div className="flex flex-wrap gap-1.5 mt-2">
-                  <span className="text-[10px] text-slate-400 font-semibold mr-1 self-center">Quick add:</span>
+                  <span className="text-[10px] text-slate-500 font-bold mr-1 self-center">Quick add:</span>
                   {popularSkills.map((sk) => (
                     <button
                       key={sk}
                       type="button"
                       onClick={() => handleAddSkill(sk)}
-                      className="px-2 py-0.5 bg-slate-800 hover:bg-indigo-600/30 hover:border-indigo-500/50 border border-slate-700/60 rounded-lg text-[10px] text-slate-300 transition"
+                      className="px-2.5 py-0.5 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-300 border border-slate-200 rounded-lg text-[10px] font-semibold text-slate-700 transition active:scale-95"
                     >
                       + {sk}
                     </button>
@@ -305,11 +305,11 @@ export const CompleteProfileModal = ({ isOpen, onClose, onCompleted }) => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
                   Expected Salary / Rate
                 </label>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
                     <DollarSign size={16} />
                   </span>
                   <input
@@ -317,7 +317,7 @@ export const CompleteProfileModal = ({ isOpen, onClose, onCompleted }) => {
                     value={expectedSalary}
                     onChange={(e) => setExpectedSalary(e.target.value)}
                     placeholder="e.g. ₹15,00,000 / yr or ₹2,500 / day"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-10 pr-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 transition"
                   />
                 </div>
               </div>
@@ -326,11 +326,11 @@ export const CompleteProfileModal = ({ isOpen, onClose, onCompleted }) => {
 
           {/* Location / Address */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">
               City / Location in India
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
                 <MapPin size={16} />
               </span>
               <input
@@ -338,7 +338,7 @@ export const CompleteProfileModal = ({ isOpen, onClose, onCompleted }) => {
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="e.g. Bandra Kurla Complex (BKC), Mumbai"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-10 pr-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 transition"
               />
             </div>
           </div>
@@ -348,13 +348,13 @@ export const CompleteProfileModal = ({ isOpen, onClose, onCompleted }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold rounded-xl text-sm transition shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 active:scale-98 text-white font-extrabold rounded-xl text-sm transition shadow-md shadow-indigo-600/25 flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {loading ? (
                 <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  Save & Complete Profile
+                  <span>Save & Complete Profile</span>
                   <ArrowRight size={16} />
                 </>
               )}
@@ -363,7 +363,7 @@ export const CompleteProfileModal = ({ isOpen, onClose, onCompleted }) => {
             <button
               type="button"
               onClick={onClose}
-              className="w-full mt-2 py-2 text-xs text-slate-400 hover:text-slate-300 transition text-center"
+              className="w-full mt-2.5 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800 transition text-center"
             >
               I will complete this later &rarr;
             </button>

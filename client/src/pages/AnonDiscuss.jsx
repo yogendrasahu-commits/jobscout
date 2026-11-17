@@ -669,7 +669,7 @@ export const AnonDiscuss = () => {
       {/* 1. FULL THREAD DISCUSSION MODAL (COMMUNITY COMMENTS)           */}
       {/* ============================================================= */}
       {selectedThread && (
-        <div className="fixed inset-0 z-[950] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
           <div className="relative w-full max-w-2xl bg-white border border-slate-200/90 rounded-3xl shadow-2xl p-4 sm:p-6 my-auto max-h-[92dvh] flex flex-col animate-in zoom-in-95 duration-150 text-slate-900">
             
             {/* Top-Left Back / Close Button */}
@@ -861,7 +861,7 @@ export const AnonDiscuss = () => {
       {/* 2. CREATE ANONYMOUS THREAD MODAL                               */}
       {/* ============================================================= */}
       {isPostModalOpen && (
-        <div className="fixed inset-0 z-[950] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
           <div className="relative w-full max-w-lg bg-white border border-slate-200/90 rounded-3xl shadow-2xl p-5 sm:p-6 my-auto max-h-[92dvh] overflow-y-auto animate-in zoom-in-95 duration-150 text-slate-900">
             
             {/* Top-Left Back / Close Button */}

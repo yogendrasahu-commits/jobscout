@@ -193,10 +193,10 @@ export const FullPageChat = ({ onOpenProfile }) => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-6 animate-in fade-in duration-200">
+    <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-6 animate-in fade-in duration-200 h-[calc(100dvh-4rem-4.5rem-env(safe-area-inset-bottom,0px))] md:h-[calc(100vh-8.5rem)] flex flex-col">
       
       {/* Outer Card Container */}
-      <div className="bg-white border border-slate-200/90 rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row h-[calc(100dvh-60px-56px-1rem)] md:h-[calc(100vh-8.5rem)] min-h-[380px] sm:min-h-[520px]">
+      <div className="bg-white border border-slate-200/90 rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row flex-1 min-h-0">
         
         {/* ============================================================ */}
         {/* LEFT COLUMN: CHAT LIST & DIRECTORY                           */}

@@ -419,6 +419,11 @@ input:-webkit-autofill:active {
     -webkit-user-select: none;
     user-select: none;
   }
+
+  input, textarea, select, [contenteditable="true"] {
+    -webkit-user-select: text !important;
+    user-select: text !important;
+  }
   
   header.sticky {
     padding-top: env(safe-area-inset-top, 0px) !important;

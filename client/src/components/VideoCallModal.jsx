@@ -116,7 +116,7 @@ export const VideoCallModal = () => {
   return (
     <div 
       onMouseMove={handleMouseMove}
-      className="fixed inset-0 z-[999] flex items-center justify-center bg-black/85 backdrop-blur-xl p-2 sm:p-4 select-none animate-in fade-in duration-200"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 backdrop-blur-xl p-2 sm:p-4 select-none animate-in fade-in duration-200"
     >
       <div className={`relative bg-slate-950 border border-white/10 rounded-3xl overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] flex flex-col transition-all duration-300 ring-1 ring-white/5 ${
         isFullscreen ? 'w-full h-full rounded-none' : 'w-full max-w-5xl h-[88vh] max-h-[760px]'

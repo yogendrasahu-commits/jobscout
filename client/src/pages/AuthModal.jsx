@@ -355,17 +355,17 @@ export const AuthModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-[#D8E2FB]/90 backdrop-blur-md animate-fadeIn overflow-y-auto">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4 md:p-6 bg-[#D8E2FB]/90 backdrop-blur-md animate-fadeIn overflow-y-auto">
       {/* Click outside to close */}
       <div className="fixed inset-0" onClick={onClose} />
 
       {/* Main Split Card Container */}
-      <div className="relative w-full max-w-4xl bg-white rounded-[32px] sm:rounded-[40px] shadow-[0_25px_60px_-15px_rgba(59,102,245,0.25)] overflow-hidden my-auto grid grid-cols-1 md:grid-cols-12 border border-slate-100/80 z-10">
+      <div className="relative w-full max-w-4xl bg-white rounded-[32px] sm:rounded-[40px] shadow-[0_25px_60px_-15px_rgba(59,102,245,0.25)] overflow-hidden my-auto grid grid-cols-1 md:grid-cols-12 border border-slate-100/80 z-10 max-h-[92dvh]">
         
         {/* ======================================================== */}
         {/* LEFT COLUMN: Clean Minimalist Form                      */}
         {/* ======================================================== */}
-        <div className="md:col-span-7 p-6 sm:p-8 lg:p-10 flex flex-col justify-between bg-white text-slate-800">
+        <div className="md:col-span-7 p-6 sm:p-8 lg:p-10 flex flex-col justify-between bg-white text-slate-800 overflow-y-auto max-h-[92dvh] no-scrollbar">
           
           {/* Top Bar: Back Button & Already Member Link */}
           <div className="flex items-center justify-between pb-2">

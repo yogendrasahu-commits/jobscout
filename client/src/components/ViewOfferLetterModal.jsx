@@ -111,7 +111,7 @@ export const ViewOfferLetterModal = ({
   const isRejected = application.status === 'rejected';
 
   return (
-    <div className="fixed inset-0 z-[950] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-2 sm:p-4 md:p-6 overflow-y-auto animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-2 sm:p-4 md:p-6 overflow-y-auto animate-in fade-in duration-150">
       
       {/* Print-specific style overrides */}
       <style>{`

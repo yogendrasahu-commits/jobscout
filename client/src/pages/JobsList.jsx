@@ -370,7 +370,7 @@ export const JobsList = ({
           </div>
 
           {/* Filter and Search Bar */}
-          <div className="bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-2xl p-4 mb-6 shadow-sm space-y-3 sticky top-20 z-20">
+          <div className="bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-2xl p-4 mb-6 shadow-sm space-y-3 md:sticky md:top-20 z-20">
             <div className="flex flex-col lg:flex-row gap-3">
               {/* Search Input */}
               <div className="relative flex-1">

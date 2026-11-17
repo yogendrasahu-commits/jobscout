@@ -180,14 +180,9 @@ export const MobileBottomNav = ({
               <NavMessagesIcon active={currentTab === 'messages'} className="w-5 h-5 flex-shrink-0" />
               <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-500 rounded-full shadow-xs border border-white" />
             </div>
-            <div className="flex items-center gap-0.5 mt-0.5">
-              <span className={`text-[10px] tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'messages' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>Chat</span>
-              {!user && (
-                <span className="text-[8px] font-extrabold px-1 rounded bg-amber-100 text-amber-800 leading-none">
-                  Login
-                </span>
-              )}
-            </div>
+            <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'messages' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>
+              Chat
+            </span>
             {currentTab === 'messages' && (
               <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
             )}

@@ -79,7 +79,7 @@ export const ProfileEditModal = ({ isOpen, onClose, onUpdated }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[960] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-3">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-3">
       <div className="relative w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl">
         <button
           type="button"

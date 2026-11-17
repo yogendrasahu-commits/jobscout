@@ -66,7 +66,7 @@ export const LinkedInProfileModal = ({ profileUser, isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[950] flex items-center justify-center bg-slate-950/65 backdrop-blur-xl p-3 sm:p-4 animate-in fade-in duration-150 overflow-y-auto">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/65 backdrop-blur-xl p-3 sm:p-4 animate-in fade-in duration-150 overflow-y-auto">
       <div className="relative w-full max-w-2xl bg-white/95 backdrop-blur-2xl border border-white/90 rounded-3xl shadow-[0_30px_90px_-15px_rgba(15,23,42,0.35)] overflow-hidden max-h-[92dvh] overflow-y-auto my-auto text-slate-900">
         
         {/* Top-Left Back Button */}

@@ -476,7 +476,7 @@ function MainApp() {
       <ProfileCompletionAlert onOpenCompleteProfile={() => setIsCompleteProfileOpen(true)} />
 
       {/* Main Content Area */}
-      <main className={`flex-1 w-full max-w-full relative ${currentTab === 'map' ? 'overflow-hidden' : 'pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] md:pb-0 overflow-x-clip'}`}>
+      <main className={`flex-1 w-full max-w-full relative ${currentTab === 'map' || currentTab === 'messages' ? 'overflow-hidden' : 'pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] md:pb-0 overflow-x-clip'}`}>
 
         {currentTab === 'feed' && (
           <Feed
