@@ -26,6 +26,7 @@ import { Welcome } from './pages/Welcome';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { CommandPalette } from './components/CommandPalette';
 import { MobileAppDownloadModal } from './components/MobileAppDownloadModal';
+import { ServerConfigModal } from './components/ServerConfigModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { jobService } from './services/jobService';
 import { userService } from './services/userService';
@@ -38,6 +39,17 @@ function MainApp() {
     const validTabs = ['welcome', 'feed', 'network', 'map', 'jobs', 'connect', 'anon', 'applications', 'messages', 'admin'];
     if (validTabs.includes(hash)) return hash;
     if (localStorage.getItem('jobradar_token')) return 'feed';
+
+    // Auto-direct standalone installed PWA and Native APK directly into Feed
+    const isStandalone = typeof window !== 'undefined' && Boolean(
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true ||
+      window.location.search.includes('source=pwa') ||
+      document.referrer.includes('android-app://') ||
+      (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())
+    );
+    if (isStandalone) return 'feed';
+
     return 'welcome';
   }); // 'welcome' | 'feed' | 'network' | 'map' | 'jobs' | 'connect' | 'anon' | 'applications' | 'messages' | 'admin'
   const [pendingTabAfterAuth, setPendingTabAfterAuth] = useState(null);
@@ -80,6 +92,7 @@ function MainApp() {
   const [jobsQuickFilter, setJobsQuickFilter] = useState('all');
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isMobileAppModalOpen, setIsMobileAppModalOpen] = useState(false);
+  const [isServerConfigOpen, setIsServerConfigOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
   const [showReconnectedToast, setShowReconnectedToast] = useState(false);
 
@@ -429,6 +442,21 @@ function MainApp() {
           isOpen={isMobileAppModalOpen}
           onClose={() => setIsMobileAppModalOpen(false)}
         />
+
+        {/* Server Connection Config Modal */}
+        <ServerConfigModal
+          isOpen={isServerConfigOpen}
+          onClose={() => setIsServerConfigOpen(false)}
+        />
+
+        {/* Native App-Style Mobile Bottom Navigation Bar on Mobile Welcome */}
+        <MobileBottomNav
+          currentTab="welcome"
+          setCurrentTab={handleNavigateTab}
+          onOpenPostJob={() => setAuthConfig({ isOpen: true, mode: 'register', role: 'emp' })}
+          onOpenAuth={() => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
+          jobsCount={jobs.length}
+        />
       </div>
     );
   }
@@ -441,6 +469,12 @@ function MainApp() {
         <div className="bg-amber-500 text-slate-900 text-xs font-bold py-2 px-4 text-center flex items-center justify-center gap-2 shadow-sm transition-all z-[1200]">
           <span className="w-2 h-2 rounded-full bg-slate-900 animate-ping" />
           <span>Offline mode: Trying to reconnect to JobScout real-time grid...</span>
+          <button
+            onClick={() => setIsServerConfigOpen(true)}
+            className="underline hover:text-white font-extrabold cursor-pointer ml-1"
+          >
+            ⚙️ Server Settings
+          </button>
         </div>
       )}
       {showReconnectedToast && (
@@ -679,6 +713,12 @@ function MainApp() {
       <MobileAppDownloadModal
         isOpen={isMobileAppModalOpen}
         onClose={() => setIsMobileAppModalOpen(false)}
+      />
+
+      {/* Server Connection Config Modal */}
+      <ServerConfigModal
+        isOpen={isServerConfigOpen}
+        onClose={() => setIsServerConfigOpen(false)}
       />
 
     </div>

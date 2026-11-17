@@ -27,16 +27,16 @@ export const MobileBottomNav = ({
         <button
           onClick={() => setCurrentTab('feed')}
           className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all ${
-            currentTab === 'feed'
+            currentTab === 'feed' || currentTab === 'welcome'
               ? 'text-indigo-600 font-extrabold scale-105'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
           <div className="relative">
-            <NavFeedIcon active={currentTab === 'feed'} className="w-5 h-5 flex-shrink-0" />
+            <NavFeedIcon active={currentTab === 'feed' || currentTab === 'welcome'} className="w-5 h-5 flex-shrink-0" />
           </div>
-          <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'feed' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>Feed</span>
-          {currentTab === 'feed' && (
+          <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'feed' || currentTab === 'welcome' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>Feed</span>
+          {(currentTab === 'feed' || currentTab === 'welcome') && (
             <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
           )}
         </button>

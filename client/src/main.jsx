@@ -79,19 +79,21 @@ Response.prototype.json = async function () {
 // Register Service Worker for Native Mobile App & Offline PWA
 if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    const isLocalOrLan = Boolean(
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === '[::1]' ||
-      window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/) ||
-      window.location.hostname.startsWith('192.168.') ||
-      window.location.hostname.startsWith('10.') ||
-      window.location.hostname.startsWith('172.')
-    );
-
-    if (window.location.protocol === 'https:' || isLocalOrLan) {
+    // Only register service worker on HTTPS or localhost (browser security requirement)
+    if (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       navigator.serviceWorker.register('/sw.js')
         .then((reg) => {
           console.log('📱 JobScout Mobile PWA active. Scope:', reg.scope);
+          reg.onupdatefound = () => {
+            const installingWorker = reg.installing;
+            if (installingWorker) {
+              installingWorker.onstatechange = () => {
+                if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  installingWorker.postMessage({ action: 'skipWaiting' });
+                }
+              };
+            }
+          };
         })
         .catch((err) => {
           console.warn('[PWA] ServiceWorker notice:', err);
