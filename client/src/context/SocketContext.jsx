@@ -147,6 +147,11 @@ export const SocketProvider = ({ children }) => {
         if (isNative) {
           return 'http://192.168.11.22:5000';
         }
+
+        // Direct connect when in local Vite dev server to bypass proxy ws disconnects/resets
+        if (window.location.port === '5173') {
+          return `${window.location.protocol}//${window.location.hostname}:5000`;
+        }
       }
       return window.location.origin;
     };
