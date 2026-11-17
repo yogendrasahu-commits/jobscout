@@ -456,3 +456,11 @@ input:-webkit-autofill:active {
   transform: scale(0.96);
   opacity: 0.9;
 }
+
+/* WebRTC Video Display Optimization across App, PWA & Desktop */
+video {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  image-rendering: -webkit-optimize-contrast;
+}

@@ -26,7 +26,10 @@ import {
   Copy,
   Check,
   RotateCcw,
-  FileCode
+  FileCode,
+  RefreshCw,
+  Wifi,
+  Signal
 } from 'lucide-react';
 import { useSocket } from '../context/SocketContext';
 
@@ -126,6 +129,9 @@ export const VideoCallModal = () => {
     endCall, 
     toggleMute, 
     toggleVideo,
+    isFrontCamera,
+    flipCamera,
+    networkStats,
     isScreenSharing,
     toggleScreenShare,
     socket
@@ -318,12 +324,25 @@ export const VideoCallModal = () => {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-extrabold text-white text-sm sm:text-base leading-tight truncate max-w-[180px] sm:max-w-xs">
+                <h3 className="font-extrabold text-white text-sm sm:text-base leading-tight truncate max-w-[160px] sm:max-w-xs">
                   {activeCall.otherUser?.name || 'User'}
                 </h3>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 border border-white/15 text-slate-300 font-bold uppercase tracking-wider">
-                  {activeCall.isVideo ? 'HD Video' : 'HQ Voice'}
-                </span>
+                {/* Real-time Adaptive Quality Badge */}
+                <div className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border ${
+                  networkStats?.quality === 'hd' 
+                    ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
+                    : networkStats?.quality === 'good'
+                    ? 'bg-cyan-500/15 border-cyan-500/30 text-cyan-300'
+                    : 'bg-amber-500/15 border-amber-500/30 text-amber-300'
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${
+                    networkStats?.quality === 'hd' ? 'bg-emerald-400 animate-pulse' : 'bg-cyan-400'
+                  }`} />
+                  <span>{networkStats?.resolution || (activeCall.isVideo ? '1080p HD' : 'HQ Voice')}</span>
+                  {activeCall.isVideo && (
+                    <span className="hidden sm:inline font-mono opacity-80">({networkStats?.fps || 30}fps)</span>
+                  )}
+                </div>
               </div>
               <div className="flex items-center gap-2 text-xs mt-0.5">
                 {activeCall.status === 'connected' ? (
@@ -338,7 +357,13 @@ export const VideoCallModal = () => {
                   </span>
                 )}
                 <span className="text-white/30">•</span>
-                <span className="text-slate-300 text-[11px] font-medium">Encrypted WebRTC</span>
+                <span className="text-slate-300 text-[11px] font-medium font-mono">
+                  {networkStats?.bitrateKbps ? `${networkStats.bitrateKbps} kbps` : 'HD P2P'}
+                </span>
+                <span className="text-white/30 hidden sm:inline">•</span>
+                <span className="text-slate-400 text-[11px] font-medium hidden sm:inline">
+                  {networkStats?.rttMs ? `${networkStats.rttMs}ms ping` : 'Encrypted WebRTC'}
+                </span>
               </div>
             </div>
           </div>
@@ -533,10 +558,16 @@ export const VideoCallModal = () => {
                         Camera Off
                       </div>
                     ) : (
-                      <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover scale-x-[-1]" />
+                      <video 
+                        ref={localVideoRef} 
+                        autoPlay 
+                        playsInline 
+                        muted 
+                        className={`w-full h-full object-cover ${(!isFrontCamera || isScreenSharing) ? '' : 'scale-x-[-1]'}`} 
+                      />
                     )}
-                    <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-[10px] text-white font-medium">
-                      You {isScreenSharing ? '(Screen)' : ''}
+                    <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-[10px] text-white font-medium flex items-center gap-1.5">
+                      <span>You {isScreenSharing ? '(Screen)' : isFrontCamera ? '(Front)' : '(Rear)'}</span>
                     </div>
                   </div>
                 )}
@@ -622,11 +653,11 @@ export const VideoCallModal = () => {
                       autoPlay
                       playsInline
                       muted
-                      className="w-full h-full object-cover scale-x-[-1]"
+                      className={`w-full h-full object-cover ${(!isFrontCamera || isScreenSharing) ? '' : 'scale-x-[-1]'}`}
                     />
                   )}
                   <div className="absolute bottom-1 left-2 text-[9px] bg-black/70 backdrop-blur-md px-1.5 py-0.5 rounded text-white font-medium flex items-center gap-1">
-                    <span>You {isScreenSharing ? '(Screen)' : ''}</span>
+                    <span>You {isScreenSharing ? '(Screen)' : isFrontCamera ? '(Front)' : '(Rear)'}</span>
                     <span className="text-[8px] text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">• Move</span>
                   </div>
                 </div>
@@ -721,6 +752,18 @@ export const VideoCallModal = () => {
                 title={activeCall.isCamOff ? 'Turn Camera On' : 'Turn Camera Off'}
               >
                 {activeCall.isCamOff ? <VideoOff className="w-5 h-5" /> : <Video className="w-5 h-5" />}
+              </button>
+            )}
+
+            {/* Flip Camera Button (Front / Rear) - Essential for App, PWA & Mobile Web */}
+            {activeCall.isVideo && !isScreenSharing && (
+              <button
+                type="button"
+                onClick={flipCamera}
+                className="p-3.5 rounded-full font-semibold transition-all active:scale-90 bg-white/10 hover:bg-white/20 text-white border border-white/10"
+                title={`Switch Camera (Currently: ${isFrontCamera ? 'Front' : 'Rear'})`}
+              >
+                <RefreshCw className="w-5 h-5 text-white" />
               </button>
             )}
 
