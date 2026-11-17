@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   X, 
   User, 
@@ -11,7 +11,12 @@ import {
   AlertCircle, 
   ArrowRight,
   Globe,
-  Tag
+  Tag,
+  Upload,
+  FileText,
+  Zap,
+  Loader2,
+  Check
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -38,6 +43,85 @@ export const CompleteProfileModal = ({ isOpen, onClose, onCompleted }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // AI Resume Auto-Fill State
+  const fileInputRef = useRef(null);
+  const [aiParsing, setAiParsing] = useState(false);
+  const [aiResult, setAiResult] = useState(null);
+  const [showPasteBox, setShowPasteBox] = useState(false);
+  const [pastedText, setPastedText] = useState('');
+
+  const parseResumeData = (parsed) => {
+    if (!parsed) return;
+    if (parsed.name && (!name || name.startsWith('User '))) {
+      setName(parsed.name);
+    }
+    if (parsed.title) {
+      setTitle(parsed.title);
+    }
+    if (Array.isArray(parsed.skills) && parsed.skills.length > 0) {
+      setSkills(parsed.skills.join(', '));
+    }
+    if (parsed.expectedSalary) {
+      setExpectedSalary(parsed.expectedSalary);
+    }
+    if (parsed.bio) {
+      setBio(parsed.bio);
+    }
+    setAiResult(parsed);
+    setSuccess(`✨ AI parsed resume successfully! ${parsed.skills?.length || 0} skills auto-detected.`);
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setAiParsing(true);
+    setError('');
+    try {
+      const formData = new FormData();
+      formData.append('resume', file);
+
+      const res = await fetch('/api/ai/parse-resume', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to parse resume');
+      }
+      parseResumeData(data.data);
+    } catch (err) {
+      setError(`AI Resume parsing failed: ${err.message}`);
+    } finally {
+      setAiParsing(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleTextParse = async () => {
+    if (!pastedText.trim()) return;
+    setAiParsing(true);
+    setError('');
+    try {
+      const res = await fetch('/api/ai/parse-resume', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: pastedText })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to parse resume');
+      }
+      parseResumeData(data.data);
+      setShowPasteBox(false);
+      setPastedText('');
+    } catch (err) {
+      setError(`AI Resume parsing failed: ${err.message}`);
+    } finally {
+      setAiParsing(false);
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -253,6 +337,103 @@ export const CompleteProfileModal = ({ isOpen, onClose, onCompleted }) => {
           {/* SEEKER FIELDS */}
           {!isEmp && (
             <>
+              {/* AI Resume 1-Click Auto-Fill Card */}
+              <div className="p-3.5 rounded-2xl bg-gradient-to-br from-indigo-50/80 via-purple-50/50 to-pink-50/40 border border-indigo-200/80 shadow-xs space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-xs">
+                      <Sparkles size={14} className="animate-pulse" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-extrabold text-indigo-950 flex items-center gap-1.5">
+                        AI Resume 1-Click Auto-Fill
+                        <span className="px-1.5 py-0.2 text-[9px] font-bold bg-indigo-100 text-indigo-700 rounded-full">New</span>
+                      </h4>
+                      <p className="text-[11px] text-slate-500">Upload PDF / TXT or paste text to auto-populate your entire profile</p>
+                    </div>
+                  </div>
+                  {aiResult && (
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold border border-emerald-300">
+                      ⚡ {aiResult.score || 90}% Match
+                    </span>
+                  )}
+                </div>
+
+                {/* Upload or Paste Controls */}
+                <div className="flex items-center gap-2 pt-1">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf,.txt,.doc,.docx"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    id="resume-file-input"
+                  />
+                  <button
+                    type="button"
+                    disabled={aiParsing}
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex-1 py-2 px-3 bg-white hover:bg-slate-50 text-indigo-700 border border-indigo-200 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-2xs transition active:scale-95 disabled:opacity-60"
+                  >
+                    {aiParsing ? (
+                      <>
+                        <Loader2 size={13} className="animate-spin text-indigo-600" />
+                        <span>Parsing Resume...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload size={13} />
+                        <span>Upload Resume (PDF/TXT)</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={aiParsing}
+                    onClick={() => setShowPasteBox(!showPasteBox)}
+                    className="py-2 px-3 bg-indigo-50/70 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-semibold rounded-xl text-xs flex items-center justify-center gap-1 transition active:scale-95"
+                  >
+                    <FileText size={13} />
+                    <span>{showPasteBox ? 'Cancel' : 'Paste Text'}</span>
+                  </button>
+                </div>
+
+                {/* Collapsible Paste Text Area */}
+                {showPasteBox && (
+                  <div className="pt-2 space-y-2 animate-fadeIn">
+                    <textarea
+                      rows={4}
+                      value={pastedText}
+                      onChange={(e) => setPastedText(e.target.value)}
+                      placeholder="Paste your resume text or LinkedIn summary here (e.g. Senior Fullstack Developer with 4 years experience in React, Node, WebRTC...)"
+                      className="w-full p-2.5 bg-white border border-indigo-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 font-mono"
+                    />
+                    <button
+                      type="button"
+                      disabled={aiParsing || !pastedText.trim()}
+                      onClick={handleTextParse}
+                      className="w-full py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 shadow-xs disabled:opacity-50"
+                    >
+                      {aiParsing ? <Loader2 size={12} className="animate-spin" /> : <Zap size={12} />}
+                      <span>Analyze & Populate Fields</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* Strengths / AI insights preview */}
+                {aiResult?.strengths && (
+                  <div className="pt-1 border-t border-indigo-100 flex flex-wrap gap-1">
+                    {aiResult.strengths.slice(0, 2).map((str, idx) => (
+                      <span key={idx} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/80 border border-indigo-100 text-[10px] text-indigo-900 font-medium">
+                        <Check size={10} className="text-emerald-500" />
+                        {str}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5">
                   Professional Title / Role <span className="text-rose-500">*</span>

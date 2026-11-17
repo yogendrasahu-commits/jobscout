@@ -36,12 +36,33 @@ if (typeof window !== 'undefined') {
 // Ringtone controller
 let ringtoneInterval = null;
 
+const triggerHapticVibrate = () => {
+  if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+    try {
+      navigator.vibrate([350, 150, 350, 150, 600]);
+    } catch (e) {
+      // Ignore vibration error if blocked by browser policy
+    }
+  }
+};
+
+const stopHapticVibrate = () => {
+  if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+    try {
+      navigator.vibrate(0);
+    } catch (e) {}
+  }
+};
+
 export const playRingtone = () => {
   stopRingtone();
+  triggerHapticVibrate();
+
   const ctx = getAudioContext();
   if (!ctx) return;
 
   const playChimeBurst = () => {
+    triggerHapticVibrate();
     if (!ctx || ctx.state === 'closed') return;
     try {
       const now = ctx.currentTime;
@@ -73,6 +94,7 @@ export const playRingtone = () => {
 };
 
 export const stopRingtone = () => {
+  stopHapticVibrate();
   if (ringtoneInterval) {
     clearInterval(ringtoneInterval);
     ringtoneInterval = null;

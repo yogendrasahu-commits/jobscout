@@ -120,6 +120,9 @@ export const SocketProvider = ({ children }) => {
   const pcRef = useRef(null);
   const localStreamRef = useRef(null);
   const remoteStreamRef = useRef(null);
+  const screenTrackRef = useRef(null);
+  const originalVideoTrackRef = useRef(null);
+  const [isScreenSharing, setIsScreenSharing] = useState(false);
   const userRef = useRef(user);
   const candidateQueueRef = useRef([]);
   const lastJoinedUserIdRef = useRef(null);
@@ -366,6 +369,13 @@ export const SocketProvider = ({ children }) => {
   // Cleanup WebRTC connection & media streams
   const cleanupCall = () => {
     ringtone.stop();
+    if (screenTrackRef.current) {
+      try { screenTrackRef.current.stop(); } catch(e) {}
+      screenTrackRef.current = null;
+    }
+    originalVideoTrackRef.current = null;
+    setIsScreenSharing(false);
+
     if (pcRef.current) {
       try { pcRef.current.close(); } catch(e) {}
       pcRef.current = null;
@@ -835,6 +845,95 @@ export const SocketProvider = ({ children }) => {
     }
   };
 
+  // Screen Sharing (WebRTC replaceTrack)
+  const toggleScreenShare = async () => {
+    if (!pcRef.current || !activeCall) {
+      showCallNotice('Screen sharing requires an active call.', 'warning');
+      return;
+    }
+
+    if (isScreenSharing) {
+      await stopScreenShare();
+    } else {
+      try {
+        if (typeof navigator === 'undefined' || !navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+          showCallNotice('Screen sharing is not supported by your current browser/device.', 'warning');
+          return;
+        }
+
+        const screenStream = await navigator.mediaDevices.getDisplayMedia({
+          video: { cursor: 'always' },
+          audio: false
+        });
+
+        const screenTrack = screenStream.getVideoTracks()[0];
+        if (!screenTrack) return;
+
+        screenTrackRef.current = screenTrack;
+
+        if (localStreamRef.current && pcRef.current) {
+          const currentVideoTrack = localStreamRef.current.getVideoTracks()[0];
+          originalVideoTrackRef.current = currentVideoTrack;
+
+          // Swap track on WebRTC RTCRtpSender
+          const senders = pcRef.current.getSenders();
+          const videoSender = senders.find(s => s.track && s.track.kind === 'video');
+          if (videoSender) {
+            await videoSender.replaceTrack(screenTrack);
+          }
+
+          // Swap track in local stream for local preview
+          if (currentVideoTrack) {
+            localStreamRef.current.removeTrack(currentVideoTrack);
+          }
+          localStreamRef.current.addTrack(screenTrack);
+          setLocalStream(new MediaStream(localStreamRef.current.getTracks()));
+        }
+
+        setIsScreenSharing(true);
+        setActiveCall(prev => prev ? { ...prev, isScreenSharing: true } : null);
+
+        // Native browser UI "Stop sharing" event listener
+        screenTrack.onended = () => {
+          stopScreenShare();
+        };
+
+        showCallNotice('🖥️ Screen sharing is live! Your screen is now broadcasting.', 'success');
+      } catch (err) {
+        if (err.name !== 'NotAllowedError') {
+          console.error('Screen sharing error:', err);
+          showCallNotice('Failed to start screen sharing.', 'error');
+        }
+      }
+    }
+  };
+
+  const stopScreenShare = async () => {
+    if (screenTrackRef.current) {
+      try { screenTrackRef.current.stop(); } catch (e) {}
+      screenTrackRef.current = null;
+    }
+
+    if (originalVideoTrackRef.current && localStreamRef.current && pcRef.current) {
+      try {
+        const videoSender = pcRef.current.getSenders().find(s => s.track && s.track.kind === 'video');
+        if (videoSender) {
+          await videoSender.replaceTrack(originalVideoTrackRef.current);
+        }
+        const tracks = localStreamRef.current.getVideoTracks();
+        tracks.forEach(t => localStreamRef.current.removeTrack(t));
+        localStreamRef.current.addTrack(originalVideoTrackRef.current);
+        setLocalStream(new MediaStream(localStreamRef.current.getTracks()));
+      } catch (err) {
+        console.warn('Error reverting camera track:', err);
+      }
+    }
+
+    setIsScreenSharing(false);
+    setActiveCall(prev => prev ? { ...prev, isScreenSharing: false } : null);
+    showCallNotice('Screen sharing ended. Reverted to camera.', 'info');
+  };
+
   // Broadcast location change
   const broadcastLocation = (lat, lng, address) => {
     if (socket && user?.id) {
@@ -889,7 +988,9 @@ export const SocketProvider = ({ children }) => {
         rejectCall,
         endCall,
         toggleMute,
-        toggleVideo
+        toggleVideo,
+        isScreenSharing,
+        toggleScreenShare
       }}
     >
       {children}

@@ -183,6 +183,35 @@ export function setupSocket(io) {
       }
     });
 
+    // 6. Collaborative In-Call Code Sandbox / Whiteboard Sync
+    socket.on('call:code_update', (payload) => {
+      const { toUserId, to, code, language, activeTab } = payload || {};
+      const targetUserId = toUserId ? String(toUserId) : null;
+      const receiverSockets = targetUserId ? userSockets.get(targetUserId) : null;
+
+      if (receiverSockets && receiverSockets.size > 0) {
+        receiverSockets.forEach(socketId => {
+          if (socketId !== socket.id) {
+            io.to(socketId).emit('call:code_update', {
+              fromUserId: String(payload.fromUserId || currentUserId || socket.id),
+              code,
+              language,
+              activeTab
+            });
+          }
+        });
+      } else if (to || toUserId) {
+        // Direct socket ID or room relay
+        const targetSocketId = to || toUserId;
+        io.to(targetSocketId).emit('call:code_update', {
+          fromUserId: String(payload.fromUserId || currentUserId || socket.id),
+          code,
+          language,
+          activeTab
+        });
+      }
+    });
+
     // Cleanup on disconnect
     socket.on('disconnect', () => {
       if (currentUserId && userSockets.has(currentUserId)) {

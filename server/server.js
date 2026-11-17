@@ -18,6 +18,7 @@ import anonRoutes from './routes/anon.js';
 import alertsRoutes from './routes/alerts.js';
 import adminRoutes from './routes/admin.js';
 import uploadRoutes from './routes/upload.js';
+import aiRoutes from './routes/ai.js';
 import { setupSocket } from './socket.js';
 import { db } from './db.js';
 import { verifyEmailConfig } from './email.js';
@@ -176,6 +177,7 @@ app.use('/api/anon', anonRoutes);
 app.use('/api/alerts', alertsRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Static uploads directory (supports local disk media storage)
 const uploadsDirPath = path.resolve(__dirname, 'public/uploads');
