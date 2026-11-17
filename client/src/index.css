@@ -411,3 +411,20 @@ input:-webkit-autofill:active {
     color: #0f172a !important;
   }
 }
+
+/* PWA Mobile Standalone Mode Polish & Notch / Gesture Inset Protection */
+@media all and (display-mode: standalone) {
+  body {
+    overscroll-behavior-y: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  header.sticky {
+    padding-top: env(safe-area-inset-top, 0px) !important;
+  }
+  
+  nav.fixed.bottom-0 {
+    padding-bottom: max(0.6rem, env(safe-area-inset-bottom, 0px)) !important;
+  }
+}

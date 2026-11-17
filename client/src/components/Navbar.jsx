@@ -338,7 +338,7 @@ export const Navbar = ({
   };
 
   return (
-    <header className="bg-white/85 backdrop-blur-2xl border-b border-slate-200/70 sticky top-0 z-[800] select-none shadow-[0_4px_24px_-4px_rgba(0,0,0,0.03)] w-full max-w-full transition-all">
+    <header className="bg-white/85 backdrop-blur-2xl border-b border-slate-200/70 sticky top-0 z-[800] select-none shadow-[0_4px_24px_-4px_rgba(0,0,0,0.03)] w-full max-w-full transition-all pt-[env(safe-area-inset-top,0px)]">
       <div className="w-full max-w-[1700px] mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex items-center justify-between h-[56px] sm:h-[60px] md:h-[68px] gap-1.5 sm:gap-2 lg:gap-3 w-full min-w-0">
           
@@ -1163,7 +1163,7 @@ export const Navbar = ({
 
           {/* Drawer Panel: stops propagation so inside taps never bubble to backdrop */}
           <aside 
-            className="relative w-[88vw] sm:w-[380px] max-w-md h-full max-h-[100dvh] bg-white border-l border-slate-200 shadow-2xl flex flex-col p-4 sm:p-5 overflow-y-auto z-20 animate-in slide-in-from-right duration-250 text-slate-900 pb-[max(1.5rem,env(safe-area-inset-bottom,1.5rem))]"
+            className="relative w-[88vw] sm:w-[380px] max-w-md h-full max-h-[100dvh] bg-white border-l border-slate-200 shadow-2xl flex flex-col p-4 sm:p-5 overflow-y-auto z-20 animate-in slide-in-from-right duration-250 text-slate-900 pt-[max(1rem,env(safe-area-inset-top,1rem))] pb-[max(1.5rem,env(safe-area-inset-bottom,1.5rem))]"
             onClick={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
             aria-label="Mobile and tablet navigation drawer"

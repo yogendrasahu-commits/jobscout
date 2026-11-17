@@ -20,13 +20,13 @@ export const MobileBottomNav = ({
   const { incomingMessage } = useSocket();
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[800] bg-white/90 backdrop-blur-2xl border-t border-slate-200/90 py-1.5 pb-[max(0.35rem,env(safe-area-inset-bottom,0px))] px-2 shadow-[0_-4px_25px_rgba(0,0,0,0.06)] select-none">
-      <div className={`grid ${user?.role !== 'admin' ? 'grid-cols-6' : 'grid-cols-5'} items-center w-full max-w-md mx-auto`}>
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[800] bg-white/95 backdrop-blur-2xl border-t border-slate-200/90 py-1.5 pb-[max(0.6rem,env(safe-area-inset-bottom,0px))] px-2 shadow-[0_-4px_25px_rgba(0,0,0,0.06)] select-none">
+      <div className="grid grid-cols-5 items-center w-full max-w-md mx-auto">
         
         {/* 1. Feed (Home) */}
         <button
           onClick={() => setCurrentTab('feed')}
-          className={`col-span-1 flex flex-col items-center justify-center py-1 px-0.5 rounded-xl transition-all ${
+          className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all ${
             currentTab === 'feed'
               ? 'text-indigo-600 font-extrabold scale-105'
               : 'text-slate-500 hover:text-slate-800'
@@ -41,22 +41,25 @@ export const MobileBottomNav = ({
           )}
         </button>
 
-        {/* 2. Network / Emp & Seeker */}
+        {/* 2. Jobs */}
         <button
-          onClick={() => setCurrentTab('network')}
-          className={`col-span-1 flex flex-col items-center justify-center py-1 px-0.5 rounded-xl transition-all ${
-            currentTab === 'network'
+          onClick={() => setCurrentTab('jobs')}
+          className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all relative ${
+            currentTab === 'jobs'
               ? 'text-indigo-600 font-extrabold scale-105'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
           <div className="relative">
-            <NavNetworkIcon active={currentTab === 'network'} className="w-5 h-5 flex-shrink-0" />
+            <NavJobsIcon active={currentTab === 'jobs'} className="w-5 h-5 flex-shrink-0" />
+            {jobsCount > 0 && (
+              <span className="absolute -top-1 -right-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-[8px] text-white font-extrabold px-1.5 py-0.2 rounded-full border border-white shadow-xs">
+                {jobsCount}
+              </span>
+            )}
           </div>
-          <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'network' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>
-            {user ? 'Network' : 'Seeker/Emp'}
-          </span>
-          {currentTab === 'network' && (
+          <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'jobs' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>Jobs</span>
+          {currentTab === 'jobs' && (
             <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
           )}
         </button>
@@ -96,34 +99,30 @@ export const MobileBottomNav = ({
           </button>
         </div>
 
-        {/* 4. Jobs */}
-        <button
-          onClick={() => setCurrentTab('jobs')}
-          className={`col-span-1 flex flex-col items-center justify-center py-1 px-0.5 rounded-xl transition-all relative ${
-            currentTab === 'jobs'
-              ? 'text-indigo-600 font-extrabold scale-105'
-              : 'text-slate-500 hover:text-slate-800'
-          }`}
-        >
-          <div className="relative">
-            <NavJobsIcon active={currentTab === 'jobs'} className="w-5 h-5 flex-shrink-0" />
-            {jobsCount > 0 && (
-              <span className="absolute -top-1 -right-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-[8px] text-white font-extrabold px-1.5 py-0.2 rounded-full border border-white shadow-xs">
-                {jobsCount}
-              </span>
+        {/* 4. Speed Connect Hub (or Network for admin) */}
+        {user?.role === 'admin' ? (
+          <button
+            onClick={() => setCurrentTab('network')}
+            className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all ${
+              currentTab === 'network'
+                ? 'text-indigo-600 font-extrabold scale-105'
+                : 'text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <div className="relative">
+              <NavNetworkIcon active={currentTab === 'network'} className="w-5 h-5 flex-shrink-0" />
+            </div>
+            <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'network' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>
+              Network
+            </span>
+            {currentTab === 'network' && (
+              <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
             )}
-          </div>
-          <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'jobs' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>Jobs</span>
-          {currentTab === 'jobs' && (
-            <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
-          )}
-        </button>
-
-        {/* 5. Speed Connect Hub (for non-admin users) */}
-        {user?.role !== 'admin' && (
+          </button>
+        ) : (
           <button
             onClick={() => setCurrentTab('connect')}
-            className={`col-span-1 flex flex-col items-center justify-center py-1 px-0.5 rounded-xl transition-all relative ${
+            className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all relative ${
               currentTab === 'connect'
                 ? 'text-indigo-600 font-extrabold scale-105'
                 : 'text-slate-500 hover:text-slate-800'
@@ -141,11 +140,11 @@ export const MobileBottomNav = ({
           </button>
         )}
 
-        {/* 6. Messages or Master Admin Portal */}
+        {/* 5. Messages or Master Admin Portal */}
         {user?.role === 'admin' ? (
           <button
             onClick={() => setCurrentTab('admin')}
-            className={`col-span-1 flex flex-col items-center justify-center py-1 px-0.5 rounded-xl transition-all relative ${
+            className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all relative ${
               currentTab === 'admin'
                 ? 'text-rose-600 font-extrabold scale-105'
                 : 'text-slate-500 hover:text-slate-800'
@@ -171,7 +170,7 @@ export const MobileBottomNav = ({
                 setCurrentTab('messages');
               }
             }}
-            className={`col-span-1 flex flex-col items-center justify-center py-1 px-0.5 rounded-xl transition-all relative ${
+            className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all relative ${
               currentTab === 'messages'
                 ? 'text-indigo-600 font-extrabold scale-105'
                 : 'text-slate-500 hover:text-slate-800'
