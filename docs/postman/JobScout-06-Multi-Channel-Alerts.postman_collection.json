@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "494c4330-39df-4fc5-8f1f-e5e43c8ae542",
+    "_postman_id": "6abe0539-fb63-4ddd-9593-c6d4aac5e563",
     "name": "JobScout - Step 6: Instant Alerts & Notification Engine",
     "description": "Automated multi-channel alert dispatch via direct WhatsApp click-to-chat links, Telegram bot webhooks, notification preference controls, and SMTP email settings.\n\nEnvironment Variables Used:\n- `{{baseUrl}}`: Base server URL\n- `{{token}}`: Active JWT session token\n- `{{jobId}}`: Target Job identifier\n- `{{applicationId}}`: Target Job Application identifier",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"

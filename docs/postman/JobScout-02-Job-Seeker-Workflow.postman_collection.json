@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "7db827c8-1aa9-4726-b756-bc7e5a573b48",
+    "_postman_id": "b16f21b8-9e89-4cdc-b680-002cccb5486f",
     "name": "JobScout - Step 2: Job Seeker Discovery & Application",
     "description": "Job discovery with geospatial radius filtering, AI fit score calculation, AI recommendations, bookmarking saved jobs, submitting job applications, and accepting formal offer letters.\n\nEnvironment Variables Used:\n- `{{baseUrl}}`: Base server URL\n- `{{token}}`: Active JWT session token\n- `{{jobId}}`: Target Job identifier\n- `{{applicationId}}`: Target Job Application identifier",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"

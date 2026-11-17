@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "735401df-d924-44bc-8ced-c1fca3569615",
+    "_postman_id": "72c5ea94-f7de-48f4-b876-41c27f7c96c7",
     "name": "JobScout - Step 3: Employer Hiring & ATS Pipeline",
     "description": "Posting new verified tech jobs, browsing active talent on the interactive radar, reviewing candidate ATS pipelines, advancing candidate interview stages, and issuing stamped digital offer letters.\n\nEnvironment Variables Used:\n- `{{baseUrl}}`: Base server URL\n- `{{token}}`: Active JWT session token\n- `{{jobId}}`: Target Job identifier\n- `{{applicationId}}`: Target Job Application identifier",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"

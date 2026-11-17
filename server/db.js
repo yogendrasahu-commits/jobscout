@@ -560,7 +560,118 @@ const getInitialAnonDiscussions = () => [
 
 class Database {
   constructor() {
+    this.storageType = 'json';
+    this.mongoConnected = false;
     this.init();
+  }
+
+  /**
+   * Connect to MongoDB Atlas Cloud Database Engine
+   * When MONGODB_URI is provided, connects to MongoDB cluster and syncs in-memory data
+   * Otherwise falls back gracefully to zero-config Atomic JSON
+   */
+  async connectMongo(uri = process.env.MONGODB_URI) {
+    if (!uri) return false;
+    try {
+      const mongoose = (await import('mongoose')).default;
+      await mongoose.connect(uri, {
+        serverSelectionTimeoutMS: 5000,
+        maxPoolSize: 50
+      });
+      this.mongoConnected = true;
+      this.storageType = 'mongodb';
+      console.log('🚀 Connected to MongoDB Atlas Cloud Database Engine!');
+
+      await this.syncFromMongo();
+      return true;
+    } catch (err) {
+      console.warn('⚠️ Could not connect to MongoDB Atlas, defaulting to Atomic JSON engine:', err.message);
+      this.mongoConnected = false;
+      this.storageType = 'json';
+      return false;
+    }
+  }
+
+  async syncFromMongo() {
+    if (!this.mongoConnected) return;
+    try {
+      const { MongoUser, MongoJob, MongoApplication, MongoMessage, MongoPost, MongoAnon } = await import('./models/mongooseSchemas.js');
+      const [users, jobs, applications, messages, posts, anonDiscussions] = await Promise.all([
+        MongoUser.find({}).lean(),
+        MongoJob.find({}).lean(),
+        MongoApplication.find({}).lean(),
+        MongoMessage.find({}).lean(),
+        MongoPost.find({}).lean(),
+        MongoAnon.find({}).lean()
+      ]);
+
+      if (users && users.length > 0) this.data.users = users;
+      if (jobs && jobs.length > 0) this.data.jobs = jobs;
+      if (applications && applications.length > 0) this.data.applications = applications;
+      if (messages && messages.length > 0) this.data.messages = messages;
+      if (posts && posts.length > 0) this.data.posts = posts;
+      if (anonDiscussions && anonDiscussions.length > 0) this.data.anonDiscussions = anonDiscussions;
+      console.log(`📦 Synced ${users.length} users and ${jobs.length} jobs from MongoDB Atlas`);
+    } catch (err) {
+      console.warn('Sync from MongoDB warning:', err.message);
+    }
+  }
+
+  async persistToMongo(collectionName, document) {
+    if (!this.mongoConnected || !document || !document.id) return;
+    try {
+      const schemas = await import('./models/mongooseSchemas.js');
+      const modelMap = {
+        users: schemas.MongoUser,
+        jobs: schemas.MongoJob,
+        applications: schemas.MongoApplication,
+        messages: schemas.MongoMessage,
+        posts: schemas.MongoPost,
+        anonDiscussions: schemas.MongoAnon
+      };
+      const Model = modelMap[collectionName];
+      if (Model) {
+        await Model.findOneAndUpdate({ id: document.id }, document, { upsert: true, new: true });
+      }
+    } catch (err) {
+      console.warn(`Mongo async persist error (${collectionName}):`, err.message);
+    }
+  }
+
+  async deleteFromMongo(collectionName, id) {
+    if (!this.mongoConnected || !id) return;
+    try {
+      const schemas = await import('./models/mongooseSchemas.js');
+      const modelMap = {
+        users: schemas.MongoUser,
+        jobs: schemas.MongoJob,
+        applications: schemas.MongoApplication,
+        messages: schemas.MongoMessage,
+        posts: schemas.MongoPost,
+        anonDiscussions: schemas.MongoAnon
+      };
+      const Model = modelMap[collectionName];
+      if (Model) {
+        await Model.deleteOne({ id });
+      }
+    } catch (err) {
+      console.warn(`Mongo async delete error (${collectionName}):`, err.message);
+    }
+  }
+
+  getHealth() {
+    return {
+      storageType: this.storageType,
+      mongoConnected: this.mongoConnected,
+      collections: {
+        users: (this.data.users || []).length,
+        jobs: (this.data.jobs || []).length,
+        applications: (this.data.applications || []).length,
+        messages: (this.data.messages || []).length,
+        posts: (this.data.posts || []).length,
+        anonDiscussions: (this.data.anonDiscussions || []).length
+      }
+    };
   }
 
   init() {
@@ -678,6 +789,7 @@ class Database {
     };
     this.data.users.push(newUser);
     this.save();
+    this.persistToMongo('users', newUser);
     return newUser;
   }
 
@@ -686,6 +798,7 @@ class Database {
     if (idx !== -1) {
       this.data.users[idx] = { ...this.data.users[idx], ...updates };
       this.save();
+      this.persistToMongo('users', this.data.users[idx]);
       return this.data.users[idx];
     }
     return null;
@@ -712,6 +825,7 @@ class Database {
     if (idx !== -1) {
       const removed = this.data.users.splice(idx, 1)[0];
       this.save();
+      this.deleteFromMongo('users', id);
       return removed;
     }
     return null;
@@ -758,6 +872,7 @@ class Database {
     };
     this.data.jobs.unshift(newJob);
     this.save();
+    this.persistToMongo('jobs', newJob);
     return newJob;
   }
 
@@ -766,6 +881,7 @@ class Database {
     this.data.jobs = this.data.jobs.filter(j => !(j.id === id && j.employerId === employerId));
     if (this.data.jobs.length !== initialLen) {
       this.save();
+      this.deleteFromMongo('jobs', id);
       return true;
     }
     return false;
@@ -776,6 +892,7 @@ class Database {
     this.data.jobs = this.data.jobs.filter(j => j.id !== id);
     if (this.data.jobs.length !== initialLen) {
       this.save();
+      this.deleteFromMongo('jobs', id);
       return true;
     }
     return false;
@@ -899,6 +1016,7 @@ class Database {
     };
     this.data.applications.unshift(newApp);
     this.save();
+    this.persistToMongo('applications', newApp);
     return newApp;
   }
 
@@ -907,6 +1025,7 @@ class Database {
     if (app) {
       app.status = status;
       this.save();
+      this.persistToMongo('applications', app);
       return app;
     }
     return null;
@@ -935,6 +1054,7 @@ class Database {
     };
     this.data.messages.push(newMsg);
     this.save();
+    this.persistToMongo('messages', newMsg);
     return newMsg;
   }
 
@@ -970,6 +1090,7 @@ class Database {
     };
     this.data.posts.unshift(newPost);
     this.save();
+    this.persistToMongo('posts', newPost);
     return newPost;
   }
 
@@ -987,6 +1108,7 @@ class Database {
       post.likes = (post.likes || 0) + 1;
     }
     this.save();
+    this.persistToMongo('posts', post);
     return post;
   }
 
@@ -1122,6 +1244,7 @@ class Database {
     };
     this.data.anonDiscussions.unshift(newDiscussion);
     this.save();
+    this.persistToMongo('anonDiscussions', newDiscussion);
     return newDiscussion;
   }
 

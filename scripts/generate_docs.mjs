@@ -152,6 +152,54 @@ const swaggerDoc = {
         }
       }
     },
+    "/api/health/db": {
+      get: {
+        tags: ["System"],
+        summary: "Database Topology & Storage Engine Health",
+        description: "Returns active database engine (Atomic JSON or MongoDB Atlas) and record counts.",
+        responses: {
+          200: {
+            description: "Database topology status",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean", example: true },
+                    storageType: { type: "string", example: "json" },
+                    mongoConnected: { type: "boolean", example: false },
+                    collections: { type: "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/upload/config": {
+      get: {
+        tags: ["System"],
+        summary: "Cloud Media Storage Engine Status",
+        description: "Returns active media upload providers (Cloudinary, AWS S3, or Local Disk).",
+        responses: {
+          200: {
+            description: "Media storage configuration",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean", example: true },
+                    storage: { type: "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/auth/check-phone/{phone}": {
       get: {
         tags: ["Authentication"],

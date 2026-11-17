@@ -349,6 +349,8 @@ const steps = [
     description: 'System health check, phone OTP verification, Seeker and Employer registration, password login, profile retrieval, and GPS geolocation synchronization.',
     routes: [
       { path: '/api/health', method: 'get' },
+      { path: '/api/health/db', method: 'get' },
+      { path: '/api/upload/config', method: 'get' },
       { path: '/api/auth/check-phone/{phone}', method: 'get' },
       { path: '/api/auth/send-otp', method: 'post' },
       { path: '/api/auth/verify-otp', method: 'post' },

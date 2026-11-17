@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "d53709ea-adf9-42d0-a136-01cfe6046864",
+    "_postman_id": "eda71a41-f355-492d-a90f-314d26f14b1d",
     "name": "JobScout & JobRadar - Complete Platform API",
     "description": "Complete API reference collection for JobScout covering all 54 endpoints across 11 modules: System, Authentication, Jobs, Applications, Messaging, Social Feed, Professional Network, Anonymous Salon, Alerts, Administration, and Email Settings.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -48,6 +48,88 @@
               ]
             },
             "description": "Returns server uptime, timestamp, and health status."
+          }
+        },
+        {
+          "name": "Database Topology & Storage Engine Health",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is successful (< 400)', function () {",
+                  "    pm.expect(pm.response.code).to.be.below(400);",
+                  "});",
+                  "pm.test('Response time < 1500ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/health/db",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "health",
+                "db"
+              ]
+            },
+            "description": "Returns active database engine (Atomic JSON or MongoDB Atlas) and record counts."
+          }
+        },
+        {
+          "name": "Cloud Media Storage Engine Status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is successful (< 400)', function () {",
+                  "    pm.expect(pm.response.code).to.be.below(400);",
+                  "});",
+                  "pm.test('Response time < 1500ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/config",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "upload",
+                "config"
+              ]
+            },
+            "description": "Returns active media upload providers (Cloudinary, AWS S3, or Local Disk)."
           }
         },
         {

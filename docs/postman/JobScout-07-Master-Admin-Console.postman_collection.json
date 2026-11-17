@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "75d17fb1-07fe-483c-bd48-51d6c4dddfae",
+    "_postman_id": "0d1d933e-4e4b-4f41-933b-1d0e34b863b2",
     "name": "JobScout - Step 7: Master Administration & Operations",
     "description": "Super admin platform governance: system analytics, user management, identity verification badges, account blocking, job moderation, geocoded map pins, dynamic feature flags, and global WebSocket broadcasts.\n\nEnvironment Variables Used:\n- `{{baseUrl}}`: Base server URL\n- `{{token}}`: Active JWT session token\n- `{{jobId}}`: Target Job identifier\n- `{{applicationId}}`: Target Job Application identifier",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"

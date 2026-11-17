@@ -17,6 +17,7 @@ import networkRoutes from './routes/network.js';
 import anonRoutes from './routes/anon.js';
 import alertsRoutes from './routes/alerts.js';
 import adminRoutes from './routes/admin.js';
+import uploadRoutes from './routes/upload.js';
 import { setupSocket } from './socket.js';
 import { db } from './db.js';
 import { verifyEmailConfig } from './email.js';
@@ -73,13 +74,40 @@ app.use('/api', rateLimiter({
   message: 'Too many requests to JobScout API. Please wait a moment before trying again.'
 }));
 
-// Socket.IO Setup
+// Socket.IO Setup with Multi-Node Clustering support
 const io = new Server(server, {
   cors: {
     origin: '*',
     methods: ['GET', 'POST']
   }
 });
+
+// Configure Multi-Node Redis Adapter if REDIS_URL or REDIS_HOST is provided
+if (process.env.REDIS_URL || process.env.REDIS_HOST) {
+  try {
+    const { createAdapter } = await import('@socket.io/redis-adapter');
+    const { createClient } = await import('redis');
+    const redisUrl = process.env.REDIS_URL || `redis://${process.env.REDIS_HOST || '127.0.0.1'}:${process.env.REDIS_PORT || 6379}`;
+    const pubClient = createClient({ url: redisUrl });
+    const subClient = pubClient.duplicate();
+
+    pubClient.on('error', (err) => console.warn('⚠️ Redis Pub Client Error:', err.message));
+    subClient.on('error', (err) => console.warn('⚠️ Redis Sub Client Error:', err.message));
+
+    await Promise.all([pubClient.connect(), subClient.connect()]);
+    io.adapter(createAdapter(pubClient, subClient));
+    console.log('🚀 Redis Multi-Node WebSocket Clustering Adapter Connected!');
+  } catch (err) {
+    console.warn('⚠️ Redis Adapter setup failed, defaulting to in-memory adapter:', err.message);
+  }
+}
+
+// Connect to MongoDB Atlas if MONGODB_URI is provided
+if (process.env.MONGODB_URI) {
+  db.connectMongo().catch(err => {
+    console.warn('⚠️ MongoDB Atlas initialization warning:', err.message);
+  });
+}
 
 setupSocket(io);
 
@@ -147,6 +175,23 @@ app.use('/api/network', networkRoutes);
 app.use('/api/anon', anonRoutes);
 app.use('/api/alerts', alertsRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/upload', uploadRoutes);
+
+// Static uploads directory (supports local disk media storage)
+const uploadsDirPath = path.resolve(__dirname, 'public/uploads');
+if (!fs.existsSync(uploadsDirPath)) {
+  fs.mkdirSync(uploadsDirPath, { recursive: true });
+}
+app.use('/uploads', express.static(uploadsDirPath));
+
+// Database Engine Health & Topology
+app.get('/api/health/db', (req, res) => {
+  res.json({
+    success: true,
+    ...db.getHealth(),
+    timestamp: new Date().toISOString()
+  });
+});
 
 // Mobile App Download Endpoints (APK Package & Info)
 const serverApkPath = path.resolve(__dirname, 'public/downloads/jobscout-mobile.apk');

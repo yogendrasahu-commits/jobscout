@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "9d9927c5-dee4-466f-8785-66db3d0cc0a7",
+    "_postman_id": "1a89bd23-dd52-4e59-9df9-ffaf12b13b97",
     "name": "JobScout - Step 5: Community Feed & Anonymous Salon",
     "description": "Public community feed posts, likes, comments, verified employer updates, and anonymous workplace discussions with upvoting and downvoting.\n\nEnvironment Variables Used:\n- `{{baseUrl}}`: Base server URL\n- `{{token}}`: Active JWT session token\n- `{{jobId}}`: Target Job identifier\n- `{{applicationId}}`: Target Job Application identifier",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"

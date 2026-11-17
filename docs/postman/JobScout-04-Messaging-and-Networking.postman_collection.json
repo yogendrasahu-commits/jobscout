@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "5b908e91-9d4c-4c68-8871-57a3e216392e",
+    "_postman_id": "ed525a77-d90f-4fdc-8a44-741c93b32c41",
     "name": "JobScout - Step 4: Messaging & Professional Network",
     "description": "Real-time in-app direct messaging, conversation history, unread counters, user network profiles, 1-tap connections, and professional skill endorsements.\n\nEnvironment Variables Used:\n- `{{baseUrl}}`: Base server URL\n- `{{token}}`: Active JWT session token\n- `{{jobId}}`: Target Job identifier\n- `{{applicationId}}`: Target Job Application identifier",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"

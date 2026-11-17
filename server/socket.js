@@ -14,6 +14,9 @@ export function setupSocket(io) {
       currentUserId = uid;
       socket.userId = uid;
 
+      // Join distributed user room for Redis multi-node clustering
+      socket.join(`user:${uid}`);
+
       if (!userSockets.has(uid)) {
         userSockets.set(uid, new Set());
       }
@@ -23,7 +26,7 @@ export function setupSocket(io) {
       db.updateUser(uid, { isOnline: true });
       io.emit('user:online_status', { userId: uid, isOnline: true });
 
-      console.log(`User connected: ${uid} (Socket: ${socket.id})`);
+      console.log(`User connected: ${uid} (Socket: ${socket.id}, Room: user:${uid})`);
     });
 
     // Uber-style Real-time Location Updates
@@ -54,31 +57,16 @@ export function setupSocket(io) {
         message
       });
 
-      // Send to recipient if online
-      const receiverSockets = userSockets.get(String(receiverId));
-      if (receiverSockets) {
-        receiverSockets.forEach(socketId => {
-          io.to(socketId).emit('chat:receive', savedMsg);
-        });
-      }
+      // Send to recipient (supports both multi-node Redis room and local socket map)
+      io.to(`user:${receiverId}`).emit('chat:receive', savedMsg);
 
       // Also confirm to sender's own other tabs
-      const senderSockets = userSockets.get(String(senderId));
-      if (senderSockets) {
-        senderSockets.forEach(socketId => {
-          io.to(socketId).emit('chat:sent', savedMsg);
-        });
-      }
+      io.to(`user:${senderId}`).emit('chat:sent', savedMsg);
     });
 
     // Typing indicator
     socket.on('chat:typing', ({ senderId, receiverId, isTyping }) => {
-      const receiverSockets = userSockets.get(String(receiverId));
-      if (receiverSockets) {
-        receiverSockets.forEach(socketId => {
-          io.to(socketId).emit('chat:typing', { senderId, isTyping });
-        });
-      }
+      io.to(`user:${receiverId}`).emit('chat:typing', { senderId, isTyping });
     });
 
     // -------------------------------------------------------------
