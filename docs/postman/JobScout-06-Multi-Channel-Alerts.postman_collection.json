@@ -1,0 +1,292 @@
+{
+  "info": {
+    "_postman_id": "494c4330-39df-4fc5-8f1f-e5e43c8ae542",
+    "name": "JobScout - Step 6: Instant Alerts & Notification Engine",
+    "description": "Automated multi-channel alert dispatch via direct WhatsApp click-to-chat links, Telegram bot webhooks, notification preference controls, and SMTP email settings.\n\nEnvironment Variables Used:\n- `{{baseUrl}}`: Base server URL\n- `{{token}}`: Active JWT session token\n- `{{jobId}}`: Target Job identifier\n- `{{applicationId}}`: Target Job Application identifier",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Generate Direct WhatsApp Notification Link",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 or 201', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/alerts/whatsapp",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "alerts",
+            "whatsapp"
+          ]
+        },
+        "description": "Generate Direct WhatsApp Notification Link",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"+91-9876543210\",\n  \"message\": \"Your job application has been reviewed by TechPulse Solutions!\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Dispatch Instant Telegram Notification",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 or 201', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/alerts/telegram",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "alerts",
+            "telegram"
+          ]
+        },
+        "description": "Dispatch Instant Telegram Notification",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"chatId\": \"123456789\",\n  \"message\": \"🎉 New candidate applied for Senior React Engineer!\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Get Alert Notification Preferences",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is successful (< 400)', function () {",
+              "    pm.expect(pm.response.code).to.be.below(400);",
+              "});",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/alerts/settings",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "alerts",
+            "settings"
+          ]
+        },
+        "description": "Get Alert Notification Preferences"
+      }
+    },
+    {
+      "name": "Update Alert Notification Preferences",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is successful (< 400)', function () {",
+              "    pm.expect(pm.response.code).to.be.below(400);",
+              "});",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/alerts/settings",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "alerts",
+            "settings"
+          ]
+        },
+        "description": "Update Alert Notification Preferences",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"whatsappPhone\": \"9876543210\",\n  \"telegramChatId\": \"@priya_tech\",\n  \"emailAlerts\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Get Email Configuration & Verification Status",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is successful (< 400)', function () {",
+              "    pm.expect(pm.response.code).to.be.below(400);",
+              "});",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/settings/email",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "settings",
+            "email"
+          ]
+        },
+        "description": "Get Email Configuration & Verification Status"
+      }
+    },
+    {
+      "name": "PUT /api/settings/email",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is successful (< 400)', function () {",
+              "    pm.expect(pm.response.code).to.be.below(400);",
+              "});",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/settings/email",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "settings",
+            "email"
+          ]
+        },
+        "description": "Endpoint for /api/settings/email",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"host\": \"smtp.gmail.com\",\n  \"port\": 587,\n  \"secure\": false,\n  \"user\": \"admin@jobscout.io\",\n  \"pass\": \"sample_app_password\",\n  \"from\": \"JobScout Alerts <alerts@jobscout.io>\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

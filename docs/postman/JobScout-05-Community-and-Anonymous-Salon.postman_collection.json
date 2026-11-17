@@ -1,0 +1,369 @@
+{
+  "info": {
+    "_postman_id": "9d9927c5-dee4-466f-8785-66db3d0cc0a7",
+    "name": "JobScout - Step 5: Community Feed & Anonymous Salon",
+    "description": "Public community feed posts, likes, comments, verified employer updates, and anonymous workplace discussions with upvoting and downvoting.\n\nEnvironment Variables Used:\n- `{{baseUrl}}`: Base server URL\n- `{{token}}`: Active JWT session token\n- `{{jobId}}`: Target Job identifier\n- `{{applicationId}}`: Target Job Application identifier",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get Social Feed Posts",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is successful (< 400)', function () {",
+              "    pm.expect(pm.response.code).to.be.below(400);",
+              "});",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/posts",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "posts"
+          ]
+        },
+        "description": "Get Social Feed Posts"
+      }
+    },
+    {
+      "name": "Create Social Community Post",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 or 201', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "if (pm.response.code === 201) {",
+              "    var res = pm.response.json();",
+              "    var p = res.post || res;",
+              "    if (p.id || p._id) {",
+              "        pm.environment.set('postId', p.id || p._id);",
+              "        console.log('✅ postId saved:', p.id || p._id);",
+              "    }",
+              "}",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/posts",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "posts"
+          ]
+        },
+        "description": "Create Social Community Post",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"content\": \"Thrilled to announce we are opening 5 new WebRTC & Cloud roles in Mumbai!\",\n  \"tags\": [\n    \"hiring\",\n    \"mumbai\",\n    \"tech\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Like or Unlike a Post",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is successful (< 400)', function () {",
+              "    pm.expect(pm.response.code).to.be.below(400);",
+              "});",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/posts/:id/like",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "posts",
+            ":id",
+            "like"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": "{{id}}",
+              "description": "Dynamic parameter for id"
+            }
+          ]
+        },
+        "description": "Like or Unlike a Post"
+      }
+    },
+    {
+      "name": "Add Comment to a Post",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 or 201', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/posts/:id/comment",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "posts",
+            ":id",
+            "comment"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": "{{id}}",
+              "description": "Dynamic parameter for id"
+            }
+          ]
+        },
+        "description": "Add Comment to a Post",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"Great milestone! Realtime WebRTC speed calling is a game changer.\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Get Anonymous Workplace Discussions",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is successful (< 400)', function () {",
+              "    pm.expect(pm.response.code).to.be.below(400);",
+              "});",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/anon",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "anon"
+          ]
+        },
+        "description": "Get Anonymous Workplace Discussions"
+      }
+    },
+    {
+      "name": "Create Anonymous Discussion",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 or 201', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "if (pm.response.code === 201) {",
+              "    var res = pm.response.json();",
+              "    var d = res.discussion || res;",
+              "    if (d.id || d._id) {",
+              "        pm.environment.set('anonId', d.id || d._id);",
+              "        console.log('✅ anonId saved:', d.id || d._id);",
+              "    }",
+              "}",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/anon",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "anon"
+          ]
+        },
+        "description": "Create Anonymous Discussion",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Average WebRTC engineer compensation in Mumbai?\",\n  \"content\": \"What are companies offering for 4-6 YOE candidates in 2026?\",\n  \"category\": \"Compensation\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Upvote or Downvote an Anonymous Discussion",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 or 201', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/anon/:id/vote",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "anon",
+            ":id",
+            "vote"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": "{{id}}",
+              "description": "Dynamic parameter for id"
+            }
+          ]
+        },
+        "description": "Upvote or Downvote an Anonymous Discussion",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"direction\": \"up\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

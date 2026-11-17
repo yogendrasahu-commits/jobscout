@@ -1,0 +1,696 @@
+{
+  "info": {
+    "_postman_id": "e5c2d403-a1e7-4a91-b6ba-a8f788547a74",
+    "name": "JobScout - Step 1: Authentication & User Onboarding",
+    "description": "System health check, phone OTP verification, Seeker and Employer registration, password login, profile retrieval, and GPS geolocation synchronization.\n\nEnvironment Variables Used:\n- `{{baseUrl}}`: Base server URL\n- `{{token}}`: Active JWT session token\n- `{{jobId}}`: Target Job identifier\n- `{{applicationId}}`: Target Job Application identifier",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "System Health & Uptime",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is successful (< 400)', function () {",
+              "    pm.expect(pm.response.code).to.be.below(400);",
+              "});",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "health"
+          ]
+        },
+        "description": "Returns server uptime, timestamp, and health status."
+      }
+    },
+    {
+      "name": "Check Phone Registration Status",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is successful (< 400)', function () {",
+              "    pm.expect(pm.response.code).to.be.below(400);",
+              "});",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/check-phone/:phone",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "check-phone",
+            ":phone"
+          ],
+          "variable": [
+            {
+              "key": "phone",
+              "value": "{{phone}}",
+              "description": "Dynamic parameter for phone"
+            }
+          ]
+        },
+        "description": "Check Phone Registration Status"
+      }
+    },
+    {
+      "name": "Send 6-digit OTP to Mobile Number",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 or 201', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/send-otp",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "send-otp"
+          ]
+        },
+        "description": "Send 6-digit OTP to Mobile Number",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"9876543210\",\n  \"purpose\": \"login\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Verify Mobile OTP",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 or 201', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/verify-otp",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "verify-otp"
+          ]
+        },
+        "description": "Verify Mobile OTP",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"9876543210\",\n  \"otp\": \"123456\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Register Job Seeker (via Phone OTP)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 or 201', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "if (pm.response.code === 200 || pm.response.code === 201) {",
+              "    var res = pm.response.json();",
+              "    if (res.token) {",
+              "        pm.environment.set('token', res.token);",
+              "        if (res.user) {",
+              "            if (res.user.role === 'seeker') {",
+              "                pm.environment.set('seekerToken', res.token);",
+              "                pm.environment.set('seekerId', res.user.id || res.user._id);",
+              "            } else if (res.user.role === 'emp') {",
+              "                pm.environment.set('employerToken', res.token);",
+              "                pm.environment.set('employerId', res.user.id || res.user._id);",
+              "            } else if (res.user.role === 'admin') {",
+              "                pm.environment.set('adminToken', res.token);",
+              "                pm.environment.set('adminId', res.user.id || res.user._id);",
+              "            }",
+              "        }",
+              "        console.log('✅ Token saved to environment variable');",
+              "    }",
+              "}",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register-phone",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register-phone"
+          ]
+        },
+        "description": "Register new Seeker or Employer via Phone + OTP",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"9899001122\",\n  \"otp\": \"123456\",\n  \"role\": \"seeker\",\n  \"name\": \"Ankit Sharma\",\n  \"password\": \"password123\",\n  \"title\": \"Fullstack Engineer\",\n  \"company\": \"Independent Consultant\",\n  \"skills\": [\n    \"Node.js\",\n    \"React\"\n  ],\n  \"lat\": 19.076,\n  \"lng\": 72.8777\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Register Employer (via Phone OTP)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 or 201', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "if (pm.response.code === 200 || pm.response.code === 201) {",
+              "    var res = pm.response.json();",
+              "    if (res.token) {",
+              "        pm.environment.set('token', res.token);",
+              "        if (res.user) {",
+              "            if (res.user.role === 'seeker') {",
+              "                pm.environment.set('seekerToken', res.token);",
+              "                pm.environment.set('seekerId', res.user.id || res.user._id);",
+              "            } else if (res.user.role === 'emp') {",
+              "                pm.environment.set('employerToken', res.token);",
+              "                pm.environment.set('employerId', res.user.id || res.user._id);",
+              "            } else if (res.user.role === 'admin') {",
+              "                pm.environment.set('adminToken', res.token);",
+              "                pm.environment.set('adminId', res.user.id || res.user._id);",
+              "            }",
+              "        }",
+              "        console.log('✅ Token saved to environment variable');",
+              "    }",
+              "}",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register-phone",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register-phone"
+          ]
+        },
+        "description": "Register new Seeker or Employer via Phone + OTP",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"9876543299\",\n  \"otp\": \"123456\",\n  \"name\": \"TechHire Solutions\",\n  \"role\": \"emp\",\n  \"password\": \"EmployerPass123!\",\n  \"address\": \"Andheri East, Mumbai\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Login with Phone Number & OTP",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 or 201', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "if (pm.response.code === 200 || pm.response.code === 201) {",
+              "    var res = pm.response.json();",
+              "    if (res.token) {",
+              "        pm.environment.set('token', res.token);",
+              "        if (res.user) {",
+              "            if (res.user.role === 'seeker') {",
+              "                pm.environment.set('seekerToken', res.token);",
+              "                pm.environment.set('seekerId', res.user.id || res.user._id);",
+              "            } else if (res.user.role === 'emp') {",
+              "                pm.environment.set('employerToken', res.token);",
+              "                pm.environment.set('employerId', res.user.id || res.user._id);",
+              "            } else if (res.user.role === 'admin') {",
+              "                pm.environment.set('adminToken', res.token);",
+              "                pm.environment.set('adminId', res.user.id || res.user._id);",
+              "            }",
+              "        }",
+              "        console.log('✅ Token saved to environment variable');",
+              "    }",
+              "}",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login-phone-otp",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login-phone-otp"
+          ]
+        },
+        "description": "Login with Phone Number & OTP",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"9876543210\",\n  \"otp\": \"123456\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Login with Phone Number & Password",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 or 201', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "if (pm.response.code === 200 || pm.response.code === 201) {",
+              "    var res = pm.response.json();",
+              "    if (res.token) {",
+              "        pm.environment.set('token', res.token);",
+              "        if (res.user) {",
+              "            if (res.user.role === 'seeker') {",
+              "                pm.environment.set('seekerToken', res.token);",
+              "                pm.environment.set('seekerId', res.user.id || res.user._id);",
+              "            } else if (res.user.role === 'emp') {",
+              "                pm.environment.set('employerToken', res.token);",
+              "                pm.environment.set('employerId', res.user.id || res.user._id);",
+              "            } else if (res.user.role === 'admin') {",
+              "                pm.environment.set('adminToken', res.token);",
+              "                pm.environment.set('adminId', res.user.id || res.user._id);",
+              "            }",
+              "        }",
+              "        console.log('✅ Token saved to environment variable');",
+              "    }",
+              "}",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login-phone-password",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login-phone-password"
+          ]
+        },
+        "description": "Login with Phone Number & Password",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"9876543210\",\n  \"password\": \"password123\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Get Current Authenticated User Profile",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is successful (< 400)', function () {",
+              "    pm.expect(pm.response.code).to.be.below(400);",
+              "});",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/me",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "me"
+          ]
+        },
+        "description": "Get Current Authenticated User Profile",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Update GPS Geolocation Coordinates",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is successful (< 400)', function () {",
+              "    pm.expect(pm.response.code).to.be.below(400);",
+              "});",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/location",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "location"
+          ]
+        },
+        "description": "Update GPS Geolocation Coordinates",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"lat\": 19.076,\n  \"lng\": 72.8777,\n  \"address\": \"BKC, Mumbai\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Update Current User Profile",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is successful (< 400)', function () {",
+              "    pm.expect(pm.response.code).to.be.below(400);",
+              "});",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/profile",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "profile"
+          ]
+        },
+        "description": "Update Current User Profile",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"TechPulse Solutions HR\",\n  \"title\": \"Talent Acquisition Director\",\n  \"company\": \"TechPulse Global\",\n  \"bio\": \"Hiring top engineering talent in Mumbai\",\n  \"skills\": [\n    \"React\",\n    \"Node\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "AI Resume Skill Extractor",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 or 201', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "pm.test('Response time < 1500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/extract-skills",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "extract-skills"
+          ]
+        },
+        "description": "AI Resume Skill Extractor",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"Experienced Senior Engineer with 6 years building applications in React, WebRTC, Node.js and Docker.\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
