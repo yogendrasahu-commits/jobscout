@@ -352,7 +352,7 @@ export const Navbar = ({
               onClick={() => setCurrentTab('feed')}
               title="JobScout - Live Feed"
             >
-              <div className="relative group-hover:scale-105 transition-all duration-300 flex-shrink-0 drop-shadow-[0_2px_10px_rgba(79,70,229,0.2)]">
+              <div className="relative group-hover:scale-105 transition-all duration-300 flex-shrink-0">
                 <JobScoutLogo size={38} className="w-8 h-8 sm:w-10 sm:h-10" />
               </div>
 

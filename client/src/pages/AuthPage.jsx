@@ -355,31 +355,16 @@ export const AuthPage = ({ initialTab = 'login', onComplete, onBack }) => {
             </div>
           </div>
 
-          {/* Header Title with Curved Doodle Arrow */}
+          {/* Header Title with Status Badge */}
           <div className="mt-4 mb-4">
             <div className="flex items-center justify-between">
               <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
                 {mode === 'register' ? 'Sign Up' : 'Sign In'}
               </h1>
-              <svg 
-                className="w-10 h-10 text-slate-800 -rotate-12 translate-y-1 shrink-0" 
-                viewBox="0 0 48 48" 
-                fill="none"
-              >
-                <path 
-                  d="M10 12 C 22 6, 38 8, 35 24 C 33 32, 28 35, 23 38" 
-                  stroke="currentColor" 
-                  strokeWidth="2.4" 
-                  strokeLinecap="round"
-                />
-                <path 
-                  d="M20 32 L 23 38 L 29 35" 
-                  stroke="currentColor" 
-                  strokeWidth="2.4" 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                />
-              </svg>
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-indigo-50 to-cyan-50 border border-indigo-200/80 text-indigo-700 text-xs font-bold shadow-2xs">
+                <Sparkles size={13} className="text-indigo-600 animate-pulse" />
+                <span>{mode === 'register' ? 'Instant Access' : 'Quick Pass'}</span>
+              </div>
             </div>
             <p className="text-xs text-slate-400 mt-1">
               {mode === 'register' 

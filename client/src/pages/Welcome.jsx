@@ -443,104 +443,101 @@ export const Welcome = ({
       {/* 1. STANDALONE HEADER */}
       {/* ========================================================== */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-2xl border-b border-slate-200/60 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.03)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           
           {/* Brand Logo & Tag */}
-          <div className="flex items-center gap-3 cursor-pointer select-none" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <div className="drop-shadow-[0_2px_10px_rgba(79,70,229,0.2)]">
-              <JobScoutLogo size={36} />
-            </div>
+          <div className="flex items-center gap-2.5 cursor-pointer select-none shrink-0" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <JobScoutLogo size={34} />
             <div>
-              <span className="font-black text-lg sm:text-xl tracking-tight text-slate-900 flex items-center">
+              <span className="font-black text-lg tracking-tight text-slate-900 flex items-center">
                 Job<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-indigo-600 to-cyan-500 ml-0.5">Scout</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 ml-1 shadow-[0_0_8px_rgba(6,182,212,0.8)] animate-pulse" />
               </span>
-              <span className="text-[10px] text-slate-400 font-semibold hidden sm:block -mt-0.5">
+              <span className="text-[10px] text-slate-400 font-semibold hidden md:block -mt-0.5">
                 Real-time Map & Speed Connect
               </span>
             </div>
           </div>
 
           {/* Center Quick Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-1 bg-slate-100/70 backdrop-blur-md p-1 rounded-full border border-slate-200/60 text-xs font-semibold text-slate-600 flex-nowrap flex-shrink-0">
-            <button onClick={onNavigateToFeed} className="px-3.5 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/60 whitespace-nowrap flex-shrink-0 transition-all flex items-center gap-1.5">
+          <nav className="hidden xl:flex items-center gap-1 bg-slate-100/70 backdrop-blur-md p-1 rounded-full border border-slate-200/60 text-xs font-semibold text-slate-600 flex-nowrap shrink-0">
+            <button onClick={onNavigateToFeed} className="px-3 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/70 whitespace-nowrap shrink-0 transition-all flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
               <span>Feed</span>
             </button>
-            <button onClick={onNavigateToNetwork} className="px-3.5 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/60 whitespace-nowrap flex-shrink-0 transition-all flex items-center gap-1.5">
+            <button onClick={onNavigateToNetwork} className="px-3 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/70 whitespace-nowrap shrink-0 transition-all flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Emp & Seeker</span>
+              <span>Network</span>
             </button>
-            <button onClick={onNavigateToMap} className="px-3.5 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/60 whitespace-nowrap flex-shrink-0 transition-all flex items-center gap-1.5">
+            <button onClick={onNavigateToMap} className="px-3 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/70 whitespace-nowrap shrink-0 transition-all flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5 text-cyan-600" />
               <span>Live Map</span>
             </button>
-            <button onClick={onNavigateToJobs} className="px-3.5 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/60 whitespace-nowrap flex-shrink-0 transition-all flex items-center gap-1.5">
+            <button onClick={onNavigateToJobs} className="px-3 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/70 whitespace-nowrap shrink-0 transition-all flex items-center gap-1.5">
               <Briefcase className="w-3.5 h-3.5 text-indigo-600" />
               <span>Jobs ({jobs.length > 0 ? jobs.length : '35+'})</span>
             </button>
-            <button onClick={onNavigateToConnect} className="px-3.5 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/60 whitespace-nowrap flex-shrink-0 transition-all flex items-center gap-1.5">
+            <button onClick={onNavigateToConnect} className="px-3 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/70 whitespace-nowrap shrink-0 transition-all flex items-center gap-1.5">
               <Video className="w-3.5 h-3.5 text-emerald-600" />
               <span>Speed Connect</span>
             </button>
-            <button onClick={onNavigateToAnon} className="px-3.5 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/60 whitespace-nowrap flex-shrink-0 transition-all flex items-center gap-1.5">
+            <button onClick={onNavigateToAnon} className="px-3 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/70 whitespace-nowrap shrink-0 transition-all flex items-center gap-1.5">
               <MessageSquare className="w-3.5 h-3.5 text-amber-600" />
-              <span>Anon Salon</span>
+              <span>Anon Talk</span>
             </button>
           </nav>
 
           {/* Right Action Header Buttons */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {user ? (
               <div className="flex items-center gap-2">
                 <button
                   onClick={onNavigateToFeed}
-                  className="px-4 py-2 rounded-full bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5 active:scale-95"
+                  className="px-4 py-2 rounded-full bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5 active:scale-95 whitespace-nowrap shrink-0"
                 >
                   <span>Go to App Dashboard</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={logout}
-                  className="p-2 rounded-full bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 transition-colors"
+                  className="p-2 rounded-full bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 transition-colors shrink-0"
                   title="Sign Out"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 {/* Mobile App Download Button */}
                 <button
                   onClick={handleOpenAppModal}
-                  className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-full bg-gradient-to-r from-indigo-50 to-cyan-50 hover:from-indigo-100 hover:to-cyan-100 text-indigo-700 text-xs font-bold border border-indigo-200/80 transition-all active:scale-95 shadow-2xs"
+                  className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-indigo-50 to-cyan-50 hover:from-indigo-100 hover:to-cyan-100 text-indigo-700 text-xs font-bold border border-indigo-200/80 transition-all active:scale-95 shadow-2xs whitespace-nowrap shrink-0"
                   title="Download JobScout Mobile App (Android APK & PWA)"
                 >
                   <Smartphone className="w-3.5 h-3.5 text-indigo-600 animate-pulse" />
-                  <span className="hidden sm:inline">📱 Mobile App</span>
-                  <span className="sm:hidden">📱 App</span>
+                  <span>📱 App</span>
                 </button>
 
                 <button
                   onClick={() => onOpenLogin ? onOpenLogin() : (window.location.hash = '#/admin')}
-                  className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold border border-rose-200/80 transition-all active:scale-95 shadow-xs"
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold border border-rose-200/80 transition-all active:scale-95 shadow-xs whitespace-nowrap shrink-0"
                   title="Master Admin Portal"
                 >
                   <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
-                  <span>Admin Portal (एडमिन)</span>
+                  <span>Admin</span>
                 </button>
 
                 <button
                   onClick={() => onOpenLogin ? onOpenLogin() : scrollToAuth('login')}
-                  className="px-4 py-2 rounded-full bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold border border-slate-200/80 shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-all flex items-center gap-1.5 active:scale-95"
+                  className="px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold border border-slate-200/80 shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-all flex items-center gap-1.5 active:scale-95 whitespace-nowrap shrink-0"
                 >
                   <LogIn className="w-3.5 h-3.5 text-indigo-600" />
-                  <span>Log In (लॉगिन)</span>
+                  <span>Log In</span>
                 </button>
 
                 <button
                   onClick={() => onOpenSignup ? onOpenSignup('seeker') : scrollToAuth('register', 'seeker')}
-                  className="px-4 py-2 rounded-full bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold shadow-md shadow-indigo-600/20 border border-indigo-400/30 transition-all flex items-center gap-1.5 active:scale-95"
+                  className="px-4 py-2 rounded-full bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-extrabold shadow-md shadow-indigo-600/25 border border-indigo-400/30 transition-all flex items-center gap-1.5 active:scale-95 whitespace-nowrap shrink-0"
                 >
                   <UserPlus className="w-3.5 h-3.5" />
                   <span>Sign Up Free</span>
@@ -555,17 +552,17 @@ export const Welcome = ({
       {/* ========================================================== */}
       {/* 2. HERO: VALUE NARRATIVE (LEFT) + UNIFIED AUTH CARD (RIGHT) */}
       {/* ========================================================== */}
-      <section className="relative pt-6 pb-16 md:pt-12 md:pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex-1">
+      <section className="relative pt-4 pb-10 md:pt-6 md:pb-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex-1">
         {/* Ambient Glows */}
         <div className="absolute top-10 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl -z-10 pointer-events-none" />
         <div className="absolute top-20 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl -z-10 pointer-events-none" />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
           
           {/* Left Column: Narrative */}
-          <div className="lg:col-span-7 space-y-5 text-center lg:text-left">
+          <div className="lg:col-span-7 space-y-4 text-center lg:text-left">
             
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-200 shadow-xs text-xs font-bold text-indigo-700">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 shadow-xs text-xs font-bold text-indigo-700">
               <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
               <span>India's 1st Live Geospatial Hiring Platform</span>
               <span className="bg-white px-2 py-0.5 rounded-full text-[10px] text-slate-600 border border-indigo-100">
@@ -573,22 +570,22 @@ export const Welcome = ({
               </span>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-[1.12]">
+            <h1 className="text-2xl sm:text-4xl lg:text-[2.85rem] font-black tracking-tight text-slate-900 leading-[1.14]">
               Find Local Jobs & Hire Tech Talent on a{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-indigo-600 to-cyan-500">
                 Live Interactive Map
               </span>
             </h1>
 
-            <p className="text-sm sm:text-base lg:text-lg text-slate-600 leading-relaxed font-medium max-w-2xl mx-auto lg:mx-0">
+            <p className="text-xs sm:text-sm lg:text-base text-slate-600 leading-relaxed font-medium max-w-2xl mx-auto lg:mx-0">
               Skip the resume blackhole. Connect in real time with nearby tech employers and candidates through visual GPS discovery, 1-tap WebRTC audio/video speed calling, and verified digital CVs.
             </p>
 
             {/* Quick Action Navigation Buttons */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 pt-1">
               <button
                 onClick={onNavigateToMap}
-                className="px-5 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-indigo-600/25 transition-all flex items-center gap-2 active:scale-95"
+                className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-indigo-600/25 transition-all flex items-center gap-2 active:scale-95 whitespace-nowrap"
               >
                 <Compass className="w-4 h-4 text-cyan-200" />
                 <span>Explore Live Job Map</span>
@@ -597,15 +594,15 @@ export const Welcome = ({
 
               <button
                 onClick={handleOpenAppModal}
-                className="px-4 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-emerald-600/20 transition-all flex items-center gap-2 active:scale-95"
+                className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-emerald-600/20 transition-all flex items-center gap-2 active:scale-95 whitespace-nowrap"
               >
                 <Smartphone className="w-4 h-4 text-emerald-200 animate-pulse" />
-                <span>📱 Download Mobile App</span>
+                <span>📱 Download App</span>
               </button>
 
               <button
                 onClick={onNavigateToJobs}
-                className="px-4 py-3 rounded-2xl bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs sm:text-sm border border-slate-200 shadow-sm transition-all flex items-center gap-2 active:scale-95"
+                className="px-4 py-2.5 rounded-2xl bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs sm:text-sm border border-slate-200 shadow-sm transition-all flex items-center gap-2 active:scale-95 whitespace-nowrap"
               >
                 <Briefcase className="w-4 h-4 text-indigo-600" />
                 <span>Browse {jobs.length > 0 ? `${jobs.length}+ Jobs` : 'Hot Jobs'}</span>
@@ -613,29 +610,29 @@ export const Welcome = ({
 
               <button
                 onClick={() => onOpenLogin ? onOpenLogin() : null}
-                className="px-4 py-3 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs sm:text-sm border border-rose-200 transition-all flex items-center gap-2 active:scale-95"
+                className="px-3.5 py-2.5 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs sm:text-sm border border-rose-200 transition-all flex items-center gap-2 active:scale-95 whitespace-nowrap"
               >
                 <ShieldAlert className="w-4 h-4 text-rose-600" />
-                <span>Admin Access (एडमिन लॉगिन)</span>
+                <span>Admin Portal</span>
               </button>
             </div>
 
             {/* Quick Stats Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4">
-              <div className="p-3 bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xs text-center lg:text-left">
-                <div className="text-xl sm:text-2xl font-black text-indigo-600">{jobs.length > 0 ? jobs.length : '35'}+</div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-3">
+              <div className="p-2.5 bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xs text-center lg:text-left">
+                <div className="text-lg sm:text-xl font-black text-indigo-600">{jobs.length > 0 ? jobs.length : '35'}+</div>
                 <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Live Tech Jobs</div>
               </div>
-              <div className="p-3 bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xs text-center lg:text-left">
-                <div className="text-xl sm:text-2xl font-black text-emerald-600">{seekers.length > 0 ? `${seekers.length * 25}+` : '500+'}</div>
+              <div className="p-2.5 bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xs text-center lg:text-left">
+                <div className="text-lg sm:text-xl font-black text-emerald-600">{seekers.length > 0 ? `${seekers.length * 25}+` : '500+'}</div>
                 <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Verified Talent</div>
               </div>
-              <div className="p-3 bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xs text-center lg:text-left">
-                <div className="text-xl sm:text-2xl font-black text-cyan-600">{employers.length > 0 ? employers.length : '18'}+</div>
+              <div className="p-2.5 bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xs text-center lg:text-left">
+                <div className="text-lg sm:text-xl font-black text-cyan-600">{employers.length > 0 ? employers.length : '18'}+</div>
                 <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Companies & Hubs</div>
               </div>
-              <div className="p-3 bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xs text-center lg:text-left">
-                <div className="text-xl sm:text-2xl font-black text-amber-600">&lt; 60s</div>
+              <div className="p-2.5 bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xs text-center lg:text-left">
+                <div className="text-lg sm:text-xl font-black text-amber-600">&lt; 60s</div>
                 <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Screening Call</div>
               </div>
             </div>
@@ -684,33 +681,16 @@ export const Welcome = ({
                 </div>
               </div>
 
-              {/* Header Title with Playful Curved Doodle Arrow */}
+              {/* Header Title with Status Badge */}
               <div className="mt-3 mb-4">
                 <div className="flex items-center justify-between">
                   <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
                     {authMode === 'register' ? 'Sign Up' : 'Sign In'}
                   </h1>
-                  {/* Playful curved doodle arrow pointing down towards input fields */}
-                  <svg 
-                    className="w-10 h-10 text-slate-800 -rotate-12 translate-y-1 shrink-0" 
-                    viewBox="0 0 48 48" 
-                    fill="none" 
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path 
-                      d="M10 12 C 22 6, 38 8, 35 24 C 33 32, 28 35, 23 38" 
-                      stroke="currentColor" 
-                      strokeWidth="2.4" 
-                      strokeLinecap="round" 
-                    />
-                    <path 
-                      d="M20 32 L 23 38 L 29 35" 
-                      stroke="currentColor" 
-                      strokeWidth="2.4" 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                    />
-                  </svg>
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-indigo-50 to-cyan-50 border border-indigo-200/80 text-indigo-700 text-xs font-bold shadow-2xs">
+                    <Sparkles size={13} className="text-indigo-600 animate-pulse" />
+                    <span>{authMode === 'register' ? 'Instant Access' : 'Quick Pass'}</span>
+                  </div>
                 </div>
                 <p className="text-xs text-slate-400 mt-1">
                   {authMode === 'register' 
