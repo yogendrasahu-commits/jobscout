@@ -577,13 +577,13 @@ export const Navbar = ({
           {/* ========================================================== */}
           {/* 2. LAPTOP & DESKTOP NAVIGATION TABS (Centered in Header) */}
           {/* ========================================================== */}
-          <div className="hidden md:flex justify-center items-center flex-1 min-w-0 mx-1 lg:mx-3">
+          <div className="hidden lg:flex justify-center items-center flex-1 min-w-0 mx-1 lg:mx-2 xl:mx-3">
             <nav className="flex items-center gap-0.5 lg:gap-1 bg-slate-100/80 backdrop-blur-md p-1 rounded-full border border-slate-200/80 shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)] flex-nowrap shrink-0">
               
               {/* 1. Feed (Home) */}
               <button
                 onClick={() => setCurrentTab('feed')}
-                className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-2 xl:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'feed'
                     ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
                     : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
@@ -597,7 +597,7 @@ export const Navbar = ({
               {/* 2. Network */}
               <button
                 onClick={() => setCurrentTab('network')}
-                className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-2 xl:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'network'
                     ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
                     : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
@@ -611,7 +611,7 @@ export const Navbar = ({
               {/* 3. Live Map */}
               <button
                 onClick={() => setCurrentTab('map')}
-                className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-2 xl:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'map'
                     ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
                     : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
@@ -626,7 +626,7 @@ export const Navbar = ({
               {/* 4. Jobs & Applied */}
               <button
                 onClick={() => setCurrentTab('jobs')}
-                className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-2 xl:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'jobs' || currentTab === 'applications'
                     ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
                     : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
@@ -646,7 +646,7 @@ export const Navbar = ({
               {user?.role !== 'admin' && (
                 <button
                   onClick={() => setCurrentTab('connect')}
-                  className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                  className={`flex items-center gap-1.5 px-2 xl:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                     currentTab === 'connect'
                       ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
                       : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
@@ -658,10 +658,10 @@ export const Navbar = ({
                 </button>
               )}
 
-              {/* 6. Anonymous Discussions (Desktop wide, hidden on tablet to avoid squishing) */}
+              {/* 6. Anonymous Discussions (Desktop & Laptop) */}
               <button
                 onClick={() => setCurrentTab('anon')}
-                className={`hidden xl:flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-2 xl:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'anon'
                     ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
                     : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
@@ -684,7 +684,7 @@ export const Navbar = ({
                     setCurrentTab('messages');
                   }
                 }}
-                className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-2 xl:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'messages'
                     ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
                     : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
@@ -702,7 +702,7 @@ export const Navbar = ({
               {user?.role === 'admin' && (
                 <button
                   onClick={() => setCurrentTab('admin')}
-                  className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                  className={`flex items-center gap-1.5 px-2 xl:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                     currentTab === 'admin'
                       ? 'bg-rose-600 text-white shadow-[0_2px_12px_rgba(225,29,72,0.4)] font-extrabold ring-1 ring-rose-400'
                       : 'text-rose-600 hover:text-rose-700 hover:bg-rose-50 font-bold bg-rose-50/70 border border-rose-200/80'
@@ -1108,8 +1108,8 @@ export const Navbar = ({
               </div>
             )}
 
-            {/* Hamburger Menu Button (Mobile & Tablet: xl:hidden) */}
-            <div className="relative group xl:hidden flex-shrink-0">
+            {/* Hamburger Menu Button (Mobile & Tablet: lg:hidden) */}
+            <div className="relative group lg:hidden flex-shrink-0">
               <button
                 type="button"
                 onClick={() => setMobileDrawerOpen(!mobileDrawerOpen)}
@@ -1146,7 +1146,7 @@ export const Navbar = ({
       {/* 4. FIXED HAMBURGER MENU DRAWER (Teleported to document.body via Portal) */}
       {/* ========================================================== */}
       {mobileDrawerOpen && typeof document !== 'undefined' && createPortal(
-        <div className="fixed inset-0 z-[99999] xl:hidden flex justify-end animate-in fade-in duration-200 select-none">
+        <div className="fixed inset-0 z-[99999] lg:hidden flex justify-end animate-in fade-in duration-200 select-none">
           {/* Backdrop with touch / click isolation */}
           <div 
             className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity cursor-pointer"

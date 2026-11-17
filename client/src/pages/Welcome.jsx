@@ -463,7 +463,7 @@ export const Welcome = ({
           </div>
 
           {/* Center Quick Navigation Links */}
-          <nav className="hidden xl:flex items-center gap-1 bg-slate-100/70 backdrop-blur-md p-1 rounded-full border border-slate-200/60 text-xs font-semibold text-slate-600 flex-nowrap shrink-0">
+          <nav className="hidden lg:flex items-center gap-1 bg-slate-100/70 backdrop-blur-md p-1 rounded-full border border-slate-200/60 text-xs font-semibold text-slate-600 flex-nowrap shrink-0">
             <button onClick={onNavigateToFeed} className="px-3 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/70 whitespace-nowrap shrink-0 transition-all flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
               <span>Feed</span>
@@ -551,11 +551,11 @@ export const Welcome = ({
                   <span>Sign Up Free</span>
                 </button>
 
-                {/* Mobile / Tablet Hamburger Menu Button (xl:hidden) */}
+                {/* Mobile / Tablet Hamburger Menu Button (lg:hidden) */}
                 <button
                   type="button"
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="xl:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 transition active:scale-95 flex items-center justify-center shrink-0"
+                  className="lg:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 transition active:scale-95 flex items-center justify-center shrink-0"
                   aria-label="Toggle Navigation Menu"
                 >
                   {isMobileMenuOpen ? <X className="w-4 h-4 text-slate-900" /> : <Menu className="w-4 h-4 text-slate-900" />}
@@ -567,9 +567,9 @@ export const Welcome = ({
         </div>
       </header>
 
-      {/* Mobile Drawer Navigation for Welcome Page (xl:hidden) */}
+      {/* Mobile Drawer Navigation for Welcome Page (lg:hidden) */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 xl:hidden">
+        <div className="fixed inset-0 z-50 lg:hidden">
           {/* Backdrop */}
           <div 
             className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity"
