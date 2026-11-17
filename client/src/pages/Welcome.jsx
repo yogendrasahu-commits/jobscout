@@ -475,7 +475,12 @@ export const Welcome = ({
             </button>
             <button onClick={onNavigateToJobs} className="px-3 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/70 whitespace-nowrap shrink-0 transition-all flex items-center gap-1.5">
               <Briefcase className="w-3.5 h-3.5 text-indigo-600" />
-              <span>Jobs ({jobs.length > 0 ? jobs.length : '35+'})</span>
+              <span>Jobs</span>
+              {jobs.length > 0 && (
+                <span className="text-[10px] bg-indigo-50 px-1.5 py-0.2 rounded-full text-indigo-700 border border-indigo-200 font-extrabold">
+                  {jobs.length}
+                </span>
+              )}
             </button>
             <button onClick={onNavigateToConnect} className="px-3 py-1.5 rounded-full hover:text-slate-900 hover:bg-white/70 whitespace-nowrap shrink-0 transition-all flex items-center gap-1.5">
               <Video className="w-3.5 h-3.5 text-emerald-600" />
@@ -515,7 +520,7 @@ export const Welcome = ({
                   title="Download JobScout Mobile App (Android APK & PWA)"
                 >
                   <Smartphone className="w-3.5 h-3.5 text-indigo-600 animate-pulse" />
-                  <span>📱 App</span>
+                  <span>Mobile App</span>
                 </button>
 
                 <button
@@ -1783,15 +1788,17 @@ export const Welcome = ({
             <span className="font-extrabold text-sm text-slate-800">JobScout</span>
             <span className="text-slate-400">• Real-time Map & Speed Connect</span>
           </div>
-          <div className="flex items-center gap-4 text-slate-600 font-medium text-xs">
-            <button onClick={onNavigateToMap} className="hover:text-indigo-600 transition-colors">Map</button>
-            <button onClick={onNavigateToJobs} className="hover:text-indigo-600 transition-colors">Jobs</button>
+          <div className="flex flex-wrap items-center justify-center gap-4 text-slate-600 font-medium text-xs">
             <button onClick={onNavigateToFeed} className="hover:text-indigo-600 transition-colors">Feed</button>
+            <button onClick={onNavigateToNetwork} className="hover:text-indigo-600 transition-colors">Network</button>
+            <button onClick={onNavigateToMap} className="hover:text-indigo-600 transition-colors">Live Map</button>
+            <button onClick={onNavigateToJobs} className="hover:text-indigo-600 transition-colors">Jobs</button>
+            <button onClick={onNavigateToConnect} className="hover:text-indigo-600 transition-colors">Speed Connect</button>
+            <button onClick={onNavigateToAnon} className="hover:text-indigo-600 transition-colors">Anon Talk</button>
             <button onClick={handleOpenAppModal} className="text-indigo-600 font-bold hover:underline transition-colors flex items-center gap-1">
               <Smartphone size={12} />
               <span>Mobile App</span>
             </button>
-            <button onClick={onNavigateToAnon} className="hover:text-indigo-600 transition-colors">Anon Salon</button>
             <button onClick={() => scrollToAuth('login')} className="hover:text-indigo-600 transition-colors">Log In</button>
             <button onClick={() => scrollToAuth('register', 'seeker')} className="hover:text-indigo-600 transition-colors">Sign Up</button>
           </div>

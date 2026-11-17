@@ -90,10 +90,10 @@ export const MobileBottomNav = ({
             </div>
 
             <div className="flex items-center gap-0.5 mt-1">
-              <span className={`text-[10px] font-black tracking-wider uppercase ${
+              <span className={`text-[10px] font-black tracking-wider uppercase whitespace-nowrap ${
                 currentTab === 'map' ? 'text-indigo-600' : 'text-slate-700'
               }`}>
-                Map
+                Live Map
               </span>
             </div>
           </button>
@@ -131,8 +131,8 @@ export const MobileBottomNav = ({
             <div className="relative">
               <NavConnectIcon active={currentTab === 'connect'} className="w-5 h-5 flex-shrink-0" />
             </div>
-            <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'connect' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>
-              Connect
+            <span className={`text-[9px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'connect' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>
+              Speed Connect
             </span>
             {currentTab === 'connect' && (
               <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />

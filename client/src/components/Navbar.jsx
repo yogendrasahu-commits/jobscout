@@ -602,12 +602,10 @@ export const Navbar = ({
                     ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
                     : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
                 }`}
-                title={user ? `My Professional Network (${seekersCount + employersCount})` : 'Emp & Seeker (Employers & Job Seekers)'}
+                title={`Professional Network (${seekersCount + employersCount})`}
               >
                 <NavNetworkIcon active={currentTab === 'network'} className="w-4 h-4 flex-shrink-0" />
-                <span className="font-bold tracking-tight">
-                  {user ? 'Network' : 'Emp & Seeker'}
-                </span>
+                <span className="font-bold tracking-tight">Network</span>
               </button>
 
               {/* 3. Live Map */}
@@ -621,7 +619,7 @@ export const Navbar = ({
                 title="Live Geospatial Job Radar Map"
               >
                 <NavRadarIcon active={currentTab === 'map'} className="w-4 h-4 flex-shrink-0" />
-                <span className="font-bold tracking-tight">Map</span>
+                <span className="font-bold tracking-tight">Live Map</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse ml-0.5 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
               </button>
 
@@ -656,14 +654,14 @@ export const Navbar = ({
                   title="Speed Connect Hub (Audio & Video Calls)"
                 >
                   <NavConnectIcon active={currentTab === 'connect'} className="w-4 h-4 flex-shrink-0" />
-                  <span className="font-bold tracking-tight">Connect</span>
+                  <span className="font-bold tracking-tight">Speed Connect</span>
                 </button>
               )}
 
               {/* 6. Anonymous Discussions (Desktop wide, hidden on tablet to avoid squishing) */}
               <button
                 onClick={() => setCurrentTab('anon')}
-                className={`hidden 2xl:flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                className={`hidden xl:flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'anon'
                     ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
                     : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
@@ -674,7 +672,7 @@ export const Navbar = ({
                   <NavAnonIcon active={currentTab === 'anon'} className="w-4 h-4 flex-shrink-0" />
                   <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" />
                 </div>
-                <span className="font-bold tracking-tight">Anon</span>
+                <span className="font-bold tracking-tight">Anon Talk</span>
               </button>
 
               {/* 7. Full-Page Messaging */}
@@ -1224,7 +1222,7 @@ export const Navbar = ({
                 >
                   <div className="flex items-center gap-3">
                     <ShieldAlert className="w-4 h-4 flex-shrink-0 text-rose-500" />
-                    <span>Master Admin Console</span>
+                    <span>Admin</span>
                   </div>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500 text-white animate-pulse">
                     Live
@@ -1232,7 +1230,7 @@ export const Navbar = ({
                 </button>
               )}
 
-              {/* Feed (Home) */}
+              {/* Feed */}
               <button
                 onClick={() => { setCurrentTab('feed'); setMobileDrawerOpen(false); }}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 cursor-pointer ${
@@ -1243,7 +1241,7 @@ export const Navbar = ({
               >
                 <div className="flex items-center gap-3">
                   <NavFeedIcon active={currentTab === 'feed'} className="w-4 h-4 flex-shrink-0" />
-                  <span>Feed (Home)</span>
+                  <span>Feed</span>
                 </div>
                 <span className={`text-[10px] font-medium ${currentTab === 'feed' ? 'text-indigo-100' : 'text-slate-400'}`}>Stories & Updates</span>
               </button>
@@ -1259,7 +1257,7 @@ export const Navbar = ({
               >
                 <div className="flex items-center gap-3">
                   <NavNetworkIcon active={currentTab === 'network'} className="w-4 h-4 flex-shrink-0" />
-                  <span>{user ? 'My Network' : 'Emp & Seeker'}</span>
+                  <span>Network</span>
                 </div>
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${currentTab === 'network' ? 'bg-white/20 border-white/30 text-white' : 'bg-slate-100 text-slate-600 border-slate-200'}`}>
                   {seekersCount + employersCount}
@@ -1288,7 +1286,7 @@ export const Navbar = ({
                 </div>
               </button>
 
-              {/* Job Board */}
+              {/* Jobs */}
               <button
                 onClick={() => { setCurrentTab('jobs'); setMobileDrawerOpen(false); }}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 cursor-pointer ${
@@ -1299,7 +1297,7 @@ export const Navbar = ({
               >
                 <div className="flex items-center gap-3">
                   <NavJobsIcon active={currentTab === 'jobs'} className="w-4 h-4 flex-shrink-0" />
-                  <span>Job Board (Openings)</span>
+                  <span>Jobs</span>
                 </div>
                 {jobsCount > 0 && (
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${currentTab === 'jobs' ? 'bg-white/20 border-white/30 text-white' : 'bg-indigo-50 border-indigo-200 text-indigo-700'}`}>
@@ -1378,14 +1376,14 @@ export const Navbar = ({
               >
                 <div className="flex items-center gap-3">
                   <NavAnonIcon active={currentTab === 'anon'} className="w-4 h-4 flex-shrink-0" />
-                  <span>Anon Talk (गुमनाम चर्चा)</span>
+                  <span>Anon Talk</span>
                 </div>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${currentTab === 'anon' ? 'bg-white/20 border-white/30 text-white' : 'bg-orange-50 text-orange-700 border-orange-200'}`}>
                   Community
                 </span>
               </button>
 
-              {/* Full-Page Messaging */}
+              {/* Chat */}
               <button
                 onClick={() => {
                   setMobileDrawerOpen(false);
@@ -1403,7 +1401,7 @@ export const Navbar = ({
               >
                 <div className="flex items-center gap-3">
                   <NavMessagesIcon active={currentTab === 'messages'} className="w-4 h-4 flex-shrink-0" />
-                  <span>Full-Page Messaging</span>
+                  <span>Chat</span>
                 </div>
                 {user ? (
                   <span className="text-[10px] bg-indigo-50 border border-indigo-200 text-indigo-700 px-2 py-0.5 rounded-full font-bold">
