@@ -35,3 +35,11 @@ Thumbs.db
 client/android/.gradle/
 client/android/app/build/
 client/android/build/
+client/android/app/src/main/assets/public/downloads/
+
+# Postman application cache & extension metadata
+.postman/
+**/.postman/
+**/postman/globals/
+**/postman/mocks/
+**/postman/flows/

@@ -20,8 +20,8 @@ if (!fs.existsSync(androidDir)) {
 
 const zip = new AdmZip();
 
-// Ignore build, .gradle, and large caches
-const ignoreDirs = new Set(['.gradle', 'build', '.idea', 'captures']);
+// Ignore build, .gradle, downloads, and large caches
+const ignoreDirs = new Set(['.gradle', 'build', '.idea', 'captures', 'downloads']);
 
 const addFilesRecursively = (currentDir, zipPrefix) => {
   const items = fs.readdirSync(currentDir);

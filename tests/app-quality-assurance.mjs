@@ -108,11 +108,11 @@ async function runAllAppTests() {
     assert.ok(res.headers.get('content-type')?.includes('application/vnd.android.package-archive'));
   });
 
-  await test('Android Studio project ZIP is present and >= 20 MB', async () => {
+  await test('Android Studio project ZIP is present and >= 2 MB', async () => {
     const zipPath = path.resolve('client/public/downloads/jobscout-android-project.zip');
     assert.ok(fs.existsSync(zipPath), 'jobscout-android-project.zip must exist');
     const stat = fs.statSync(zipPath);
-    assert.ok(stat.size > 20 * 1024 * 1024, `ZIP size must contain full native project (>20MB), got: ${(stat.size / 1024 / 1024).toFixed(2)} MB`);
+    assert.ok(stat.size > 2 * 1024 * 1024, `ZIP size must contain full native project (>2MB), got: ${(stat.size / 1024 / 1024).toFixed(2)} MB`);
   });
 
   await test('Android Studio ZIP download endpoint returns HTTP 200 with zip content-type', async () => {
