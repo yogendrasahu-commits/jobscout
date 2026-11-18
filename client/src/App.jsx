@@ -28,6 +28,8 @@ import { CommandPalette } from './components/CommandPalette';
 import { MobileAppDownloadModal } from './components/MobileAppDownloadModal';
 import { ServerConfigModal } from './components/ServerConfigModal';
 import { AIMockInterviewModal } from './components/AIMockInterviewModal';
+import { DynamicIslandPill } from './components/DynamicIslandPill';
+import { FloatingSpeedDial } from './components/FloatingSpeedDial';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { jobService } from './services/jobService';
 import { userService } from './services/userService';
@@ -581,6 +583,23 @@ function MainApp() {
         </div>
       )}
 
+      {/* 2026 Floating Dynamic Island Status Capsule */}
+      <DynamicIslandPill
+        activeLocationName={user?.address || 'Bandra Kurla Complex (BKC)'}
+        jobsCount={jobs.length}
+        seekersCount={seekers.length}
+        isOnline={isOnline}
+        currentTab={currentTab}
+        setCurrentTab={handleNavigateTab}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        onStartMockInterview={(j) => setInterviewJob(j)}
+        onQuickFilterChange={(f) => {
+          setJobsQuickFilter(f);
+          handleNavigateTab('jobs');
+        }}
+      />
+
       {/* Top Desktop/Tablet Navbar */}
       <Navbar
         currentTab={currentTab}
@@ -834,6 +853,21 @@ function MainApp() {
       <ServerConfigModal
         isOpen={isServerConfigOpen}
         onClose={() => setIsServerConfigOpen(false)}
+      />
+
+      {/* 2026 Mobile Floating Radial Speed-Dial FAB */}
+      <FloatingSpeedDial
+        onOpenPostJob={() => {
+          setPostJobCoords(null);
+          setIsPostJobOpen(true);
+        }}
+        onToggleTheme={toggleTheme}
+        theme={theme}
+        onInstantShift={() => {
+          setJobsQuickFilter('instant_shift');
+          handleNavigateTab('jobs');
+        }}
+        onStartMockInterview={() => setInterviewJob(jobs[0] || null)}
       />
 
     </div>

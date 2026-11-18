@@ -38,6 +38,8 @@ import { useSocket } from '../context/SocketContext';
 import { postService } from '../services/postService';
 import { networkService } from '../services/networkService';
 import { getOfflineData, saveOfflineData } from '../utils/offlineStorage';
+import { handleSpotlightMouseMove } from '../utils/spotlight';
+import { SkeletonCard } from '../components/SkeletonCard';
 
 export const Feed = ({ 
   jobs = [],
@@ -521,30 +523,10 @@ export const Feed = ({
           {/* Posts Feed List */}
           {loading ? (
             <div className="space-y-4">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="bg-white/90 backdrop-blur-xl border border-slate-200/90 rounded-3xl p-5 shadow-sm space-y-4 animate-pulse">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-slate-200" />
-                    <div className="space-y-2 flex-1">
-                      <div className="h-3.5 bg-slate-200 rounded-md w-1/3" />
-                      <div className="h-2.5 bg-slate-100 rounded-md w-1/4" />
-                    </div>
-                  </div>
-                  <div className="space-y-2 pt-1">
-                    <div className="h-3 bg-slate-100 rounded-md w-full" />
-                    <div className="h-3 bg-slate-100 rounded-md w-5/6" />
-                    <div className="h-3 bg-slate-100 rounded-md w-3/4" />
-                  </div>
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-around">
-                    <div className="h-6 bg-slate-100 rounded-xl w-16" />
-                    <div className="h-6 bg-slate-100 rounded-xl w-20" />
-                    <div className="h-6 bg-slate-100 rounded-xl w-16" />
-                  </div>
-                </div>
-              ))}
+              <SkeletonCard count={3} />
             </div>
           ) : posts.length === 0 ? (
-            <div className="bg-white border border-slate-200 rounded-3xl p-8 text-center text-slate-500 shadow-sm">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 text-center text-slate-500 shadow-sm">
               No feed posts yet. Be the first to share an update!
             </div>
           ) : (
@@ -556,7 +538,8 @@ export const Feed = ({
               return (
                 <article
                   key={post.id}
-                  className="card-spotlight bg-white/95 hover:bg-white backdrop-blur-2xl border border-slate-200/90 hover:border-indigo-400/90 rounded-3xl p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_-8px_rgba(99,102,241,0.12)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
+                  onMouseMove={handleSpotlightMouseMove}
+                  className="spotlight-card bg-white/95 dark:bg-slate-900/95 hover:bg-white dark:hover:bg-slate-900 backdrop-blur-2xl border border-slate-200/90 dark:border-slate-800 hover:border-indigo-400/90 dark:hover:border-cyan-400/80 rounded-3xl p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.4)] hover:shadow-[0_20px_40px_-8px_rgba(99,102,241,0.12)] dark:hover:shadow-[0_20px_40px_-8px_rgba(6,182,212,0.2)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
                 >
                   
                   {/* Post Author Header */}

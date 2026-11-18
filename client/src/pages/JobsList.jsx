@@ -28,6 +28,7 @@ import { AIMatchBadge } from '../components/AIMatchBadge';
 import { AIMatchModal } from '../components/AIMatchModal';
 import { SmartCommuteModal } from '../components/SmartCommuteModal';
 import { queueOfflineAction } from '../utils/offlineStorage';
+import { handleSpotlightMouseMove } from '../utils/spotlight';
 
 export const JobsList = ({ 
   jobs = [], 
@@ -532,7 +533,8 @@ export const JobsList = ({
                   <div
                     key={job.id}
                     onClick={() => onSelectJob(job)}
-                    className="group card-spotlight bg-white/95 hover:bg-white backdrop-blur-2xl border border-slate-200/90 hover:border-indigo-400/90 rounded-3xl p-5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_-8px_rgba(99,102,241,0.16)] hover:-translate-y-1.5 transition-all duration-300 cursor-pointer flex flex-col justify-between relative overflow-hidden"
+                    onMouseMove={handleSpotlightMouseMove}
+                    className="group spotlight-card bg-white/95 dark:bg-slate-900/95 hover:bg-white dark:hover:bg-slate-900 backdrop-blur-2xl border border-slate-200/90 dark:border-slate-800 hover:border-indigo-400/90 dark:hover:border-cyan-400/80 rounded-3xl p-5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.4)] hover:shadow-[0_20px_40px_-8px_rgba(99,102,241,0.16)] dark:hover:shadow-[0_20px_40px_-8px_rgba(6,182,212,0.25)] hover:-translate-y-1.5 transition-all duration-300 cursor-pointer flex flex-col justify-between relative overflow-hidden"
                   >
                     {/* Top subtle hairline glow */}
                     <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-indigo-500 via-cyan-400 to-emerald-400 opacity-60 group-hover:opacity-100 transition-opacity" />
@@ -541,16 +543,16 @@ export const JobsList = ({
                       {/* Top Badges & Bookmark */}
                       <div className="flex items-start justify-between gap-2 mb-3.5">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="px-2.5 py-1 text-[10px] font-black tracking-wider uppercase rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200/80 shadow-2xs">
+                          <span className="px-2.5 py-1 text-[10px] font-black tracking-wider uppercase rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800 shadow-2xs">
                             {job.jobType}
                           </span>
                           {job.workMode && (
-                            <span className="px-2 py-0.5 text-[10px] font-bold rounded-lg bg-slate-100 text-slate-700 border border-slate-200">
+                            <span className="px-2 py-0.5 text-[10px] font-bold rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                               {job.workMode}
                             </span>
                           )}
                           {job.urgent && (
-                            <span className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-extrabold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg shadow-2xs">
+                            <span className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-extrabold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 rounded-lg shadow-2xs">
                               <Flame className="w-3 h-3 text-rose-500 fill-rose-500 animate-pulse" /> Urgent
                             </span>
                           )}
@@ -569,8 +571,8 @@ export const JobsList = ({
                           onClick={(e) => toggleSaveJob(e, job.id)}
                           className={`p-2 rounded-xl border transition-all active:scale-95 ${
                             isSaved 
-                              ? 'bg-amber-50 border-amber-300 text-amber-600 shadow-xs' 
-                              : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-400 hover:text-slate-600'
+                              ? 'bg-amber-50 dark:bg-amber-950/50 border-amber-300 dark:border-amber-700 text-amber-600 dark:text-amber-400 shadow-xs' 
+                              : 'bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-600'
                           }`}
                           title={isSaved ? 'Remove from Saved Jobs' : 'Save Job for Later'}
                         >
@@ -580,18 +582,31 @@ export const JobsList = ({
 
                       {/* Company Avatar & Job Title */}
                       <div className="flex items-start gap-3 mb-2">
-                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-50 to-indigo-100/80 border border-indigo-200/70 flex items-center justify-center font-black text-sm text-indigo-700 flex-shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-50 to-indigo-100/80 dark:from-indigo-950/60 dark:to-indigo-900/60 border border-indigo-200/70 dark:border-indigo-800/60 flex items-center justify-center font-black text-sm text-indigo-700 dark:text-indigo-300 flex-shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                           {(job.company || 'JS').slice(0, 2).toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-extrabold text-base text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1 leading-snug">
+                          <h3 className="font-extrabold text-base text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-cyan-400 transition-colors line-clamp-1 leading-snug">
                             {job.title}
                           </h3>
-                          <p className="text-xs text-slate-600 font-semibold truncate flex items-center gap-1 mt-0.5">
+                          <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold truncate flex items-center gap-1 mt-0.5">
                             <Building className="w-3 h-3 text-slate-400 flex-shrink-0" />
                             <span className="truncate">{job.company}</span>
                           </p>
                         </div>
+                      </div>
+
+                      {/* 2026 AI Quick-Take Intelligence Pill */}
+                      <div className="my-2.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-50/90 via-cyan-50/70 to-indigo-50/90 dark:from-indigo-950/40 dark:via-cyan-950/30 dark:to-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/60 flex items-center justify-between text-[11px] font-bold text-slate-800 dark:text-slate-200 shadow-2xs">
+                        <div className="flex items-center gap-1.5 truncate">
+                          <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-cyan-400 animate-pulse flex-shrink-0" />
+                          <span className="truncate">
+                            {job.urgent ? '⚡ Urgent Spot Opening' : '✨ High Match'} • {job.workMode || 'Hybrid'} • {job.skills?.slice(0, 2).join(' + ') || 'Tech Stack'}
+                          </span>
+                        </div>
+                        <span className="text-[9px] text-indigo-700 dark:text-cyan-300 font-extrabold flex-shrink-0 bg-white/80 dark:bg-slate-900/80 px-1.5 py-0.2 rounded-md border border-indigo-200/60 dark:border-indigo-800/60">
+                          AI Take
+                        </span>
                       </div>
 
                       {/* Prominent Tabular Figures Salary & Commute */}

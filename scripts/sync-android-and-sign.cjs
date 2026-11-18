@@ -23,6 +23,7 @@ function copyDirSync(src, dest) {
   if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
   const entries = fs.readdirSync(src, { withFileTypes: true });
   for (const entry of entries) {
+    if (entry.name === 'downloads') continue; // Never nest recursive APK installers into assets
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
     if (entry.isDirectory()) {
@@ -45,10 +46,10 @@ console.log('📦 Step 2: Updating assets/public inside jobscout-mobile.apk...')
 if (fs.existsSync(clientApk)) {
   const zip = new AdmZip(clientApk);
   
-  // Remove existing assets/public entries
+  // Remove existing assets/public entries and any recursively embedded downloads
   const entries = zip.getEntries();
   for (const entry of entries) {
-    if (entry.entryName.startsWith('assets/public/')) {
+    if (entry.entryName.startsWith('assets/public/') || entry.entryName.includes('downloads/')) {
       zip.deleteFile(entry.entryName);
     }
   }
@@ -57,6 +58,7 @@ if (fs.existsSync(clientApk)) {
   function addDirToZip(dirPath, zipPrefix) {
     const items = fs.readdirSync(dirPath, { withFileTypes: true });
     for (const item of items) {
+      if (item.name === 'downloads') continue; // Never embed downloads (APK/zip) inside the APK!
       const fullPath = path.join(dirPath, item.name);
       if (item.isDirectory()) {
         addDirToZip(fullPath, `${zipPrefix}/${item.name}`);

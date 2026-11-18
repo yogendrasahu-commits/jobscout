@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { triggerConfetti } from '../utils/confetti';
 import { playSuccessChime } from '../utils/soundEffects';
+import { AudioWaveformVisualizer } from './AudioWaveformVisualizer';
 
 export const AIMockInterviewModal = ({ isOpen, onClose, job, user, onReadyToApply }) => {
   const [currentStep, setCurrentStep] = useState(0); // 0, 1, 2 = Questions, 3 = Scorecard
@@ -293,6 +294,13 @@ export const AIMockInterviewModal = ({ isOpen, onClose, job, user, onReadyToAppl
                 </button>
               </div>
             </div>
+
+            {/* Siri / Gemini Live Animated Waveform Visualizer */}
+            <AudioWaveformVisualizer 
+              isSpeaking={isSpeaking}
+              isListening={isListening}
+              label={isSpeaking ? 'AI Voice Active' : isListening ? 'Capturing Voice Response' : 'Click Mic or Listen to Begin'}
+            />
 
             {/* Answer Input Box */}
             <div className="space-y-2">

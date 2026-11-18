@@ -44,7 +44,9 @@ import {
   Download,
   QrCode,
   Menu,
-  X
+  X,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { JobScoutLogo } from '../components/JobScoutLogo';
 import { useAuth } from '../context/AuthContext';
@@ -66,7 +68,9 @@ export const Welcome = ({
   onOpenMobileAppModal,
   jobs = [],
   seekers = [],
-  employers = []
+  employers = [],
+  theme = 'light',
+  onToggleTheme
 }) => {
   const { 
     user, 
@@ -525,6 +529,19 @@ export const Welcome = ({
                   <Smartphone className="w-3.5 h-3.5 text-indigo-600 animate-pulse" />
                   <span>Mobile App</span>
                 </button>
+
+                {/* Dark / Light Mode Switch */}
+                {onToggleTheme && (
+                  <button
+                    type="button"
+                    onClick={onToggleTheme}
+                    title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                    className="p-2 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-amber-300 border border-slate-200 dark:border-slate-700 transition-all active:scale-95 cursor-pointer shrink-0"
+                    aria-label="Toggle Theme"
+                  >
+                    {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+                  </button>
+                )}
 
                 <button
                   onClick={() => onOpenLogin ? onOpenLogin() : (window.location.hash = '#/admin')}
