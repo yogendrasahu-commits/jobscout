@@ -1,6 +1,14 @@
+import { 
+  saveOfflineData, 
+  getOfflineData, 
+  queueOfflineAction, 
+  isAppOnline 
+} from '../utils/offlineStorage.js';
+
 /**
  * Enterprise API Client for JobScout
- * Standardizes HTTP communication, headers, error parsing, and auth tokens.
+ * Standardizes HTTP communication, headers, error parsing, auth tokens,
+ * and transparent Offline-First Stale-While-Revalidate caching.
  */
 
 const resolveBaseUrl = () => {
@@ -47,9 +55,37 @@ class ApiClient {
   }
 
   /**
-   * Universal Request Method
+   * Universal Request Method with Transparent Offline-First Cache Fallback & Outbox
    */
   async request(endpoint, options = {}) {
+    const isGet = !options.method || options.method.toUpperCase() === 'GET';
+    const cleanEndpoint = endpoint.split('?')[0];
+
+    // 1. If completely offline and making a GET request, immediately serve cached data
+    if (isGet && !isAppOnline()) {
+      const cached = getOfflineData(endpoint) || getOfflineData(cleanEndpoint);
+      if (cached) {
+        console.log(`[ApiClient] 📡 Offline mode: serving cached data for ${endpoint}`);
+        return cached;
+      }
+    }
+
+    // 2. If offline and making a mutation (POST, PUT, DELETE), queue in Outbox
+    if (!isGet && !isAppOnline()) {
+      console.log(`[ApiClient] 📡 Offline mode: queueing mutation in outbox for ${endpoint}`);
+      const queued = queueOfflineAction({
+        endpoint,
+        method: options.method,
+        body: options.body
+      });
+      return {
+        success: true,
+        offlineQueued: true,
+        actionId: queued?.id,
+        message: 'Saved in offline outbox. Will sync automatically once online.'
+      };
+    }
+
     const url = `${this.getBaseURL()}${endpoint}`;
     const token = this.getToken();
 
@@ -81,13 +117,40 @@ class ApiClient {
         throw err;
       }
 
+      // Automatically cache successful GET requests in local offline store
+      if (isGet && data) {
+        saveOfflineData(endpoint, data);
+        if (cleanEndpoint !== endpoint) {
+          saveOfflineData(cleanEndpoint, data);
+        }
+      }
+
       return data;
     } catch (err) {
-      if (!navigator.onLine) {
-        const netErr = new Error('You are currently offline. Please check your internet connection.');
-        netErr.status = 0;
-        throw netErr;
+      // If network failed (Wi-Fi dropped or server unreachable), fallback to offline cache for GET
+      if (isGet) {
+        const cached = getOfflineData(endpoint) || getOfflineData(cleanEndpoint);
+        if (cached) {
+          console.warn(`[ApiClient] Network fetch failed, falling back to offline cache for ${endpoint}:`, err.message);
+          return cached;
+        }
       }
+
+      // If mutation failed because user went offline mid-flight, queue it
+      if (!isGet && (!isAppOnline() || err.name === 'TypeError')) {
+        const queued = queueOfflineAction({
+          endpoint,
+          method: options.method,
+          body: options.body
+        });
+        return {
+          success: true,
+          offlineQueued: true,
+          actionId: queued?.id,
+          message: 'Network interrupted. Action queued for auto-sync.'
+        };
+      }
+
       throw err;
     }
   }

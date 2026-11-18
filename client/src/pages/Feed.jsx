@@ -37,6 +37,7 @@ import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { postService } from '../services/postService';
 import { networkService } from '../services/networkService';
+import { getOfflineData, saveOfflineData } from '../utils/offlineStorage';
 
 export const Feed = ({ 
   jobs = [],
@@ -58,7 +59,7 @@ export const Feed = ({
   const { user, isEmployer, isSeeker } = useAuth();
   const { startCall, setActiveChatUser } = useSocket();
 
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState(() => getOfflineData('posts', []));
   const [loading, setLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [newContent, setNewContent] = useState('');
@@ -100,13 +101,21 @@ export const Feed = ({
     return { usr_seek_2: true, usr_emp_1: true };
   });
 
-  // Fetch feed posts via PostService
+  // Fetch feed posts via PostService with offline cache persistence
   const fetchPosts = async () => {
     try {
       const postsData = await postService.getPosts();
-      setPosts(postsData || []);
+      if (Array.isArray(postsData) && postsData.length > 0) {
+        setPosts(postsData);
+        saveOfflineData('posts', postsData);
+      } else {
+        const cached = getOfflineData('posts', []);
+        if (cached && cached.length > 0) setPosts(cached);
+      }
     } catch (err) {
-      console.error('Failed to fetch posts:', err);
+      console.warn('Failed to fetch posts online, falling back to offline cache:', err);
+      const cached = getOfflineData('posts', []);
+      if (cached && cached.length > 0) setPosts(cached);
     } finally {
       setLoading(false);
     }
@@ -116,7 +125,7 @@ export const Feed = ({
     fetchPosts();
   }, []);
 
-  // Handle Create Post via PostService
+  // Handle Create Post via PostService (with offline queueing support)
   const handleCreatePost = async (e) => {
     e.preventDefault();
     setPostError('');
@@ -149,7 +158,7 @@ export const Feed = ({
       if (isSeeker) tags.push('#OpenToWork');
       if (selectedTag) tags.push(selectedTag);
 
-      const created = await postService.createPost({
+      const postPayload = {
         authorId: user?.id || 'usr_anonymous',
         authorName: user?.name || (user?.role === 'admin' ? 'System Administrator' : isEmployer ? 'Tech Recruiter' : 'Software Candidate'),
         authorRole: user?.role || 'seeker',
@@ -158,9 +167,21 @@ export const Feed = ({
         content: trimmedContent,
         image: cleanedImage,
         tags
-      });
+      };
 
-      setPosts([created, ...posts]);
+      const created = await postService.createPost(postPayload);
+
+      const optimisticPost = created || {
+        ...postPayload,
+        id: `post_local_${Date.now()}`,
+        likes: 0,
+        likedBy: [],
+        comments: [],
+        createdAt: new Date().toISOString(),
+        isOfflineQueued: true
+      };
+
+      setPosts(prev => [optimisticPost, ...prev]);
       setNewContent('');
       setNewImage('');
       setSelectedTag('');

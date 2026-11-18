@@ -17,7 +17,8 @@ export const jobService = {
 
     const queryString = query.toString();
     const res = await apiClient.get(`/api/jobs${queryString ? `?${queryString}` : ''}`);
-    return res.jobs || [];
+    if (Array.isArray(res)) return res;
+    return res?.jobs || [];
   },
 
   /**

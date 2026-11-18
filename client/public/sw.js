@@ -1,5 +1,6 @@
-// JobScout Enterprise Mobile Service Worker v2.0.0
-const CACHE_NAME = 'jobscout-cache-v2.0.0';
+// JobScout Enterprise Mobile Service Worker v2.2.0 (Offline-First Ready)
+const CACHE_NAME = 'jobscout-cache-v2.2.0';
+const API_CACHE_NAME = 'jobscout-api-cache-v2.2.0';
 
 // Essential offline core shell
 const STATIC_ASSETS = [
@@ -31,7 +32,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((keys) => {
       return Promise.all(
         keys.map((key) => {
-          if (key !== CACHE_NAME) {
+          if (key !== CACHE_NAME && key !== API_CACHE_NAME) {
             console.log('[SW] Purging outdated cache:', key);
             return caches.delete(key);
           }
@@ -49,19 +50,19 @@ self.addEventListener('message', (event) => {
 });
 
 // Fetch Event:
-// 1. /api, /socket.io, /download, /downloads: ALWAYS Network-Only (Never cache dynamic data)
-// 2. Navigation (HTML): Network-First with cache update + offline fallback to index.html
-// 3. Static Assets (/assets, images, icons): Stale-While-Revalidate with automatic cache refresh
+// 1. Read APIs (/api/jobs, /api/auth/seekers, /api/auth/employers, /api/posts, etc.): Stale-While-Revalidate with Offline Cache Fallback
+// 2. Navigation (SPA Pages): Network-First with cache update + Offline Fallback to index.html
+// 3. Static Assets (/assets, images, fonts): Cache-First with Background Update
+// 4. Map Tiles (tile.openstreetmap.org): Stale-While-Revalidate
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Skip non-GET requests
+  // Skip non-GET requests (mutations handled by Client Outbox Sync Engine)
   if (request.method !== 'GET') return;
 
-  // Never intercept API routes, real-time WebSockets, or file download endpoints
+  // Never intercept real-time WebSockets or binary file downloads
   if (
-    url.pathname.startsWith('/api') ||
     url.pathname.startsWith('/socket.io') ||
     url.pathname.startsWith('/download') ||
     url.pathname.startsWith('/downloads') ||
@@ -70,8 +71,74 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 1. Navigation requests (SPA pages): Network-First
-  // Ensures user always gets the freshest index.html with up-to-date JS chunk hashes
+  // 1. Read APIs: Stale-While-Revalidate & Instant Offline Cache Serving
+  if (
+    url.pathname.startsWith('/api/jobs') ||
+    url.pathname.startsWith('/api/auth/seekers') ||
+    url.pathname.startsWith('/api/auth/employers') ||
+    url.pathname.startsWith('/api/posts') ||
+    url.pathname.startsWith('/api/discussions') ||
+    url.pathname.startsWith('/api/auth/me') ||
+    url.pathname.startsWith('/api/health')
+  ) {
+    event.respondWith(
+      caches.open(API_CACHE_NAME).then(async (apiCache) => {
+        const cachedResponse = await apiCache.match(request);
+
+        const fetchPromise = fetch(request)
+          .then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              apiCache.put(request, networkResponse.clone());
+            }
+            return networkResponse;
+          })
+          .catch(async () => {
+            // When network fails (Wi-Fi off), return cached response or fallback JSON
+            if (cachedResponse) {
+              return cachedResponse;
+            }
+            const cleanUrlMatch = await apiCache.match(url.pathname);
+            if (cleanUrlMatch) return cleanUrlMatch;
+
+            return new Response(JSON.stringify({ offline: true, message: 'Offline cache active' }), {
+              status: 200,
+              headers: { 'Content-Type': 'application/json' }
+            });
+          });
+
+        return cachedResponse || fetchPromise;
+      })
+    );
+    return;
+  }
+
+  // 2. Map Tiles (OpenStreetMap & CartoCDN): Cache-First with Network Refresh
+  if (
+    url.hostname.includes('tile.openstreetmap.org') || 
+    url.hostname.includes('openstreetmap') ||
+    url.hostname.includes('cartocdn.com')
+  ) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then(async (cache) => {
+        const cached = await cache.match(request);
+        if (cached) return cached;
+
+        try {
+          const networkResponse = await fetch(request);
+          if (networkResponse && networkResponse.status === 200) {
+            cache.put(request, networkResponse.clone());
+          }
+          return networkResponse;
+        } catch {
+          // Transparent empty 204 response if tile fetch fails while offline
+          return new Response('', { status: 204 });
+        }
+      })
+    );
+    return;
+  }
+
+  // 3. Navigation requests (SPA pages): Network-First with Cache fallback to index.html
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
@@ -85,16 +152,18 @@ self.addEventListener('fetch', (event) => {
         .catch(async () => {
           const cache = await caches.open(CACHE_NAME);
           const cachedIndex = await cache.match('/index.html') || await cache.match('/');
-          return cachedIndex || new Response(
-            '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>JobScout Offline</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="font-family:sans-serif;text-align:center;padding:40px 20px;background:#0f172a;color:#fff;"><h2>📡 Offline Mode</h2><p>Please check your internet connection to continue browsing JobScout.</p><button onclick="location.reload()" style="background:#4f46e5;color:#fff;border:none;padding:12px 24px;border-radius:12px;font-weight:bold;margin-top:16px;cursor:pointer;">Retry</button></body></html>',
-            { status: 503, headers: { 'Content-Type': 'text/html' } }
+          if (cachedIndex) return cachedIndex;
+
+          return new Response(
+            '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>JobScout Offline</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="font-family:sans-serif;text-align:center;padding:40px 20px;background:#0f172a;color:#fff;"><h2>📡 Offline Mode Active</h2><p>Viewing cached JobScout application shell.</p><button onclick="location.reload()" style="background:#4f46e5;color:#fff;border:none;padding:12px 24px;border-radius:12px;font-weight:bold;margin-top:16px;cursor:pointer;">Refresh</button></body></html>',
+            { status: 200, headers: { 'Content-Type': 'text/html' } }
           );
         })
     );
     return;
   }
 
-  // 2. Static Assets (JS, CSS, Images, Fonts): Cache-First with Background Update
+  // 4. Static Assets (JS, CSS, Images, Fonts): Cache-First with Background Revalidation
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
       const fetchPromise = fetch(request)

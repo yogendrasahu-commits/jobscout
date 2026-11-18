@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Briefcase, DollarSign, MapPin, Tag, Sparkles, Check, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { queueOfflineAction } from '../utils/offlineStorage';
 
 export const PostJobModal = ({ isOpen, onClose, onJobCreated, defaultCoords }) => {
   const { user, token } = useAuth();
@@ -60,40 +61,83 @@ export const PostJobModal = ({ isOpen, onClose, onJobCreated, defaultCoords }) =
     setLoading(true);
     setError('');
 
-    try {
-      const res = await fetch('/api/jobs', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          title: trimmedTitle,
-          company: (company && company.trim()) || user?.companyName || user?.name,
-          category,
-          jobType,
-          salary: trimmedSalary,
-          description: description.trim(),
-          skills: skills.split(',').map(s => s.trim()).filter(Boolean),
-          address: trimmedAddress,
-          lat: nLat,
-          lng: nLng,
-          urgent
-        })
-      });
+    const jobPayload = {
+      title: trimmedTitle,
+      company: (company && company.trim()) || user?.companyName || user?.name,
+      category,
+      jobType,
+      salary: trimmedSalary,
+      description: description.trim(),
+      skills: skills.split(',').map(s => s.trim()).filter(Boolean),
+      address: trimmedAddress,
+      lat: nLat,
+      lng: nLng,
+      urgent
+    };
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to post job');
+    try {
+      let createdJob = null;
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        // Queue job posting in Outbox
+        queueOfflineAction({
+          type: 'CREATE_JOB',
+          endpoint: '/api/jobs',
+          method: 'POST',
+          body: jobPayload
+        });
+        createdJob = {
+          ...jobPayload,
+          id: `job_local_${Date.now()}`,
+          createdAt: new Date().toISOString(),
+          isOfflineQueued: true
+        };
+      } else {
+        const res = await fetch('/api/jobs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(jobPayload)
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to post job');
+        createdJob = data.job;
+      }
 
       setTitle('');
       setSalary('');
       setDescription('');
       setSkills('');
       setUrgent(false);
-      if (onJobCreated) onJobCreated(data.job);
+      if (onJobCreated && createdJob) onJobCreated(createdJob);
       onClose();
     } catch (err) {
-      setError(err.message);
+      if (err.message && err.message.toLowerCase().includes('failed to fetch')) {
+        // Offline network error during fetch fallback
+        queueOfflineAction({
+          type: 'CREATE_JOB',
+          endpoint: '/api/jobs',
+          method: 'POST',
+          body: jobPayload
+        });
+        const createdJob = {
+          ...jobPayload,
+          id: `job_local_${Date.now()}`,
+          createdAt: new Date().toISOString(),
+          isOfflineQueued: true
+        };
+        setTitle('');
+        setSalary('');
+        setDescription('');
+        setSkills('');
+        setUrgent(false);
+        if (onJobCreated) onJobCreated(createdJob);
+        onClose();
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }

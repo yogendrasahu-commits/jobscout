@@ -602,7 +602,19 @@ export const UberJobMap = ({
   const [showSearchThisArea, setShowSearchThisArea] = useState(false);
   const [autoMoveRadar, setAutoMoveRadar] = useState(false);
   const [isDraggingBeacon, setIsDraggingBeacon] = useState(false);
+  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
   const searchContainerRef = useRef(null);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   // Zoom In & Zoom Out Handlers
   const handleZoomIn = () => {
@@ -1619,6 +1631,16 @@ export const UberJobMap = ({
         )}
 
       </div>
+
+      {/* Offline Mode Radar Badge */}
+      {!isOnline && (
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-[550] pointer-events-none animate-in fade-in slide-in-from-top duration-300">
+          <div className="bg-slate-900/95 text-amber-300 backdrop-blur-xl px-4 py-1.5 rounded-full border border-amber-500/40 text-xs font-bold flex items-center gap-2 shadow-2xl">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+            <span>📡 Offline Radar • Displaying cached coordinates & pins ({visibleJobs.length} jobs, {visibleSeekers.length} seekers)</span>
+          </div>
+        </div>
+      )}
 
       {/* Map Guidance Tip (Desktop only) */}
       <div className="absolute bottom-4 left-4 z-[500] pointer-events-none hidden lg:block">

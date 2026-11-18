@@ -30,6 +30,13 @@ import { ServerConfigModal } from './components/ServerConfigModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { jobService } from './services/jobService';
 import { userService } from './services/userService';
+import { apiClient } from './services/apiClient';
+import { 
+  getOfflineData, 
+  saveOfflineData, 
+  syncOfflineOutbox, 
+  getOfflineQueue 
+} from './utils/offlineStorage';
 
 function MainApp() {
   const { user, isEmployer } = useAuth();
@@ -55,9 +62,9 @@ function MainApp() {
   const [pendingTabAfterAuth, setPendingTabAfterAuth] = useState(null);
   const [jobsSubTab, setJobsSubTab] = useState('browse'); // 'browse' | 'applied'
 
-  const [jobs, setJobs] = useState([]);
-  const [seekers, setSeekers] = useState([]);
-  const [employers, setEmployers] = useState([]);
+  const [jobs, setJobs] = useState(() => getOfflineData('jobs', []));
+  const [seekers, setSeekers] = useState(() => getOfflineData('seekers', []));
+  const [employers, setEmployers] = useState(() => getOfflineData('employers', []));
   const [loading, setLoading] = useState(true);
 
   // Modals state
@@ -95,13 +102,27 @@ function MainApp() {
   const [isServerConfigOpen, setIsServerConfigOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
   const [showReconnectedToast, setShowReconnectedToast] = useState(false);
+  const [syncStatusMsg, setSyncStatusMsg] = useState('✓ Back online! Real-time sync restored.');
 
-  // Network connection listener (Uber/Slack style offline notice)
+  // Network connection listener & offline Outbox background sync
   useEffect(() => {
-    const handleOnline = () => {
+    const handleOnline = async () => {
       setIsOnline(true);
       setShowReconnectedToast(true);
-      setTimeout(() => setShowReconnectedToast(false), 3500);
+      try {
+        const result = await syncOfflineOutbox(apiClient);
+        if (result && result.synced > 0) {
+          setSyncStatusMsg(`✓ Back online! Auto-synchronized ${result.synced} offline actions.`);
+          fetchJobs();
+          fetchSeekers();
+          fetchEmployers();
+        } else {
+          setSyncStatusMsg('✓ Back online! Real-time sync restored.');
+        }
+      } catch {
+        setSyncStatusMsg('✓ Back online! Real-time sync restored.');
+      }
+      setTimeout(() => setShowReconnectedToast(false), 4000);
     };
     const handleOffline = () => {
       setIsOnline(false);
@@ -208,35 +229,59 @@ function MainApp() {
       });
   };
 
-  // Fetch jobs via JobService
+  // Fetch jobs via JobService with offline cache persistence
   const fetchJobs = async () => {
     try {
       const data = await jobService.getAllJobs(
         user?.lat && user?.lng ? { userLat: user.lat, userLng: user.lng } : {}
       );
-      setJobs(data || []);
+      if (Array.isArray(data) && data.length > 0) {
+        setJobs(data);
+        saveOfflineData('jobs', data);
+      } else {
+        const cached = getOfflineData('jobs', []);
+        if (cached && cached.length > 0) setJobs(cached);
+      }
     } catch (err) {
-      console.error('Failed to fetch jobs:', err);
+      console.warn('Failed to fetch jobs online, falling back to offline cache:', err);
+      const cached = getOfflineData('jobs', []);
+      if (cached && cached.length > 0) setJobs(cached);
     }
   };
 
-  // Fetch seekers via UserService
+  // Fetch seekers via UserService with offline cache persistence
   const fetchSeekers = async () => {
     try {
       const data = await userService.getSeekers();
-      setSeekers(data || []);
+      if (Array.isArray(data) && data.length > 0) {
+        setSeekers(data);
+        saveOfflineData('seekers', data);
+      } else {
+        const cached = getOfflineData('seekers', []);
+        if (cached && cached.length > 0) setSeekers(cached);
+      }
     } catch (err) {
-      console.error('Failed to fetch seekers:', err);
+      console.warn('Failed to fetch seekers online, falling back to offline cache:', err);
+      const cached = getOfflineData('seekers', []);
+      if (cached && cached.length > 0) setSeekers(cached);
     }
   };
 
-  // Fetch employers via UserService
+  // Fetch employers via UserService with offline cache persistence
   const fetchEmployers = async () => {
     try {
       const data = await userService.getEmployers();
-      setEmployers(data || []);
+      if (Array.isArray(data) && data.length > 0) {
+        setEmployers(data);
+        saveOfflineData('employers', data);
+      } else {
+        const cached = getOfflineData('employers', []);
+        if (cached && cached.length > 0) setEmployers(cached);
+      }
     } catch (err) {
-      console.error('Failed to fetch employers:', err);
+      console.warn('Failed to fetch employers online, falling back to offline cache:', err);
+      const cached = getOfflineData('employers', []);
+      if (cached && cached.length > 0) setEmployers(cached);
     }
   };
 
@@ -389,6 +434,12 @@ function MainApp() {
   if (currentTab === 'welcome' && !user) {
     return (
       <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 text-slate-900 flex flex-col font-sans antialiased">
+        {!isOnline && (
+          <div className="bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-slate-950 font-bold py-2 px-4 shadow-md transition-all z-[1200] border-b border-amber-400/40 text-xs text-center flex items-center justify-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-slate-950 animate-ping" />
+            <span>📡 Offline Mode Active • Viewing cached job listings & talent radar</span>
+          </div>
+        )}
         <Welcome
           onNavigateToMap={() => handleNavigateTab('map')}
           onNavigateToJobs={() => handleNavigateTab('jobs')}
@@ -464,22 +515,36 @@ function MainApp() {
   return (
     <div className="min-h-screen w-full max-w-full overflow-x-clip bg-slate-50 text-slate-900 flex flex-col font-sans antialiased">
       
-      {/* Offline / Reconnected Banner */}
+      {/* Luxury Glassmorphic Offline Status Capsule */}
       {!isOnline && (
-        <div className="bg-amber-500 text-slate-900 text-xs font-bold py-2 px-4 text-center flex items-center justify-center gap-2 shadow-sm transition-all z-[1200]">
-          <span className="w-2 h-2 rounded-full bg-slate-900 animate-ping" />
-          <span>Offline mode: Trying to reconnect to JobScout real-time grid...</span>
-          <button
-            onClick={() => setIsServerConfigOpen(true)}
-            className="underline hover:text-white font-extrabold cursor-pointer ml-1"
-          >
-            ⚙️ Server Settings
-          </button>
+        <div className="bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-slate-950 font-medium py-2 px-4 shadow-md transition-all z-[1200] border-b border-amber-400/40">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2 font-bold">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-950 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-slate-950"></span>
+              </span>
+              <span>📡 Offline Mode Active • Viewing cached jobs, candidate radar & local profiles (Actions auto-queue & sync on reconnect)</span>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <button
+                onClick={() => setIsServerConfigOpen(true)}
+                className="px-2.5 py-1 rounded-lg bg-black/15 hover:bg-black/25 text-slate-950 font-extrabold text-[11px] transition-colors border border-black/10 cursor-pointer"
+              >
+                ⚙️ Server Settings
+              </button>
+            </div>
+          </div>
         </div>
       )}
+
+      {/* Luxury Back Online Auto-Sync Toast */}
       {showReconnectedToast && (
-        <div className="bg-emerald-600 text-white text-xs font-bold py-2 px-4 text-center flex items-center justify-center gap-2 shadow-sm transition-all z-[1200] animate-in fade-in duration-300">
-          <span>✓ Back online! Real-time sync restored.</span>
+        <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white font-medium py-2 px-4 shadow-lg transition-all z-[1200] border-b border-emerald-400/40 animate-in fade-in slide-in-from-top duration-300">
+          <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-xs font-bold">
+            <span className="w-2 h-2 rounded-full bg-emerald-200 animate-ping"></span>
+            <span>{syncStatusMsg}</span>
+          </div>
         </div>
       )}
 

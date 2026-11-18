@@ -6,7 +6,9 @@ export const postService = {
    */
   async getPosts() {
     const res = await apiClient.get('/api/posts');
-    return res.posts || [];
+    if (res && Array.isArray(res.posts)) return res.posts;
+    if (Array.isArray(res)) return res;
+    return [];
   },
 
   /**

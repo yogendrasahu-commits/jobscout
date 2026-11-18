@@ -25,6 +25,7 @@ import { triggerConfetti } from '../utils/confetti';
 import { playSuccessChime } from '../utils/soundEffects';
 import { calculateAIMatch } from '../utils/aiMatchEngine';
 import { AIMatchModal } from './AIMatchModal';
+import { queueOfflineAction } from '../utils/offlineStorage';
 
 export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
   const { user, token } = useAuth();
@@ -84,27 +85,42 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
     setError('');
 
     try {
-      const res = await fetch('/api/applications/apply', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          jobId: job.id,
-          coverNote: coverNote.trim()
-        })
-      });
+      let data = null;
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        // Queue application in Outbox
+        queueOfflineAction({
+          type: 'JOB_APPLICATION',
+          endpoint: '/api/applications/apply',
+          method: 'POST',
+          body: {
+            jobId: job.id,
+            coverNote: coverNote.trim()
+          }
+        });
+        data = { success: true, offlineQueued: true };
+      } else {
+        const res = await fetch('/api/applications/apply', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            jobId: job.id,
+            coverNote: coverNote.trim()
+          })
+        });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to submit application');
+        data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to submit application');
+      }
 
       setSuccess(true);
       triggerConfetti();
       playSuccessChime();
       if (onApplied) onApplied(job.id);
 
-      if (data.whatsappUrl || data.telegramUrl) {
+      if (data && (data.whatsappUrl || data.telegramUrl)) {
         setAlertDetails({
           whatsappUrl: data.whatsappUrl,
           telegramUrl: data.telegramUrl
@@ -115,7 +131,24 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
         }, 1800);
       }
     } catch (err) {
-      setError(err.message);
+      if (err.message && err.message.toLowerCase().includes('failed to fetch')) {
+        // Fallback: network disconnected during fetch
+        queueOfflineAction({
+          type: 'JOB_APPLICATION',
+          endpoint: '/api/applications/apply',
+          method: 'POST',
+          body: {
+            jobId: job.id,
+            coverNote: coverNote.trim()
+          }
+        });
+        setSuccess(true);
+        triggerConfetti();
+        if (onApplied) onApplied(job.id);
+        setTimeout(() => onClose(), 1800);
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }

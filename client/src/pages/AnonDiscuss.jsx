@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
+import { getOfflineData, saveOfflineData } from '../utils/offlineStorage';
 
 // Available Community Discussion Channels
 const CHANNELS = [
@@ -60,7 +61,7 @@ export const AnonDiscuss = () => {
   const { user, isEmployer } = useAuth();
   const { socket } = useSocket();
 
-  const [discussions, setDiscussions] = useState([]);
+  const [discussions, setDiscussions] = useState(() => getOfflineData('anonDiscussions', []));
   const [loading, setLoading] = useState(true);
   const [channelFilter, setChannelFilter] = useState('all');
   const [sortMode, setSortMode] = useState('hot'); // 'hot' | 'new' | 'top'
@@ -95,10 +96,21 @@ export const AnonDiscuss = () => {
       const res = await fetch(`/api/anon?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
-        setDiscussions(data.discussions || []);
+        if (Array.isArray(data.discussions) && data.discussions.length > 0) {
+          setDiscussions(data.discussions);
+          saveOfflineData('anonDiscussions', data.discussions);
+        } else {
+          const cached = getOfflineData('anonDiscussions', []);
+          if (cached && cached.length > 0) setDiscussions(cached);
+        }
+      } else {
+        const cached = getOfflineData('anonDiscussions', []);
+        if (cached && cached.length > 0) setDiscussions(cached);
       }
     } catch (err) {
-      console.error('Failed to load anon discussions:', err);
+      console.warn('Failed to load anon discussions online, using cache:', err);
+      const cached = getOfflineData('anonDiscussions', []);
+      if (cached && cached.length > 0) setDiscussions(cached);
     } finally {
       setLoading(false);
     }

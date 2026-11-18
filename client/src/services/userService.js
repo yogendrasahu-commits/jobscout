@@ -6,7 +6,8 @@ export const userService = {
    */
   async getSeekers() {
     const res = await apiClient.get('/api/auth/seekers');
-    return res.seekers || [];
+    if (Array.isArray(res)) return res;
+    return res?.seekers || [];
   },
 
   /**
@@ -14,7 +15,8 @@ export const userService = {
    */
   async getEmployers() {
     const res = await apiClient.get('/api/auth/employers');
-    return res.employers || [];
+    if (Array.isArray(res)) return res;
+    return res?.employers || [];
   },
 
   /**
