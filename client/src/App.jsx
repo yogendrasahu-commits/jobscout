@@ -28,7 +28,6 @@ import { CommandPalette } from './components/CommandPalette';
 import { MobileAppDownloadModal } from './components/MobileAppDownloadModal';
 import { ServerConfigModal } from './components/ServerConfigModal';
 import { AIMockInterviewModal } from './components/AIMockInterviewModal';
-import { DynamicIslandPill } from './components/DynamicIslandPill';
 import { FloatingSpeedDial } from './components/FloatingSpeedDial';
 import { LiveWalkinQueueModal } from './components/LiveWalkinQueueModal';
 import { VideoPitchRecorderModal } from './components/VideoPitchRecorderModal';
@@ -600,24 +599,6 @@ function MainApp() {
         </div>
       )}
 
-      {/* 2026 Floating Dynamic Island Status Capsule */}
-      <DynamicIslandPill
-        activeLocationName={user?.address || 'Bandra Kurla Complex (BKC)'}
-        jobsCount={jobs.length}
-        seekersCount={seekers.length}
-        isOnline={isOnline}
-        currentTab={currentTab}
-        setCurrentTab={handleNavigateTab}
-        theme={theme}
-        onToggleTheme={toggleTheme}
-        onStartMockInterview={(j) => setInterviewJob(j)}
-        onQuickFilterChange={(f) => {
-          setJobsQuickFilter(f);
-          handleNavigateTab('jobs');
-        }}
-        onOpenReels={() => setIsReelsOpen(true)}
-        onOpenSkillBlitz={() => setIsSkillBlitzOpen(true)}
-      />
 
       {/* Top Desktop/Tablet Navbar */}
       <Navbar
