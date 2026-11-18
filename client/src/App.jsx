@@ -30,6 +30,13 @@ import { ServerConfigModal } from './components/ServerConfigModal';
 import { AIMockInterviewModal } from './components/AIMockInterviewModal';
 import { DynamicIslandPill } from './components/DynamicIslandPill';
 import { FloatingSpeedDial } from './components/FloatingSpeedDial';
+import { LiveWalkinQueueModal } from './components/LiveWalkinQueueModal';
+import { VideoPitchRecorderModal } from './components/VideoPitchRecorderModal';
+import { JobReelsModal } from './components/JobReelsModal';
+import { SkillBlitzModal } from './components/SkillBlitzModal';
+import { JobOfferBattleModal } from './components/JobOfferBattleModal';
+import { ReferralBountyModal } from './components/ReferralBountyModal';
+import { CompanyPulseModal } from './components/CompanyPulseModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { THEMES, getThemeById, getNextTheme, applyThemeToDocument } from './utils/theme';
 import { jobService } from './services/jobService';
@@ -137,6 +144,15 @@ function MainApp() {
 
   // AI Voice Mock Interviewer Modal Job Target
   const [interviewJob, setInterviewJob] = useState(null);
+
+  // 2026 Next-Gen Engagement Modals State (Categories A, B, C)
+  const [walkinJob, setWalkinJob] = useState(null);
+  const [isPitchRecorderOpen, setIsPitchRecorderOpen] = useState(false);
+  const [isReelsOpen, setIsReelsOpen] = useState(false);
+  const [isSkillBlitzOpen, setIsSkillBlitzOpen] = useState(false);
+  const [isOfferBattleOpen, setIsOfferBattleOpen] = useState(false);
+  const [bountyJob, setBountyJob] = useState(null);
+  const [pulseCompanyName, setPulseCompanyName] = useState(null);
 
   // Network connection listener & offline Outbox background sync
   useEffect(() => {
@@ -599,6 +615,8 @@ function MainApp() {
           setJobsQuickFilter(f);
           handleNavigateTab('jobs');
         }}
+        onOpenReels={() => setIsReelsOpen(true)}
+        onOpenSkillBlitz={() => setIsSkillBlitzOpen(true)}
       />
 
       {/* Top Desktop/Tablet Navbar */}
@@ -682,6 +700,13 @@ function MainApp() {
             onPostJobAtCoords={handlePostJobAtCoords}
             theme={theme}
             onStartMockInterview={(job) => setInterviewJob(job)}
+            onOpenWalkin={(job) => setWalkinJob(job)}
+            onOpenBounty={(job) => setBountyJob(job)}
+            onOpenPulse={(comp) => setPulseCompanyName(comp)}
+            onOpenOfferBattle={() => setIsOfferBattleOpen(true)}
+            onOpenReels={() => setIsReelsOpen(true)}
+            onOpenSkillBlitz={() => setIsSkillBlitzOpen(true)}
+            onOpenPitchRecorder={() => setIsPitchRecorderOpen(true)}
           />
         )}
 
@@ -705,6 +730,13 @@ function MainApp() {
             onQuickFilterChange={(filter) => setJobsQuickFilter(filter)}
             theme={theme}
             onStartMockInterview={(job) => setInterviewJob(job)}
+            onOpenWalkin={(job) => setWalkinJob(job)}
+            onOpenBounty={(job) => setBountyJob(job)}
+            onOpenPulse={(comp) => setPulseCompanyName(comp)}
+            onOpenOfferBattle={() => setIsOfferBattleOpen(true)}
+            onOpenReels={() => setIsReelsOpen(true)}
+            onOpenSkillBlitz={() => setIsSkillBlitzOpen(true)}
+            onOpenPitchRecorder={() => setIsPitchRecorderOpen(true)}
           />
         )}
 
@@ -869,6 +901,83 @@ function MainApp() {
           handleNavigateTab('jobs');
         }}
         onStartMockInterview={() => setInterviewJob(jobs[0] || null)}
+        onOpenReels={() => setIsReelsOpen(true)}
+        onOpenSkillBlitz={() => setIsSkillBlitzOpen(true)}
+        onOpenOfferBattle={() => setIsOfferBattleOpen(true)}
+        onOpenPitchRecorder={() => setIsPitchRecorderOpen(true)}
+      />
+
+      {/* 2026 Next-Gen Live Walk-in Queue Modal */}
+      <LiveWalkinQueueModal
+        isOpen={Boolean(walkinJob)}
+        onClose={() => setWalkinJob(null)}
+        job={walkinJob}
+        employerName={walkinJob?.company}
+        user={user}
+        onStartVideoCall={({ targetUserId, targetName }) => {
+          setActiveVideoCallUser({ id: targetUserId, name: targetName });
+        }}
+      />
+
+      {/* 2026 Video Pitch Recorder Modal */}
+      <VideoPitchRecorderModal
+        isOpen={isPitchRecorderOpen}
+        onClose={() => setIsPitchRecorderOpen(false)}
+        onSavePitch={(url) => {
+          if (user) {
+            user.videoPitchUrl = url;
+          }
+        }}
+      />
+
+      {/* 2026 Job Reels Modal */}
+      <JobReelsModal
+        isOpen={isReelsOpen}
+        onClose={() => setIsReelsOpen(false)}
+        seekers={seekers}
+        jobs={jobs}
+        onStartVideoCall={({ targetUserId, targetName }) => {
+          setActiveVideoCallUser({ id: targetUserId, name: targetName });
+        }}
+        onOpenChat={(target) => {
+          setActiveChatUser(target);
+          setIsChatDrawerOpen(true);
+        }}
+        onSelectSeeker={(s) => handleOpenProfile(s)}
+      />
+
+      {/* 2026 AI Skill Blitz Modal */}
+      <SkillBlitzModal
+        isOpen={isSkillBlitzOpen}
+        onClose={() => setIsSkillBlitzOpen(false)}
+        user={user}
+        onAwardBadge={(badge) => {
+          if (user) {
+            user.verifiedBadges = [...(user.verifiedBadges || []), badge];
+          }
+        }}
+      />
+
+      {/* 2026 Job Offer Battle Modal */}
+      <JobOfferBattleModal
+        isOpen={isOfferBattleOpen}
+        onClose={() => setIsOfferBattleOpen(false)}
+        jobs={jobs}
+      />
+
+      {/* 2026 Referral Bounty Modal */}
+      <ReferralBountyModal
+        isOpen={Boolean(bountyJob)}
+        onClose={() => setBountyJob(null)}
+        job={bountyJob}
+        user={user}
+      />
+
+      {/* 2026 Company Pulse Modal */}
+      <CompanyPulseModal
+        isOpen={Boolean(pulseCompanyName)}
+        onClose={() => setPulseCompanyName(null)}
+        companyName={pulseCompanyName}
       />
 
     </div>

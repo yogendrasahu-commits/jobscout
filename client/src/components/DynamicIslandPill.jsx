@@ -25,7 +25,9 @@ export const DynamicIslandPill = ({
   theme = 'light',
   onToggleTheme,
   onStartMockInterview,
-  onQuickFilterChange
+  onQuickFilterChange,
+  onOpenReels,
+  onOpenSkillBlitz
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [tickerIndex, setTickerIndex] = useState(0);
@@ -203,6 +205,36 @@ export const DynamicIslandPill = ({
               <Sparkles className="w-3.5 h-3.5 text-amber-300" />
               <span>Voice AI Mock</span>
             </button>
+
+            {/* 30s Reels Shortcut */}
+            {onOpenReels && (
+              <button
+                type="button"
+                onClick={() => {
+                  onOpenReels();
+                  setIsExpanded(false);
+                }}
+                className="py-2 px-3 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-extrabold text-xs flex items-center justify-center gap-1 shadow-md active:scale-95 transition-all cursor-pointer"
+                title="Watch 30-second video elevator pitches"
+              >
+                <span>🎥 Reels</span>
+              </button>
+            )}
+
+            {/* 60s Skill Blitz Shortcut */}
+            {onOpenSkillBlitz && (
+              <button
+                type="button"
+                onClick={() => {
+                  onOpenSkillBlitz();
+                  setIsExpanded(false);
+                }}
+                className="py-2 px-3 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-extrabold text-xs flex items-center justify-center gap-1 shadow-md active:scale-95 transition-all cursor-pointer"
+                title="Take 60-second AI skill blitz quiz"
+              >
+                <span>⚡ Blitz</span>
+              </button>
+            )}
 
             {/* Theme Toggle Shortcut */}
             {onToggleTheme && (() => {

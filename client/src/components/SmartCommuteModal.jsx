@@ -40,6 +40,26 @@ export const SmartCommuteModal = ({
 
   const selectedMode = profile.modes.find((m) => m.id === selectedModeId) || profile.modes[0];
 
+  // Extract gross monthly salary from job.salary
+  const parseMonthlySalary = (salaryStr) => {
+    if (!salaryStr) return 50000;
+    const digits = salaryStr.replace(/[^0-9]/g, '');
+    const num = parseInt(digits, 10);
+    if (!num) return 50000;
+    if (num < 150) {
+      return Math.round((num * 100000) / 12);
+    }
+    if (num > 200000) {
+      return Math.round(num / 12);
+    }
+    return num;
+  };
+
+  const grossMonthlySalary = parseMonthlySalary(job.salary);
+  const transitCost = selectedMode.monthlyCostNum || 0;
+  const netInHand = Math.max(0, grossMonthlySalary - transitCost);
+  const netSavingsPercent = Math.round((netInHand / Math.max(grossMonthlySalary, 1)) * 100);
+
   return (
     <div className="fixed inset-0 z-[1200] flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200">
       <div className="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-200/90 flex flex-col">
@@ -214,6 +234,36 @@ export const SmartCommuteModal = ({
             <div className="p-2.5 rounded-xl bg-white border border-slate-200 text-[11px] text-slate-600 flex items-center justify-between">
               <span>Traffic Sensitivity:</span>
               <span className="font-bold text-slate-800">{selectedMode.trafficSensitivity}</span>
+            </div>
+          </div>
+
+          {/* 2026 Net Take-Home Salary Calculator */}
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-indigo-500/15 border border-emerald-300 dark:border-emerald-700/60 shadow-xs">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300 flex items-center gap-1">
+                <span>💡 Net Take-Home In-Hand</span>
+                <span className="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-full font-bold">
+                  {netSavingsPercent}% Retained
+                </span>
+              </span>
+              <span className="text-xs font-black text-emerald-700">
+                ₹{netInHand.toLocaleString('en-IN')} / mo
+              </span>
+            </div>
+
+            <div className="text-[11px] text-slate-600 dark:text-slate-300 space-y-1">
+              <div className="flex justify-between">
+                <span>Gross Monthly Salary:</span>
+                <span className="font-mono font-bold text-slate-900">₹{grossMonthlySalary.toLocaleString('en-IN')}</span>
+              </div>
+              <div className="flex justify-between text-rose-600">
+                <span>- Monthly {selectedMode.name} Transit:</span>
+                <span className="font-mono font-bold">-₹{transitCost.toLocaleString('en-IN')}</span>
+              </div>
+              <div className="flex justify-between pt-1 border-t border-emerald-200/60 font-bold text-slate-900">
+                <span>Annual Net In-Hand Savings:</span>
+                <span className="text-emerald-700 font-mono">₹{(netInHand * 12).toLocaleString('en-IN')} / yr</span>
+              </div>
             </div>
           </div>
 

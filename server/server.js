@@ -68,10 +68,10 @@ app.use(securityHeaders);
 // Performance & Request observability logger
 app.use(requestLogger);
 
-// Global API rate limiter (600 requests per 15 minutes per IP)
+// Global API rate limiter (2500 requests per 15 minutes per IP for high-throughput concurrency)
 app.use('/api', rateLimiter({
   windowMs: 15 * 60 * 1000,
-  max: 600,
+  max: 2500,
   message: 'Too many requests to JobScout API. Please wait a moment before trying again.'
 }));
 

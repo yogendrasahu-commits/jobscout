@@ -44,7 +44,13 @@ export const JobsList = ({
   initialQuickFilter = 'all',
   onQuickFilterChange,
   theme = 'light',
-  onStartMockInterview
+  onStartMockInterview,
+  onOpenWalkin,
+  onOpenBounty,
+  onOpenPulse,
+  onOpenOfferBattle,
+  onOpenReels,
+  onOpenSkillBlitz
 }) => {
   const { user, token, isEmployer } = useAuth();
   const userSkills = (user?.skills || []).map(s => String(s).toLowerCase().trim());
@@ -478,6 +484,41 @@ export const JobsList = ({
                   </select>
                 </div>
               </div>
+
+              {/* 2026 Next-Gen Tools Launch Bar */}
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-2.5 mt-1 border-t border-slate-100 dark:border-white/10">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 shrink-0">Scout Tools:</span>
+                {onOpenReels && (
+                  <button
+                    type="button"
+                    onClick={onOpenReels}
+                    className="px-2.5 py-1 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-[11px] font-extrabold flex items-center gap-1 active:scale-95 transition-all shrink-0 cursor-pointer"
+                  >
+                    <span>🎥</span>
+                    <span>30s Reels</span>
+                  </button>
+                )}
+                {onOpenSkillBlitz && (
+                  <button
+                    type="button"
+                    onClick={onOpenSkillBlitz}
+                    className="px-2.5 py-1 rounded-xl bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-[11px] font-extrabold flex items-center gap-1 active:scale-95 transition-all shrink-0 cursor-pointer"
+                  >
+                    <span>⚡</span>
+                    <span>Skill Blitz</span>
+                  </button>
+                )}
+                {onOpenOfferBattle && (
+                  <button
+                    type="button"
+                    onClick={onOpenOfferBattle}
+                    className="px-2.5 py-1 rounded-xl bg-violet-50 hover:bg-violet-100 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800 text-[11px] font-extrabold flex items-center gap-1 active:scale-95 transition-all shrink-0 cursor-pointer"
+                  >
+                    <span>⚔️</span>
+                    <span>Offer Battle</span>
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Active Filters Summary */}
@@ -648,6 +689,51 @@ export const JobsList = ({
                             >
                               <span>🎙️</span>
                               <span>Mock AI</span>
+                            </button>
+                          )}
+
+                          {onOpenWalkin && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onOpenWalkin(job);
+                              }}
+                              className="flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 px-2 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800 transition-colors shadow-2xs cursor-pointer"
+                              title="Join live virtual walk-in interview queue"
+                            >
+                              <span>⚡</span>
+                              <span>Walk-in</span>
+                            </button>
+                          )}
+
+                          {onOpenBounty && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onOpenBounty(job);
+                              }}
+                              className="flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-300 px-2 py-1 rounded-xl border border-amber-200 dark:border-amber-800 transition-colors shadow-2xs cursor-pointer"
+                              title="Refer a friend & earn cash bounty"
+                            >
+                              <span>🎁</span>
+                              <span>Refer ₹5k</span>
+                            </button>
+                          )}
+
+                          {onOpenPulse && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onOpenPulse(job.company);
+                              }}
+                              className="flex items-center gap-1 text-[10px] font-bold text-cyan-700 bg-cyan-50 hover:bg-cyan-100 dark:bg-cyan-950/40 dark:text-cyan-300 px-2 py-1 rounded-xl border border-cyan-200 dark:border-cyan-800 transition-colors shadow-2xs cursor-pointer"
+                              title="View authentic workplace pulse & interview tips"
+                            >
+                              <span>🏢</span>
+                              <span>Pulse</span>
                             </button>
                           )}
                         </div>

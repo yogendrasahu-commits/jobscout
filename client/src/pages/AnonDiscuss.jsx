@@ -29,6 +29,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { getOfflineData, saveOfflineData } from '../utils/offlineStorage';
+import { CompanyPulseModal } from '../components/CompanyPulseModal';
 
 // Available Community Discussion Channels
 const CHANNELS = [
@@ -72,6 +73,7 @@ export const AnonDiscuss = () => {
 
   // New post modal state
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+  const [isPulseModalOpen, setIsPulseModalOpen] = useState(false);
   const [postTitle, setPostTitle] = useState('');
   const [postContent, setPostContent] = useState('');
   const [postChannel, setPostChannel] = useState('SalaryTalk');
@@ -434,6 +436,16 @@ export const AnonDiscuss = () => {
                   <Dice5 className="w-3.5 h-3.5" />
                 </button>
               </div>
+
+              <button
+                type="button"
+                onClick={() => setIsPulseModalOpen(true)}
+                className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30 font-bold text-xs transition-all active:scale-95 whitespace-nowrap cursor-pointer"
+                title="Explore authentic insider company ratings, green & red flags"
+              >
+                <Building2 className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                <span>Workplace Pulse</span>
+              </button>
 
               <button
                 onClick={() => setIsPostModalOpen(true)}
@@ -1021,6 +1033,12 @@ export const AnonDiscuss = () => {
           </div>
         </div>
       )}
+
+      {/* 2026 Company Blind & Workplace Pulse Modal */}
+      <CompanyPulseModal
+        isOpen={isPulseModalOpen}
+        onClose={() => setIsPulseModalOpen(false)}
+      />
 
     </div>
   );

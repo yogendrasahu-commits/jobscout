@@ -46,6 +46,7 @@ import {
   Minus,
   ArrowLeft,
   Zap,
+  Flame,
   Clock,
   ArrowRight,
   ExternalLink
@@ -581,6 +582,7 @@ export const UberJobMap = ({
   const [fitBoundsTrigger, setFitBoundsTrigger] = useState(0);
   const [showJobsLayer, setShowJobsLayer] = useState(true);
   const [showSeekersLayer, setShowSeekersLayer] = useState(true);
+  const [showHiringHeatmap, setShowHiringHeatmap] = useState(false);
   const [mapTheme, setMapTheme] = useState(() => (theme === 'dark' ? 'dark' : 'voyager')); // 'voyager' | 'dark'
 
   // Sync external theme changes
@@ -1238,6 +1240,20 @@ export const UberJobMap = ({
           >
             <Layers className="w-4 h-4 text-indigo-600" />
             <span className="text-xs font-bold hidden md:inline">{mapTheme === 'voyager' ? 'Satellite' : 'Streets'}</span>
+          </button>
+
+          {/* 2026 Live Hiring Surge Heatmap Toggle */}
+          <button
+            onClick={() => setShowHiringHeatmap(!showHiringHeatmap)}
+            title="Toggle Live Hiring Surge Heatmap"
+            className={`flex-shrink-0 px-2.5 py-2.5 sm:py-2 backdrop-blur-2xl rounded-2xl shadow-lg border transition-all flex items-center gap-1.5 active:scale-95 ${
+              showHiringHeatmap
+                ? 'bg-gradient-to-r from-rose-600 to-amber-500 text-white border-rose-400 shadow-rose-500/20'
+                : 'bg-white/95 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200/90 dark:border-slate-700 hover:bg-slate-50'
+            }`}
+          >
+            <Flame className={`w-4 h-4 ${showHiringHeatmap ? 'fill-white text-white' : 'text-rose-500 fill-rose-500'}`} />
+            <span className="text-xs font-bold hidden md:inline">Heatmap</span>
           </button>
 
           {/* Mobile & Desktop Filter Sheet Trigger Button */}
@@ -2277,6 +2293,44 @@ export const UberJobMap = ({
             dashArray: '3, 6'
           }}
         />
+
+        {/* 2026 Live Hiring Surge Heatmap Density Rings */}
+        {showHiringHeatmap && (
+          <>
+            {[
+              { name: 'BKC Hub, Mumbai', lat: 19.066, lng: 72.868, radius: 2600, color: '#f43f5e' },
+              { name: 'Andheri MIDC, Mumbai', lat: 19.119, lng: 72.869, radius: 2800, color: '#f59e0b' },
+              { name: 'Koramangala, Bengaluru', lat: 12.935, lng: 77.624, radius: 3200, color: '#f43f5e' },
+              { name: 'Whitefield, Bengaluru', lat: 12.969, lng: 77.750, radius: 3500, color: '#ec4899' },
+              { name: 'Cyber City, Gurugram', lat: 28.495, lng: 77.089, radius: 3000, color: '#f43f5e' },
+              { name: 'Hinjewadi, Pune', lat: 18.591, lng: 73.738, radius: 3200, color: '#8b5cf6' },
+              { name: 'Hitec City, Hyderabad', lat: 17.443, lng: 78.377, radius: 3400, color: '#f43f5e' }
+            ].map((zone) => (
+              <React.Fragment key={zone.name}>
+                <Circle
+                  center={[zone.lat, zone.lng]}
+                  radius={zone.radius}
+                  pathOptions={{
+                    color: zone.color,
+                    fillColor: zone.color,
+                    fillOpacity: 0.22,
+                    weight: 0
+                  }}
+                />
+                <Circle
+                  center={[zone.lat, zone.lng]}
+                  radius={zone.radius * 0.45}
+                  pathOptions={{
+                    color: '#ffffff',
+                    fillColor: zone.color,
+                    fillOpacity: 0.45,
+                    weight: 1.5
+                  }}
+                />
+              </React.Fragment>
+            ))}
+          </>
+        )}
 
         {/* Live Commute Route Polyline (Uber / Cyberpunk Navigation Beam) */}
         {routePolyline.length > 0 && (

@@ -6,7 +6,10 @@ import {
   Plus, 
   X, 
   Palette,
-  Briefcase 
+  Briefcase,
+  Video,
+  Swords,
+  Award
 } from 'lucide-react';
 import { getThemeById, getNextTheme } from '../utils/theme';
 
@@ -16,7 +19,10 @@ export const FloatingSpeedDial = ({
   onToggleTheme,
   theme = 'light',
   onInstantShift,
-  onStartMockInterview
+  onStartMockInterview,
+  onOpenReels,
+  onOpenSkillBlitz,
+  onOpenOfferBattle
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
@@ -76,6 +82,57 @@ export const FloatingSpeedDial = ({
               <Mic className="w-3.5 h-3.5" />
             </div>
           </button>
+
+          {/* Action 2B: 30s Job Reels */}
+          {onOpenReels && (
+            <button
+              type="button"
+              onClick={() => {
+                onOpenReels();
+                setIsOpen(false);
+              }}
+              className="flex items-center gap-2 pl-3.5 pr-2.5 py-1.5 rounded-full bg-slate-900/90 text-white backdrop-blur-xl border border-rose-500/50 shadow-xl active:scale-95 transition-transform"
+            >
+              <span className="text-[11px] font-black text-rose-300">🎥 30s Job Reels</span>
+              <div className="w-7 h-7 rounded-full bg-rose-600 text-white flex items-center justify-center font-bold">
+                <Video className="w-3.5 h-3.5" />
+              </div>
+            </button>
+          )}
+
+          {/* Action 2C: 60s AI Skill Blitz */}
+          {onOpenSkillBlitz && (
+            <button
+              type="button"
+              onClick={() => {
+                onOpenSkillBlitz();
+                setIsOpen(false);
+              }}
+              className="flex items-center gap-2 pl-3.5 pr-2.5 py-1.5 rounded-full bg-slate-900/90 text-white backdrop-blur-xl border border-amber-500/50 shadow-xl active:scale-95 transition-transform"
+            >
+              <span className="text-[11px] font-black text-amber-300">⚡ 60s Skill Blitz</span>
+              <div className="w-7 h-7 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-bold">
+                <Award className="w-3.5 h-3.5" />
+              </div>
+            </button>
+          )}
+
+          {/* Action 2D: Job Offer Battle */}
+          {onOpenOfferBattle && (
+            <button
+              type="button"
+              onClick={() => {
+                onOpenOfferBattle();
+                setIsOpen(false);
+              }}
+              className="flex items-center gap-2 pl-3.5 pr-2.5 py-1.5 rounded-full bg-slate-900/90 text-white backdrop-blur-xl border border-indigo-500/50 shadow-xl active:scale-95 transition-transform"
+            >
+              <span className="text-[11px] font-black text-indigo-300">⚔️ Offer Battle Matrix</span>
+              <div className="w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">
+                <Swords className="w-3.5 h-3.5" />
+              </div>
+            </button>
+          )}
 
           {/* Action 3: 4-Theme Engine Palette Switcher */}
           {onToggleTheme && (() => {
