@@ -380,56 +380,60 @@ export const Navbar = ({
 
             {/* Quick Live Search Bar (Desktop / Laptop >= md) */}
             <div className="hidden md:flex items-center gap-1 flex-shrink-0 relative" ref={searchRef}>
-              <form onSubmit={handleSearchSubmit} className="relative group">
-                <Search className="w-3.5 h-3.5 text-indigo-500 group-focus-within:text-indigo-600 absolute left-3 top-2.5 transition-colors" />
+              <form onSubmit={handleSearchSubmit} className="relative group flex items-center">
+                <Search className="w-3.5 h-3.5 text-indigo-500 group-focus-within:text-indigo-600 absolute left-3 top-2.5 transition-colors pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search jobs..."
+                  placeholder="Search jobs, talent..."
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
                     setSearchFocused(true);
                   }}
                   onFocus={() => setSearchFocused(true)}
-                  className="w-24 md:w-28 lg:w-32 xl:w-44 2xl:w-52 bg-slate-100/70 hover:bg-slate-100 dark:bg-slate-900/70 dark:hover:bg-slate-900 border border-slate-200/70 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700 rounded-full pl-8 pr-7 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-all"
+                  className="w-28 md:w-36 lg:w-44 xl:w-52 2xl:w-60 bg-slate-100/70 hover:bg-slate-100 dark:bg-slate-900/70 dark:hover:bg-slate-900 border border-slate-200/70 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700 rounded-full pl-8 pr-16 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-all"
                   title="Search Jobs, Companies, Candidates"
                 />
-                {searchQuery ? (
+
+                {/* Right controls inside search bar */}
+                <div className="absolute right-2 flex items-center gap-1">
+                  {searchQuery ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery('');
+                        setSearchFocused(false);
+                      }}
+                      className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-full cursor-pointer"
+                      title="Clear search"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  ) : (
+                    <kbd 
+                      onClick={onOpenCommandPalette}
+                      className="hidden 2xl:inline-flex items-center gap-0.5 px-1 py-0.5 text-[9px] font-black text-slate-400 bg-slate-200/60 dark:bg-slate-800 border border-slate-300/60 dark:border-slate-700 rounded-md cursor-pointer hover:bg-slate-300/80 transition-colors"
+                      title="Press Ctrl+K for Global Spotlight Search"
+                    >
+                      Ctrl K
+                    </kbd>
+                  )}
+
+                  {/* Mic integrated INSIDE the search bar */}
                   <button
                     type="button"
-                    onClick={() => {
-                      setSearchQuery('');
-                      setSearchFocused(false);
-                    }}
-                    className="absolute right-2 top-2 p-0.5 text-slate-400 hover:text-slate-700 rounded-full"
-                    title="Clear search"
+                    onClick={handleVoiceSearch}
+                    className={`p-1 rounded-full transition-all cursor-pointer ${
+                      isListening
+                        ? 'bg-rose-500 text-white border border-rose-400 ring-2 ring-rose-400/40 animate-pulse'
+                        : 'text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-200/60 dark:hover:bg-slate-800'
+                    }`}
+                    title={isListening ? 'Listening... Speak now' : 'Voice Search (बोलकर खोजें)'}
                   >
-                    <X className="w-3 h-3" />
+                    <Mic className="w-3.5 h-3.5" />
                   </button>
-                ) : (
-                  <kbd 
-                    onClick={onOpenCommandPalette}
-                    className="hidden xl:inline-flex items-center gap-0.5 absolute right-2.5 top-2 px-1.5 py-0.5 text-[9px] font-black text-slate-400 bg-slate-200/60 border border-slate-300/60 rounded-md cursor-pointer hover:bg-slate-300/80 transition-colors"
-                    title="Press Ctrl+K for Global Spotlight Search"
-                  >
-                    Ctrl K
-                  </kbd>
-                )}
+                </div>
               </form>
-
-              {/* Instant Voice Search Button (Desktop) - Catchy & Colorful */}
-              <button
-                type="button"
-                onClick={handleVoiceSearch}
-                className={`p-1.5 rounded-full border transition-all ${
-                  isListening
-                    ? 'bg-rose-500 text-white border-rose-400 ring-2 ring-rose-400/40 animate-pulse'
-                    : 'bg-gradient-to-r from-violet-50 to-indigo-50 hover:from-indigo-600 hover:to-violet-600 border-indigo-200/80 text-indigo-600 hover:text-white shadow-2xs hover:scale-105 active:scale-95'
-                }`}
-                title={isListening ? 'Listening... Speak now' : 'Voice Search (बोलकर खोजें)'}
-              >
-                <Mic className="w-3.5 h-3.5" />
-              </button>
 
               {/* Live Search Suggestions & Results Dropdown */}
               {searchFocused && (
@@ -611,7 +615,7 @@ export const Navbar = ({
                 title={`Professional Network (${seekersCount + employersCount})`}
               >
                 <NavNetworkIcon active={currentTab === 'network'} className="w-4 h-4 flex-shrink-0" />
-                <span className="font-bold tracking-tight hidden xl:inline">Network</span>
+                <span className="font-bold tracking-tight">Network</span>
               </button>
 
               {/* 3. Live Map */}
@@ -660,7 +664,7 @@ export const Navbar = ({
                   title="Speed Connect Hub (Audio & Video Calls)"
                 >
                   <NavConnectIcon active={currentTab === 'connect'} className="w-4 h-4 flex-shrink-0" />
-                  <span className="font-bold tracking-tight hidden xl:inline">Speed Connect</span>
+                  <span className="font-bold tracking-tight">Speed Connect</span>
                 </button>
               )}
 
@@ -678,7 +682,7 @@ export const Navbar = ({
                   <NavAnonIcon active={currentTab === 'anon'} className="w-4 h-4 flex-shrink-0" />
                   <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" />
                 </div>
-                <span className="font-bold tracking-tight hidden 2xl:inline">Anon Talk</span>
+                <span className="font-bold tracking-tight">Anon Talk</span>
               </button>
 
               {/* 7. Full-Page Messaging */}
@@ -701,7 +705,7 @@ export const Navbar = ({
                   <NavMessagesIcon active={currentTab === 'messages'} className="w-4 h-4 flex-shrink-0" />
                   <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
                 </div>
-                <span className="font-bold tracking-tight hidden 2xl:inline">Chat</span>
+                <span className="font-bold tracking-tight">Chat</span>
               </button>
 
               {/* 8. Admin Portal (Exclusive to Admin Role) */}
