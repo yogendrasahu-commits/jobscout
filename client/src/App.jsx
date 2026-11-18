@@ -31,6 +31,7 @@ import { AIMockInterviewModal } from './components/AIMockInterviewModal';
 import { DynamicIslandPill } from './components/DynamicIslandPill';
 import { FloatingSpeedDial } from './components/FloatingSpeedDial';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { THEMES, getThemeById, getNextTheme, applyThemeToDocument } from './utils/theme';
 import { jobService } from './services/jobService';
 import { userService } from './services/userService';
 import { apiClient } from './services/apiClient';
@@ -107,31 +108,31 @@ function MainApp() {
   const [showReconnectedToast, setShowReconnectedToast] = useState(false);
   const [syncStatusMsg, setSyncStatusMsg] = useState('✓ Back online! Real-time sync restored.');
 
-  // Persistent OLED Midnight Dark Mode State
+  // Persistent 2026 Multi-Aesthetic Theme Engine (Obsidian, Emerald, Ceramic, Sunset)
   const [theme, setTheme] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('jobscout_theme');
       if (saved) return saved;
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        return 'dark';
+        return 'obsidian';
       }
     }
-    return 'light';
+    return 'obsidian';
   });
 
   useEffect(() => {
-    if (typeof document !== 'undefined') {
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
+    applyThemeToDocument(theme);
+    if (typeof window !== 'undefined') {
       localStorage.setItem('jobscout_theme', theme);
     }
   }, [theme]);
 
-  const toggleTheme = () => {
-    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+  const toggleTheme = (targetTheme) => {
+    if (targetTheme && typeof targetTheme === 'string') {
+      setTheme(targetTheme);
+    } else {
+      setTheme(prev => getNextTheme(prev));
+    }
   };
 
   // AI Voice Mock Interviewer Modal Job Target

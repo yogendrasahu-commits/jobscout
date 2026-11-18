@@ -46,8 +46,10 @@ import {
   Menu,
   X,
   Sun,
-  Moon
+  Moon,
+  Palette
 } from 'lucide-react';
+import { getThemeById, getNextTheme } from '../utils/theme';
 import { JobScoutLogo } from '../components/JobScoutLogo';
 import { useAuth } from '../context/AuthContext';
 import { MobileAppDownloadModal } from '../components/MobileAppDownloadModal';
@@ -530,18 +532,24 @@ export const Welcome = ({
                   <span>Mobile App</span>
                 </button>
 
-                {/* Dark / Light Mode Switch */}
-                {onToggleTheme && (
-                  <button
-                    type="button"
-                    onClick={onToggleTheme}
-                    title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                    className="p-2 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-amber-300 border border-slate-200 dark:border-slate-700 transition-all active:scale-95 cursor-pointer shrink-0"
-                    aria-label="Toggle Theme"
-                  >
-                    {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
-                  </button>
-                )}
+                {/* 2026 Theme Switcher */}
+                {onToggleTheme && (() => {
+                  const currentThemeInfo = getThemeById(theme);
+                  const nextThemeId = getNextTheme(theme);
+                  const nextThemeInfo = getThemeById(nextThemeId);
+                  return (
+                    <button
+                      type="button"
+                      onClick={onToggleTheme}
+                      title={`Active: ${currentThemeInfo.name} • Switch to ${nextThemeInfo.name}`}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-all active:scale-95 cursor-pointer shrink-0"
+                      aria-label="Toggle Theme"
+                    >
+                      <span className="text-sm">{currentThemeInfo.icon}</span>
+                      <span className="hidden sm:inline text-xs font-bold">{currentThemeInfo.label}</span>
+                    </button>
+                  );
+                })()}
 
                 <button
                   onClick={() => onOpenLogin ? onOpenLogin() : (window.location.hash = '#/admin')}

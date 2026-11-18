@@ -22,13 +22,16 @@ export const MobileBottomNav = ({
   const { incomingMessage } = useSocket();
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[800] bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border-t border-slate-200/90 dark:border-slate-800/90 py-1.5 pb-[max(0.6rem,env(safe-area-inset-bottom,0px))] px-2 shadow-[0_-4px_25px_rgba(0,0,0,0.06)] dark:shadow-[0_-4px_25px_rgba(0,0,0,0.5)] select-none transition-colors duration-200">
+    <nav className="md:hidden fixed bottom-2.5 sm:bottom-3 left-3 right-3 sm:left-4 sm:right-4 max-w-lg mx-auto z-[800] rounded-3xl floating-glass-dock py-1.5 pb-[max(0.6rem,calc(env(safe-area-inset-bottom,0px)+0.2rem))] px-2 shadow-[0_12px_40px_rgba(0,0,0,0.18)] dark:shadow-[0_16px_45px_rgba(0,0,0,0.7)] select-none transition-all duration-300">
       <div className="grid grid-cols-5 items-center w-full max-w-md mx-auto">
         
         {/* 1. Feed (Home) */}
         <button
-          onClick={() => setCurrentTab('feed')}
-          className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all ${
+          onClick={() => {
+            if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(10);
+            setCurrentTab('feed');
+          }}
+          className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-2xl transition-all ${
             currentTab === 'feed' || currentTab === 'welcome'
               ? 'text-indigo-600 dark:text-indigo-400 font-extrabold scale-105'
               : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
@@ -39,14 +42,17 @@ export const MobileBottomNav = ({
           </div>
           <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'feed' || currentTab === 'welcome' ? 'text-indigo-600 dark:text-indigo-400 font-extrabold' : 'text-slate-600 dark:text-slate-400'}`}>Feed</span>
           {(currentTab === 'feed' || currentTab === 'welcome') && (
-            <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
+            <span className="w-4 h-1 rounded-full bg-gradient-to-r from-indigo-500 via-cyan-400 to-indigo-500 mt-0.5 shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
           )}
         </button>
 
         {/* 2. Jobs */}
         <button
-          onClick={() => setCurrentTab('jobs')}
-          className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all relative ${
+          onClick={() => {
+            if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(10);
+            setCurrentTab('jobs');
+          }}
+          className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-2xl transition-all relative ${
             currentTab === 'jobs'
               ? 'text-indigo-600 dark:text-indigo-400 font-extrabold scale-105'
               : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
@@ -62,24 +68,27 @@ export const MobileBottomNav = ({
           </div>
           <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'jobs' ? 'text-indigo-600 dark:text-indigo-400 font-extrabold' : 'text-slate-600 dark:text-slate-400'}`}>Jobs</span>
           {currentTab === 'jobs' && (
-            <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
+            <span className="w-4 h-1 rounded-full bg-gradient-to-r from-indigo-500 via-cyan-400 to-indigo-500 mt-0.5 shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
           )}
         </button>
 
         {/* 3. Center Elevated JobScout Radar Button (Map) */}
         <div className="col-span-1 flex flex-col items-center justify-center relative">
           <button
-            onClick={() => setCurrentTab('map')}
-            className="relative -top-3.5 flex flex-col items-center group active:scale-95 transition-transform"
+            onClick={() => {
+              if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate([10, 30, 15]);
+              setCurrentTab('map');
+            }}
+            className="relative -top-4 flex flex-col items-center group active:scale-95 transition-transform cursor-pointer"
           >
             {/* Ambient Aura Halo */}
             <div className={`absolute -inset-1 rounded-2xl bg-gradient-to-tr from-indigo-500 via-cyan-400 to-violet-500 blur-md transition-opacity duration-300 ${
-              currentTab === 'map' ? 'opacity-70' : 'opacity-25 group-hover:opacity-50'
+              currentTab === 'map' ? 'opacity-85 scale-105' : 'opacity-25 group-hover:opacity-50'
             }`} />
 
             <div className={`relative flex items-center justify-center w-12 h-12 rounded-2xl transition-all ${
               currentTab === 'map'
-                ? 'bg-white dark:bg-slate-900 border border-indigo-500/50 shadow-[0_4px_20px_rgba(99,102,241,0.25)] ring-2 ring-indigo-500/30 scale-105'
+                ? 'bg-white dark:bg-slate-900 border border-indigo-500/50 shadow-[0_4px_25px_rgba(99,102,241,0.35)] ring-2 ring-indigo-500/30 scale-105'
                 : 'bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 ring-1 ring-slate-100 dark:ring-slate-800 shadow-sm group-hover:border-indigo-400/40'
             }`}>
               <JobScoutLogo size={38} withBadge={false} animated={currentTab === 'map'} />
@@ -104,8 +113,11 @@ export const MobileBottomNav = ({
         {/* 4. Speed Connect Hub (or Network for admin) */}
         {user?.role === 'admin' ? (
           <button
-            onClick={() => setCurrentTab('network')}
-            className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all ${
+            onClick={() => {
+              if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(10);
+              setCurrentTab('network');
+            }}
+            className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-2xl transition-all ${
               currentTab === 'network'
                 ? 'text-indigo-600 dark:text-indigo-400 font-extrabold scale-105'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
@@ -118,13 +130,16 @@ export const MobileBottomNav = ({
               Network
             </span>
             {currentTab === 'network' && (
-              <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
+              <span className="w-4 h-1 rounded-full bg-gradient-to-r from-indigo-500 via-cyan-400 to-indigo-500 mt-0.5 shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
             )}
           </button>
         ) : (
           <button
-            onClick={() => setCurrentTab('connect')}
-            className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all relative ${
+            onClick={() => {
+              if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(10);
+              setCurrentTab('connect');
+            }}
+            className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-2xl transition-all relative ${
               currentTab === 'connect'
                 ? 'text-indigo-600 dark:text-indigo-400 font-extrabold scale-105'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
@@ -137,7 +152,7 @@ export const MobileBottomNav = ({
               Speed Connect
             </span>
             {currentTab === 'connect' && (
-              <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
+              <span className="w-4 h-1 rounded-full bg-gradient-to-r from-indigo-500 via-cyan-400 to-indigo-500 mt-0.5 shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
             )}
           </button>
         )}
@@ -145,8 +160,11 @@ export const MobileBottomNav = ({
         {/* 5. Messages or Master Admin Portal */}
         {user?.role === 'admin' ? (
           <button
-            onClick={() => setCurrentTab('admin')}
-            className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all relative ${
+            onClick={() => {
+              if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(10);
+              setCurrentTab('admin');
+            }}
+            className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-2xl transition-all relative ${
               currentTab === 'admin'
                 ? 'text-rose-600 dark:text-rose-400 font-extrabold scale-105'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
@@ -160,19 +178,20 @@ export const MobileBottomNav = ({
               <span className={`text-[10px] tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'admin' ? 'text-rose-600 dark:text-rose-400 font-extrabold' : 'text-slate-600 dark:text-slate-400'}`}>Admin</span>
             </div>
             {currentTab === 'admin' && (
-              <span className="w-1.5 h-1 rounded-full bg-rose-500 mt-0.5 shadow-xs" />
+              <span className="w-4 h-1 rounded-full bg-rose-500 mt-0.5 shadow-[0_0_8px_rgba(244,63,94,0.6)]" />
             )}
           </button>
         ) : (
           <button
             onClick={() => {
+              if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(10);
               if (!user) {
                 onOpenAuth ? onOpenAuth() : setCurrentTab('messages');
               } else {
                 setCurrentTab('messages');
               }
             }}
-            className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all relative ${
+            className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-2xl transition-all relative ${
               currentTab === 'messages'
                 ? 'text-indigo-600 dark:text-indigo-400 font-extrabold scale-105'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
@@ -186,7 +205,7 @@ export const MobileBottomNav = ({
               Chat
             </span>
             {currentTab === 'messages' && (
-              <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
+              <span className="w-4 h-1 rounded-full bg-gradient-to-r from-indigo-500 via-cyan-400 to-indigo-500 mt-0.5 shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
             )}
           </button>
         )}

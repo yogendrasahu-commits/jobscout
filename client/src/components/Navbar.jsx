@@ -33,8 +33,10 @@ import {
   ShieldCheck,
   LogIn,
   Sun,
-  Moon
+  Moon,
+  Palette
 } from 'lucide-react';
+import { THEMES, getThemeById, getNextTheme } from '../utils/theme';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { startVoiceRecognition, isVoiceRecognitionSupported } from '../utils/voiceSearch';
@@ -903,22 +905,26 @@ export const Navbar = ({
               )}
             </div>
 
-            {/* Universal OLED Midnight Dark Mode Toggle Button */}
-            {onToggleTheme && (
-              <button
-                type="button"
-                onClick={onToggleTheme}
-                title={theme === 'dark' ? 'Switch to Clean Light Mode' : 'Switch to Universal OLED Midnight Dark Mode'}
-                className="relative p-2 rounded-full bg-slate-100/90 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-amber-300 transition-all shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:scale-105 active:scale-95 flex-shrink-0 cursor-pointer"
-                aria-label="Toggle Theme"
-              >
-                {theme === 'dark' ? (
-                  <Sun className="w-4 h-4 text-amber-400" />
-                ) : (
-                  <Moon className="w-4 h-4 text-slate-700" />
-                )}
-              </button>
-            )}
+            {/* 2026 Multi-Aesthetic Theme Engine Switcher */}
+            {onToggleTheme && (() => {
+              const currentThemeInfo = getThemeById(theme);
+              const nextThemeId = getNextTheme(theme);
+              const nextThemeInfo = getThemeById(nextThemeId);
+              return (
+                <button
+                  type="button"
+                  onClick={onToggleTheme}
+                  title={`Active Theme: ${currentThemeInfo.name} • Click to switch to ${nextThemeInfo.name}`}
+                  className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-slate-100/90 hover:bg-slate-200 dark:bg-slate-800/90 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-200 transition-all shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:scale-105 active:scale-95 flex-shrink-0 cursor-pointer"
+                  aria-label="Cycle Themes"
+                >
+                  <span className="text-sm">{currentThemeInfo.icon}</span>
+                  <span className="hidden xl:inline text-xs font-bold text-slate-800 dark:text-slate-200">
+                    {currentThemeInfo.label}
+                  </span>
+                </button>
+              );
+            })()}
 
             {/* User Profile Pill or Auth with Hover Tooltip */}
             {user ? (
@@ -1630,28 +1636,29 @@ export const Navbar = ({
                 </button>
               )}
 
-              {/* Universal OLED Midnight Dark Mode Switch in Mobile Drawer */}
-              {onToggleTheme && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    onToggleTheme();
-                  }}
-                  className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 cursor-pointer bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700"
-                >
-                  <div className="flex items-center gap-2.5">
-                    {theme === 'dark' ? (
-                      <Sun className="w-4 h-4 text-amber-400" />
-                    ) : (
-                      <Moon className="w-4 h-4 text-slate-700" />
-                    )}
-                    <span>{theme === 'dark' ? 'Switch to Light Mode' : 'OLED Midnight Mode'}</span>
-                  </div>
-                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-amber-300">
-                    {theme === 'dark' ? 'Dark' : 'Light'}
-                  </span>
-                </button>
-              )}
+              {/* 2026 Multi-Aesthetic Theme Switcher in Mobile Drawer */}
+              {onToggleTheme && (() => {
+                const currentThemeInfo = getThemeById(theme);
+                const nextThemeId = getNextTheme(theme);
+                const nextThemeInfo = getThemeById(nextThemeId);
+                return (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onToggleTheme();
+                    }}
+                    className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 cursor-pointer bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-base">{currentThemeInfo.icon}</span>
+                      <span>Theme: {currentThemeInfo.name}</span>
+                    </div>
+                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-cyan-300">
+                      Next: {nextThemeInfo.label}
+                    </span>
+                  </button>
+                );
+              })()}
 
               {/* Close Menu Button */}
               <button

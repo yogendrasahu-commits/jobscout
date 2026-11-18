@@ -1018,6 +1018,28 @@ export const UberJobMap = ({
     return currentDrawerList.slice(start, start + DRAWER_PAGE_SIZE);
   }, [currentDrawerList, drawerPage]);
 
+  // 2026 Active Job Hubs Radar Capsule (Dynamic Cluster Extraction)
+  const activeHubClusters = useMemo(() => {
+    const hubMap = {};
+    visibleJobs.forEach(job => {
+      const raw = (job.address || job.location?.city || 'Local Hub').split(',')[0].trim();
+      const key = raw.replace(/\b(Road|Street|Nagar|Marg|Sector|Phase|Plot)\b.*$/i, '').trim() || raw;
+      if (!hubMap[key]) {
+        hubMap[key] = { 
+          name: key, 
+          count: 0, 
+          lat: job.location?.lat, 
+          lng: job.location?.lng 
+        };
+      }
+      hubMap[key].count += 1;
+    });
+    return Object.values(hubMap)
+      .filter(h => h.name && h.lat && h.lng)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+  }, [visibleJobs]);
+
   // Handle HTML5 GPS Geolocation (with Chrome Windows fallback)
   const locateMe = useCallback((options = {}) => {
     const isAuto = Boolean(options?.isAuto);
@@ -1269,6 +1291,33 @@ export const UberJobMap = ({
             );
           })}
         </div>
+
+        {/* Row: Active Job Hubs Radar Capsule */}
+        {activeHubClusters.length > 0 && (
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pointer-events-auto py-0.5 max-w-full">
+            <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-900/90 text-white backdrop-blur-xl border border-white/20 text-[10px] font-black uppercase tracking-wider flex-shrink-0 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
+              <span>Surge Hubs</span>
+            </div>
+            {activeHubClusters.map((hub) => (
+              <button
+                key={hub.name}
+                type="button"
+                onClick={() => {
+                  if (hub.lat && hub.lng && mapRef.current) {
+                    mapRef.current.flyTo([hub.lat, hub.lng], 14, { duration: 1.2 });
+                  }
+                }}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/90 dark:bg-slate-900/90 hover:bg-white dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100 backdrop-blur-xl border border-slate-200/90 dark:border-white/10 text-xs font-bold transition-all shadow-xs hover:border-indigo-400 active:scale-95 flex-shrink-0 cursor-pointer"
+                title={`Center map on ${hub.name} (${hub.count} openings)`}
+              >
+                <MapPin className="w-3 h-3 text-indigo-500" />
+                <span>{hub.name}</span>
+                <span className="micro-pill micro-pill-indigo text-[9px] py-0 px-1 font-extrabold">{hub.count}</span>
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Row 2: Mobile Status Strip */}
         <div className="md:hidden flex items-center justify-between gap-1 pointer-events-auto">

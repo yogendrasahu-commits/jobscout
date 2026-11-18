@@ -5,10 +5,10 @@ import {
   Mic, 
   Plus, 
   X, 
-  Sun, 
-  Moon, 
+  Palette,
   Briefcase 
 } from 'lucide-react';
+import { getThemeById, getNextTheme } from '../utils/theme';
 
 export const FloatingSpeedDial = ({
   onOpenPostJob,
@@ -77,24 +77,32 @@ export const FloatingSpeedDial = ({
             </div>
           </button>
 
-          {/* Action 3: Quick Dark / Light Switch */}
-          {onToggleTheme && (
-            <button
-              type="button"
-              onClick={() => {
-                onToggleTheme();
-                setIsOpen(false);
-              }}
-              className="flex items-center gap-2 pl-3.5 pr-2.5 py-1.5 rounded-full bg-slate-900/90 text-white backdrop-blur-xl border border-white/20 shadow-xl active:scale-95 transition-transform"
-            >
-              <span className="text-[11px] font-black text-slate-200">
-                {theme === 'dark' ? '☀️ Clean Light' : '🌙 OLED Dark'}
-              </span>
-              <div className="w-7 h-7 rounded-full bg-slate-800 text-amber-300 flex items-center justify-center font-bold">
-                {theme === 'dark' ? <Sun className="w-3.5 h-3.5 text-amber-300" /> : <Moon className="w-3.5 h-3.5 text-slate-300" />}
-              </div>
-            </button>
-          )}
+          {/* Action 3: 4-Theme Engine Palette Switcher */}
+          {onToggleTheme && (() => {
+            const currentThemeInfo = getThemeById(theme);
+            const nextThemeId = getNextTheme(theme);
+            const nextThemeInfo = getThemeById(nextThemeId);
+            return (
+              <button
+                type="button"
+                onClick={() => {
+                  onToggleTheme();
+                  setIsOpen(false);
+                }}
+                className="flex items-center gap-2 pl-3.5 pr-2.5 py-1.5 rounded-full bg-slate-900/90 text-white backdrop-blur-xl border border-white/20 shadow-xl active:scale-95 transition-transform"
+              >
+                <span className="text-[11px] font-black text-slate-200">
+                  {currentThemeInfo.icon} {currentThemeInfo.name} → {nextThemeInfo.label}
+                </span>
+                <div 
+                  className="w-7 h-7 rounded-full text-white flex items-center justify-center font-bold shadow-xs"
+                  style={{ backgroundColor: currentThemeInfo.color }}
+                >
+                  <Palette className="w-3.5 h-3.5" />
+                </div>
+              </button>
+            );
+          })()}
 
           {/* Action 4: Post Opportunity */}
           {onOpenPostJob && (

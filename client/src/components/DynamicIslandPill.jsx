@@ -4,8 +4,7 @@ import {
   MapPin, 
   Briefcase, 
   Zap, 
-  Sun, 
-  Moon, 
+  Palette,
   Compass, 
   ChevronDown, 
   ChevronUp, 
@@ -14,6 +13,7 @@ import {
   Mic, 
   Activity 
 } from 'lucide-react';
+import { getThemeById, getNextTheme } from '../utils/theme';
 
 export const DynamicIslandPill = ({
   activeLocationName = 'Bandra Kurla Complex (BKC)',
@@ -205,19 +205,22 @@ export const DynamicIslandPill = ({
             </button>
 
             {/* Theme Toggle Shortcut */}
-            {onToggleTheme && (
-              <button
-                type="button"
-                onClick={() => {
-                  onToggleTheme();
-                }}
-                className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer"
-                title="Toggle Dark / Light Theme"
-              >
-                {theme === 'dark' ? <Sun className="w-3.5 h-3.5 text-amber-300" /> : <Moon className="w-3.5 h-3.5 text-slate-300" />}
-                <span className="hidden sm:inline">{theme === 'dark' ? 'Light' : 'Dark'}</span>
-              </button>
-            )}
+            {onToggleTheme && (() => {
+              const currentThemeInfo = getThemeById(theme);
+              return (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onToggleTheme();
+                  }}
+                  className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer"
+                  title={`Current Theme: ${currentThemeInfo.name} (Click to cycle themes)`}
+                >
+                  <span>{currentThemeInfo.icon}</span>
+                  <span className="hidden sm:inline">{currentThemeInfo.label}</span>
+                </button>
+              );
+            })()}
           </div>
 
         </div>

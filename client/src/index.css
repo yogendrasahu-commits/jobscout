@@ -63,6 +63,72 @@ html.dark body {
   color: #f8fafc;
 }
 
+/* ==========================================================================
+   2026 MULTI-AESTHETIC THEME ENGINE PALETTES
+   ========================================================================== */
+
+/* 1. Obsidian Aurora (Default Dark) */
+html[data-theme="obsidian"] body,
+html.dark:not([data-theme]) body {
+  background-color: #07080d;
+  background-image: 
+    radial-gradient(at 10% 8%, rgba(99, 102, 241, 0.16) 0px, transparent 45%),
+    radial-gradient(at 90% 12%, rgba(6, 182, 212, 0.14) 0px, transparent 45%),
+    radial-gradient(at 48% 50%, rgba(139, 92, 246, 0.08) 0px, transparent 55%),
+    radial-gradient(at 82% 85%, rgba(99, 102, 241, 0.10) 0px, transparent 45%);
+  color: #f8fafc;
+}
+
+/* 2. Midnight Emerald (Executive) */
+html[data-theme="emerald"] body {
+  background-color: #040d0c;
+  background-image: 
+    radial-gradient(at 12% 10%, rgba(16, 185, 129, 0.18) 0px, transparent 45%),
+    radial-gradient(at 88% 14%, rgba(5, 150, 105, 0.14) 0px, transparent 45%),
+    radial-gradient(at 50% 50%, rgba(20, 184, 166, 0.08) 0px, transparent 55%),
+    radial-gradient(at 80% 85%, rgba(245, 158, 11, 0.08) 0px, transparent 45%);
+  color: #f0fdf4;
+}
+
+html[data-theme="emerald"] .spotlight-card::before {
+  background: radial-gradient(
+    380px circle at var(--mouse-x, -500px) var(--mouse-y, -500px),
+    rgba(16, 185, 129, 0.45),
+    transparent 50%
+  );
+}
+
+/* 3. Ceramic Minimal (Clean Light) */
+html[data-theme="ceramic"] body,
+html:not(.dark):not([data-theme]) body {
+  background-color: #f8fafc;
+  background-image: 
+    radial-gradient(at 10% 8%, rgba(37, 99, 235, 0.06) 0px, transparent 45%),
+    radial-gradient(at 90% 12%, rgba(14, 165, 233, 0.05) 0px, transparent 45%),
+    radial-gradient(at 50% 50%, rgba(99, 102, 241, 0.03) 0px, transparent 55%),
+    radial-gradient(at 82% 85%, rgba(16, 185, 129, 0.04) 0px, transparent 45%);
+  color: #0f172a;
+}
+
+/* 4. Sunset Tokyo (Vibrant) */
+html[data-theme="sunset"] body {
+  background-color: #0c0a17;
+  background-image: 
+    radial-gradient(at 10% 8%, rgba(244, 63, 94, 0.18) 0px, transparent 45%),
+    radial-gradient(at 90% 12%, rgba(251, 191, 36, 0.12) 0px, transparent 45%),
+    radial-gradient(at 48% 50%, rgba(168, 85, 247, 0.10) 0px, transparent 55%),
+    radial-gradient(at 82% 85%, rgba(244, 63, 94, 0.10) 0px, transparent 45%);
+  color: #fff1f2;
+}
+
+html[data-theme="sunset"] .spotlight-card::before {
+  background: radial-gradient(
+    380px circle at var(--mouse-x, -500px) var(--mouse-y, -500px),
+    rgba(244, 63, 94, 0.45),
+    transparent 50%
+  );
+}
+
 html.dark .bg-slate-50 {
   background-color: #030712 !important;
 }
@@ -625,4 +691,100 @@ html.dark .skeleton-shimmer::after {
     rgba(255, 255, 255, 0.08) 50%,
     transparent 100%
   );
+}
+
+/* ==========================================================================
+   2026 FLOATING GLASS DOCK NAVIGATION & TRANSLUCENT MICRO-PILLS
+   ========================================================================== */
+
+/* Floating Dock Style Mobile Navigation (Apple Dock inspired) */
+.floating-glass-dock {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.8);
+}
+
+html.dark .floating-glass-dock {
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+html[data-theme="emerald"] .floating-glass-dock {
+  background: rgba(7, 23, 21, 0.90);
+  border-color: rgba(16, 185, 129, 0.25);
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(16, 185, 129, 0.1);
+}
+
+html[data-theme="sunset"] .floating-glass-dock {
+  background: rgba(19, 16, 36, 0.90);
+  border-color: rgba(244, 63, 94, 0.25);
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(244, 63, 94, 0.1);
+}
+
+/* Translucent Micro-Pills (2026 UI Upgrade) */
+.micro-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.micro-pill-emerald {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.12);
+}
+html.dark .micro-pill-emerald {
+  color: #34d399;
+}
+
+.micro-pill-indigo {
+  background: rgba(99, 102, 241, 0.12);
+  color: #4f46e5;
+  border: 1px solid rgba(99, 102, 241, 0.28);
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.12);
+}
+html.dark .micro-pill-indigo {
+  color: #818cf8;
+}
+
+.micro-pill-cyan {
+  background: rgba(6, 182, 212, 0.12);
+  color: #0891b2;
+  border: 1px solid rgba(6, 182, 212, 0.28);
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.12);
+}
+html.dark .micro-pill-cyan {
+  color: #22d3ee;
+}
+
+.micro-pill-rose {
+  background: rgba(244, 63, 94, 0.12);
+  color: #e11d48;
+  border: 1px solid rgba(244, 63, 94, 0.28);
+  box-shadow: 0 0 12px rgba(244, 63, 94, 0.12);
+}
+html.dark .micro-pill-rose {
+  color: #fb7185;
+}
+
+.micro-pill-amber {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.12);
+}
+html.dark .micro-pill-amber {
+  color: #fbbf24;
 }

@@ -543,16 +543,16 @@ export const JobsList = ({
                       {/* Top Badges & Bookmark */}
                       <div className="flex items-start justify-between gap-2 mb-3.5">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="px-2.5 py-1 text-[10px] font-black tracking-wider uppercase rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800 shadow-2xs">
+                          <span className="micro-pill micro-pill-indigo uppercase tracking-wider">
                             {job.jobType}
                           </span>
                           {job.workMode && (
-                            <span className="px-2 py-0.5 text-[10px] font-bold rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                            <span className="micro-pill bg-slate-100/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                               {job.workMode}
                             </span>
                           )}
                           {job.urgent && (
-                            <span className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-extrabold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 rounded-lg shadow-2xs">
+                            <span className="micro-pill micro-pill-rose">
                               <Flame className="w-3 h-3 text-rose-500 fill-rose-500 animate-pulse" /> Urgent
                             </span>
                           )}
@@ -611,8 +611,8 @@ export const JobsList = ({
 
                       {/* Prominent Tabular Figures Salary & Commute */}
                       <div className="mt-3.5 flex items-center justify-between gap-2">
-                        <span className="font-mono tracking-tight font-black text-xs sm:text-sm text-emerald-800 bg-emerald-50/90 px-3 py-1 rounded-xl border border-emerald-200/90 shadow-2xs flex items-center gap-1">
-                          <DollarSign className="w-3.5 h-3.5 text-emerald-600 -mr-0.5" />
+                        <span className="micro-pill micro-pill-emerald font-mono tracking-tight font-black text-xs sm:text-sm px-3 py-1">
+                          <DollarSign className="w-3.5 h-3.5 -mr-0.5" />
                           <span>{job.salary || 'Competitive'}</span>
                         </span>
                         
@@ -663,24 +663,20 @@ export const JobsList = ({
                       </p>
 
                       {job.skills && job.skills.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-1">
+                        <div className="mt-3 flex flex-wrap gap-1.5">
                           {job.skills.slice(0, 3).map((s, idx) => {
                             const isMatched = userSkills.includes(s.toLowerCase().trim());
                             return (
                               <span
                                 key={idx}
-                                className={`px-2 py-0.5 text-[10px] font-semibold rounded-lg border ${
-                                  isMatched 
-                                    ? 'bg-indigo-50 text-indigo-700 border-indigo-200 font-bold' 
-                                    : 'bg-slate-50 text-slate-700 border-slate-200'
-                                }`}
+                                className={isMatched ? 'micro-pill micro-pill-indigo' : 'micro-pill bg-slate-100/80 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'}
                               >
                                 {isMatched ? '✓ ' : ''}{s}
                               </span>
                             );
                           })}
                           {job.skills.length > 3 && (
-                            <span className="px-1.5 py-0.5 text-[10px] font-semibold text-slate-400 bg-slate-50 rounded-lg">
+                            <span className="micro-pill bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
                               +{job.skills.length - 3}
                             </span>
                           )}
