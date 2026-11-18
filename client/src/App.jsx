@@ -27,6 +27,7 @@ import { AdminDashboard } from './pages/AdminDashboard';
 import { CommandPalette } from './components/CommandPalette';
 import { MobileAppDownloadModal } from './components/MobileAppDownloadModal';
 import { ServerConfigModal } from './components/ServerConfigModal';
+import { AIMockInterviewModal } from './components/AIMockInterviewModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { jobService } from './services/jobService';
 import { userService } from './services/userService';
@@ -103,6 +104,36 @@ function MainApp() {
   const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
   const [showReconnectedToast, setShowReconnectedToast] = useState(false);
   const [syncStatusMsg, setSyncStatusMsg] = useState('✓ Back online! Real-time sync restored.');
+
+  // Persistent OLED Midnight Dark Mode State
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('jobscout_theme');
+      if (saved) return saved;
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'dark';
+      }
+    }
+    return 'light';
+  });
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      localStorage.setItem('jobscout_theme', theme);
+    }
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
+  // AI Voice Mock Interviewer Modal Job Target
+  const [interviewJob, setInterviewJob] = useState(null);
 
   // Network connection listener & offline Outbox background sync
   useEffect(() => {
@@ -433,7 +464,7 @@ function MainApp() {
   // STANDALONE WELCOME / ONBOARDING LANDING VIEW (Unauthenticated only)
   if (currentTab === 'welcome' && !user) {
     return (
-      <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 text-slate-900 flex flex-col font-sans antialiased">
+      <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 dark:bg-[#070b14] text-slate-900 dark:text-slate-100 flex flex-col font-sans antialiased">
         {!isOnline && (
           <div className="bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-slate-950 font-bold py-2 px-4 shadow-md transition-all z-[1200] border-b border-amber-400/40 text-xs text-center flex items-center justify-center gap-2">
             <span className="w-2 h-2 rounded-full bg-slate-950 animate-ping" />
@@ -459,6 +490,8 @@ function MainApp() {
           jobs={jobs}
           seekers={seekers}
           employers={employers}
+          theme={theme}
+          onToggleTheme={toggleTheme}
         />
 
         {/* Global Auth Modal for Welcome Page Login / Register */}
@@ -513,7 +546,7 @@ function MainApp() {
   }
 
   return (
-    <div className="min-h-screen w-full max-w-full overflow-x-clip bg-slate-50 text-slate-900 flex flex-col font-sans antialiased">
+    <div className="min-h-screen w-full max-w-full overflow-x-clip bg-slate-50 dark:bg-[#070b14] text-slate-900 dark:text-slate-100 flex flex-col font-sans antialiased transition-colors duration-200">
       
       {/* Luxury Glassmorphic Offline Status Capsule */}
       {!isOnline && (
@@ -569,6 +602,8 @@ function MainApp() {
         seekersCount={seekers.length}
         employersCount={employers.length}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       {/* Persistent Profile Incomplete Alert Banner */}
@@ -625,6 +660,8 @@ function MainApp() {
             onSelectJob={(job) => setSelectedJob(job)}
             onSelectSeeker={(seeker) => handleOpenProfile(seeker)}
             onPostJobAtCoords={handlePostJobAtCoords}
+            theme={theme}
+            onStartMockInterview={(job) => setInterviewJob(job)}
           />
         )}
 
@@ -646,6 +683,8 @@ function MainApp() {
             }}
             initialQuickFilter={jobsQuickFilter}
             onQuickFilterChange={(filter) => setJobsQuickFilter(filter)}
+            theme={theme}
+            onStartMockInterview={(job) => setInterviewJob(job)}
           />
         )}
 
@@ -683,6 +722,8 @@ function MainApp() {
         }}
         onOpenAuth={() => setAuthConfig({ isOpen: true, mode: 'login', role: 'seeker' })}
         jobsCount={jobs.length}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       {/* Global Realtime Components */}
@@ -715,6 +756,15 @@ function MainApp() {
         onApplied={() => {
           fetchJobs();
         }}
+        theme={theme}
+        onStartMockInterview={(j) => setInterviewJob(j)}
+      />
+
+      {/* Voice AI Mock Interviewer Modal */}
+      <AIMockInterviewModal
+        job={interviewJob}
+        isOpen={Boolean(interviewJob)}
+        onClose={() => setInterviewJob(null)}
       />
 
       <SeekerProfileModal

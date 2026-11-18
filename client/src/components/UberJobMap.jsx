@@ -5,6 +5,7 @@ import {
   Marker, 
   Popup, 
   Circle, 
+  Polyline,
   useMap, 
   useMapEvents 
 } from 'react-leaflet';
@@ -556,7 +557,9 @@ export const UberJobMap = ({
   employers = [],
   onSelectJob, 
   onSelectSeeker, 
-  onPostJobAtCoords 
+  onPostJobAtCoords,
+  theme = 'light',
+  onStartMockInterview
 }) => {
   const { user, isEmployer, updateLocation } = useAuth();
   const { otherUserLocations, broadcastLocation, startCall, setActiveChatUser } = useSocket();
@@ -578,7 +581,16 @@ export const UberJobMap = ({
   const [fitBoundsTrigger, setFitBoundsTrigger] = useState(0);
   const [showJobsLayer, setShowJobsLayer] = useState(true);
   const [showSeekersLayer, setShowSeekersLayer] = useState(true);
-  const [mapTheme, setMapTheme] = useState('voyager'); // 'voyager' | 'dark'
+  const [mapTheme, setMapTheme] = useState(() => (theme === 'dark' ? 'dark' : 'voyager')); // 'voyager' | 'dark'
+
+  // Sync external theme changes
+  useEffect(() => {
+    if (theme === 'dark') {
+      setMapTheme('dark');
+    } else {
+      setMapTheme('voyager');
+    }
+  }, [theme]);
   
   // Drawer & Mobile Modals (with Pagination & Marker Capping)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -589,6 +601,10 @@ export const UberJobMap = ({
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [selectedPin, setSelectedPin] = useState(null); // { type: 'job' | 'seeker', data: Object }
   const [commuteModalJob, setCommuteModalJob] = useState(null);
+
+  // Live Commute Polyline via OSRM Route Engine
+  const [routePolyline, setRoutePolyline] = useState([]);
+  const [routeCommuteMeta, setRouteCommuteMeta] = useState(null); // { distanceKm, durationMin, isFallback }
 
   // Search Functionality States
   const [searchQuery, setSearchQuery] = useState(user?.address || '');
@@ -676,6 +692,66 @@ export const UberJobMap = ({
     }
     return [INDIA_CENTER[0], INDIA_CENTER[1]];
   }, [centerCoords]);
+
+  // Live Commute Route Polyline calculation via OSRM with instant graceful fallback
+  useEffect(() => {
+    if (!selectedPin || !selectedPin.data || !isValidCoord(selectedPin.data.lat, selectedPin.data.lng)) {
+      setRoutePolyline([]);
+      setRouteCommuteMeta(null);
+      return;
+    }
+
+    const originLat = safeCoords[0];
+    const originLng = safeCoords[1];
+    const destLat = Number(selectedPin.data.lat);
+    const destLng = Number(selectedPin.data.lng);
+
+    const directDist = calculateDistance(originLat, originLng, destLat, destLng);
+
+    let isAborted = false;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2500);
+
+    // OSRM expects coordinates in order: lng,lat;lng,lat
+    const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${originLng},${originLat};${destLng},${destLat}?overview=full&geometries=geojson`;
+
+    fetch(osrmUrl, { signal: controller.signal })
+      .then(res => res.ok ? res.json() : Promise.reject(new Error('OSRM non-200')))
+      .then(data => {
+        clearTimeout(timeoutId);
+        if (isAborted) return;
+        if (data?.routes?.[0]?.geometry?.coordinates) {
+          // OSRM returns coordinates as [lng, lat], map to Leaflet [lat, lng]
+          const coords = data.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+          const distanceKm = Math.round((data.routes[0].distance / 1000) * 10) / 10;
+          const durationMin = Math.max(2, Math.round(data.routes[0].duration / 60));
+          setRoutePolyline(coords);
+          setRouteCommuteMeta({ distanceKm, durationMin, isFallback: false });
+        } else {
+          throw new Error('No OSRM route found');
+        }
+      })
+      .catch(() => {
+        clearTimeout(timeoutId);
+        if (isAborted) return;
+        // Offline / fast fallback: direct polyline
+        setRoutePolyline([
+          [originLat, originLng],
+          [destLat, destLng]
+        ]);
+        setRouteCommuteMeta({
+          distanceKm: directDist,
+          durationMin: Math.max(2, Math.round(directDist * 2.5)),
+          isFallback: true
+        });
+      });
+
+    return () => {
+      isAborted = true;
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
+  }, [selectedPin, safeCoords]);
 
   // Close search dropdown on click outside
   useEffect(() => {
@@ -1916,23 +1992,36 @@ export const UberJobMap = ({
               </div>
 
               {/* Salary & Details Pill */}
-              <div className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl">
+              <div className="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 rounded-2xl">
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Offered Compensation</span>
-                  <span className="text-sm font-mono font-extrabold text-emerald-700 tracking-tight">
+                  <span className="text-sm font-mono font-extrabold text-emerald-700 dark:text-emerald-400 tracking-tight">
                     {selectedPin.data.salary || 'Competitive'}
                   </span>
                 </div>
                 <div className="text-right">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Category</span>
-                  <span className="text-xs font-semibold text-slate-700">
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                     {selectedPin.data.category || 'General'}
                   </span>
                 </div>
               </div>
 
+              {/* Live Commute Route Badge */}
+              {routeCommuteMeta && (
+                <div className="flex items-center justify-between p-2.5 bg-cyan-50/90 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800/80 rounded-2xl text-xs font-bold text-cyan-900 dark:text-cyan-200">
+                  <div className="flex items-center gap-1.5">
+                    <Navigation className="w-3.5 h-3.5 text-cyan-600 animate-pulse flex-shrink-0" />
+                    <span>Live Commute Route: ~<strong>{routeCommuteMeta.durationMin} mins</strong></span>
+                  </div>
+                  <span className="text-[11px] text-cyan-700 dark:text-cyan-400 font-mono">
+                    {routeCommuteMeta.distanceKm} km {routeCommuteMeta.isFallback ? '(direct)' : 'road'}
+                  </span>
+                </div>
+              )}
+
               {/* Action Buttons */}
-              <div className="flex items-center gap-2 pt-0.5">
+              <div className="flex flex-wrap items-center gap-2 pt-0.5">
                 <button
                   type="button"
                   onClick={() => {
@@ -1943,10 +2032,21 @@ export const UberJobMap = ({
                   <span>{user?.role === 'admin' ? 'Manage Job' : 'Apply'}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
+                {onStartMockInterview && user?.role !== 'admin' && (
+                  <button
+                    type="button"
+                    onClick={() => onStartMockInterview(selectedPin.data)}
+                    className="py-2.5 px-3 rounded-2xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white border border-indigo-400/40 transition-all flex items-center justify-center gap-1.5 text-xs font-extrabold active:scale-95 shadow-md shadow-indigo-600/20 cursor-pointer"
+                    title="Practice Voice AI Mock Interview for this job"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+                    <span>AI Mock Interview</span>
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => setCommuteModalJob(selectedPin.data)}
-                  className="py-2.5 px-3.5 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-all flex items-center justify-center gap-1.5 text-xs font-bold active:scale-95 shadow-xs"
+                  className="py-2.5 px-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 transition-all flex items-center justify-center gap-1.5 text-xs font-bold active:scale-95 shadow-xs"
                   title="Calculate travel time via Metro, Bike, Cab & Walking"
                 >
                   <Navigation className="w-3.5 h-3.5 text-emerald-600" />
@@ -2128,6 +2228,35 @@ export const UberJobMap = ({
             dashArray: '3, 6'
           }}
         />
+
+        {/* Live Commute Route Polyline (Uber / Cyberpunk Navigation Beam) */}
+        {routePolyline.length > 0 && (
+          <>
+            {/* Outer Cyan Glow Polyline */}
+            <Polyline
+              positions={routePolyline}
+              pathOptions={{
+                color: '#06b6d4',
+                weight: 6,
+                opacity: 0.75,
+                lineCap: 'round',
+                lineJoin: 'round'
+              }}
+            />
+            {/* Inner High-contrast Pulsing Beam */}
+            <Polyline
+              positions={routePolyline}
+              pathOptions={{
+                color: '#ffffff',
+                weight: 2.5,
+                opacity: 0.95,
+                dashArray: '8, 8',
+                lineCap: 'round',
+                lineJoin: 'round'
+              }}
+            />
+          </>
+        )}
 
         {/* User's Center Location Pin (Draggable like Google Maps Pin) */}
         <Marker

@@ -31,7 +31,9 @@ import {
   MicOff,
   ShieldAlert,
   ShieldCheck,
-  LogIn
+  LogIn,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
@@ -67,7 +69,9 @@ export const Navbar = ({
   jobsCount = 0,
   seekersCount = 0,
   employersCount = 0,
-  onOpenCommandPalette
+  onOpenCommandPalette,
+  theme = 'light',
+  onToggleTheme
 }) => {
   const { user, isEmployer, isSeeker, logout } = useAuth();
   const { setActiveChatUser, socket } = useSocket();
@@ -899,6 +903,23 @@ export const Navbar = ({
               )}
             </div>
 
+            {/* Universal OLED Midnight Dark Mode Toggle Button */}
+            {onToggleTheme && (
+              <button
+                type="button"
+                onClick={onToggleTheme}
+                title={theme === 'dark' ? 'Switch to Clean Light Mode' : 'Switch to Universal OLED Midnight Dark Mode'}
+                className="relative p-2 rounded-full bg-slate-100/90 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-amber-300 transition-all shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:scale-105 active:scale-95 flex-shrink-0 cursor-pointer"
+                aria-label="Toggle Theme"
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-4 h-4 text-amber-400" />
+                ) : (
+                  <Moon className="w-4 h-4 text-slate-700" />
+                )}
+              </button>
+            )}
+
             {/* User Profile Pill or Auth with Hover Tooltip */}
             {user ? (
               <div className="relative group flex-shrink-0" ref={profileRef}>
@@ -1606,6 +1627,29 @@ export const Navbar = ({
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Sign Out</span>
+                </button>
+              )}
+
+              {/* Universal OLED Midnight Dark Mode Switch in Mobile Drawer */}
+              {onToggleTheme && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onToggleTheme();
+                  }}
+                  className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 cursor-pointer bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700"
+                >
+                  <div className="flex items-center gap-2.5">
+                    {theme === 'dark' ? (
+                      <Sun className="w-4 h-4 text-amber-400" />
+                    ) : (
+                      <Moon className="w-4 h-4 text-slate-700" />
+                    )}
+                    <span>{theme === 'dark' ? 'Switch to Light Mode' : 'OLED Midnight Mode'}</span>
+                  </div>
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-amber-300">
+                    {theme === 'dark' ? 'Dark' : 'Light'}
+                  </span>
                 </button>
               )}
 

@@ -41,7 +41,9 @@ export const JobsList = ({
   setActiveSubTab: externalSetActiveSubTab,
   defaultSubTab = 'browse',
   initialQuickFilter = 'all',
-  onQuickFilterChange
+  onQuickFilterChange,
+  theme = 'light',
+  onStartMockInterview
 }) => {
   const { user, token, isEmployer } = useAuth();
   const userSkills = (user?.skills || []).map(s => String(s).toLowerCase().trim());
@@ -196,6 +198,7 @@ export const JobsList = ({
       // Quick filter chips
       if (quickFilter === 'saved' && !savedJobIds.includes(j.id)) return false;
       if (quickFilter === 'urgent' && !j.urgent) return false;
+      if (quickFilter === 'instant_shift' && !(j.urgent || j.isInstantShift || j.jobType === 'Shift' || j.jobType === 'Part-time' || j.jobType === 'Contract')) return false;
       if (quickFilter === 'remote' && !(j.workMode === 'Remote' || j.address?.toLowerCase().includes('remote'))) return false;
 
       return matchesSearch && matchesType && matchesCategory && matchesWorkMode && matchesExperience;
@@ -366,11 +369,24 @@ export const JobsList = ({
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
                 quickFilter === 'urgent'
                   ? 'bg-orange-600 text-white shadow-xs'
-                  : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200'
+                  : 'bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
               }`}
             >
               <Flame className="w-3.5 h-3.5 text-orange-500" />
               <span>🔥 Urgent Spot Hiring</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleQuickFilterChange('instant_shift')}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                quickFilter === 'instant_shift'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
+              }`}
+            >
+              <Zap className={`w-3.5 h-3.5 ${quickFilter === 'instant_shift' ? 'fill-white text-white' : 'text-emerald-500 fill-emerald-500'}`} />
+              <span>⚡ Instant Shift (24h)</span>
             </button>
 
             <button
@@ -598,12 +614,27 @@ export const JobsList = ({
                               e.stopPropagation();
                               setCommuteModalJob(job);
                             }}
-                            className="flex items-center gap-1 text-[10px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-xl border border-indigo-200 transition-colors shadow-2xs"
+                            className="flex items-center gap-1 text-[10px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:text-indigo-300 px-2 py-1 rounded-xl border border-indigo-200 dark:border-indigo-800 transition-colors shadow-2xs cursor-pointer"
                             title="Calculate travel time via Metro, Bike, Cab & Walking"
                           >
                             <span>🚇</span>
                             <span>Commute</span>
                           </button>
+
+                          {onStartMockInterview && user?.role !== 'emp' && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onStartMockInterview(job);
+                              }}
+                              className="flex items-center gap-1 text-[10px] font-bold text-violet-700 bg-violet-50 hover:bg-violet-100 dark:bg-violet-950/40 dark:text-violet-300 px-2 py-1 rounded-xl border border-violet-200 dark:border-violet-800 transition-colors shadow-2xs cursor-pointer"
+                              title="Practice Voice AI Mock Interview for this job"
+                            >
+                              <span>🎙️</span>
+                              <span>Mock AI</span>
+                            </button>
+                          )}
                         </div>
                       </div>
 

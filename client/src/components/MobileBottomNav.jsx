@@ -14,13 +14,15 @@ export const MobileBottomNav = ({
   currentTab, 
   setCurrentTab, 
   jobsCount = 0,
-  onOpenAuth
+  onOpenAuth,
+  theme = 'light',
+  onToggleTheme
 }) => {
   const { user } = useAuth();
   const { incomingMessage } = useSocket();
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[800] bg-white/95 backdrop-blur-2xl border-t border-slate-200/90 py-1.5 pb-[max(0.6rem,env(safe-area-inset-bottom,0px))] px-2 shadow-[0_-4px_25px_rgba(0,0,0,0.06)] select-none">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[800] bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border-t border-slate-200/90 dark:border-slate-800/90 py-1.5 pb-[max(0.6rem,env(safe-area-inset-bottom,0px))] px-2 shadow-[0_-4px_25px_rgba(0,0,0,0.06)] dark:shadow-[0_-4px_25px_rgba(0,0,0,0.5)] select-none transition-colors duration-200">
       <div className="grid grid-cols-5 items-center w-full max-w-md mx-auto">
         
         {/* 1. Feed (Home) */}
@@ -28,14 +30,14 @@ export const MobileBottomNav = ({
           onClick={() => setCurrentTab('feed')}
           className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all ${
             currentTab === 'feed' || currentTab === 'welcome'
-              ? 'text-indigo-600 font-extrabold scale-105'
-              : 'text-slate-500 hover:text-slate-800'
+              ? 'text-indigo-600 dark:text-indigo-400 font-extrabold scale-105'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
         >
           <div className="relative">
             <NavFeedIcon active={currentTab === 'feed' || currentTab === 'welcome'} className="w-5 h-5 flex-shrink-0" />
           </div>
-          <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'feed' || currentTab === 'welcome' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>Feed</span>
+          <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'feed' || currentTab === 'welcome' ? 'text-indigo-600 dark:text-indigo-400 font-extrabold' : 'text-slate-600 dark:text-slate-400'}`}>Feed</span>
           {(currentTab === 'feed' || currentTab === 'welcome') && (
             <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
           )}
@@ -46,19 +48,19 @@ export const MobileBottomNav = ({
           onClick={() => setCurrentTab('jobs')}
           className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all relative ${
             currentTab === 'jobs'
-              ? 'text-indigo-600 font-extrabold scale-105'
-              : 'text-slate-500 hover:text-slate-800'
+              ? 'text-indigo-600 dark:text-indigo-400 font-extrabold scale-105'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
         >
           <div className="relative">
             <NavJobsIcon active={currentTab === 'jobs'} className="w-5 h-5 flex-shrink-0" />
             {jobsCount > 0 && (
-              <span className="absolute -top-1 -right-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-[8px] text-white font-extrabold px-1.5 py-0.2 rounded-full border border-white shadow-xs">
+              <span className="absolute -top-1 -right-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-[8px] text-white font-extrabold px-1.5 py-0.2 rounded-full border border-white dark:border-slate-900 shadow-xs">
                 {jobsCount}
               </span>
             )}
           </div>
-          <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'jobs' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>Jobs</span>
+          <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'jobs' ? 'text-indigo-600 dark:text-indigo-400 font-extrabold' : 'text-slate-600 dark:text-slate-400'}`}>Jobs</span>
           {currentTab === 'jobs' && (
             <span className="w-1.5 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 mt-0.5 shadow-xs" />
           )}
@@ -77,21 +79,21 @@ export const MobileBottomNav = ({
 
             <div className={`relative flex items-center justify-center w-12 h-12 rounded-2xl transition-all ${
               currentTab === 'map'
-                ? 'bg-white border border-indigo-500/50 shadow-[0_4px_20px_rgba(99,102,241,0.25)] ring-2 ring-indigo-500/30 scale-105'
-                : 'bg-white/95 border border-slate-200 text-indigo-600 ring-1 ring-slate-100 shadow-sm group-hover:border-indigo-400/40'
+                ? 'bg-white dark:bg-slate-900 border border-indigo-500/50 shadow-[0_4px_20px_rgba(99,102,241,0.25)] ring-2 ring-indigo-500/30 scale-105'
+                : 'bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 ring-1 ring-slate-100 dark:ring-slate-800 shadow-sm group-hover:border-indigo-400/40'
             }`}>
               <JobScoutLogo size={38} withBadge={false} animated={currentTab === 'map'} />
               
               {/* Radar Live Beacon Dot */}
               <span className="absolute -top-1 -right-1 flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-gradient-to-tr from-emerald-500 to-cyan-500 border-2 border-white shadow-xs" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-gradient-to-tr from-emerald-500 to-cyan-500 border-2 border-white dark:border-slate-900 shadow-xs" />
               </span>
             </div>
 
             <div className="flex items-center gap-0.5 mt-1">
               <span className={`text-[10px] font-black tracking-wider uppercase whitespace-nowrap ${
-                currentTab === 'map' ? 'text-indigo-600' : 'text-slate-700'
+                currentTab === 'map' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-700 dark:text-slate-300'
               }`}>
                 Live Map
               </span>
@@ -105,14 +107,14 @@ export const MobileBottomNav = ({
             onClick={() => setCurrentTab('network')}
             className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all ${
               currentTab === 'network'
-                ? 'text-indigo-600 font-extrabold scale-105'
-                : 'text-slate-500 hover:text-slate-800'
+                ? 'text-indigo-600 dark:text-indigo-400 font-extrabold scale-105'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
             }`}
           >
             <div className="relative">
               <NavNetworkIcon active={currentTab === 'network'} className="w-5 h-5 flex-shrink-0" />
             </div>
-            <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'network' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>
+            <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'network' ? 'text-indigo-600 dark:text-indigo-400 font-extrabold' : 'text-slate-600 dark:text-slate-400'}`}>
               Network
             </span>
             {currentTab === 'network' && (
@@ -124,14 +126,14 @@ export const MobileBottomNav = ({
             onClick={() => setCurrentTab('connect')}
             className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all relative ${
               currentTab === 'connect'
-                ? 'text-indigo-600 font-extrabold scale-105'
-                : 'text-slate-500 hover:text-slate-800'
+                ? 'text-indigo-600 dark:text-indigo-400 font-extrabold scale-105'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
             }`}
           >
             <div className="relative">
               <NavConnectIcon active={currentTab === 'connect'} className="w-5 h-5 flex-shrink-0" />
             </div>
-            <span className={`text-[9px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'connect' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>
+            <span className={`text-[9px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'connect' ? 'text-indigo-600 dark:text-indigo-400 font-extrabold' : 'text-slate-600 dark:text-slate-400'}`}>
               Speed Connect
             </span>
             {currentTab === 'connect' && (
@@ -146,8 +148,8 @@ export const MobileBottomNav = ({
             onClick={() => setCurrentTab('admin')}
             className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all relative ${
               currentTab === 'admin'
-                ? 'text-rose-600 font-extrabold scale-105'
-                : 'text-slate-500 hover:text-slate-800'
+                ? 'text-rose-600 dark:text-rose-400 font-extrabold scale-105'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
             }`}
           >
             <div className="relative">
@@ -155,7 +157,7 @@ export const MobileBottomNav = ({
               <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-rose-500 rounded-full animate-ping" />
             </div>
             <div className="flex items-center gap-0.5 mt-0.5">
-              <span className={`text-[10px] tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'admin' ? 'text-rose-600 font-extrabold' : 'text-slate-600'}`}>Admin</span>
+              <span className={`text-[10px] tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'admin' ? 'text-rose-600 dark:text-rose-400 font-extrabold' : 'text-slate-600 dark:text-slate-400'}`}>Admin</span>
             </div>
             {currentTab === 'admin' && (
               <span className="w-1.5 h-1 rounded-full bg-rose-500 mt-0.5 shadow-xs" />
@@ -172,15 +174,15 @@ export const MobileBottomNav = ({
             }}
             className={`col-span-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all relative ${
               currentTab === 'messages'
-                ? 'text-indigo-600 font-extrabold scale-105'
-                : 'text-slate-500 hover:text-slate-800'
+                ? 'text-indigo-600 dark:text-indigo-400 font-extrabold scale-105'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
             }`}
           >
             <div className="relative">
               <NavMessagesIcon active={currentTab === 'messages'} className="w-5 h-5 flex-shrink-0" />
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-500 rounded-full shadow-xs border border-white" />
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-500 rounded-full shadow-xs border border-white dark:border-slate-900" />
             </div>
-            <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'messages' ? 'text-indigo-600 font-extrabold' : 'text-slate-600'}`}>
+            <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center font-bold ${currentTab === 'messages' ? 'text-indigo-600 dark:text-indigo-400 font-extrabold' : 'text-slate-600 dark:text-slate-400'}`}>
               Chat
             </span>
             {currentTab === 'messages' && (

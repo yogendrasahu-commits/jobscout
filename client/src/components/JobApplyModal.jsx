@@ -27,7 +27,7 @@ import { calculateAIMatch } from '../utils/aiMatchEngine';
 import { AIMatchModal } from './AIMatchModal';
 import { queueOfflineAction } from '../utils/offlineStorage';
 
-export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
+export const JobApplyModal = ({ job, isOpen, onClose, onApplied, theme = 'light', onStartMockInterview }) => {
   const { user, token } = useAuth();
   const { setActiveChatUser, startCall } = useSocket();
 
@@ -56,9 +56,16 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
   const matchPercentage = matchResult?.score || 0;
   const userSkills = (user?.skills || []).map(s => String(s).toLowerCase().trim());
 
-  const handleGenerateAIPitch = () => {
-    const matched = matchResult.matchedSkills.slice(0, 3).join(', ');
-    const note = `Hi, I am excited about the ${job.title} opportunity at ${job.company || 'your team'}! With hands-on experience in ${matched || 'modern engineering and problem solving'}, I can add immediate value from Day 1. Available for an immediate discussion!`;
+  const handleGenerateAIPitch = (tone = 'confident') => {
+    const matched = matchResult?.matchedSkills?.slice(0, 3)?.join(', ') || (user?.skills?.slice(0, 3)?.join(', ')) || 'full-stack engineering';
+    let note = '';
+    if (tone === 'executive') {
+      note = `Dear Hiring Team at ${job.company || 'your organization'},\n\nI am writing to express my strong enthusiasm for the ${job.title} position. With my background in ${matched} and a strong focus on high-reliability shipping and scalable architectures, I am confident in driving measurable results from Day 1. Looking forward to connecting!`;
+    } else if (tone === 'direct') {
+      note = `Hi ${job.company} Team! I am available locally and ready to join immediately for the ${job.title} role. Deeply experienced in ${matched}. Let's schedule a quick call!`;
+    } else {
+      note = `Hi, I am excited about the ${job.title} opportunity at ${job.company || 'your team'}! With hands-on experience in ${matched}, I can add immediate value from Day 1. Available for an immediate discussion!`;
+    }
     setCoverNote(note);
   };
 
@@ -177,7 +184,7 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/65 backdrop-blur-xl p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl bg-white/95 backdrop-blur-2xl border border-white/90 rounded-3xl p-5 sm:p-7 shadow-[0_30px_90px_-15px_rgba(15,23,42,0.35)] animate-in zoom-in-95 duration-200 max-h-[92dvh] overflow-y-auto my-auto text-slate-900">
+      <div className="relative w-full max-w-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-white/90 dark:border-slate-800 rounded-3xl p-5 sm:p-7 shadow-[0_30px_90px_-15px_rgba(15,23,42,0.35)] animate-in zoom-in-95 duration-200 max-h-[92dvh] overflow-y-auto my-auto text-slate-900 dark:text-slate-100">
         {/* Subtle top iridescent highlight */}
         <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-indigo-500 via-cyan-400 to-emerald-400" />
         
@@ -514,30 +521,69 @@ export const JobApplyModal = ({ job, isOpen, onClose, onApplied }) => {
           </div>
         ) : (
           /* Application Submission Form */
-          <form onSubmit={handleApply} className="space-y-3.5 pt-2 border-t border-slate-100">
+          <form onSubmit={handleApply} className="space-y-3.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+            {/* Rehearse Mock Interview First */}
+            {onStartMockInterview && user?.role !== 'emp' && (
+              <div className="p-3 bg-gradient-to-r from-violet-500/10 via-indigo-500/10 to-cyan-500/10 border border-indigo-200 dark:border-indigo-800/60 rounded-2xl flex items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-violet-500" />
+                  <div>
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-100 block">Practice Voice Interview First?</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400">Rehearse 3 role-tailored questions with speech feedback.</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onStartMockInterview(job);
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-[11px] shadow-sm flex items-center gap-1 active:scale-95 whitespace-nowrap cursor-pointer"
+                >
+                  <span>🎙️ Voice Mock</span>
+                </button>
+              </div>
+            )}
+
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs font-extrabold text-slate-800">
-                  Quick Pitch / Candidate Note (Optional)
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-1.5">
+                <label className="block text-xs font-extrabold text-slate-800 dark:text-slate-200">
+                  Tailored Cover Note / Pitch (Optional)
                 </label>
                 {user?.role !== 'emp' && (
-                  <button
-                    type="button"
-                    onClick={handleGenerateAIPitch}
-                    className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer transition-colors"
-                  >
-                    <Sparkles className="w-3 h-3" />
-                    <span>Auto-Generate AI Pitch</span>
-                  </button>
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <span className="text-[10px] text-slate-400 font-bold hidden sm:inline">1-Click AI:</span>
+                    <button
+                      type="button"
+                      onClick={() => handleGenerateAIPitch('confident')}
+                      className="px-2 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold border border-indigo-200/80 dark:border-indigo-800 transition-colors cursor-pointer"
+                    >
+                      ✨ Confident
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleGenerateAIPitch('direct')}
+                      className="px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold border border-emerald-200/80 dark:border-emerald-800 transition-colors cursor-pointer"
+                    >
+                      ⚡ Direct
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleGenerateAIPitch('executive')}
+                      className="px-2 py-0.5 rounded-lg bg-purple-50 dark:bg-purple-950/60 hover:bg-purple-100 text-purple-700 dark:text-purple-300 text-[10px] font-bold border border-purple-200/80 dark:border-purple-800 transition-colors cursor-pointer"
+                    >
+                      👔 Formal
+                    </button>
+                  </div>
                 )}
               </div>
               <textarea
-                rows={2}
+                rows={3}
                 placeholder="Hi, I am ready for this role and available nearby for an immediate discussion..."
                 value={coverNote}
                 onChange={(e) => setCoverNote(e.target.value)}
                 disabled={user?.role === 'emp'}
-                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 resize-none disabled:opacity-60 transition-all"
+                className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-2xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 resize-none disabled:opacity-60 transition-all"
               />
             </div>
 
