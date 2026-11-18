@@ -106,6 +106,10 @@ export const AuthModal = ({
 
   // Send OTP for Phone Login
   const handlePhoneSendOtp = async () => {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setError('You are currently offline. Please reconnect to Wi-Fi or mobile data to log in.');
+      return;
+    }
     const cleanPhone = phoneInput.replace(/[^0-9]/g, '').slice(-10);
     if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
       setError('Please enter a valid 10-digit Indian mobile number');
@@ -131,6 +135,10 @@ export const AuthModal = ({
   // Phone + OTP Login Handler
   const handlePhoneOtpLogin = async (e) => {
     e.preventDefault();
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setError('You are currently offline. Please reconnect to Wi-Fi or mobile data to log in.');
+      return;
+    }
     const cleanPhone = phoneInput.replace(/[^0-9]/g, '').slice(-10);
     if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
       setError('Please enter a valid 10-digit Indian mobile number');
@@ -167,6 +175,10 @@ export const AuthModal = ({
   // Phone + Password Login Handler
   const handlePhonePasswordLogin = async (e) => {
     e.preventDefault();
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setError('You are currently offline. Please reconnect to Wi-Fi or mobile data to log in.');
+      return;
+    }
     const cleanPhone = phoneInput.replace(/[^0-9]/g, '').slice(-10);
     if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
       setError('Please enter a valid 10-digit Indian mobile number');
@@ -196,6 +208,10 @@ export const AuthModal = ({
   // Email + Password Login Handler
   const handleEmailLogin = async (e) => {
     e.preventDefault();
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setError('You are currently offline. Please reconnect to Wi-Fi or mobile data to log in.');
+      return;
+    }
     const cleanEmail = emailInput.trim().toLowerCase();
     if (!cleanEmail || !cleanEmail.includes('@')) {
       setError('Please enter a valid email address');
@@ -224,6 +240,10 @@ export const AuthModal = ({
 
   // Send OTP for Register (Handles both Phone and Email via Switching)
   const handleRegisterSendOtp = async () => {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setError('You are currently offline. Please reconnect to Wi-Fi or mobile data to sign up.');
+      return;
+    }
     if (signupMethod === 'phone') {
       const cleanPhone = signupPhone.replace(/[^0-9]/g, '').slice(-10);
       if (!cleanPhone || !/^[6-9]\d{9}$/.test(cleanPhone)) {
@@ -270,6 +290,10 @@ export const AuthModal = ({
   // Sign Up Handler (Validates Primary Method Selected via Switcher)
   const handleSignup = async (e) => {
     e.preventDefault();
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setError('You are currently offline. Please reconnect to Wi-Fi or mobile data to complete registration.');
+      return;
+    }
     if (!name.trim() || name.trim().length < 2) {
       setError('Please enter your full name (minimum 2 characters)');
       return;

@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
+import { getOfflineData, saveOfflineData } from '../utils/offlineStorage';
 
 export const FullPageChat = ({ onOpenProfile }) => {
   const { user, token } = useAuth();
@@ -43,7 +44,7 @@ export const FullPageChat = ({ onOpenProfile }) => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  // 1. Fetch Threads and Contacts
+  // 1. Fetch Threads and Contacts (with offline cache persistence)
   const fetchThreads = async () => {
     if (!token) return;
     setLoadingThreads(true);
@@ -53,11 +54,24 @@ export const FullPageChat = ({ onOpenProfile }) => {
       });
       if (res.ok) {
         const data = await res.json();
-        setThreads(data.threads || []);
-        setContacts(data.contacts || []);
+        const threadsList = data.threads || [];
+        const contactsList = data.contacts || [];
+        setThreads(threadsList);
+        setContacts(contactsList);
+        saveOfflineData('chat_threads', threadsList);
+        saveOfflineData('chat_contacts', contactsList);
+      } else {
+        const cachedThreads = getOfflineData('chat_threads', []);
+        const cachedContacts = getOfflineData('chat_contacts', []);
+        if (cachedThreads.length > 0) setThreads(cachedThreads);
+        if (cachedContacts.length > 0) setContacts(cachedContacts);
       }
     } catch (err) {
-      console.error('Failed to load chat threads:', err);
+      console.warn('Failed to load chat threads online, falling back to cache:', err);
+      const cachedThreads = getOfflineData('chat_threads', []);
+      const cachedContacts = getOfflineData('chat_contacts', []);
+      if (cachedThreads.length > 0) setThreads(cachedThreads);
+      if (cachedContacts.length > 0) setContacts(cachedContacts);
     } finally {
       setLoadingThreads(false);
     }
@@ -67,7 +81,7 @@ export const FullPageChat = ({ onOpenProfile }) => {
     fetchThreads();
   }, [token]);
 
-  // 2. Fetch conversation history when activeChatUser changes
+  // 2. Fetch conversation history when activeChatUser changes (with offline cache persistence)
   useEffect(() => {
     if (!activeChatUser || !token) {
       setMessages([]);
@@ -76,16 +90,24 @@ export const FullPageChat = ({ onOpenProfile }) => {
 
     const fetchHistory = async () => {
       setLoadingMessages(true);
+      const cacheKey = `chat_history_${activeChatUser.id}`;
       try {
         const res = await fetch(`/api/messages/${activeChatUser.id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.ok) {
           const data = await res.json();
-          setMessages(data.messages || []);
+          const msgs = data.messages || [];
+          setMessages(msgs);
+          saveOfflineData(cacheKey, msgs);
+        } else {
+          const cached = getOfflineData(cacheKey, []);
+          if (cached && cached.length > 0) setMessages(cached);
         }
       } catch (err) {
-        console.error('Failed to load chat history:', err);
+        console.warn('Failed to load chat history online, falling back to cache:', err);
+        const cached = getOfflineData(cacheKey, []);
+        if (cached && cached.length > 0) setMessages(cached);
       } finally {
         setLoadingMessages(false);
       }

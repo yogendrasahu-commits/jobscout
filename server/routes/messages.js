@@ -70,8 +70,8 @@ router.get('/threads/all', authenticateToken, (req, res) => {
   res.json({ threads, contacts });
 });
 
-// 2. Post a message (REST API endpoint)
-router.post('/', authenticateToken, (req, res) => {
+// 2. Post a message (REST API endpoint with / and /send alias)
+const handlePostMessage = (req, res) => {
   const { receiverId, message, content } = req.body;
   const rawMsg = message !== undefined ? message : content;
   const trimmedMsg = rawMsg ? String(rawMsg).trim() : '';
@@ -98,7 +98,10 @@ router.post('/', authenticateToken, (req, res) => {
   }
 
   res.status(201).json({ message: newMsg });
-});
+};
+
+router.post('/', authenticateToken, handlePostMessage);
+router.post('/send', authenticateToken, handlePostMessage);
 
 // 3. Get conversation history with specific user
 router.get('/:otherUserId', authenticateToken, (req, res) => {

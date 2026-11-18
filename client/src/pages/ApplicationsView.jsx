@@ -39,6 +39,7 @@ import { playMessageChime, playSuccessChime } from '../utils/soundEffects';
 import { calculateAIMatch } from '../utils/aiMatchEngine';
 import { AIMatchBadge } from '../components/AIMatchBadge';
 import { AIMatchModal } from '../components/AIMatchModal';
+import { getOfflineData, saveOfflineData, queueOfflineAction } from '../utils/offlineStorage';
 
 export const ApplicationsView = ({ 
   onOpenProfile, 
@@ -50,7 +51,7 @@ export const ApplicationsView = ({
   const { setActiveChatUser, startCall, socket } = useSocket();
   const [selectedMatchApp, setSelectedMatchApp] = useState(null);
 
-  const [applications, setApplications] = useState([]);
+  const [applications, setApplications] = useState(() => getOfflineData(isEmployer ? 'employer_applications' : 'my_applications', []));
   const [loading, setLoading] = useState(Boolean(token));
 
   // Modal states
@@ -126,6 +127,7 @@ export const ApplicationsView = ({
       return;
     }
     setLoading(true);
+    const cacheKey = isEmployer ? 'employer_applications' : 'my_applications';
     try {
       const endpoint = isEmployer ? '/api/applications/employer' : '/api/applications/my';
       const res = await fetch(endpoint, {
@@ -135,10 +137,22 @@ export const ApplicationsView = ({
         const data = await res.json();
         const list = data.applications || [];
         setApplications(list);
+        saveOfflineData(cacheKey, list);
         if (onCountChange) onCountChange(list.length);
+      } else {
+        const cached = getOfflineData(cacheKey, []);
+        if (cached && cached.length > 0) {
+          setApplications(cached);
+          if (onCountChange) onCountChange(cached.length);
+        }
       }
     } catch (err) {
-      console.error('Failed to fetch applications:', err);
+      console.warn('Failed to fetch applications online, falling back to cache:', err);
+      const cached = getOfflineData(cacheKey, []);
+      if (cached && cached.length > 0) {
+        setApplications(cached);
+        if (onCountChange) onCountChange(cached.length);
+      }
     } finally {
       setLoading(false);
     }
@@ -187,6 +201,24 @@ export const ApplicationsView = ({
   }, [socket, isEmployer, user, selectedAppForView]);
 
   const updateStatus = async (appId, newStatus) => {
+    // Optimistic status update
+    setApplications(prev =>
+      prev.map(a => (a.id === appId ? { ...a, status: newStatus } : a))
+    );
+    if (newStatus === 'hired' || newStatus === 'offered') {
+      playSuccessChime();
+    }
+
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      queueOfflineAction({
+        type: 'UPDATE_APPLICATION_STATUS',
+        endpoint: `/api/applications/${appId}/status`,
+        method: 'PUT',
+        body: { status: newStatus }
+      });
+      return;
+    }
+
     try {
       const res = await fetch(`/api/applications/${appId}/status`, {
         method: 'PUT',
@@ -196,16 +228,17 @@ export const ApplicationsView = ({
         },
         body: JSON.stringify({ status: newStatus })
       });
-      if (res.ok) {
-        setApplications(prev =>
-          prev.map(a => (a.id === appId ? { ...a, status: newStatus } : a))
-        );
-        if (newStatus === 'hired' || newStatus === 'offered') {
-          playSuccessChime();
-        }
+      if (!res.ok) {
+        console.warn('Status update API response non-ok');
       }
     } catch (err) {
-      console.error('Failed to update application status:', err);
+      queueOfflineAction({
+        type: 'UPDATE_APPLICATION_STATUS',
+        endpoint: `/api/applications/${appId}/status`,
+        method: 'PUT',
+        body: { status: newStatus }
+      });
+      console.warn('Status update queued offline:', err);
     }
   };
 

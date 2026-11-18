@@ -151,6 +151,35 @@ export const jobController = {
     }
   },
 
+  // Update a job
+  updateJob: (req, res, next) => {
+    try {
+      if (req.user.role !== 'emp' && req.user.role !== 'admin') {
+        throw AppError.forbidden('Only employers or administrators can update jobs');
+      }
+
+      const existingJob = db.findJobById(req.params.id);
+      if (!existingJob) {
+        throw AppError.notFound('Job not found');
+      }
+      if (req.user.role !== 'admin' && existingJob.employerId !== req.user.id) {
+        throw AppError.forbidden('You can only update your own job postings');
+      }
+
+      const updates = { ...req.body };
+      delete updates.id;
+      delete updates.employerId;
+
+      const updatedJob = db.updateJob(req.params.id, updates);
+      if (req.io) {
+        req.io.emit('job:updated', updatedJob);
+      }
+      res.json({ success: true, job: updatedJob });
+    } catch (err) {
+      next(err);
+    }
+  },
+
   // Delete a job
   deleteJob: (req, res, next) => {
     try {

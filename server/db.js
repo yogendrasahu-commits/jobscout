@@ -1175,9 +1175,13 @@ class Database {
     }
     let list = [...this.data.anonDiscussions];
 
-    // Filter by channel
+    // Filter by channel (normalizing r/ or # prefixes for robust cross-client matching)
     if (filter.channel && filter.channel !== 'all') {
-      list = list.filter(d => d.channel.toLowerCase() === filter.channel.toLowerCase());
+      const targetChannel = filter.channel.toLowerCase().replace(/^(r\/|#)/, '').trim();
+      list = list.filter(d => {
+        const itemChannel = (d.channel || '').toLowerCase().replace(/^(r\/|#)/, '').trim();
+        return itemChannel === targetChannel;
+      });
     }
 
     // Filter by search query

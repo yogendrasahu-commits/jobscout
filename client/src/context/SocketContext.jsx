@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, useRef } from 'r
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 import { playMessageChime } from '../utils/soundEffects';
+import { queueOfflineAction } from '../utils/offlineStorage';
 
 const SocketContext = createContext();
 
@@ -207,8 +208,11 @@ export const SocketProvider = ({ children }) => {
     };
     const socketUrl = resolveSocketUrl();
     const s = io(socketUrl, {
-      reconnectionAttempts: 10,
+      reconnection: true,
+      reconnectionAttempts: Infinity,
       reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      timeout: 20000,
       transports: ['websocket', 'polling']
     });
 
@@ -1223,14 +1227,25 @@ export const SocketProvider = ({ children }) => {
     }
   };
 
-  // Send Chat message
+  // Send Chat message (with offline queueing support)
   const sendMessage = (receiverId, messageText) => {
-    if (socket && user?.id) {
+    if (socket && user?.id && socket.connected) {
       socket.emit('chat:send', {
         senderId: user.id,
         senderName: user.name,
         receiverId,
         message: messageText
+      });
+    } else if (user?.id) {
+      // If socket is disconnected / offline, queue message via outbox
+      queueOfflineAction({
+        type: 'CHAT_MESSAGE',
+        endpoint: '/api/messages',
+        method: 'POST',
+        body: {
+          receiverId,
+          message: messageText
+        }
       });
     }
   };

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { queueOfflineAction } from '../utils/offlineStorage.js';
 
 const AuthContext = createContext();
 
@@ -30,7 +31,7 @@ export const AuthProvider = ({ children }) => {
           const data = await res.json();
           setUser(data.user);
           localStorage.setItem('jobradar_user', JSON.stringify(data.user));
-        } else {
+        } else if (res.status === 401 || res.status === 403) {
           logout();
         }
       } catch (err) {
@@ -163,7 +164,21 @@ export const AuthProvider = ({ children }) => {
 
 
   const updateLocation = async (lat, lng, address) => {
-    if (!token) return;
+    if (!token && !user) return;
+    const optimisticUser = { ...user, lat, lng, address };
+    setUser(optimisticUser);
+    try { localStorage.setItem('jobradar_user', JSON.stringify(optimisticUser)); } catch {}
+
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      queueOfflineAction({
+        type: 'UPDATE_LOCATION',
+        endpoint: '/api/auth/location',
+        method: 'PUT',
+        body: { lat, lng, address }
+      });
+      return;
+    }
+
     try {
       const res = await fetch('/api/auth/location', {
         method: 'PUT',
@@ -179,12 +194,32 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('jobradar_user', JSON.stringify(data.user));
       }
     } catch (err) {
-      console.error('Update location error:', err);
+      queueOfflineAction({
+        type: 'UPDATE_LOCATION',
+        endpoint: '/api/auth/location',
+        method: 'PUT',
+        body: { lat, lng, address }
+      });
+      console.warn('Update location queued offline:', err);
     }
   };
 
   const updateProfile = async (updates) => {
-    if (!token) return { success: false, error: 'Not authenticated' };
+    if (!token && !user) return { success: false, error: 'Not authenticated' };
+    const optimisticUser = { ...user, ...updates };
+
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      queueOfflineAction({
+        type: 'UPDATE_PROFILE',
+        endpoint: '/api/auth/profile',
+        method: 'PUT',
+        body: updates
+      });
+      setUser(optimisticUser);
+      try { localStorage.setItem('jobradar_user', JSON.stringify(optimisticUser)); } catch {}
+      return { success: true, user: optimisticUser, offlineQueued: true, message: 'Profile updated offline (will sync on reconnect)' };
+    }
+
     try {
       const res = await fetch('/api/auth/profile', {
         method: 'PUT',
@@ -206,6 +241,17 @@ export const AuthProvider = ({ children }) => {
       }
       return { success: true, user: data.user, message: data.message };
     } catch (err) {
+      if (err.message && err.message.toLowerCase().includes('failed to fetch')) {
+        queueOfflineAction({
+          type: 'UPDATE_PROFILE',
+          endpoint: '/api/auth/profile',
+          method: 'PUT',
+          body: updates
+        });
+        setUser(optimisticUser);
+        try { localStorage.setItem('jobradar_user', JSON.stringify(optimisticUser)); } catch {}
+        return { success: true, user: optimisticUser, offlineQueued: true, message: 'Saved offline. Will sync when reconnected.' };
+      }
       console.error('Update profile error:', err);
       return { success: false, error: err.message };
     }

@@ -27,6 +27,7 @@ import { calculateAIMatch } from '../utils/aiMatchEngine';
 import { AIMatchBadge } from '../components/AIMatchBadge';
 import { AIMatchModal } from '../components/AIMatchModal';
 import { SmartCommuteModal } from '../components/SmartCommuteModal';
+import { queueOfflineAction } from '../utils/offlineStorage';
 
 export const JobsList = ({ 
   jobs = [], 
@@ -90,6 +91,16 @@ export const JobsList = ({
     });
 
     if (token) {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        queueOfflineAction({
+          type: 'TOGGLE_SAVED_JOB',
+          endpoint: '/api/auth/saved-jobs/toggle',
+          method: 'POST',
+          body: { jobId }
+        });
+        return;
+      }
+
       fetch('/api/auth/saved-jobs/toggle', {
         method: 'POST',
         headers: {
@@ -97,7 +108,14 @@ export const JobsList = ({
           Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({ jobId })
-      }).catch(() => {});
+      }).catch(() => {
+        queueOfflineAction({
+          type: 'TOGGLE_SAVED_JOB',
+          endpoint: '/api/auth/saved-jobs/toggle',
+          method: 'POST',
+          body: { jobId }
+        });
+      });
     }
   };
 

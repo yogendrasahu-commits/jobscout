@@ -15,6 +15,7 @@ router.get('/my', authenticateToken, jobController.getMyJobs);
 router.get('/', jobController.getAllJobs);
 router.get('/:id', jobController.getJobById);
 router.post('/', authenticateToken, jobController.createJob);
+router.put('/:id', authenticateToken, jobController.updateJob);
 router.delete('/:id', authenticateToken, jobController.deleteJob);
 
 export default router;
