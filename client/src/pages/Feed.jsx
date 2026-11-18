@@ -772,42 +772,42 @@ export const Feed = ({
         {/* ========================================================== */}
         {/* RIGHT COLUMN: RADAR, DISCOVERY & HIGH-TECH WIDGETS */}
         {/* ========================================================== */}
-        <div className="hidden lg:block lg:col-span-3 space-y-4 sticky top-20 self-start max-h-[calc(100vh-5.5rem)] overflow-y-auto overscroll-contain no-scrollbar pb-6">
+        <div className="hidden lg:block lg:col-span-3 space-y-4 sticky top-20 self-start max-h-[calc(100vh-5.5rem)] overflow-y-auto overscroll-contain no-scrollbar pb-28">
           
           {/* Live Speed Match & WebRTC Radar Card */}
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white p-5 shadow-xl border border-indigo-500/20">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-50/90 via-violet-50/70 to-cyan-50/80 dark:from-slate-900 dark:via-indigo-950 dark:to-slate-900 text-slate-900 dark:text-white p-5 shadow-sm dark:shadow-xl border border-indigo-200/80 dark:border-indigo-500/20 transition-all duration-300">
             {/* Background glowing blur */}
-            <div className="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/20 rounded-full blur-2xl pointer-events-none" />
-            <div className="absolute -bottom-8 -left-8 w-28 h-28 bg-emerald-500/20 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute -bottom-8 -left-8 w-28 h-28 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-full blur-2xl pointer-events-none" />
 
             <div className="relative z-10 space-y-3.5">
               <div className="flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-[10px] font-black uppercase tracking-wider text-emerald-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 dark:bg-emerald-500/20 border border-emerald-500/30 dark:border-emerald-400/30 text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
                   Live Radar Online
                 </span>
-                <Radio className="w-4 h-4 text-indigo-300 animate-pulse" />
+                <Radio className="w-4 h-4 text-indigo-600 dark:text-indigo-300 animate-pulse" />
               </div>
 
               <div>
-                <h3 className="text-sm font-black tracking-tight text-white flex items-center gap-1.5">
-                  <Zap className="w-4 h-4 text-amber-400 fill-amber-400" />
+                <h3 className="text-sm font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <Zap className="w-4 h-4 text-amber-500 dark:text-amber-400 fill-amber-500 dark:fill-amber-400" />
                   Instant Speed Connect
                 </h3>
-                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
                   Direct peer-to-peer WebRTC video screening without middleman delays.
                 </p>
               </div>
 
               {/* Dynamic Ecosystem Counts */}
               <div className="grid grid-cols-2 gap-2 py-1">
-                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-2.5 border border-white/10 text-center">
-                  <div className="text-base font-black text-white">{seekers?.length || 24}</div>
-                  <div className="text-[10px] font-semibold text-slate-300 uppercase tracking-wider">Talent Online</div>
+                <div className="bg-white/80 dark:bg-white/10 backdrop-blur-md rounded-2xl p-2.5 border border-indigo-100 dark:border-white/10 text-center shadow-xs">
+                  <div className="text-base font-black text-slate-900 dark:text-white">{seekers?.length || 24}</div>
+                  <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Talent Online</div>
                 </div>
-                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-2.5 border border-white/10 text-center">
-                  <div className="text-base font-black text-amber-400">{jobs?.length || 38}</div>
-                  <div className="text-[10px] font-semibold text-slate-300 uppercase tracking-wider">Active Jobs</div>
+                <div className="bg-white/80 dark:bg-white/10 backdrop-blur-md rounded-2xl p-2.5 border border-indigo-100 dark:border-white/10 text-center shadow-xs">
+                  <div className="text-base font-black text-indigo-600 dark:text-amber-400">{jobs?.length || 38}</div>
+                  <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Active Jobs</div>
                 </div>
               </div>
 
@@ -815,7 +815,7 @@ export const Feed = ({
               <button
                 type="button"
                 onClick={() => onNavigateToConnect ? onNavigateToConnect() : (onNavigateToMap && onNavigateToMap())}
-                className="w-full py-2.5 px-3 rounded-2xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/50 transition-all flex items-center justify-center gap-2 active:scale-98 group cursor-pointer"
+                className="w-full py-2.5 px-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold text-xs shadow-md shadow-indigo-600/25 hover:shadow-indigo-600/40 transition-all flex items-center justify-center gap-2 active:scale-98 group cursor-pointer"
               >
                 <Zap className="w-3.5 h-3.5 group-hover:scale-110 transition-transform text-amber-300 fill-amber-300" />
                 <span>Launch Speed Match</span>

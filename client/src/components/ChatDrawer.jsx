@@ -238,22 +238,22 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
     return (
       <button
         onClick={() => setIsChatDrawerOpen(true)}
-        className="hidden md:flex fixed bottom-5 right-6 z-30 bg-white/95 hover:bg-white text-slate-800 hover:text-slate-950 rounded-2xl px-4 py-2.5 shadow-xl items-center gap-2.5 border border-slate-200/90 active:scale-95 transition-all select-none group backdrop-blur-md"
+        className="hidden md:flex fixed bottom-5 right-6 z-30 bg-white/95 dark:bg-slate-900/95 hover:bg-white dark:hover:bg-slate-900 text-slate-800 dark:text-slate-100 hover:text-slate-950 dark:hover:text-white rounded-full px-3.5 py-2 shadow-xl items-center gap-2 border border-slate-200/90 dark:border-slate-800 active:scale-95 transition-all select-none group backdrop-blur-md cursor-pointer"
         title="Open Chat List (चैट लिस्ट)"
       >
         <div className="relative">
-          <div className="w-7 h-7 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-            <MessageSquare className="w-4 h-4" />
+          <div className="w-7 h-7 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+            <MessageSquare className="w-3.5 h-3.5" />
           </div>
           {totalUnread > 0 ? (
-            <span className="absolute -top-1.5 -right-2 bg-rose-500 text-[10px] font-black text-white px-1.5 py-0.2 rounded-full border border-white animate-pulse">
+            <span className="absolute -top-1.5 -right-2 bg-rose-500 text-[10px] font-black text-white px-1.5 py-0.2 rounded-full border border-white dark:border-slate-900 animate-pulse">
               {totalUnread}
             </span>
           ) : (
             <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-500 rounded-full" />
           )}
         </div>
-        <span className="text-xs font-bold">
+        <span className="text-xs font-bold hidden xl:inline">
           Messaging (चैट)
         </span>
       </button>

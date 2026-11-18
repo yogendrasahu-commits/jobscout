@@ -344,34 +344,34 @@ export const Navbar = ({
   };
 
   return (
-    <header className="bg-white/85 backdrop-blur-2xl border-b border-slate-200/70 sticky top-0 z-[800] select-none shadow-[0_4px_24px_-4px_rgba(0,0,0,0.03)] w-full max-w-full transition-all pt-[env(safe-area-inset-top,0px)]">
+    <header className="bg-white/85 dark:bg-slate-950/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-slate-800/70 sticky top-0 z-[800] select-none shadow-[0_4px_24px_-4px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_24px_-4px_rgba(0,0,0,0.4)] w-full max-w-full transition-all pt-[env(safe-area-inset-top,0px)]">
       <div className="w-full max-w-[1700px] mx-auto px-2 sm:px-4 lg:px-6">
-        <div className="flex items-center justify-between h-[56px] sm:h-[60px] md:h-[68px] gap-1.5 sm:gap-2 lg:gap-3 w-full min-w-0">
+        <div className="flex items-center justify-between h-[56px] sm:h-[60px] md:h-[68px] gap-1 sm:gap-2 lg:gap-3 w-full min-w-0">
           
           {/* ========================================================== */}
           {/* 1. BRAND LOGO & LOCATION PILL & SEARCH BAR */}
           {/* ========================================================== */}
-          <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 justify-start min-w-0 flex-shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-2.5 justify-start min-w-0 flex-shrink-0">
             {/* Logo */}
             <div 
-              className="flex items-center gap-1.5 sm:gap-2.5 cursor-pointer group flex-shrink-0" 
+              className="flex items-center gap-1.5 sm:gap-2 cursor-pointer group flex-shrink-0" 
               onClick={() => setCurrentTab('feed')}
               title="JobScout - Live Feed"
             >
               <div className="relative group-hover:scale-105 transition-all duration-300 flex-shrink-0">
-                <JobScoutLogo size={38} className="w-8 h-8 sm:w-10 sm:h-10" />
+                <JobScoutLogo size={36} className="w-7 h-7 sm:w-9 sm:h-9" />
               </div>
 
               <div className="leading-none">
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                  <span className="font-black text-base sm:text-lg lg:text-xl tracking-tight text-slate-900 flex items-center">
+                <div className="flex items-center gap-1">
+                  <span className="font-black text-base sm:text-lg tracking-tight text-slate-900 dark:text-white flex items-center">
                     Job<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-indigo-600 to-cyan-500 ml-0.5">Scout</span>
                     <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 ml-1 shadow-[0_0_8px_rgba(6,182,212,0.8)] animate-pulse" />
                   </span>
                 </div>
-                <div className="hidden 2xl:flex items-center gap-1.5 text-[10px] text-slate-500 mt-1">
+                <div className="hidden 2xl:flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400 mt-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0 shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
-                  <span className="truncate max-w-[120px] font-medium text-slate-600">
+                  <span className="truncate max-w-[120px] font-medium text-slate-600 dark:text-slate-300">
                     {user?.address ? user.address.split(',')[0] : 'India • GPS Live'}
                   </span>
                 </div>
@@ -379,19 +379,19 @@ export const Navbar = ({
             </div>
 
             {/* Quick Live Search Bar (Desktop / Laptop >= md) */}
-            <div className="hidden md:flex items-center gap-1.5 flex-shrink-0 relative" ref={searchRef}>
+            <div className="hidden md:flex items-center gap-1 flex-shrink-0 relative" ref={searchRef}>
               <form onSubmit={handleSearchSubmit} className="relative group">
                 <Search className="w-3.5 h-3.5 text-indigo-500 group-focus-within:text-indigo-600 absolute left-3 top-2.5 transition-colors" />
                 <input
                   type="text"
-                  placeholder="Search jobs, talent..."
+                  placeholder="Search jobs..."
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
                     setSearchFocused(true);
                   }}
                   onFocus={() => setSearchFocused(true)}
-                  className="w-24 md:w-28 lg:w-36 xl:w-52 bg-slate-100/70 hover:bg-slate-100 border border-slate-200/70 hover:border-slate-300 rounded-full pl-8 pr-7 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-all"
+                  className="w-24 md:w-28 lg:w-32 xl:w-44 2xl:w-52 bg-slate-100/70 hover:bg-slate-100 dark:bg-slate-900/70 dark:hover:bg-slate-900 border border-slate-200/70 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700 rounded-full pl-8 pr-7 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-all"
                   title="Search Jobs, Companies, Candidates"
                 />
                 {searchQuery ? (
@@ -583,16 +583,16 @@ export const Navbar = ({
           {/* ========================================================== */}
           {/* 2. LAPTOP & DESKTOP NAVIGATION TABS (Centered in Header) */}
           {/* ========================================================== */}
-          <div className="hidden lg:flex justify-center items-center flex-1 min-w-0 mx-1 lg:mx-2 xl:mx-3">
-            <nav className="flex items-center gap-0.5 lg:gap-1 bg-slate-100/80 backdrop-blur-md p-1 rounded-full border border-slate-200/80 shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)] flex-nowrap shrink-0">
+          <div className="hidden lg:flex justify-center items-center flex-1 min-w-0 mx-1 lg:mx-2 xl:mx-3 overflow-hidden">
+            <nav className="flex items-center gap-0.5 lg:gap-1 bg-slate-100/80 dark:bg-slate-900/80 backdrop-blur-md p-1 rounded-full border border-slate-200/80 dark:border-slate-800 shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)] flex-nowrap max-w-full">
               
               {/* 1. Feed (Home) */}
               <button
                 onClick={() => setCurrentTab('feed')}
-                className={`flex items-center gap-1.5 px-2 xl:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-2.5 xl:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'feed'
-                    ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
-                    : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
+                    ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 dark:ring-white/10 font-extrabold'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-800/80 font-bold'
                 }`}
                 title="Feed (Home)"
               >
@@ -603,24 +603,24 @@ export const Navbar = ({
               {/* 2. Network */}
               <button
                 onClick={() => setCurrentTab('network')}
-                className={`flex items-center gap-1.5 px-2 xl:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-2 xl:px-3 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'network'
-                    ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
-                    : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
+                    ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 dark:ring-white/10 font-extrabold'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-800/80 font-bold'
                 }`}
                 title={`Professional Network (${seekersCount + employersCount})`}
               >
                 <NavNetworkIcon active={currentTab === 'network'} className="w-4 h-4 flex-shrink-0" />
-                <span className="font-bold tracking-tight">Network</span>
+                <span className="font-bold tracking-tight hidden xl:inline">Network</span>
               </button>
 
               {/* 3. Live Map */}
               <button
                 onClick={() => setCurrentTab('map')}
-                className={`flex items-center gap-1.5 px-2 xl:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-2 xl:px-3 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'map'
-                    ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
-                    : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
+                    ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 dark:ring-white/10 font-extrabold'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-800/80 font-bold'
                 }`}
                 title="Live Geospatial Job Radar Map"
               >
@@ -632,17 +632,17 @@ export const Navbar = ({
               {/* 4. Jobs & Applied */}
               <button
                 onClick={() => setCurrentTab('jobs')}
-                className={`flex items-center gap-1.5 px-2 xl:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-2 xl:px-3 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'jobs' || currentTab === 'applications'
-                    ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
-                    : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
+                    ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 dark:ring-white/10 font-extrabold'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-800/80 font-bold'
                 }`}
                 title={`Job Board & Applications (${jobsCount} openings)`}
               >
                 <NavJobsIcon active={currentTab === 'jobs' || currentTab === 'applications'} className="w-4 h-4 flex-shrink-0" />
                 <span className="font-bold tracking-tight">Jobs</span>
                 {jobsCount > 0 && (
-                  <span className="text-[10px] bg-indigo-50 px-1.5 py-0.2 rounded-full text-indigo-700 border border-indigo-200 font-extrabold">
+                  <span className="text-[10px] bg-indigo-50 dark:bg-indigo-950/60 px-1.5 py-0.2 rounded-full text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-extrabold">
                     {jobsCount}
                   </span>
                 )}
@@ -652,25 +652,25 @@ export const Navbar = ({
               {user?.role !== 'admin' && (
                 <button
                   onClick={() => setCurrentTab('connect')}
-                  className={`flex items-center gap-1.5 px-2 xl:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                  className={`flex items-center gap-1.5 px-2 xl:px-3 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                     currentTab === 'connect'
-                      ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
-                      : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
+                      ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 dark:ring-white/10 font-extrabold'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-800/80 font-bold'
                   }`}
                   title="Speed Connect Hub (Audio & Video Calls)"
                 >
                   <NavConnectIcon active={currentTab === 'connect'} className="w-4 h-4 flex-shrink-0" />
-                  <span className="font-bold tracking-tight">Speed Connect</span>
+                  <span className="font-bold tracking-tight hidden xl:inline">Speed Connect</span>
                 </button>
               )}
 
               {/* 6. Anonymous Discussions (Desktop & Laptop) */}
               <button
                 onClick={() => setCurrentTab('anon')}
-                className={`flex items-center gap-1.5 px-2 xl:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-2 xl:px-3 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'anon'
-                    ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
-                    : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
+                    ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 dark:ring-white/10 font-extrabold'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-800/80 font-bold'
                 }`}
                 title="JobScout Anon Talk"
               >
@@ -678,7 +678,7 @@ export const Navbar = ({
                   <NavAnonIcon active={currentTab === 'anon'} className="w-4 h-4 flex-shrink-0" />
                   <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" />
                 </div>
-                <span className="font-bold tracking-tight">Anon Talk</span>
+                <span className="font-bold tracking-tight hidden 2xl:inline">Anon Talk</span>
               </button>
 
               {/* 7. Full-Page Messaging */}
@@ -690,10 +690,10 @@ export const Navbar = ({
                     setCurrentTab('messages');
                   }
                 }}
-                className={`flex items-center gap-1.5 px-2 xl:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-2 xl:px-3 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'messages'
-                    ? 'bg-white text-slate-950 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 font-extrabold'
-                    : 'text-slate-700 hover:text-slate-950 hover:bg-white/80 font-bold'
+                    ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 dark:ring-white/10 font-extrabold'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-800/80 font-bold'
                 }`}
                 title={user ? 'Full-Page Messaging (चैट)' : 'Messages (Login Required)'}
               >
@@ -701,22 +701,22 @@ export const Navbar = ({
                   <NavMessagesIcon active={currentTab === 'messages'} className="w-4 h-4 flex-shrink-0" />
                   <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
                 </div>
-                <span className="font-bold tracking-tight">Chat</span>
+                <span className="font-bold tracking-tight hidden 2xl:inline">Chat</span>
               </button>
 
               {/* 8. Admin Portal (Exclusive to Admin Role) */}
               {user?.role === 'admin' && (
                 <button
                   onClick={() => setCurrentTab('admin')}
-                  className={`flex items-center gap-1.5 px-2 xl:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                  className={`flex items-center gap-1.5 px-2 xl:px-3 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                     currentTab === 'admin'
                       ? 'bg-rose-600 text-white shadow-[0_2px_12px_rgba(225,29,72,0.4)] font-extrabold ring-1 ring-rose-400'
-                      : 'text-rose-600 hover:text-rose-700 hover:bg-rose-50 font-bold bg-rose-50/70 border border-rose-200/80'
+                      : 'text-rose-600 dark:text-rose-400 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 font-bold bg-rose-50/70 dark:bg-rose-950/20 border border-rose-200/80 dark:border-rose-900/60'
                   }`}
                   title="JobScout Enterprise Master Admin Console"
                 >
                   <ShieldAlert className="w-4 h-4 flex-shrink-0 text-rose-500" />
-                  <span className="font-extrabold tracking-tight">Admin</span>
+                  <span className="font-extrabold tracking-tight hidden 2xl:inline">Admin</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping ml-0.5" />
                 </button>
               )}
@@ -810,11 +810,11 @@ export const Navbar = ({
             {user && isEmployer && (
               <button
                 onClick={onOpenPostJob}
-                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 text-white shadow-md shadow-emerald-600/20 border border-emerald-500/30 transition-all active:scale-95 flex-shrink-0"
+                className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 text-white shadow-md shadow-emerald-600/20 border border-emerald-500/30 transition-all active:scale-95 flex-shrink-0"
                 title="Post a New Job on Map"
               >
                 <PlusCircle className="w-4 h-4 flex-shrink-0" />
-                <span className="hidden xl:inline whitespace-nowrap">Post Job</span>
+                <span className="hidden 2xl:inline whitespace-nowrap">Post Job</span>
               </button>
             )}
 
@@ -823,7 +823,7 @@ export const Navbar = ({
               <button
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
                 title={`Notifications (${unreadNotifsCount} unread)`}
-                className="relative p-2 rounded-full bg-gradient-to-br from-amber-50 to-orange-50/80 hover:from-amber-100 hover:to-orange-100 border border-amber-200/80 text-amber-600 hover:text-amber-700 transition-all shadow-[0_1px_3px_rgba(245,158,11,0.12)] hover:scale-105 active:scale-95 flex-shrink-0"
+                className="relative p-2 rounded-full bg-gradient-to-br from-amber-50 to-orange-50/80 hover:from-amber-100 hover:to-orange-100 dark:from-amber-950/40 dark:to-orange-950/40 border border-amber-200/80 dark:border-amber-800/60 text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-all shadow-[0_1px_3px_rgba(245,158,11,0.12)] hover:scale-105 active:scale-95 flex-shrink-0 cursor-pointer"
               >
                 <Bell className="w-4 h-4" />
                 {unreadNotifsCount > 0 && (
@@ -919,7 +919,7 @@ export const Navbar = ({
                   aria-label="Cycle Themes"
                 >
                   <span className="text-sm">{currentThemeInfo.icon}</span>
-                  <span className="hidden xl:inline text-xs font-bold text-slate-800 dark:text-slate-200">
+                  <span className="hidden 2xl:inline text-xs font-bold text-slate-800 dark:text-slate-200">
                     {currentThemeInfo.label}
                   </span>
                 </button>
