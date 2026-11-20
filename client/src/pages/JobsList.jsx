@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Search, 
   MapPin, 
@@ -174,59 +174,61 @@ export const JobsList = ({
     if (onQuickFilterChange) onQuickFilterChange(filter);
   };
 
-  // Filter & Sort Logic
-  const filteredJobs = jobs
-    .filter(j => {
-      // Search match
-      const s = searchTerm.toLowerCase();
-      const matchesSearch = !s || (
-        j.title?.toLowerCase().includes(s) ||
-        j.company?.toLowerCase().includes(s) ||
-        j.address?.toLowerCase().includes(s) ||
-        (j.skills && j.skills.some(sk => sk.toLowerCase().includes(s)))
-      );
+  // High-performance memoized filter and sort
+  const filteredJobs = useMemo(() => {
+    return jobs
+      .filter(j => {
+        // Search match
+        const s = (searchTerm || '').trim().toLowerCase();
+        const matchesSearch = !s || (
+          j.title?.toLowerCase().includes(s) ||
+          j.company?.toLowerCase().includes(s) ||
+          j.address?.toLowerCase().includes(s) ||
+          (j.skills && j.skills.some(sk => sk.toLowerCase().includes(s)))
+        );
 
-      // Dropdown filters
-      const matchesType = selectedType === 'All' ? true : j.jobType === selectedType;
-      const matchesCategory = selectedCategory === 'All' ? true : (
-        j.category?.toLowerCase() === selectedCategory.toLowerCase() ||
-        (selectedCategory === 'Technology' && (j.category === 'Technology' || j.skills?.some(sk => ['React', 'Node.js', 'Python', 'Go'].includes(sk)))) ||
-        (selectedCategory === 'AI & Data' && (j.title?.toLowerCase().includes('ai') || j.title?.toLowerCase().includes('data') || j.skills?.some(sk => ['PyTorch', 'LLM', 'SQL', 'Python'].includes(sk))))
-      );
-      const matchesWorkMode = selectedWorkMode === 'All' ? true : (
-        j.workMode === selectedWorkMode || (selectedWorkMode === 'Remote' && (j.address?.toLowerCase().includes('remote') || j.jobType?.toLowerCase().includes('remote')))
-      );
-      const matchesExperience = selectedExperience === 'All' ? true : (
-        j.experienceLevel === selectedExperience || 
-        (selectedExperience === 'Senior' && j.title?.toLowerCase().includes('senior')) ||
-        (selectedExperience === 'Lead' && j.title?.toLowerCase().includes('lead'))
-      );
+        // Dropdown filters
+        const matchesType = selectedType === 'All' ? true : j.jobType === selectedType;
+        const matchesCategory = selectedCategory === 'All' ? true : (
+          j.category?.toLowerCase() === selectedCategory.toLowerCase() ||
+          (selectedCategory === 'Technology' && (j.category === 'Technology' || j.skills?.some(sk => ['React', 'Node.js', 'Python', 'Go'].includes(sk)))) ||
+          (selectedCategory === 'AI & Data' && (j.title?.toLowerCase().includes('ai') || j.title?.toLowerCase().includes('data') || j.skills?.some(sk => ['PyTorch', 'LLM', 'SQL', 'Python'].includes(sk))))
+        );
+        const matchesWorkMode = selectedWorkMode === 'All' ? true : (
+          j.workMode === selectedWorkMode || (selectedWorkMode === 'Remote' && (j.address?.toLowerCase().includes('remote') || j.jobType?.toLowerCase().includes('remote')))
+        );
+        const matchesExperience = selectedExperience === 'All' ? true : (
+          j.experienceLevel === selectedExperience || 
+          (selectedExperience === 'Senior' && j.title?.toLowerCase().includes('senior')) ||
+          (selectedExperience === 'Lead' && j.title?.toLowerCase().includes('lead'))
+        );
 
-      // Quick filter chips
-      if (quickFilter === 'saved' && !savedJobIds.includes(j.id)) return false;
-      if (quickFilter === 'urgent' && !j.urgent) return false;
-      if (quickFilter === 'instant_shift' && !(j.urgent || j.isInstantShift || j.jobType === 'Shift' || j.jobType === 'Part-time' || j.jobType === 'Contract')) return false;
-      if (quickFilter === 'remote' && !(j.workMode === 'Remote' || j.address?.toLowerCase().includes('remote'))) return false;
+        // Quick filter chips
+        if (quickFilter === 'saved' && !savedJobIds.includes(j.id)) return false;
+        if (quickFilter === 'urgent' && !j.urgent) return false;
+        if (quickFilter === 'instant_shift' && !(j.urgent || j.isInstantShift || j.jobType === 'Shift' || j.jobType === 'Part-time' || j.jobType === 'Contract')) return false;
+        if (quickFilter === 'remote' && !(j.workMode === 'Remote' || j.address?.toLowerCase().includes('remote'))) return false;
 
-      return matchesSearch && matchesType && matchesCategory && matchesWorkMode && matchesExperience;
-    })
-    .sort((a, b) => {
-      if (sortBy === 'ai_match') {
-        const scoreA = calculateAIMatch(user, a).score;
-        const scoreB = calculateAIMatch(user, b).score;
-        return scoreB - scoreA;
-      }
-      if (sortBy === 'salary_high') {
-        const salA = a.minSalary || (parseInt((a.salary || '').replace(/[^0-9]/g, '')) || 0);
-        const salB = b.minSalary || (parseInt((b.salary || '').replace(/[^0-9]/g, '')) || 0);
-        return salB - salA;
-      }
-      if (sortBy === 'urgent') {
-        return (b.urgent ? 1 : 0) - (a.urgent ? 1 : 0);
-      }
-      // default newest
-      return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-    });
+        return matchesSearch && matchesType && matchesCategory && matchesWorkMode && matchesExperience;
+      })
+      .sort((a, b) => {
+        if (sortBy === 'ai_match') {
+          const scoreA = calculateAIMatch(user, a).score;
+          const scoreB = calculateAIMatch(user, b).score;
+          return scoreB - scoreA;
+        }
+        if (sortBy === 'salary_high') {
+          const salA = a.minSalary || (parseInt((a.salary || '').replace(/[^0-9]/g, '')) || 0);
+          const salB = b.minSalary || (parseInt((b.salary || '').replace(/[^0-9]/g, '')) || 0);
+          return salB - salA;
+        }
+        if (sortBy === 'urgent') {
+          return (b.urgent ? 1 : 0) - (a.urgent ? 1 : 0);
+        }
+        // default newest
+        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+      });
+  }, [jobs, searchTerm, selectedType, selectedCategory, selectedWorkMode, selectedExperience, quickFilter, savedJobIds, sortBy, user]);
 
   return (
     <div className="max-w-[1600px] w-full mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">

@@ -788,3 +788,20 @@ html.dark .micro-pill-rose {
 html.dark .micro-pill-amber {
   color: #fbbf24;
 }
+
+/* 60fps GPU Hardware Acceleration for Map, Modals, and Interactive Cards */
+.leaflet-tile-container {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.custom-job-icon, .custom-seeker-icon {
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.modal-sheet, .modal-backdrop {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+

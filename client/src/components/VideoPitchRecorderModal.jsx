@@ -130,12 +130,25 @@ export const VideoPitchRecorderModal = ({
     setCountdown(30);
   };
 
+  // Close modal safely terminating media stream
+  const handleCloseModal = () => {
+    if (stream) {
+      try {
+        stream.getTracks().forEach(track => track.stop());
+      } catch {}
+    }
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
+    }
+    onClose();
+  };
+
   // Save to Profile
   const handleSave = () => {
     if (onSavePitch) {
       onSavePitch(recordedBlobUrl || 'saved_video_pitch');
     }
-    onClose();
+    handleCloseModal();
   };
 
   return (
@@ -149,7 +162,7 @@ export const VideoPitchRecorderModal = ({
             <h3 className="text-sm font-black tracking-wide">30-Second Elevator Pitch</h3>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleCloseModal}
             className="p-1.5 rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
