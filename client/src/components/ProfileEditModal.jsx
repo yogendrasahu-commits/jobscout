@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Edit3, Save, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { validateEmail } from '../utils/validators';
 
 /**
  * Modal for editing the current user's profile.
@@ -45,6 +46,20 @@ export const ProfileEditModal = ({ isOpen, onClose, onUpdated }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const trimmedName = form.name.trim();
+    if (trimmedName.length < 2) {
+      setError('Please enter a valid full name (at least 2 characters)');
+      return;
+    }
+    const trimmedEmail = form.email.trim();
+    if (trimmedEmail) {
+      const emailErr = validateEmail(trimmedEmail);
+      if (emailErr) {
+        setError(emailErr);
+        return;
+      }
+    }
+
     setLoading(true);
     setError('');
     try {

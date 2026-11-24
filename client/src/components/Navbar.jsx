@@ -587,8 +587,8 @@ export const Navbar = ({
           {/* ========================================================== */}
           {/* 2. LAPTOP & DESKTOP NAVIGATION TABS (Centered in Header) */}
           {/* ========================================================== */}
-          <div className="hidden lg:flex justify-center items-center flex-1 min-w-0 mx-1 lg:mx-2 xl:mx-3 overflow-hidden">
-            <nav className="flex items-center gap-0.5 lg:gap-1 bg-slate-100/80 dark:bg-slate-900/80 backdrop-blur-md p-1 rounded-full border border-slate-200/80 dark:border-slate-800 shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)] flex-nowrap max-w-full">
+          <div className="hidden lg:flex justify-center items-center flex-1 min-w-0 mx-2 lg:mx-3 xl:mx-4">
+            <nav className="flex items-center gap-0.5 lg:gap-1 bg-slate-100/80 dark:bg-slate-900/80 backdrop-blur-md p-1 rounded-full border border-slate-200/80 dark:border-slate-800 shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)] flex-nowrap">
               
               {/* 1. Feed (Home) */}
               <button
@@ -814,11 +814,11 @@ export const Navbar = ({
             {user && isEmployer && (
               <button
                 onClick={onOpenPostJob}
-                className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 text-white shadow-md shadow-emerald-600/20 border border-emerald-500/30 transition-all active:scale-95 flex-shrink-0"
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 text-white shadow-md shadow-emerald-600/20 border border-emerald-500/30 transition-all active:scale-95 flex-shrink-0 cursor-pointer"
                 title="Post a New Job on Map"
               >
                 <PlusCircle className="w-4 h-4 flex-shrink-0" />
-                <span className="hidden 2xl:inline whitespace-nowrap">Post Job</span>
+                <span className="whitespace-nowrap">Post Job</span>
               </button>
             )}
 
@@ -908,27 +908,6 @@ export const Navbar = ({
                 </div>
               )}
             </div>
-
-            {/* 2026 Multi-Aesthetic Theme Engine Switcher */}
-            {onToggleTheme && (() => {
-              const currentThemeInfo = getThemeById(theme);
-              const nextThemeId = getNextTheme(theme);
-              const nextThemeInfo = getThemeById(nextThemeId);
-              return (
-                <button
-                  type="button"
-                  onClick={onToggleTheme}
-                  title={`Active Theme: ${currentThemeInfo.name} • Click to switch to ${nextThemeInfo.name}`}
-                  className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-slate-100/90 hover:bg-slate-200 dark:bg-slate-800/90 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-200 transition-all shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:scale-105 active:scale-95 flex-shrink-0 cursor-pointer"
-                  aria-label="Cycle Themes"
-                >
-                  <span className="text-sm">{currentThemeInfo.icon}</span>
-                  <span className="hidden 2xl:inline text-xs font-bold text-slate-800 dark:text-slate-200">
-                    {currentThemeInfo.label}
-                  </span>
-                </button>
-              );
-            })()}
 
             {/* User Profile Pill or Auth with Hover Tooltip */}
             {user ? (
@@ -1640,29 +1619,6 @@ export const Navbar = ({
                 </button>
               )}
 
-              {/* 2026 Multi-Aesthetic Theme Switcher in Mobile Drawer */}
-              {onToggleTheme && (() => {
-                const currentThemeInfo = getThemeById(theme);
-                const nextThemeId = getNextTheme(theme);
-                const nextThemeInfo = getThemeById(nextThemeId);
-                return (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onToggleTheme();
-                    }}
-                    className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-98 cursor-pointer bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-base">{currentThemeInfo.icon}</span>
-                      <span>Theme: {currentThemeInfo.name}</span>
-                    </div>
-                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-cyan-300">
-                      Next: {nextThemeInfo.label}
-                    </span>
-                  </button>
-                );
-              })()}
 
               {/* Close Menu Button */}
               <button

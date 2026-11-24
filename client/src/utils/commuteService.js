@@ -6,17 +6,23 @@
 
 // Haversine formula to compute great-circle distance in kilometers
 export function calculateDistanceKm(lat1, lon1, lat2, lon2) {
-  if (!lat1 || !lon1 || !lat2 || !lon2) return 5.0; // fallback avg 5km
+  const nLat1 = Number(lat1);
+  const nLon1 = Number(lon1);
+  const nLat2 = Number(lat2);
+  const nLon2 = Number(lon2);
+  if (!Number.isFinite(nLat1) || !Number.isFinite(nLon1) || !Number.isFinite(nLat2) || !Number.isFinite(nLon2)) {
+    return 5.0; // fallback avg 5km
+  }
   const R = 6371; // Radius of the Earth in km
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const dLat = ((nLat2 - nLat1) * Math.PI) / 180;
+  const dLon = ((nLon2 - nLon1) * Math.PI) / 180;
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
+    Math.cos((nLat1 * Math.PI) / 180) *
+      Math.cos((nLat2 * Math.PI) / 180) *
       Math.sin(dLon / 2) *
       Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const c = 2 * Math.atan2(Math.sqrt(Math.max(0, Math.min(1, a))), Math.sqrt(Math.max(0, 1 - a)));
   const straightDist = R * c;
   // Multiply by road tortuosity factor (~1.28 for Indian urban grids)
   return Math.round(straightDist * 1.28 * 10) / 10;
@@ -160,3 +166,21 @@ export function estimateCommuteProfile({ userCoords, jobCoords, userAddress, job
     ]
   };
 }
+
+/**
+ * Calculates net in-hand savings after subtracting monthly commute expenses.
+ */
+export function calculateNetInHand({ grossMonthlySalary, commuteMonthlyCost = 0, taxPercent = 0 }) {
+  const salary = Math.max(0, Number(grossMonthlySalary) || 0);
+  const commute = Math.max(0, Number(commuteMonthlyCost) || 0);
+  const tax = Math.max(0, Math.min(50, Number(taxPercent) || 0));
+  const afterTax = salary * (1 - tax / 100);
+  const net = Math.max(0, Math.round(afterTax - commute));
+  const savingsRate = salary > 0 ? Math.round((net / salary) * 100) : 0;
+  return {
+    netInHand: net,
+    commuteExpense: commute,
+    savingsRatePercent: savingsRate
+  };
+}
+

@@ -65,6 +65,17 @@ export const IssueOfferModal = ({ application, isOpen, onClose, onSuccess }) => 
       return;
     }
 
+    const cleanSalary = (salary || '').trim();
+    if (cleanSalary.length < 2) {
+      setError('कृपया वैध वेतन / CTC दर्ज करें (जैसे ₹12,00,000 / yr)');
+      return;
+    }
+    const cleanDesignation = (designation || '').trim();
+    if (cleanDesignation.length < 2) {
+      setError('कृपया पदनाम (Designation) दर्ज करें');
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch(`/api/applications/${application.id}/offer`, {

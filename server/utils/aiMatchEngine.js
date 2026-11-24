@@ -52,6 +52,8 @@ export function normalizeSkill(raw) {
   return String(raw)
     .toLowerCase()
     .trim()
+    .replace(/c#/g, 'csharp')
+    .replace(/c\+\+/g, 'cpp')
     .replace(/[#\-_.]/g, '')
     .replace(/\s+/g, '');
 }
@@ -60,12 +62,24 @@ export function isSkillMatch(candidateSkill, jobSkill) {
   const normCand = normalizeSkill(candidateSkill);
   const normJob = normalizeSkill(jobSkill);
 
+  if (!normCand || !normJob) return false;
   if (normCand === normJob) return true;
-  if (normCand.includes(normJob) || normJob.includes(normCand)) return true;
 
+  // Substring match only if both tokens are at least 3 chars long (e.g. 'react' in 'reactjs', avoids single/two-letter false positives like 'c', 'go', 'js')
+  if (normJob.length >= 3 && normCand.length >= 3) {
+    if (normCand.includes(normJob) || normJob.includes(normCand)) return true;
+  }
+
+  // Search taxonomy families
   for (const family of Object.values(SKILL_TAXONOMY)) {
-    const hasCand = family.some(f => normalizeSkill(f) === normCand || normCand.includes(normalizeSkill(f)));
-    const hasJob = family.some(f => normalizeSkill(f) === normJob || normJob.includes(normalizeSkill(f)));
+    const hasCand = family.some(f => {
+      const nf = normalizeSkill(f);
+      return nf === normCand || (nf.length >= 3 && normCand.length >= 3 && normCand.includes(nf));
+    });
+    const hasJob = family.some(f => {
+      const nf = normalizeSkill(f);
+      return nf === normJob || (nf.length >= 3 && normJob.length >= 3 && normJob.includes(nf));
+    });
     if (hasCand && hasJob) return true;
   }
 

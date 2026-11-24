@@ -2,6 +2,7 @@ import { db } from '../db.js';
 import { AppError } from '../utils/AppError.js';
 import { sendOfferLetterEmail, sendOfferAcceptedEmail } from '../email.js';
 import { dispatchCandidateAlert } from '../alerts.js';
+import { isValidEmail, sanitizeString } from '../utils/validator.js';
 
 export const applicationController = {
   // Apply for a job (Seeker only)
@@ -188,6 +189,10 @@ export const applicationController = {
       }
       if (app.employerId !== req.user.id) {
         throw AppError.forbidden('You can only issue offers for your own job candidates');
+      }
+
+      if (candidateEmail && !isValidEmail(String(candidateEmail).trim())) {
+        throw AppError.badRequest('Please provide a valid candidate email address');
       }
 
       const seeker = db.findUserById(app.seekerId);

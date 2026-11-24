@@ -43,9 +43,9 @@ export const SmartCommuteModal = ({
   // Extract gross monthly salary from job.salary
   const parseMonthlySalary = (salaryStr) => {
     if (!salaryStr) return 50000;
-    const digits = salaryStr.replace(/[^0-9]/g, '');
+    const digits = String(salaryStr).replace(/[^0-9]/g, '');
     const num = parseInt(digits, 10);
-    if (!num) return 50000;
+    if (!num || isNaN(num)) return 50000;
     if (num < 150) {
       return Math.round((num * 100000) / 12);
     }

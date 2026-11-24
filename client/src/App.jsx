@@ -120,10 +120,10 @@ function MainApp() {
       const saved = localStorage.getItem('jobscout_theme');
       if (saved) return saved;
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        return 'obsidian';
+        return 'ceramic';
       }
     }
-    return 'obsidian';
+    return 'ceramic';
   });
 
   useEffect(() => {

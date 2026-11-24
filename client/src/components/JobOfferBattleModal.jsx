@@ -44,23 +44,33 @@ export const JobOfferBattleModal = ({
     joiningBonus: 200000
   });
 
-  // Calculate Net Annual Value Score
-  // Annual in-hand + bonus - estimated annual commute cost (fuel/time value)
-  const annualCommuteHoursA = (5 - offerA.wfhDays) * (offerA.commuteMins * 2 / 60) * 48;
-  const annualCommuteHoursB = (5 - offerB.wfhDays) * (offerB.commuteMins * 2 / 60) * 48;
+  // Calculate Net Annual Value Score with defensive NaN protections
+  const monthlyInHandA = Number(offerA.monthlyInHand) || 0;
+  const monthlyInHandB = Number(offerB.monthlyInHand) || 0;
+  const bonusA = Number(offerA.joiningBonus) || 0;
+  const bonusB = Number(offerB.joiningBonus) || 0;
+  const wfhA = Math.max(0, Math.min(5, Number(offerA.wfhDays) || 0));
+  const wfhB = Math.max(0, Math.min(5, Number(offerB.wfhDays) || 0));
+  const commuteA = Math.max(0, Number(offerA.commuteMins) || 0);
+  const commuteB = Math.max(0, Number(offerB.commuteMins) || 0);
+  const insuranceA = Math.max(0, Number(offerA.medicalInsuranceLakhs) || 0);
+  const insuranceB = Math.max(0, Number(offerB.medicalInsuranceLakhs) || 0);
+
+  const annualCommuteHoursA = (5 - wfhA) * (commuteA * 2 / 60) * 48;
+  const annualCommuteHoursB = (5 - wfhB) * (commuteB * 2 / 60) * 48;
 
   const scoreA = Math.round(
-    (offerA.monthlyInHand * 12 + offerA.joiningBonus) / 100000 - 
+    (monthlyInHandA * 12 + bonusA) / 100000 - 
     annualCommuteHoursA * 0.4 + 
-    offerA.wfhDays * 4 + 
-    offerA.medicalInsuranceLakhs * 0.5
+    wfhA * 4 + 
+    insuranceA * 0.5
   );
 
   const scoreB = Math.round(
-    (offerB.monthlyInHand * 12 + offerB.joiningBonus) / 100000 - 
+    (monthlyInHandB * 12 + bonusB) / 100000 - 
     annualCommuteHoursB * 0.4 + 
-    offerB.wfhDays * 4 + 
-    offerB.medicalInsuranceLakhs * 0.5
+    wfhB * 4 + 
+    insuranceB * 0.5
   );
 
   const winner = scoreB >= scoreA ? 'B' : 'A';

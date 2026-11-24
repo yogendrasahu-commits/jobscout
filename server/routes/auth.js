@@ -5,6 +5,7 @@ import { db } from '../db.js';
 import { verifyEmailConfig, sendTestEmail } from '../email.js';
 import { rateLimiter, parseCookies } from '../middleware/security.js';
 import { extractSkillsFromResume } from '../utils/aiMatchEngine.js';
+import { isValidEmail, isValidIndianPhone, cleanPhone, sanitizeSkills, sanitizeString } from '../utils/validator.js';
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'jobradar_secret_jwt_key_2026';
@@ -20,17 +21,6 @@ const authRateLimiter = rateLimiter({
 
 // In-memory OTP storage: phone (last 10 digits) -> { otp, expiresAt }
 const otpStore = new Map();
-
-// Helper to clean phone number to last 10 digits
-function cleanPhone(phone) {
-  if (!phone) return '';
-  return String(phone).replace(/[^0-9]/g, '').slice(-10);
-}
-
-// Helper to validate Indian mobile number (10 digits starting with 6-9)
-function isValidIndianPhone(cleaned) {
-  return /^[6-9]\d{9}$/.test(cleaned);
-}
 
 // Helper to validate coordinates within India bounds
 function sanitizeCoords(lat, lng) {
@@ -407,7 +397,7 @@ router.post('/register-phone', authRateLimiter, async (req, res) => {
 // -------------------------------------------------------------
 
 // Email Register
-router.post('/register', authRateLimiter, async (req, res) => {
+router.post(['/register', '/register-email'], authRateLimiter, async (req, res) => {
   try {
     const { name, email, password, role, companyName, title, skills, phone, otp, lat, lng, address } = req.body;
 
@@ -583,13 +573,13 @@ router.put(['/profile', '/profile/:id'], authenticateToken, (req, res) => {
   const user = db.findUserById(req.user.id);
   if (!user) return res.status(404).json({ error: 'User not found' });
 
-  const { email, name, title, bio, skills, experience, expectedSalary, availability, companyName, website, industry, address, avatar } = req.body;
+  const { email, phone, name, title, bio, skills, experience, expectedSalary, availability, companyName, website, industry, address, avatar } = req.body;
 
   const updates = { isProfileComplete: true };
 
   if (email !== undefined) {
-    const trimmedEmail = String(email).trim().toLowerCase();
-    if (trimmedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+    const trimmedEmail = sanitizeString(email, 150).toLowerCase();
+    if (trimmedEmail && !isValidEmail(trimmedEmail)) {
       return res.status(400).json({ error: 'Please enter a valid email address (e.g. name@example.com)' });
     }
     // Check if another user already has this email
@@ -602,22 +592,36 @@ router.put(['/profile', '/profile/:id'], authenticateToken, (req, res) => {
     updates.email = trimmedEmail;
   }
 
-  if (name && String(name).trim().length >= 2) {
-    updates.name = String(name).trim();
+  if (phone !== undefined) {
+    const cleaned = cleanPhone(phone);
+    if (cleaned && !isValidIndianPhone(cleaned)) {
+      return res.status(400).json({ error: 'Please enter a valid 10-digit Indian phone number' });
+    }
+    if (cleaned) {
+      updates.phone = `+91 ${cleaned}`;
+    }
   }
-  if (title !== undefined) updates.title = String(title).trim();
-  if (bio !== undefined) updates.bio = String(bio).trim();
+
+  if (name !== undefined) {
+    const cleanName = sanitizeString(name, 100);
+    if (cleanName.length < 2) {
+      return res.status(400).json({ error: 'Name must be at least 2 characters long' });
+    }
+    updates.name = cleanName;
+  }
+  if (title !== undefined) updates.title = sanitizeString(title, 100);
+  if (bio !== undefined) updates.bio = sanitizeString(bio, 2000);
   if (skills !== undefined) {
-    updates.skills = Array.isArray(skills) ? skills : String(skills).split(',').map(s => s.trim()).filter(Boolean);
+    updates.skills = sanitizeSkills(skills, 40, 50);
   }
-  if (experience !== undefined) updates.experience = String(experience).trim();
-  if (expectedSalary !== undefined) updates.expectedSalary = String(expectedSalary).trim();
-  if (availability !== undefined) updates.availability = String(availability).trim();
-  if (companyName !== undefined) updates.companyName = String(companyName).trim();
-  if (website !== undefined) updates.website = String(website).trim();
-  if (industry !== undefined) updates.industry = String(industry).trim();
-  if (address !== undefined) updates.address = String(address).trim();
-  if (avatar !== undefined) updates.avatar = String(avatar).trim();
+  if (experience !== undefined) updates.experience = sanitizeString(experience, 60);
+  if (expectedSalary !== undefined) updates.expectedSalary = sanitizeString(expectedSalary, 60);
+  if (availability !== undefined) updates.availability = sanitizeString(availability, 60);
+  if (companyName !== undefined) updates.companyName = sanitizeString(companyName, 100);
+  if (website !== undefined) updates.website = sanitizeString(website, 200);
+  if (industry !== undefined) updates.industry = sanitizeString(industry, 100);
+  if (address !== undefined) updates.address = sanitizeString(address, 250);
+  if (avatar !== undefined) updates.avatar = sanitizeString(avatar, 300);
 
   const updated = db.updateUser(req.user.id, updates);
   if (!updated) {

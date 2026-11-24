@@ -453,6 +453,7 @@ export const ChatDrawer = ({ onOpenFullPageChat, currentTab }) => {
             <input
               type="text"
               value={inputText}
+              maxLength={2000}
               onChange={(e) => setInputText(e.target.value)}
               placeholder={`Message ${activeChatUser?.name ? activeChatUser.name.split(' ')[0] : 'User'}...`}
               className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 transition-colors"

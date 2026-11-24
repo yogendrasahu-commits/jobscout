@@ -1,6 +1,7 @@
 import { db } from '../db.js';
 import { AppError } from '../utils/AppError.js';
 import { calculateAIMatch } from '../utils/aiMatchEngine.js';
+import { sanitizeSkills, sanitizeString } from '../utils/validator.js';
 
 // Haversine distance in kilometers
 function getDistanceKm(lat1, lon1, lat2, lon2) {
@@ -128,16 +129,16 @@ export const jobController = {
       const newJob = db.createJob({
         employerId: req.user.id,
         employerName: req.user.name,
-        company: company && String(company).trim() ? String(company).trim() : req.user.name,
+        company: company && String(company).trim() ? sanitizeString(company, 150) : req.user.name,
         title: trimmedTitle,
-        description: description ? String(description).trim() : '',
+        description: description ? sanitizeString(description, 5000) : '',
         category: category || 'General',
         jobType: jobType || 'Full-time',
         salary: trimmedSalary,
         lat: nLat,
         lng: nLng,
-        address: address && String(address).trim() ? String(address).trim() : 'Mumbai, India',
-        skills: Array.isArray(skills) ? skills.filter(Boolean) : (skills ? String(skills).split(',').map(s => s.trim()).filter(Boolean) : []),
+        address: address && String(address).trim() ? sanitizeString(address, 250) : 'Mumbai, India',
+        skills: sanitizeSkills(skills, 30, 40),
         urgent: Boolean(urgent)
       });
 
