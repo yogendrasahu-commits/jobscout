@@ -447,7 +447,7 @@ export const Feed = ({
         {/* ========================================================== */}
         {/* CENTER COLUMN: CREATE POST + FEED POSTS */}
         {/* ========================================================== */}
-        <div className="lg:col-span-6 space-y-5">
+        <div className="w-full col-span-1 lg:col-span-6 min-w-0 space-y-5">
           
           {/* Start a Post Input Box */}
           <div className="bg-white/90 backdrop-blur-xl border border-slate-200/80 rounded-3xl p-5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)]">

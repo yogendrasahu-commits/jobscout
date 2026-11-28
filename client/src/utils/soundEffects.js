@@ -36,22 +36,23 @@ if (typeof window !== 'undefined') {
 // Ringtone controller
 let ringtoneInterval = null;
 
-const triggerHapticVibrate = () => {
-  if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
-    try {
-      navigator.vibrate([350, 150, 350, 150, 600]);
-    } catch (e) {
-      // Ignore vibration error if blocked by browser policy
+const safeVibrate = (pattern) => {
+  try {
+    if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+      if (typeof navigator.userActivation !== 'undefined' && !navigator.userActivation.hasBeenActive) {
+        return;
+      }
+      navigator.vibrate(pattern);
     }
-  }
+  } catch (e) {}
+};
+
+const triggerHapticVibrate = () => {
+  safeVibrate([350, 150, 350, 150, 600]);
 };
 
 const stopHapticVibrate = () => {
-  if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
-    try {
-      navigator.vibrate(0);
-    } catch (e) {}
-  }
+  safeVibrate(0);
 };
 
 export const playRingtone = () => {

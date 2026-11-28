@@ -391,7 +391,7 @@ export const Navbar = ({
                     setSearchFocused(true);
                   }}
                   onFocus={() => setSearchFocused(true)}
-                  className="w-28 md:w-36 lg:w-44 xl:w-52 2xl:w-60 bg-slate-100/70 hover:bg-slate-100 dark:bg-slate-900/70 dark:hover:bg-slate-900 border border-slate-200/70 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700 rounded-full pl-8 pr-16 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-all"
+                  className="w-36 sm:w-40 md:w-44 lg:w-48 xl:w-48 flex-shrink-0 bg-slate-100/70 hover:bg-slate-100 dark:bg-slate-900/70 dark:hover:bg-slate-900 border border-slate-200/70 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700 rounded-full pl-8 pr-16 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-all"
                   title="Search Jobs, Companies, Candidates"
                 />
 
@@ -587,13 +587,13 @@ export const Navbar = ({
           {/* ========================================================== */}
           {/* 2. LAPTOP & DESKTOP NAVIGATION TABS (Centered in Header) */}
           {/* ========================================================== */}
-          <div className="hidden lg:flex justify-center items-center flex-1 min-w-0 mx-2 lg:mx-3 xl:mx-4">
-            <nav className="flex items-center gap-0.5 lg:gap-1 bg-slate-100/80 dark:bg-slate-900/80 backdrop-blur-md p-1 rounded-full border border-slate-200/80 dark:border-slate-800 shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)] flex-nowrap">
+          <div className="hidden lg:flex justify-center items-center flex-1 min-w-0 mx-1 lg:mx-1.5 xl:mx-2">
+            <nav className="flex items-center gap-0.5 bg-slate-100/80 dark:bg-slate-900/80 backdrop-blur-md p-1 rounded-full border border-slate-200/80 dark:border-slate-800 shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)] flex-nowrap">
               
               {/* 1. Feed (Home) */}
               <button
                 onClick={() => setCurrentTab('feed')}
-                className={`flex items-center gap-1.5 px-2.5 xl:px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                className={`flex items-center gap-1 px-2 xl:px-2.5 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'feed'
                     ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 dark:ring-white/10 font-extrabold'
                     : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-800/80 font-bold'
@@ -607,7 +607,7 @@ export const Navbar = ({
               {/* 2. Network */}
               <button
                 onClick={() => setCurrentTab('network')}
-                className={`flex items-center gap-1.5 px-2 xl:px-3 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                className={`flex items-center gap-1 px-1.5 xl:px-2 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'network'
                     ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 dark:ring-white/10 font-extrabold'
                     : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-800/80 font-bold'
@@ -621,7 +621,7 @@ export const Navbar = ({
               {/* 3. Live Map */}
               <button
                 onClick={() => setCurrentTab('map')}
-                className={`flex items-center gap-1.5 px-2 xl:px-3 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                className={`flex items-center gap-1 px-1.5 xl:px-2 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'map'
                     ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 dark:ring-white/10 font-extrabold'
                     : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-800/80 font-bold'
@@ -636,7 +636,7 @@ export const Navbar = ({
               {/* 4. Jobs & Applied */}
               <button
                 onClick={() => setCurrentTab('jobs')}
-                className={`flex items-center gap-1.5 px-2 xl:px-3 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                className={`flex items-center gap-1 px-1.5 xl:px-2 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'jobs' || currentTab === 'applications'
                     ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 dark:ring-white/10 font-extrabold'
                     : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-800/80 font-bold'
@@ -656,7 +656,7 @@ export const Navbar = ({
               {user?.role !== 'admin' && (
                 <button
                   onClick={() => setCurrentTab('connect')}
-                  className={`flex items-center gap-1.5 px-2 xl:px-3 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                  className={`flex items-center gap-1 px-1.5 xl:px-2 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                     currentTab === 'connect'
                       ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 dark:ring-white/10 font-extrabold'
                       : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-800/80 font-bold'
@@ -671,7 +671,7 @@ export const Navbar = ({
               {/* 6. Anonymous Discussions (Desktop & Laptop) */}
               <button
                 onClick={() => setCurrentTab('anon')}
-                className={`flex items-center gap-1.5 px-2 xl:px-3 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                className={`flex items-center gap-1 px-1.5 xl:px-2 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'anon'
                     ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 dark:ring-white/10 font-extrabold'
                     : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-800/80 font-bold'
@@ -694,7 +694,7 @@ export const Navbar = ({
                     setCurrentTab('messages');
                   }
                 }}
-                className={`flex items-center gap-1.5 px-2 xl:px-3 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                className={`flex items-center gap-1 px-1.5 xl:px-2 py-1.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                   currentTab === 'messages'
                     ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-900/10 dark:ring-white/10 font-extrabold'
                     : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-800/80 font-bold'
@@ -731,7 +731,7 @@ export const Navbar = ({
           {/* ========================================================== */}
           {/* 3. RIGHT CONTROLS: MOBILE SEARCH, POST JOB, BELL, PROFILE, HAMBURGER */}
           {/* ========================================================== */}
-          <div className="flex items-center gap-1.5 sm:gap-2 justify-end flex-shrink-0 ml-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 justify-end flex-shrink-0 ml-1 sm:ml-2">
             
             {/* Mobile Search Toggle Button (Phone Only) */}
             <div className="md:hidden relative" ref={mobileSearchRef}>
@@ -814,7 +814,7 @@ export const Navbar = ({
             {user && isEmployer && (
               <button
                 onClick={onOpenPostJob}
-                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 text-white shadow-md shadow-emerald-600/20 border border-emerald-500/30 transition-all active:scale-95 flex-shrink-0 cursor-pointer"
+                className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 text-white shadow-md shadow-emerald-600/20 border border-emerald-500/30 transition-all active:scale-95 flex-shrink-0 cursor-pointer"
                 title="Post a New Job on Map"
               >
                 <PlusCircle className="w-4 h-4 flex-shrink-0" />
@@ -1123,7 +1123,7 @@ export const Navbar = ({
               <button
                 type="button"
                 onClick={() => setMobileDrawerOpen(!mobileDrawerOpen)}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl border transition-all active:scale-95 cursor-pointer ${
+                className={`lg:hidden flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl border transition-all active:scale-95 cursor-pointer ${
                   mobileDrawerOpen 
                     ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white border-indigo-500 shadow-md shadow-indigo-600/30' 
                     : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700 shadow-xs'
